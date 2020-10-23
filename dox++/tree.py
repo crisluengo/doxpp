@@ -16,90 +16,42 @@
 # this program; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from .clang import cindex
 import tempfile
 import functools
 
 from .defdict import Defdict
-
 from . import comment
 from . import nodes
-from . import includepaths
-from . import documentmerger
-
+from . import libclang
 from . import example
-from . import utf8
 from . import log
 
-from .cmp import cmp
+import os, sys, re, glob, shlex
 
-import os, sys, re, glob, platform
+cindex = libclang.load_libclang()
 
-from ctypes.util import find_library
-
-if platform.system() == 'Darwin':
-    libclangs = [
-        '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib',
-        '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
-    ]
-
-    found = False
-
-    for libclang in libclangs:
-        if os.path.exists(libclang):
-            cindex.Config.set_library_path(os.path.dirname(libclang))
-            found = True
-            break
-
-    if not found:
-        lname = find_library("clang")
-
-        if not lname is None:
-            cindex.Config.set_library_file(lname)
-else:
-    versions = [None, '7.0', '6.0', '5.0', '4.0', '3.9', '3.8', '3.7', '3.6', '3.5', '3.4', '3.3', '3.2']
-
-    for v in versions:
-        name = 'clang'
-
-        if not v is None:
-            name += '-' + v
-
-        lname = find_library(name)
-
-        if not lname is None:
-            cindex.Config.set_library_file(lname)
-            break
-
-testconf = cindex.Config()
-
-try:
-    testconf.get_cindex_library()
-except cindex.LibclangError as e:
-    sys.stderr.write("\nFatal: Failed to locate libclang library. dox++ depends on libclang for parsing sources, please make sure you have libclang installed.\n" + str(e) + "\n\n")
-    sys.exit(1)
-
-class Tree(documentmerger.DocumentMerger):
-    def __init__(self, files, flags):
+class Tree():
+    def __init__(self, root, files, additional_files, flags, include_dirs):
+        """
+        :param root: The root directory for the header files, that you would pass to the compiler with `-I` when using the library
+        :param files: header files (with wildcards and path relative to working directory), space separated
+        :param additional_files: Markdown files (with wildcards and path relative to working directory), space separated
+        :param flags: flags to pass to the compiler
+        :param include_dirs: include directories to pass to the compiler
+        """
         self.processed = {}
-        self.files, ok = self.expand_sources([os.path.realpath(f) for f in files])
-        
-        if not ok:
-            sys.exit(1)
-
-        self.flags = includepaths.flags(flags)
-
-        # Sort files on sources, then headers
-        self.files.sort(key=functools.cmp_to_key(lambda a, b: cmp(self.is_header(a), self.is_header(b))))
-
+        self.root = self.expand_sources(root)
+        self.files = self.expand_sources(files)
+        self.additional_files = additional_files
+        self.flags = libclang.flags(flags)
+        self.flags += ['-I{0}'.format(x) for x in shlex.split(include_dirs, posix=False)]
         self.processing = {}
         self.kindmap = {}
 
         # Things to skip
-        self.kindmap[cindex.CursorKind.USING_DIRECTIVE] = None
+        #self.kindmap[cindex.CursorKind.USING_DIRECTIVE] = None  # TODO: What is this?
 
-        # Create a map from CursorKind to classes representing those cursor
-        # kinds.
+        # Create a map from CursorKind to classes representing those cursor kinds.
         for cls in nodes.Node.subclasses():
             if hasattr(cls, 'kind'):
                 self.kindmap[cls.kind] = cls
@@ -120,31 +72,15 @@ class Tree(documentmerger.DocumentMerger):
         self.qid_to_node[None] = self.root
         self.usr_to_node[None] = self.root
 
-    def filter_source(self, path):
-        return path.endswith('.c') or path.endswith('.cpp') or path.endswith('.h') or path.endswith('.cc') or path.endswith('.hh') or path.endswith('.hpp')
-
-    def expand_sources(self, sources, filter=None):
+    def expand_sources(self, sources):
         ret = []
-        ok = True
-
         for source in sources:
-            if not filter is None and not filter(source):
-                continue
-
-            if os.path.isdir(source):
-                retdir, okdir = self.expand_sources([os.path.join(source, x) for x in os.listdir(source)], self.filter_source)
-
-                if not okdir:
-                    ok = False
-
-                ret += retdir
-            elif not os.path.exists(source):
-                sys.stderr.write("The specified source `" + source + "` could not be found\n")
-                ok = False
+            source = os.path.realpath(source)
+            if ('*' in source) or ('?' in source):
+                ret.extend(glob.glob(source))
             else:
                 ret.append(source)
-
-        return (ret, ok)
+        return ret
 
     def is_header(self, filename):
         return filename.endswith('.hh') or filename.endswith('.hpp') or filename.endswith('.h')

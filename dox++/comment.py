@@ -15,10 +15,7 @@
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from .clang import cindex
-from .defdict import Defdict
-
 from .struct import Struct
-from . import utf8
 
 import os, re, sys, bisect
 

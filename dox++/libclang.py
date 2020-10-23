@@ -14,7 +14,8 @@
 # this program; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import os, subprocess, sys
+import os, subprocess, sys, platform
+from .clang import cindex
 
 def flags(f):
     devnull = open(os.devnull)
@@ -26,12 +27,9 @@ def flags(f):
                              stderr=subprocess.PIPE)
     except OSError as e:
         sys.stderr.write("\nFatal: Failed to run clang++ to obtain system include headers, please install clang++ to use dox++\n")
-
         message = str(e)
-
         if message:
             sys.stderr.write("  Error message: " + message + "\n")
-
         sys.stderr.write("\n")
         sys.exit(1)
 
@@ -43,19 +41,53 @@ def flags(f):
 
     for line in lines:
         line = line.decode('UTF-8')
-
         if line.startswith('#include <...>'):
             init = True
         elif line.startswith('End of search list.'):
             init = False
         elif init:
             p = line.strip()
-
             suffix = ' (framework directory)'
-
             if p.endswith(suffix):
                 p = p[:-len(suffix)]
-
             paths.append(p)
             
     return ['-I{0}'.format(x) for x in paths] + f
+
+def load_libclang():
+    from ctypes.util import find_library
+
+    if platform.system() == 'Darwin':
+        libclangs = [
+            '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib',
+            '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
+        ]
+        found = False
+        for libclang in libclangs:
+            if os.path.exists(libclang):
+                cindex.Config.set_library_path(os.path.dirname(libclang))
+                found = True
+                break
+        if not found:
+            lname = find_library("clang")
+            if not lname is None:
+                cindex.Config.set_library_file(lname)
+    else:
+        versions = [None, '7.0', '6.0', '5.0', '4.0', '3.9', '3.8', '3.7', '3.6', '3.5', '3.4', '3.3', '3.2']
+        for v in versions:
+            name = 'clang'
+            if not v is None:
+                name += '-' + v
+            lname = find_library(name)
+            if not lname is None:
+                cindex.Config.set_library_file(lname)
+                break
+
+    testconf = cindex.Config()
+    try:
+        testconf.get_cindex_library()
+    except cindex.LibclangError as e:
+        sys.stderr.write("\nFatal: Failed to locate libclang library. dox++ depends on libclang for parsing sources, please make sure you have libclang installed.\n" + str(e) + "\n\n")
+        sys.exit(1)
+
+    return cindex

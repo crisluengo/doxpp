@@ -20,9 +20,6 @@ from ..clang import cindex
 from ..comment import Comment
 from ..comment import Parser
 
-from .. import utf8
-from ..cmp import cmp
-
 import re
 
 class Node(object):
