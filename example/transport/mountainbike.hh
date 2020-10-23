@@ -3,9 +3,11 @@
 
 #include <transport/bicycle.hh>
 
+/// \file Defines the `MountainBike` class
+
 namespace transport
 {
-	/* Mountain bike implementation of a <Bicycle>.
+	/** Mountain bike implementation of a <Bicycle>.
 	 *
 	 * MountainBike is an implementation of a <Bicycle>
 	 * providing a bike for cycling on rough terrain. Mountain bikes
@@ -17,7 +19,7 @@ namespace transport
 	class MountainBike : public Bicycle
 	{
 	public:
-		/* Set suspension stiffness.
+		/** Set suspension stiffness.
 		 * @stiffness the suspension stiffness.
 		 *
 		 * SetSuspension changes the stiffness of the suspension
@@ -29,7 +31,7 @@ namespace transport
 		 */
 		bool SetSuspension(double stiffness);
 
-		/* Change the break type.
+		/** Change the break type.
 		 * @BreakType the break type.
 		 * @breakType the type of the break.
 		 *

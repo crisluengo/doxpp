@@ -72,6 +72,7 @@ def process_command(comment, status):
     cmd, comment = split_string(comment)
     if len(cmd) > 1 and (cmd[0] == '\\' or cmd[0] == '@'):
         cmd = cmd[1:]
+
         # Grouping commands: this works differently than in Doxygen.
         # \defgroup defines a group, subsequent definitions fall within the group
         # \addtogroup makes subsequent definitions fall within the group, but doesn't provide
@@ -127,9 +128,11 @@ def process_command(comment, status):
             name, comment = split_string(comment, '\n')
             # TODO: do we search for
 
+            return False
 
+        return True
 
-
+    return False
 
 def extract_comment(token):
     prelen = token.extent.start.column - 1
@@ -181,14 +184,18 @@ def extract_loop(iter, status):
             # Previous comment not associated with a declaration. Let's parse it
             # and take an action on it.
             comments = comments.strip('\n')
-            process_command(comments, status)
-            # Reset
-            comments = []
+            if process_command(comments, status):
+                # Reset and continue reading comments
+                comments = ''
         if not comment is None:
             comments += comment
         prev = token
         token = next(iter)
+
+    # Let's see if this comment block is a command or not
     comments = comments.strip('\n')
+    if (process_command(comments, status)):
+        return
 
     # Get token that comes after, and prepare member data
     if len(comments) > 0:
@@ -216,16 +223,18 @@ def extract_markdown(f, status):
 
 def buildtree(root_dir, input_files, additional_files, compiler_flags, include_dirs):
     """
-    :param root_dir: The root directory for the header files, that you would pass to the compiler with `-I` when using the library
-    :param input_files: header files (with wildcards and path relative to working directory), space separated
-    :param additional_files: Markdown files (with wildcards and path relative to working directory), space separated
-    :param compiler_flags: flags to pass to the compiler
-    :param include_dirs: include directories to pass to the compiler
+    :param root_dir: The root directory for the header files, that you would pass to the compiler with `-I` when using the library (string)
+    :param input_files: header files (with wildcards and path relative to working directory), space separated (string)
+    :param additional_files: Markdown files (with wildcards and path relative to working directory), space separated (string)
+    :param compiler_flags: flags to pass to the compiler (string)
+    :param include_dirs: include directories to pass to the compiler (string)
     """
-    input_files = expand_sources(input_files)
-    additional_files = expand_sources(additional_files)
-    compiler_flags = libclang.flags(compiler_flags)
+    input_files = expand_sources(shlex.split(input_files))
+    additional_files = expand_sources(shlex.split(additional_files))
+    compiler_flags = libclang.flags(compiler_flags.split())
     compiler_flags += ['-I{0}'.format(x) for x in shlex.split(include_dirs, posix=False)]
+
+    log.debug("Compiler flags: %s", ' '.join(compiler_flags))
 
     # Create a map from CursorKind to classes representing those cursor kinds.
     #kindmap = {}
@@ -275,7 +284,16 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
         status['files'][file_id] = status['data']['headers'][-1]
 
         # Parse the file
-        tu = index.parse(f, compiler_flags)
+        tu = None
+        try:
+            tu = index.parse(f, compiler_flags)
+        except cindex.TranslationUnitLoadError as e:
+            log.error("Could not parse file %s", f)
+            log.error(str(e))
+            exit(1)
+        if not tu:
+            log.error("Could not parse file %s", f)
+            exit(1)
         if len(tu.diagnostics) != 0:
             fatal = False
             for d in tu.diagnostics:
@@ -288,10 +306,7 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
                     log.warning(d.format())
             if fatal:
                 log.error("Could not generate documentation due to parser errors")
-                sys.exit(1)
-        if not tu:
-            log.error("Could not parse file %s", f)
-            sys.exit(1)
+                exit(1)
 
         # Extract comments from file
         extract_documentation(f, tu, status)

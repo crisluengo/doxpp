@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 # Copyright 2013-2018, Jesse van den Kieboom
 # Copyright 2020, Cris Luengo
 #
@@ -15,9 +17,8 @@
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import argparse, configparser
-from . import log
-from . import buildtree
 import json
+import doxpp
 
 def generate_config_file(filename):
     config = configparser.ConfigParser()
@@ -35,43 +36,41 @@ def generate_config_file(filename):
         'include directories': '',  # make these space-separated
     }
     with open(filename, 'w') as configfile:
-        configfile.write('# Default dox++ configuration file')
+        configfile.write('# Default dox++ configuration file\n')
         config.write(configfile)
 
-def run():
-    parser = argparse.ArgumentParser(description='Clang based documentation generator.', usage='%(prog)s [options] [config file]')
-    parser.add_argument('-g', default=False, action='generate', const=True, help='generate a default configuration file')
-    parser.add_argument('config_file', nargs=1, default='dox++config', help='name of the configuration file')
-    args = parser.parse_args()
+# Main
 
-    # Generate configuration file if requested, then quit
-    if args.generate:
-        generate_config_file(args.config_file)
-        return
+parser = argparse.ArgumentParser(description='Clang based documentation generator.')
+parser.add_argument('-g', action='store_true', help='generate a default configuration file')
+parser.add_argument('config_file', nargs='?', default='dox++config', help='name of the configuration file')
+args = parser.parse_args()
 
-    # Read configuration file, ensure all sections are present
-    config = configparser.ConfigParser()
-    config.read(args.config_file)
-    if not 'input' in config:
-        config['input'] = {}
-    if not 'output' in config:
-        config['output'] = {}
-    if not 'clang' in config:
-        config['clang'] = {}
+# Generate configuration file if requested, then quit
+if args.g:
+    generate_config_file(args.config_file)
+    exit(0)
 
-    log.setLevel(config['output'].get('log level', 'warning'))  # the default value
+# Read configuration file, ensure all sections are present
+config = configparser.ConfigParser()
+config.read(args.config_file)
+if not 'input' in config:
+    config['input'] = {}
+if not 'output' in config:
+    config['output'] = {}
+if not 'clang' in config:
+    config['clang'] = {}
 
-    data = buildtree.buildtree(
-        config['input'].get('root directory', ''),
-        config['input'].get('header files', ''),
-        config['input'].get('markdown files', ''),
-        config['clang'].get('compiler flags', ''),
-        config['clang'].get('include directories', '')
-    )
+doxpp.log.setLevel(config['output'].get('log level', 'warning'))  # the default value
 
-    filename = config['output'].get('filename', 'dox++out.json')
-    with open(filename, 'w') as outputfile:
-        outputfile.write(json.dumps(data))
+data = doxpp.buildtree.buildtree(
+    config['input'].get('root directory', ''),
+    config['input'].get('header files', ''),
+    config['input'].get('markdown files', ''),
+    config['clang'].get('compiler flags', ''),
+    config['clang'].get('include directories', '')
+)
 
-if __name__ == '__main__':
-    run()
+filename = config['output'].get('filename', 'dox++out.json')
+with open(filename, 'w') as outputfile:
+    outputfile.write(json.dumps(data))

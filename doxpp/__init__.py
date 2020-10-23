@@ -1,3 +1,4 @@
+# Copyright 2013-2018, Jesse van den Kieboom
 # Copyright 2020, Cris Luengo
 #
 # This file is part of dox++.  dox++ is free software: you can
@@ -13,7 +14,5 @@
 # this program; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import urllib.parse
-
-def header(name):
-    return name.replace('/','__')
+from . import log
+from . import buildtree

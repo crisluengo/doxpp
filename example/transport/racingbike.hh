@@ -3,9 +3,11 @@
 
 #include <transport/bicycle.hh>
 
+/// \file Defines the `RacingBike` class
+
 namespace transport
 {
-	/* Racing bike class.
+	/** Racing bike class.
 	 *
 	 * RacingBike is a special kind of bike which can go much faster
 	 * on the road, with much less effort (even uphill!). It doesn't make
@@ -14,10 +16,10 @@ namespace transport
 	class RacingBike : public Bicycle
 	{
 	public:
-		/* @inherit */
+		/** @inherit */
 		virtual void PedalHarder();
 
-		/* RingBell is not implemented. */
+		/** RingBell is not implemented. */
 		virtual void RingBell();
 	};
 }

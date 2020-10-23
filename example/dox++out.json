@@ -1,0 +1,36 @@
+{
+  "index": "",
+  "members": [],
+  "headers": [
+    {
+      "id": "transport%2Fbicycle.hh",
+      "name": "transport/bicycle.hh",
+      "brief": "Defines the `Bicycle` class",
+      "doc": "",
+      "includes": []
+    },
+    {
+      "id": "transport%2Ftransport.hh",
+      "name": "transport/transport.hh",
+      "brief": "Main include file for the `transport` project",
+      "doc": "This is the longer documentation...",
+      "includes": []
+    },
+    {
+      "id": "transport%2Fracingbike.hh",
+      "name": "transport/racingbike.hh",
+      "brief": "Defines the `RacingBike` class",
+      "doc": "",
+      "includes": []
+    },
+    {
+      "id": "transport%2Fmountainbike.hh",
+      "name": "transport/mountainbike.hh",
+      "brief": "Defines the `MountainBike` class",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

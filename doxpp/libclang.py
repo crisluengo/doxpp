@@ -16,6 +16,7 @@
 
 import os, subprocess, sys, platform
 from .clang import cindex
+from . import log
 
 def flags(f):
     devnull = open(os.devnull)
@@ -26,12 +27,11 @@ def flags(f):
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
     except OSError as e:
-        sys.stderr.write("\nFatal: Failed to run clang++ to obtain system include headers, please install clang++ to use dox++\n")
+        log.error("Fatal: Failed to run clang++ to obtain system include headers, please install clang++ to use dox++")
         message = str(e)
         if message:
-            sys.stderr.write("  Error message: " + message + "\n")
-        sys.stderr.write("\n")
-        sys.exit(1)
+            log.error("  Error message: %s", message)
+        exit(1)
 
     devnull.close()
 
@@ -87,7 +87,8 @@ def load_libclang():
     try:
         testconf.get_cindex_library()
     except cindex.LibclangError as e:
-        sys.stderr.write("\nFatal: Failed to locate libclang library. dox++ depends on libclang for parsing sources, please make sure you have libclang installed.\n" + str(e) + "\n\n")
-        sys.exit(1)
+        log.error("Fatal: Failed to locate libclang library.\ndox++ depends on libclang for parsing sources, please make sure you have libclang installed.")
+        log.error(str(e))
+        exit(1)
 
     return cindex

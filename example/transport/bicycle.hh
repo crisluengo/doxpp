@@ -1,9 +1,12 @@
 #ifndef __TRANSPORT_BICYCLE_H__
 #define __TRANSPORT_BICYCLE_H__
 
+/// \file Defines the `Bicycle` class
+
+/// The namespace for the project
 namespace transport
 {
-	/* Standard bicycle class.
+	/** Standard bicycle class.
 	 *
 	 * Bicycle implements a standard bicycle. Bicycles are a useful way of
 	 * transporting oneself, without too much effort (unless you go uphill
@@ -14,16 +17,16 @@ namespace transport
 	class Bicycle
 	{
 	public:
-		// PedalHarder makes you go faster (usually).
+		/// PedalHarder makes you go faster (usually).
 		virtual void PedalHarder();
 
-		/* Ring bell on the bike.
+		/** Ring bell on the bike.
 		 *
 		 * RingBell rings the bell on the bike. Note that not all
 		 * bikes have bells. */
 		virtual void RingBell();
 
-		// Default destructor.
+		/// Default destructor.
 		virtual ~Bicycle();
 	};
 }
