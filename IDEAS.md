@@ -74,7 +74,7 @@ A list of defined groups. Each `groups[i]` is a dictionary as follows:
    brief: '',
    doc: '',
    parent: '',       // id of the parent group, if any
-   subgroups: set()  // list of ids of child groups
+   subgroups: []     // list of ids of child groups
 }
 
 Groups can be nested.

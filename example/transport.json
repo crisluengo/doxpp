@@ -1,0 +1,116 @@
+{
+  "index": "",
+  "members": [
+    {
+      "id": "transport",
+      "name": "transport",
+      "brief": "The namespace for the project",
+      "doc": "",
+      "type": "namespace",
+      "parent": "",
+      "file": "/Users/cris/src/dox++/example/transport/bicycle.hh",
+      "group": "",
+      "members": {
+        "transport-str": {
+          "id": "transport-str",
+          "name": "str",
+          "brief": "A string",
+          "doc": "",
+          "type": "using",
+          "parent": "transport",
+          "file": "/Users/cris/src/dox++/example/transport/bicycle.hh",
+          "group": "",
+          "members": {},
+          "deprecated": false
+        },
+        "transport-foo": {
+          "id": "transport-foo",
+          "name": "foo",
+          "brief": "Another string",
+          "doc": "",
+          "type": "typedef",
+          "parent": "transport",
+          "file": "/Users/cris/src/dox++/example/transport/bicycle.hh",
+          "group": "",
+          "members": {},
+          "deprecated": false
+        },
+        "transport-Bicycle": {
+          "id": "transport-Bicycle",
+          "name": "Bicycle",
+          "brief": "Standard bicycle class. This is a rather long brief line, it\noccupies the whole paragraph...",
+          "doc": "Bicycle implements a standard bicycle. Bicycles are a useful way of\ntransporting oneself, without too much effort (unless you go uphill\nor against the wind). If there are a lot of people on the road, you\ncan use <RingBell> to ring your bell (**note**, not all bicycles\nhave bells!).",
+          "type": "cclass",
+          "parent": "transport",
+          "file": "/Users/cris/src/dox++/example/transport/bicycle.hh",
+          "group": "",
+          "members": {
+            "transport-Bicycle-PedalHarder": {
+              "id": "transport-Bicycle-PedalHarder",
+              "name": "PedalHarder",
+              "brief": "PedalHarder makes you go faster (usually).",
+              "doc": "",
+              "type": "method",
+              "parent": "transport-Bicycle",
+              "file": "/Users/cris/src/dox++/example/transport/bicycle.hh",
+              "group": "",
+              "members": {},
+              "deprecated": false
+            },
+            "transport-Bicycle-RingBell": {
+              "id": "transport-Bicycle-RingBell",
+              "name": "RingBell",
+              "brief": "Ring bell on the bike.",
+              "doc": "RingBell rings the bell on the bike. Note that not all\nbikes have bells.",
+              "type": "method",
+              "parent": "transport-Bicycle",
+              "file": "/Users/cris/src/dox++/example/transport/bicycle.hh",
+              "group": "",
+              "members": {},
+              "deprecated": false
+            },
+            "transport-Bicycle-~Bicycle": {
+              "id": "transport-Bicycle-~Bicycle",
+              "name": "~Bicycle",
+              "brief": "Default destructor.",
+              "doc": "Some might want to override this",
+              "type": "destructor",
+              "parent": "transport-Bicycle",
+              "file": "/Users/cris/src/dox++/example/transport/bicycle.hh",
+              "group": "",
+              "members": {},
+              "deprecated": false
+            },
+            "transport-Bicycle-id": {
+              "id": "transport-Bicycle-id",
+              "name": "id",
+              "brief": "Something to identify a bike by",
+              "doc": "",
+              "type": "field",
+              "parent": "transport-Bicycle",
+              "file": "/Users/cris/src/dox++/example/transport/bicycle.hh",
+              "group": "",
+              "members": {},
+              "deprecated": false
+            }
+          },
+          "deprecated": false
+        }
+      },
+      "deprecated": false
+    }
+  ],
+  "headers": [
+    {
+      "id": "transport%2Fbicycle.hh",
+      "name": "transport/bicycle.hh",
+      "brief": "Defines the `Bicycle` class",
+      "doc": "This is a pretty sweet file all by itself, but the `Bicycle` class is virtual,\nso this file is even better when combined with other files that define derived\nclasses.",
+      "includes": [
+        "/Library/Developer/CommandLineTools/usr/include/c++/v1/string"
+      ]
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

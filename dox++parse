@@ -71,6 +71,8 @@ data = doxpp.buildtree.buildtree(
     config['clang'].get('include directories', '')
 )
 
+print(data)
+
 filename = config['output'].get('filename', 'dox++out.json')
 with open(filename, 'w') as outputfile:
     outputfile.write(json.dumps(data))

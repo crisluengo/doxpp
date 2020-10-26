@@ -1,13 +1,14 @@
 # Default dox++ configuration file
 [input]
-root directory = example
-header files = example/transport/*.hh
-markdown files = 
+root directory = .
+#header files = transport/*.hh
+header files = transport/bicycle.hh
+#markdown files = docs/*.md
 
 [output]
-filename = dox++out.json
+filename = transport.json
 log level = debug
 
 [clang]
-compiler flags = 
-include directories = example
+compiler flags = -std=c++11
+include directories = .

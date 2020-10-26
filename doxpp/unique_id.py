@@ -18,3 +18,12 @@ import urllib.parse
 def header(name):
     return urllib.parse.quote(name, safe='')
     #return name.replace('/','__')
+
+def member(dict, status):
+    id = dict['name']
+    if dict['parent']:
+        id = status.members[dict['parent']]['id'] + '-' + id
+    # TODO: Add decoration according to dict['type']:
+    #   - for functions the argument types
+    #   - for class methods additionally the const qualifier
+    return id

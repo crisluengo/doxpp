@@ -46,6 +46,9 @@ def warning(msg, *args, **kwargs):
 def error(msg, *args, **kwargs):
     logger.error(msg, *args, **kwargs)
 
+def info(msg, *args, **kwargs):
+    logger.info(msg, *args, **kwargs)
+
 def debug(msg, *args, **kwargs):
     logger.debug(msg, *args, **kwargs)
 

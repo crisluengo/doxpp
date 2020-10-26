@@ -26,7 +26,7 @@ def new_group(id, name='', brief='', doc='', parent=''):
     group = basic(id, name, brief, doc)
     group.update({
         'parent': parent,
-        'subgroups': set()
+        'subgroups': []
     })
     return group
 
@@ -36,3 +36,17 @@ def new_header(id, name='', brief='', doc=''):
         'includes': []
     })
     return header
+
+def new_member(id, name='', type='', parent='', file=''):
+    member = basic(id, name)
+    member.update({
+        'type': type,
+        'parent': parent,       # ID of the parent member, empty string if declared in global namespace
+        'file': file,           # ID of the first file this member was encountered
+        'group': '',            # ID of the group it is in, if any
+        'members': {},          # member structs for the things declared inside this member
+        'deprecated': False     # Set to True if marked 'deprecated'
+    })
+    return member
+
+
