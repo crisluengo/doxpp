@@ -3,10 +3,17 @@
 
 #include <transport/bicycle.hh>
 
-/// \file Defines the `MountainBike` class
+/// \file
+/// Defines the `MountainBike` class
+
+/// \addtogroup bikes
 
 namespace transport
 {
+
+   /// \defgroup all-terrain All-terrain bicycles
+   /// A group of classes representing bicycle types that can go off-road
+
 	/** Mountain bike implementation of a <Bicycle>.
 	 *
 	 * MountainBike is an implementation of a <Bicycle>
@@ -53,7 +60,12 @@ namespace transport
 			return false;
 		}
 	};
+
+	/// \endgroup
+
 }
+
+/// \endgroup
 
 #endif /* __TRANSPORT_MOUNTAIN_BIKE_H__ */
 

@@ -1,8 +1,8 @@
 # Default dox++ configuration file
 [input]
 root directory = .
-#header files = transport/*.hh
-header files = transport/bicycle.hh
+header files = transport/*.hh
+#header files = transport/bicycle.hh
 #markdown files = docs/*.md
 
 [output]

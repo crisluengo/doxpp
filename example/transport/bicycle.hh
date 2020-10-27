@@ -11,13 +11,23 @@
 /// so this file is even better when combined with other files that define derived
 /// classes.
 
+/// \defgroup bikes Bicycle types
+/// A group of classes representing various bicycle types
+
 /// The namespace for the project
 namespace transport
 {
+
+   /// \defgroup types Types used by bicycles
+   /// Stuff in this group is silly
+
    /// A string
    using str = std::string;
    /// Another string
+   /// \ingroup all-terrain
    typedef str foo;
+
+   /// \endgroup
 
 	/** \brief Standard bicycle class. This is a rather long brief line, it
 	 * occupies the whole paragraph...
@@ -50,5 +60,7 @@ namespace transport
 	   int id; ///< Something to identify a bike by
 	};
 }
+
+/// \endgroup
 
 #endif /* __TRANSPORT_BICYCLE_H__ */

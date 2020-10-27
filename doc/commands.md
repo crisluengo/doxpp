@@ -82,7 +82,7 @@ These should still point to things that the parser found, though. Or maybe if th
 weren't found, add an indicator that this is indeed not implemented.
 
 - `\addtogroup <name>`
-- `\class <name> [<header-file>] [<header-name>]`
+- `\class <name>`
 - `\def <name>`
 - `\defgroup <name> (group title)`
 - `\dir [<path fragment>]`
@@ -95,15 +95,15 @@ weren't found, add an indicator that this is indeed not implemented.
 - `\namespace <name>`
 - `\overload [(function declaration)]`
 - `\page <name> (title)`
-- `\struct <name> [<header-file>] [<header-name>]`
+- `\struct <name>`
 - `\typedef (typedef declaration)`
-- `\union <name> [<header-file>] [<header-name>]`
+- `\union <name>`
 - `\var (variable declaration)`
 
 ## Inside a member documentation block 
 
 - `\headerfile <header-file> [<header-name>]`
-- `\ingroup (<groupname> [<groupname> <groupname>])` -> But we'll do a single group here
+- `\ingroup <groupname>` -> But we'll do a single group here
 - `\nosubgrouping`
 - `\ref <name> ["(text)"]`
 - `\related <name>`
@@ -120,9 +120,9 @@ weren't found, add an indicator that this is indeed not implemented.
 
 ### Because the information is always retrieved from the code
 
-- `\extends <name>`
-- `\implements <name>`
-- `\memberof <name>`
+- `\extends`
+- `\implements`
+- `\memberof`
 - `\private`
 - `\privatesection`
 - `\protected`
@@ -135,10 +135,11 @@ weren't found, add an indicator that this is indeed not implemented.
 ### Because it doesn't apply to C++
 
 - `\idlexcept` -> IDL only
-- `\package <name>` -> Java only
-- `\property (qualified property name)`
-- `\protocol <name> [<header-file>] [<header-name>]` -> Objective-C only
-- `\vhdlflow [(title for the flow chart)]` -> VHDL only
+- `\interface`
+- `\package` -> Java only
+- `\property`
+- `\protocol` -> Objective-C only
+- `\vhdlflow` -> VHDL only
 
 ### Because it doesn't make sense to me
 
@@ -152,12 +153,11 @@ weren't found, add an indicator that this is indeed not implemented.
 - `\hideinitializer` -> this is something that the backend can do
 - `\hiderefby`
 - `\hiderefs`
-- `\interface <name> [<header-file>] [<header-name>]`
 - `\internal`
 - `\showinitializer` -> this is something that the backend can do
 - `\showrefby`
 - `\showrefs`
-- `\weakgroup <name> [(title)]`
+- `\weakgroup`
 - `\{` -> is implicit in dox++
 - `\}` -> we use `\endgroup` instead
 

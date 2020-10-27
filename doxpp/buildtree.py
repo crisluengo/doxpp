@@ -21,7 +21,7 @@ from . import members
 from . import unique_id
 from . import log
 
-import os, sys, glob, shlex
+import os, sys, glob, shlex, re
 
 
 cindex = libclang.load_libclang()
@@ -80,9 +80,9 @@ class Status:
     def __init__(self, data):
         self.data = data
         self.current_group = ['']    # Here we keep a stack of current group IDs. `current_group[-1]` is the current group.
-        self.group_extent = []       # Here we keep a list of which lines start a new group, and which group they start, for the current file only
+        self.group_locations = []    # Here we keep a list of (line, group_id), for the current file only. line is the line that the group starts. If group_id is '', then no group is active after that line
         self.current_file = {}       # `files[i]` dict for  the current file.
-        self.current_file_name = ''  # Full file name (with absolute path)
+        self.current_file_name = ''  # Full file name (with absolute path).
         self.groups = {}             # These dictionaries contain the same dictionaries as in 'data',
         self.files = {}              #    but indexed by their id so they're easy to find. It is the
         self.members = {}            #    *same* dictionaries, modifying these will modify 'data'.
@@ -168,10 +168,28 @@ def is_documentation_comment(comment, style):  # style should be '/' or '*' for 
         return len(comment) > 2 and (comment[2] == '/' or comment[2] == '!')
     return comment[2] == '*' or comment[2] == '!'  # no need to test length, this syle comment must have at least 4 characters
 
+def get_group_at_line(group_locations, line):
+    current_group = ''
+    for item in group_locations:
+        if line < item[0]:
+            return current_group
+        current_group = item[1]
+    return current_group
+
+ingroup_cmd_match = re.compile(r"^\s*\\ingroup\s+(\S+)\s*$", re.MULTILINE)
+
+def find_ingroup_cmd(member):
+    doc = member['doc']
+    m = ingroup_cmd_match.search(doc)
+    if m:
+        group = m.group(1)
+        member['doc'] = doc[:m.span(0)[0]]+doc[m.span(0)[1]:]
+        return group
+    return ''
 
 #--- Parsing header files --- extracting and processing comments ---
 
-def process_command(lines, status: Status):
+def process_command(lines, loc, status: Status):
     # This function processes a specific set of commands that should not be associated
     # to a declaration in the header file
 
@@ -205,6 +223,7 @@ def process_command(lines, status: Status):
         current_group = status.current_group[-1]
         if not id in status.groups:
             status.groups[id] = members.new_group(id, name, brief, doc, current_group)
+            status.data['groups'].append(status.groups[id])
         else:
             group = status.groups[id]
             if not group['name']:
@@ -215,7 +234,7 @@ def process_command(lines, status: Status):
             if group['subgroups'].count(id) == 0:  # add group only once
                 group['subgroups'].append(id)
         status.current_group.append(id)
-        # TODO: add location information to `status.group_extent`
+        status.group_locations.append((loc, id))
 
     elif cmd == 'addtogroup':
         id, name = split_string(args)
@@ -226,23 +245,22 @@ def process_command(lines, status: Status):
         current_group = status.current_group[-1]
         if not id in status.groups:
             status.groups[id] = members.new_group(id, '', '', '', current_group)
+            status.data['groups'].append(status.groups[id])
         if current_group:
             group = status.groups[current_group]
             if group['subgroups'].count(id) == 0:  # add group only once
                 group['subgroups'].append(id)
         # We also ignore the rest of the comment block
         status.current_group.append(id)
-        # TODO: add location information to `status.group_extent`
+        status.group_locations.append((loc, id))
 
     elif cmd == 'endgroup':
         current_group = status.current_group[-1]
         if current_group:
             status.current_group.pop()
-            # TODO: add location information to `status.group_extent`
+            status.group_locations.append((loc, status.current_group[-1]))
         else:
             log.warning("\\endgroup cannot occur while not in a group\n   in file %s", status.current_file_name)
-
-    # TODO: From here on down, code applies to Markdown files as well. Better separate it out into a different file.
 
     # Documenting the current file
     elif cmd == 'file':
@@ -293,6 +311,7 @@ def process_comments(tu, status: Status):
             # Concatenate individual single-line comments together, but only if they are strictly
             # adjacent, and all are documentation comments
             if is_documentation_comment(comment, '/'):
+                loc = token.extent.start.line
                 lines = [clean_comment(comment)]
                 pos = token.extent.end.line
                 token = next(it, None)
@@ -305,22 +324,36 @@ def process_comments(tu, status: Status):
                     lines.append(clean_comment(comment))
                     pos = token.extent.end.line
                     token = next(it, None)
-                process_command(lines, status)
+                process_command(lines, loc, status)
                 continue  # token currently is the next token, it hasn't been processed yet, we don't want to skip it
         else:
             # Multi-line comments are not concatenated with anything
             if is_documentation_comment(comment, '*'):
                 prelen = token.extent.start.column - 1
                 lines = clean_multiline_comment(comment, prelen)
-                process_command(lines, status)
+                process_command(lines, token.extent.start.line, status)
 
         token = next(it, None)
 
     while status.current_group[-1]:
-        status.current_group.pop()
-        # TODO: add location information to `status.group_extent`
+        log.warning("Missing \\endgroup for group %s\n   in file %s", status.current_group.pop(), status.current_file_name)
 
 #--- Parsing header files --- extracting declarations ---
+
+def merge_member(member, new_member):
+    # Merges the two member structures, filling in empty elements in `memeber` with new data, and appending any documentation.
+    add_doc(member, new_member['brief'], new_member['doc'])
+    for key in new_member:
+        if key == 'doc' or key == 'brief':
+            continue
+        if key == 'members':
+            for m in new_member['members']:
+                if not m in member['members']:
+                    member['members'].append(m)
+            continue
+        if key in member and not member[key]:
+            member[key] = new_member[key]
+    return member
 
 def extract_declarations(citer, parent, status: Status):
     # Recursive AST exploration, adds data to `status`.
@@ -348,10 +381,11 @@ def extract_declarations(citer, parent, status: Status):
 
         if item.kind in kind_to_type_map:
             log.debug("member: kind = %s, spelling = %s, parent = %s", item.kind, item.spelling, parent)
-            log.debug("        displayname = %s", item.displayname)
-            log.debug("        raw_comment = %s", item.raw_comment)
+            # Create a member data structure for this one
             type = kind_to_type_map[item.kind]
             member = members.new_member('', item.spelling, type, parent, status.current_file_name)
+
+            # Find the associated documentation comment and parse it
             comment = item.raw_comment
             if comment:
                 if is_single_line_comment(comment):
@@ -362,6 +396,12 @@ def extract_declarations(citer, parent, status: Status):
                 if not(len(cmd) > 1 and cmd[0] == '\\' and cmd[1:] in documentation_commands):
                     brief, doc = separate_brief(comment)
                     add_doc(member, brief, doc)
+
+            # Find the group this member belongs to
+            group = find_ingroup_cmd(member)
+            if not group:
+                group = get_group_at_line(status.group_locations, item.extent.start.line)
+            member['group'] = group
 
             # Associate any other information with this member
             # TODO: process other cursor data and child cursors, depending on what `type` we're dealing with
@@ -417,22 +457,21 @@ def extract_declarations(citer, parent, status: Status):
 
             # Deal with IDs
             usr = item.get_usr()
-            id = unique_id.member(member, status)
-            member['id'] = id
             if usr in status.member_ids:
-                pass  # TODO
+                id = status.member_ids[usr]
+                member = merge_member(status.members[id], member)
             else:
+                id = unique_id.member(member, status)
+                member['id'] = id
                 status.member_ids[usr] = id
                 if id in status.members:
-                    log.error("USR was known, but ID was not! (this should not happen)")
+                    log.error("USR was unknown, but ID was already there! This means that there is a name clash, unique_id.member is not good enough")
                     continue  # skip the rest of this function, we're in trouble here...
-                status.members[id] = member
-                if parent:
-                    status.members[parent]['members'][id] = member
-                else:
-                    status.data['members'].append(member)
-
-            # TODO: add grouping
+            status.members[id] = member
+            if parent:
+                status.members[parent]['members'][id] = member
+            else:
+                status.data['members'].append(member)
 
             # Process child members
             if process_children:
@@ -519,6 +558,7 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
 
         # Reset the rest of the data
         status.current_group = ['']
+        status.group_locations = []
 
         # Add info for current file
         file_id = unique_id.header(canonical_name)

@@ -3,7 +3,10 @@
 
 #include <transport/bicycle.hh>
 
-/// \file Defines the `RacingBike` class
+/// \file
+/// Defines the `RacingBike` class
+
+/// \addtogroup bikes
 
 namespace transport
 {
@@ -23,5 +26,7 @@ namespace transport
 		virtual void RingBell();
 	};
 }
+
+/// \endgroup
 
 #endif /* __TRANSPORT_RACING_BIKE_H__ */
