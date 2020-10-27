@@ -51,6 +51,14 @@ cursor_kind_to_type_map = {
 type_kind_to_type_map = {
     cindex.TypeKind.POINTER: '*',
     cindex.TypeKind.LVALUEREFERENCE: '&',
+    cindex.TypeKind.RVALUEREFERENCE: '&&',
+}
+
+type_kind_array_types = {
+    cindex.TypeKind.CONSTANTARRAY,
+    cindex.TypeKind.INCOMPLETEARRAY,
+    cindex.TypeKind.VARIABLEARRAY,
+    cindex.TypeKind.DEPENDENTSIZEDARRAY
 }
 
 type_kind_to_name_map = {
@@ -79,6 +87,13 @@ type_kind_to_name_map = {
     cindex.TypeKind.NULLPTR: 'nullptr_t',
 }
 
+access_specifier_map = {
+    cindex.AccessSpecifier.INVALID: '',
+    cindex.AccessSpecifier.PUBLIC: 'public',
+    cindex.AccessSpecifier.PROTECTED: 'protected',
+    cindex.AccessSpecifier.PRIVATE: 'private',
+    cindex.AccessSpecifier.NONE: ''
+}
 
 
 # These are the commands that can start a documentation block
@@ -385,44 +400,40 @@ def full_typename(decl):
 
 def process_type_recursive(type, cursor, output):
     kind = type.kind
-    print(' - Figuring out type for', kind)
+    done = False
     if kind in type_kind_to_type_map:
         process_type_recursive(type.get_pointee(), cursor, output)
         output['qualifiers'].append(type_kind_to_type_map[kind])
-        if type.is_const_qualified():
-            output['qualifiers'].append('const')
-        return
+        done = True
+    if kind in type_kind_array_types:
+        process_type_recursive(type.get_array_element_type(), None, output)
+        output['qualifiers'].append('[]')
+        done = True
     if type.is_const_qualified():
         output['qualifiers'].append('const')
-    #elif tp.kind == cindex.TypeKind.CONSTANTARRAY:
-    #    self._element_type = Type(tp.get_array_element_type())
-    #    self._array_size = tp.get_array_size()
+    if done:
+        return
     decl = type.get_declaration()
     if decl and decl.displayname:
-        print("    We've got a decl.displayname")
         typename = full_typename(decl)
     elif kind in type_kind_to_name_map:
-        print("    Builtin type")
         typename = type_kind_to_name_map[kind]
-    #elif kind != cindex.TypeKind.CONSTANTARRAY and hasattr(type, 'spelling'):
+    elif hasattr(type, 'spelling'):
     #    canon = type.get_canonical()
     #    if canon.kind == cindex.TypeKind.FUNCTIONPROTO:
     #        kind = canon.kind
-    #        result = Type(canon.get_result())
-    #        arguments = [Type(arg) for arg in canon.argument_types()]
-    elif cursor is None:
-        print("    Cursor is none")
-        typename = ''
-    else:
-        print("    We're using cursor.displayname")
+    #        result = process_type(canon.get_result())
+    #        arguments = [process_type(arg) for arg in canon.argument_types()]
+        typename = type.spelling
+    elif cursor:
         typename = cursor.displayname
+    else:
+        typename = ''
     output['typename'] = typename
 
 def process_type(type, cursor=None):
-    print('Figuring out a new type:')
     output = {'typename': '', 'qualifiers': []}
     process_type_recursive(type, cursor, output)
-    print(' - result:', output)
     return output
 
 def process_function_declaration(item, member):
@@ -430,14 +441,16 @@ def process_function_declaration(item, member):
     arguments = []
     for child in item.get_children():
         if child.kind == cindex.CursorKind.PARM_DECL:
-            type = None
+            name = child.spelling
+            param = None
             for elem in child.get_children():
                 if elem.kind == cindex.CursorKind.TYPE_REF:
-                    type = process_type(child.type, cursor=elem)
+                    param = process_type(child.type, cursor=elem)
                     break
-            if type is None:
-                type = process_type(child.type)
-            arguments.append(type)
+            if param is None:
+                param = process_type(child.type)
+            param['name'] = name
+            arguments.append(param)
     member['arguments'] = arguments
 
 def merge_member(member, new_member):
@@ -482,8 +495,8 @@ def extract_declarations(citer, parent, status: Status):
             log.debug("member: kind = %s, spelling = %s, parent = %s", item.kind, item.spelling, parent)
             #log.debug("        tokens = %s", [x.spelling for x in item.get_tokens()])
             # Create a member data structure for this one
-            type = cursor_kind_to_type_map[item.kind]
-            member = members.new_member('', item.spelling, type, parent, status.current_file_name)
+            member_type = cursor_kind_to_type_map[item.kind]
+            member = members.new_member('', item.spelling, member_type, parent, status.current_file_name)
 
             # Find the associated documentation comment and parse it
             comment = item.raw_comment
@@ -503,16 +516,21 @@ def extract_declarations(citer, parent, status: Status):
                 group = get_group_at_line(status.group_locations, item.extent.start.line)
             member['group'] = group
 
-            # Disambiguate:
-            if type == 'functiontemplate':
+            # Disambiguate templated types:
+            is_template = False
+            if member_type == 'functiontemplate':
+                is_template = True
                 # Could be 'methodtemplate' also
                 parent_kind = item.semantic_parent.kind
                 if parent_kind == cindex.CursorKind.CLASS_DECL or \
                    parent_kind == cindex.CursorKind.CLASS_TEMPLATE or \
                    parent_kind == cindex.CursorKind.STRUCT_DECL:
-                    type = 'methodtemplate'
-                    member['type'] = type
-            elif type == 'classtemplate':
+                    member_type = 'method'
+                else:
+                    member_type = 'function'
+            elif member_type == 'classtemplate':
+                is_template = True
+                member_type = 'class'
                 # Could be 'structtemplate' also
                 l = list(item.get_tokens())
                 n = 0
@@ -525,60 +543,69 @@ def extract_declarations(citer, parent, status: Status):
                             i += 1
                             if i < len(l):
                                 if l[i].kind == cindex.TokenKind.KEYWORD and l[i].spelling == 'struct':
-                                    type = 'structtemplate'
-                                    member['type'] = type
+                                    member_type = 'struct'
                             break
 
             # Associate any other information with this member
-            # TODO: process other cursor data and child cursors, depending on what `type` we're dealing with
+            # TODO: process other cursor data and child cursors, depending on what `member_type` we're dealing with
             process_children = False
-            is_template = False
-            if type == 'class' or type == 'classtemplate' or\
-               type == 'struct' or type == 'structtemplate':
+            member['deprecated'] = item.availability == cindex.AvailabilityKind.DEPRECATED
+            if member_type == 'class' or member_type == 'struct':
+                member['templated'] = is_template
                 member['bases'] = []
-                is_template = type == 'classtemplate'
+                # TODO: If templated, the name contains part of the template. How to fix this?
                 process_children = True
-            elif type == 'method' or type == 'methodtemplate' or \
-                 type == 'conversionfunction' or type == 'constructor' or type == 'destructor':
+            elif member_type == 'method' or member_type == 'conversionfunction' or \
+                    member_type == 'constructor' or member_type == 'destructor':
+                member['templated'] = is_template
                 member['static'] = item.is_static_method()
                 member['virtual'] = item.is_virtual_method()
                 member['pure_virtual'] = item.is_pure_virtual_method()
                 member['const'] = item.is_const_method()
+                member['access'] = access_specifier_map[item.access_specifier]
+                member['method_type'] = member_type
                 process_function_declaration(item, member)
-                is_template = type == 'methodtemplate'
-            elif type == 'enumvalue':
+                member_type = 'function'  # write out as function
+            elif member_type == 'enumvalue':
                 pass
-            elif type == 'enum':
+            elif member_type == 'enum':
                 member['scoped'] = item.is_scoped_enum()
                 process_children = True
                 pass
-            elif type == 'field':  # variable inside a class, struct or union
-                pass
-            elif type == 'function' or type == 'functiontemplate':
+            elif member_type == 'field':
+                member['type'] = process_type(item.type, item)
+                member['static'] = item.storage_class == cindex.StorageClass.STATIC
+                member['mutable'] = item.is_mutable_field()
+                member['access'] = access_specifier_map[item.access_specifier]
+                if item.is_bitfield():
+                    member['width'] = item.get_bitfield_width()
+                member_type = 'variable'
+            elif member_type == 'function':
+                member['templated'] = is_template
                 process_function_declaration(item, member)
-                is_template = type == 'functiontemplate'
-            elif type == 'namespace':
+            elif member_type == 'namespace':
+                process_children = True
+            elif member_type == 'templatenontypeparameter':
                 process_children = True
                 pass
-            elif type == 'templatenontypeparameter':
+            elif member_type == 'templatetypeparameter':
                 process_children = True
                 pass
-            elif type == 'templatetypeparameter':
+            elif member_type == 'typedef':
+                member_type = 'alias'
+                pass
+            elif member_type == 'using':
+                member_type = 'alias'
+                # NOTE: could be templated!
+                pass
+            elif member_type == 'union':
                 process_children = True
-                pass
-            elif type == 'typedef':
-                pass
-            elif type == 'using':
-                pass
-            elif type == 'union':
-                process_children = True
-                pass
-            elif type == 'variable':
-                pass
+            elif member_type == 'variable':
+                member['type'] = process_type(item.type, item)
+                member['static'] = item.storage_class == cindex.StorageClass.STATIC
             if is_template:  #  'classtemplate', 'structtemplate', 'functiontemplate', 'methodtemplate'
-                pass
-            member['deprecated'] = item.availability == cindex.AvailabilityKind.DEPRECATED
-            # member.access_specifier (public, protected, private)
+                member['template_parameters'] = []
+            member['member_type'] = member_type
 
             # Deal with IDs
             usr = item.get_usr()
@@ -595,8 +622,15 @@ def extract_declarations(citer, parent, status: Status):
                     log.error("USR was unknown, but ID was already there! This means that there is a name clash, unique_id.member is not good enough")
                     continue  # skip the rest of this function, we're in trouble here...
                 status.members[id] = member
-                if parent:
-                    status.members[parent]['members'][id] = member
+                semantic_parent = item.semantic_parent.get_usr()
+                if semantic_parent:
+                    if semantic_parent in status.member_ids:
+                        semantic_parent = status.member_ids[semantic_parent]
+                    else:
+                        log.error("USR of semantic parent was unknown, using lexical parent instead")
+                        semantic_parent = parent
+                if semantic_parent:
+                    status.members[semantic_parent]['members'][id] = member
                 else:
                     status.data['members'].append(member)
 
@@ -728,17 +762,12 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
 
         # Extract list of headers included by this file
         extract_includes(tu, status.current_file)
-        print("Base members after extract_includes:", len(status.data['members']))
 
         # Extract and process documentation comments with commands
         process_comments(tu, status)
-        print("Base members after process_comments:", len(status.data['members']))
 
         # Extract declarations and build member tree
         extract_declarations(tu.cursor.get_children(), '', status)
-        print("Base members after extract_declarations:", len(status.data['members']))
-
-        print(status.member_ids)
 
         # Mark this file as complete
         processed[f] = True

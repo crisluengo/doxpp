@@ -80,6 +80,9 @@ class ClassTemplate {
 template< typename A, typename std::enable_if_t< !std::numeric_limits< A >::has_infinity, int > = 0 >
 struct ComplexStructTemplate {
    A member;
+   float array[5];
+   ComplexStructTemplate(double x[], A& y);
+   ComplexStructTemplate(double const x[], A& y);
 };
 
 }

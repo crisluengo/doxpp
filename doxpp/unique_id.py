@@ -19,11 +19,30 @@ def header(name):
     return urllib.parse.quote(name, safe='')
     #return name.replace('/','__')
 
+qualifier_map = {
+    '*': 'P',
+    '&': 'L',
+    '&&': 'R',
+    '[]': 'A',
+    'const': 'C'
+}
+
+def type(dict):
+    qualifiers = ''.join([qualifier_map[x] for x in dict['qualifiers']])
+    id = '-' + dict['typename'] + '-' + qualifiers
+    return id
+
 def member(dict, status):
     id = dict['name']
     if dict['parent']:
         id = status.members[dict['parent']]['id'] + '-' + id
-    # TODO: Add decoration according to dict['type']:
-    #   - for functions the argument types
-    #   - for class methods additionally the const qualifier
+    if 'template_parameters' in dict:
+        id += '-T'
+        # TODO: do we need additionally to say something about template parameter types?
+    member_type = dict['member_type']
+    if member_type == 'function':
+        for arg in dict['arguments']:
+            id += type(arg)
+    if 'const' in dict and dict['const']:
+        id += '-C'
     return id
