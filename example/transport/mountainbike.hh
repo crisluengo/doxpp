@@ -2,6 +2,7 @@
 #define __TRANSPORT_MOUNTAIN_BIKE_H__
 
 #include <transport/bicycle.hh>
+#include <type_traits>
 
 /// \file
 /// Defines the `MountainBike` class
@@ -62,6 +63,24 @@ namespace transport
 	};
 
 	/// \endgroup
+
+
+template<typename A, typename B>
+struct StructTemplate {
+   B member;
+   int action(const A * * const * * & a);
+};
+
+template<typename A, typename B>
+class ClassTemplate {
+   B member;
+   str action(A const& a);
+};
+
+template< typename A, typename std::enable_if_t< !std::numeric_limits< A >::has_infinity, int > = 0 >
+struct ComplexStructTemplate {
+   A member;
+};
 
 }
 

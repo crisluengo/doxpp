@@ -1,4 +1,4 @@
-# Default dox++ configuration file
+# dox++ configuration file for the 'transport' example project
 [input]
 root directory = .
 header files = transport/*.hh
@@ -10,5 +10,5 @@ filename = transport.json
 log level = debug
 
 [clang]
-compiler flags = -std=c++11
+compiler flags = -std=c++14
 include directories = .

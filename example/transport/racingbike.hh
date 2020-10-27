@@ -8,6 +8,10 @@
 
 /// \addtogroup bikes
 
+/// The first line here should be ignored, because the brief is defined in a header parsed earlier
+/// But this is some additional documentation for this namespace that we add to the bottom
+/// of the previously written documentation. The order depends on the order in which files are
+/// parsed!
 namespace transport
 {
 	/** Racing bike class.

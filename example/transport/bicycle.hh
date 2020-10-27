@@ -15,6 +15,8 @@
 /// A group of classes representing various bicycle types
 
 /// The namespace for the project
+/// This is the detailed documentation for this namespace. We can extend it by writing
+/// stuff in other files too.
 namespace transport
 {
 
