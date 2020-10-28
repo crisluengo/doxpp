@@ -83,11 +83,24 @@ struct ComplexStructTemplate {
    float array[5];
    ComplexStructTemplate(double x[], A& y);
    ComplexStructTemplate(double const x[], A& y);
+   ~ComplexStructTemplate();
+   ComplexStructTemplate(const ComplexStructTemplate &) = default;
+   ComplexStructTemplate(ComplexStructTemplate &&) = default;
+   ComplexStructTemplate& operator=(const ComplexStructTemplate &) = default;
+   ComplexStructTemplate& operator=(ComplexStructTemplate &&) = default;
 };
+
+typedef ClassTemplate<int, int> IntStruct;
+
+using FloatStruct = ClassTemplate<float, int>;
+
+template<typename X>
+using IXStruct = ClassTemplate<int, X>;
+
+bool MountainBike::SetSuspension(double stiffness) {}
 
 }
 
 /// \endgroup
 
 #endif /* __TRANSPORT_MOUNTAIN_BIKE_H__ */
-

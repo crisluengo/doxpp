@@ -43,7 +43,6 @@ def new_member(id, name='', member_type='', parent='', file=''):
         'parent': parent,       # ID of the parent member, empty string if declared in global namespace
         'file': file,           # ID of the first file this member was encountered
         'group': '',            # ID of the group it is in, if any
-        'members': {},          # member structs for the things declared inside this member
         'deprecated': False     # Set to True if marked 'deprecated'
     })
     return member

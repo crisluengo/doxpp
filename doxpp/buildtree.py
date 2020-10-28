@@ -30,6 +30,7 @@ cursor_kind_to_type_map = {
     cindex.CursorKind.CLASS_TEMPLATE: 'classtemplate',
     cindex.CursorKind.CONSTRUCTOR: 'constructor',
     cindex.CursorKind.CONVERSION_FUNCTION: 'conversionfunction',
+    cindex.CursorKind.CXX_BASE_SPECIFIER: 'basespecifier',
     cindex.CursorKind.CXX_METHOD: 'method',
     cindex.CursorKind.DESTRUCTOR: 'destructor',
     cindex.CursorKind.ENUM_CONSTANT_DECL: 'enumvalue',
@@ -44,6 +45,7 @@ cursor_kind_to_type_map = {
     #cindex.CursorKind.TEMPLATE_TEMPLATE_PARAMETER: 'templatetemplateparameter', # TODO: do we need to add this?
     cindex.CursorKind.TYPEDEF_DECL: 'typedef',
     cindex.CursorKind.TYPE_ALIAS_DECL: 'using',
+    cindex.CursorKind.TYPE_ALIAS_TEMPLATE_DECL: 'usingtemplate',
     cindex.CursorKind.UNION_DECL: 'union',
     cindex.CursorKind.VAR_DECL: 'variable'
 }
@@ -467,6 +469,26 @@ def merge_member(member, new_member):
         if key in member and not member[key]:
             member[key] = new_member[key]
 
+def insert_template_parameter(member, parent, status: Status):
+    if not parent:
+        log.error("Template parameter %s doesn't have a parent", member['name'])
+        return
+    if not 'template_parameters' in status.members[parent]:
+        log.error("Template parameter %s has a parent that is not a template", member['name'])
+        return
+    param = {
+        'name': member['name'],
+        'brief': member['brief'],
+        'doc': member['doc'],
+    }
+    if member['member_type'] == 'templatetypeparameter':
+        param['type'] = 'type'
+        param['default_type'] = member['default_type']
+    else:
+        param['type'] = 'nontype'
+        param['default_type'] = member['default_value']
+    status.members[parent]['template_parameters'].append(param)
+
 def extract_declarations(citer, parent, status: Status):
     # Recursive AST exploration, adds data to `status`.
     if not citer:
@@ -492,11 +514,52 @@ def extract_declarations(citer, parent, status: Status):
             continue
 
         if item.kind in cursor_kind_to_type_map:
-            log.debug("member: kind = %s, spelling = %s, parent = %s", item.kind, item.spelling, parent)
-            #log.debug("        tokens = %s", [x.spelling for x in item.get_tokens()])
-            # Create a member data structure for this one
+            # What are we dealing with?
             member_type = cursor_kind_to_type_map[item.kind]
-            member = members.new_member('', item.spelling, member_type, parent, status.current_file_name)
+
+            # Find out what the actual parent is.
+            # The `parent` passed in is the member where this declaration lives (lexical parent),
+            # but it not necessarily the actual (semantic) parent.
+            # For example a class method defined outside the class body will have as the `parent` whatever
+            # namespace this definition is written inside, rather than the class.
+            # But for a using template, for some reason, the semantic parent of the template parameters is
+            # set to the enclosing namespace rather than the using statement:
+            # - namespace
+            #     - TYPE_ALIAS_TEMPLATE_DECL
+            #         - TEMPLATE_TYPE_PARAMETER (but semantic parent is "namespace")
+            #         - TYPE_ALIAS_DECL (the actual 'using' statement)
+            if member_type == 'templatenontypeparameter' or member_type == 'templatetypeparameter':
+                semantic_parent = parent
+            else:
+                semantic_parent = item.semantic_parent
+                if semantic_parent:
+                    semantic_parent = item.semantic_parent.get_usr()
+                if semantic_parent:
+                    if semantic_parent in status.member_ids:
+                        semantic_parent = status.member_ids[semantic_parent]
+                    else:
+                        log.error("USR of semantic parent was unknown, using lexical parent instead")
+                        semantic_parent = parent
+                else:
+                    log.debug("Semantic parent not given, assuming lexical parent is semantic parent")
+                    semantic_parent = parent
+
+            log.debug("member: kind = %s, spelling = %s, parent = %s, semantic_parent = %s", item.kind, item.spelling, parent, semantic_parent)
+            #log.debug("        tokens = %s", [x.spelling for x in item.get_tokens()])
+
+            # Process base class specifier differently
+            if member_type == 'basespecifier':
+                if not semantic_parent:
+                    log.error("Base class specifier has no semantic parent!?")
+                    continue
+                type = process_type(item.type, item)
+                type['access'] = access_specifier_map[item.access_specifier]
+                status.members[semantic_parent]['bases'].append(type)
+                continue
+            # TODO: Should we move the 'templatenontypeparameter' and 'templatetypeparameter' handling here?
+
+            # Create a member data structure for this member
+            member = members.new_member('', item.spelling, member_type, semantic_parent, status.current_file_name)
 
             # Find the associated documentation comment and parse it
             comment = item.raw_comment
@@ -510,21 +573,12 @@ def extract_declarations(citer, parent, status: Status):
                     brief, doc = separate_brief(comment)
                     add_doc(member, brief, doc)
 
-            # Find the group this member belongs to
-            group = find_ingroup_cmd(member)
-            if not group:
-                group = get_group_at_line(status.group_locations, item.extent.start.line)
-            member['group'] = group
-
             # Disambiguate templated types:
             is_template = False
             if member_type == 'functiontemplate':
                 is_template = True
                 # Could be 'methodtemplate' also
-                parent_kind = item.semantic_parent.kind
-                if parent_kind == cindex.CursorKind.CLASS_DECL or \
-                   parent_kind == cindex.CursorKind.CLASS_TEMPLATE or \
-                   parent_kind == cindex.CursorKind.STRUCT_DECL:
+                if semantic_parent and status.members[semantic_parent]['member_type'] in ['class', 'struct']:
                     member_type = 'method'
                 else:
                     member_type = 'function'
@@ -545,18 +599,32 @@ def extract_declarations(citer, parent, status: Status):
                                 if l[i].kind == cindex.TokenKind.KEYWORD and l[i].spelling == 'struct':
                                     member_type = 'struct'
                             break
+            elif member_type == 'usingtemplate':
+                is_template = True
+                member_type = 'using'
+
+            # Fix constructor and destructor names for templated classes
+            if member_type in ['constructor', 'destructor']:
+                if item.semantic_parent.kind == cindex.CursorKind.CLASS_TEMPLATE:
+                    # Remove the "<...>" at the end of the name
+                    member['name'] = item.spelling.split('<', maxsplit=1)[0]
+
+            # Find the group this member belongs to
+            # TODO: for class or struct members, we need a separate grouping system
+            group = find_ingroup_cmd(member)
+            if not group:
+                group = get_group_at_line(status.group_locations, item.extent.start.line)
+            member['group'] = group
 
             # Associate any other information with this member
-            # TODO: process other cursor data and child cursors, depending on what `member_type` we're dealing with
             process_children = False
             member['deprecated'] = item.availability == cindex.AvailabilityKind.DEPRECATED
-            if member_type == 'class' or member_type == 'struct':
+            if member_type in ['class', 'struct']:
                 member['templated'] = is_template
                 member['bases'] = []
-                # TODO: If templated, the name contains part of the template. How to fix this?
+                member['members'] = {}
                 process_children = True
-            elif member_type == 'method' or member_type == 'conversionfunction' or \
-                    member_type == 'constructor' or member_type == 'destructor':
+            elif member_type in ['method', 'conversionfunction', 'constructor', 'destructor']:
                 member['templated'] = is_template
                 member['static'] = item.is_static_method()
                 member['virtual'] = item.is_virtual_method()
@@ -567,11 +635,12 @@ def extract_declarations(citer, parent, status: Status):
                 process_function_declaration(item, member)
                 member_type = 'function'  # write out as function
             elif member_type == 'enumvalue':
-                pass
+                member['value'] = item.enum_value
             elif member_type == 'enum':
                 member['scoped'] = item.is_scoped_enum()
+                member['type'] = item.enum_type
+                member['members'] = {}
                 process_children = True
-                pass
             elif member_type == 'field':
                 member['type'] = process_type(item.type, item)
                 member['static'] = item.storage_class == cindex.StorageClass.STATIC
@@ -584,30 +653,47 @@ def extract_declarations(citer, parent, status: Status):
                 member['templated'] = is_template
                 process_function_declaration(item, member)
             elif member_type == 'namespace':
+                member['members'] = {}
                 process_children = True
             elif member_type == 'templatenontypeparameter':
-                process_children = True
-                pass
+                default_value = None
+                for child in item.get_children():
+                    if child.kind == cindex.CursorKind.TYPE_REF:
+                        continue
+                    default_value = ''.join([t.spelling for t in child.get_tokens()][:-1])
+                    break
+                member['default_value'] = default_value
+                insert_template_parameter(member, semantic_parent, status)
+                continue
             elif member_type == 'templatetypeparameter':
-                process_children = True
-                pass
-            elif member_type == 'typedef':
+                default_type = None
+                for child in item.get_children():
+                    if child.kind == cindex.CursorKind.TYPE_REF:
+                        default_type = process_type(child.type, child)
+                    break
+                member['default_type'] = default_type
+                insert_template_parameter(member, semantic_parent, status)
+                continue
+            elif member_type in ['typedef', 'using']:
                 member_type = 'alias'
-                pass
-            elif member_type == 'using':
-                member_type = 'alias'
-                # NOTE: could be templated!
-                pass
+                type = process_type(item.underlying_typedef_type, item)
+                if type['typename']:
+                    member['type'] = type
+                else:
+                    member['type'] = {}  # This happens if we're processing a 'usingtemplate'. Leave the type empty so that it can be replaced later
+                if is_template:
+                    process_children = True
             elif member_type == 'union':
+                member['members'] = {}
                 process_children = True
             elif member_type == 'variable':
                 member['type'] = process_type(item.type, item)
                 member['static'] = item.storage_class == cindex.StorageClass.STATIC
-            if is_template:  #  'classtemplate', 'structtemplate', 'functiontemplate', 'methodtemplate'
+            if is_template:  #  'classtemplate', 'structtemplate', 'functiontemplate', 'methodtemplate', 'usingtemplate'
                 member['template_parameters'] = []
             member['member_type'] = member_type
 
-            # Deal with IDs
+            # Deal with IDs -- we do this at the end of the above so we can use all that data to generate our ID.
             usr = item.get_usr()
             if usr in status.member_ids:
                 id = status.member_ids[usr]
@@ -622,13 +708,6 @@ def extract_declarations(citer, parent, status: Status):
                     log.error("USR was unknown, but ID was already there! This means that there is a name clash, unique_id.member is not good enough")
                     continue  # skip the rest of this function, we're in trouble here...
                 status.members[id] = member
-                semantic_parent = item.semantic_parent.get_usr()
-                if semantic_parent:
-                    if semantic_parent in status.member_ids:
-                        semantic_parent = status.member_ids[semantic_parent]
-                    else:
-                        log.error("USR of semantic parent was unknown, using lexical parent instead")
-                        semantic_parent = parent
                 if semantic_parent:
                     status.members[semantic_parent]['members'][id] = member
                 else:
@@ -639,29 +718,9 @@ def extract_declarations(citer, parent, status: Status):
                 extract_declarations(item.get_children(), id, status)
 
         else:
-            log.debug("ignored: kind = %s, spelling = %s, parent = %s", item.kind, item.spelling, parent)
-            extract_declarations(item.get_children(), item.get_usr, status)
-            continue
+            log.debug("ignore: kind = %s, spelling = %s, parent = %s", item.kind, item.spelling, parent)
+            extract_declarations(item.get_children(), parent, status)
 
-            par = self.cursor_to_node[item.semantic_parent]
-            if not par:
-                par = parent
-            if par:
-                ret = par.visit(item, citer) # This runs if par is a class, and this item is a CXX_ACCESS_SPEC_DECL or CXX_BASE_SPECIFIER
-                #if cursor.kind == cindex.CursorKind.CXX_ACCESS_SPEC_DECL:
-                #    self.current_access = cursor.access_specifier
-                #    return []
-                #elif cursor.kind == cindex.CursorKind.CXX_BASE_SPECIFIER:
-                #    # Add base
-                #    self.bases.append(Class.Base(cursor.type.get_declaration(), cursor.access_specifier))
-                #    return []
-                #return Node.visit(self, cursor, citer)
-                if not ret is None:
-                    for node in ret:
-                        self.register_node(node, par)
-            ignoretop = [cindex.CursorKind.TYPE_REF, cindex.CursorKind.PARM_DECL]
-            if (not par or ret is None) and not item.kind in ignoretop:
-                log.warning("Unhandled cursor: %s", item.kind)
 
 #--- Parsing header files --- extracting include statements ---
 
