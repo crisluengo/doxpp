@@ -97,7 +97,6 @@ access_specifier_map = {
     cindex.AccessSpecifier.NONE: ''
 }
 
-
 # These are the commands that can start a documentation block
 # Aliases are mapped to our preferred version
 documentation_commands = {
@@ -164,7 +163,10 @@ def expand_sources(sources):
 def split_string(string, separator=None):
     # Separate the first part from string, the second part could be empty. Returns a tuple.
     parts = string.split(separator, maxsplit=1)
-    part1 = parts[0]
+    if parts:
+        part1 = parts[0]
+    else:
+        part1 = ''
     if len(parts) > 1:  # never more than 2 elements
         part2 = parts[1]
     else:
@@ -193,7 +195,7 @@ def add_doc(member, brief, doc):
 
 def clean_comment(comment):
     # Removes first few characters from single-line documentation comment
-    line = comment[3:].rstrip()  # removes '///' or '//!'
+    line = comment[3:]  # removes '///' or '//!'
     if len(line) > 0 and line[0] == '<':
         # This is if the comment is in the style "///< ..."
         line = line[1:]
@@ -209,7 +211,7 @@ def clean_multiline_comment(comment, prelen=0):
         start = 4
     for line in comment[start:-2].splitlines():
         if prelen == 0 or line[0:prelen].isspace():
-            line = line[prelen:].rstrip()
+            line = line[prelen:]
             if line.startswith(' *') or line.startswith('  '):
                 line = line[2:]
                 if len(line) > 0 and line[0] == ' ':
@@ -240,7 +242,7 @@ def get_group_at_line(group_locations, line):
         current_group = item[1]
     return current_group
 
-ingroup_cmd_match = re.compile(r"^\s*\\ingroup\s+(\S+)\s*$", re.MULTILINE)
+ingroup_cmd_match = re.compile(r"^\s*[\@]ingroup\s+(\S+)\s*$", re.MULTILINE)
 
 def find_ingroup_cmd(member):
     doc = member['doc']
@@ -252,27 +254,76 @@ def find_ingroup_cmd(member):
     return ''
 
 
-#--- Parsing header files --- extracting and processing comments ---
+#--- Processing documentation commands ---
+
+def process_generic_command(cmd: DocumentationCommand, status: Status):
+    # These are all handled in the same way:
+    # 1. Find first member with cmd.args as name
+    # 2. Produce error if there's none
+    # 3. Do group thing below, mix in cmd.group
+    # 4. add_doc(member, cmd.brief, cmd.doc)
+
+    #group = find_ingroup_cmd(member)
+    #if not group:
+    #    group = get_group_at_line(status.group_locations, item.extent.start.line)
+    #member['group'] = group
+    pass
+
+def process_macro_command(cmd: DocumentationCommand, status: Status):
+    # 1. Check to see if a macro already exists with cmd.args as name
+    # 2. If so: add_doc(member, cmd.brief, cmd.doc)
+    # 3. Otherwise create new member
+    # 4. Don't forget the grouping thing!
+    pass
+
+def process_dir_command(cmd: DocumentationCommand, status: Status):
+    # TODO: How do we record these? Is this even useful?
+    pass
+
+def process_file_command(cmd: DocumentationCommand, status: Status):
+    pass
+
+def process_mainpage_command(cmd: DocumentationCommand, status: Status):
+    # This one should call process_page_command(), but set name to `index`.
+    process_page_command(cmd, status)
+    pass
+
+def process_page_command(cmd: DocumentationCommand, status: Status):
+    # Here we call `find_ingroup_cmd` or a similar function to find a `\subpage` command
+    pass
 
 def process_documentation_command(cmd: DocumentationCommand, status: Status):
     # This function processes commands that add documentation to members
-
-    # Here we call `find_ingroup_cmd` or a similar function to find a `\subpage` command
-
-    pass
-    # TODO
-
+    if cmd.cmd == 'dir':
+        process_dir_command(cmd, status)
+        return
+    if cmd.cmd == 'file':
+        process_file_command(cmd, status)
+        return
+    if cmd.cmd == 'macro':
+        process_macro_command(cmd, status)
+        return
+    if cmd.cmd == 'mainpage':
+        process_mainpage_command(cmd, status)
+        return
+    if cmd.cmd == 'page':
+        process_page_command(cmd, status)
+        return
+    # Handle namespace, class, struct, union, enum, alias, function, variable
+    process_generic_command(cmd, status)
 
 def process_grouping_command(cmd, args, brief, doc, loc, status: Status):
-    # This function processes commands that handle grouping of members
-    # Returns True if the command was processed, false otherwise
-    # Grouping commands: this works differently than in Doxygen.
-    # \defgroup defines a group, subsequent definitions fall within the group
+    # This function processes commands that handle grouping of members.
+    # Returns True if the command was processed, false otherwise.
+    #
+    # Grouping commands work differently than in Doxygen:
+    # \defgroup defines a group, subsequent definitions fall within the group.
     # \addtogroup makes subsequent definitions fall within the group, but doesn't provide
-    # documentation for the group itself
-    # \endgroup stops the current group
+    # documentation for the group itself.
+    # \endgroup stops the current group.
     # Starting a group within a group causes nested groups. Also adding \ingroup to the group's
     # documentation causes it to be nested.
+    # \name and \endname work similarly, but only inside a class or struct definition.
     if cmd == 'defgroup':
         id, name = split_string(args)
         if not id or not name:
@@ -320,7 +371,14 @@ def process_grouping_command(cmd, args, brief, doc, loc, status: Status):
         else:
             log.warning("\\endgroup cannot occur while not in a group\n   in file %s", status.current_include_name)
         return True
+    if cmd == 'name':
+        return True
+    if cmd == 'endname':
+        return True
     return False
+
+
+#--- Parsing header files --- extracting and processing comments ---
 
 def process_comment_command(lines, loc, status: Status):
     # This function processes a specific set of commands that should not be associated
@@ -334,7 +392,7 @@ def process_comment_command(lines, loc, status: Status):
 
     # The comment should start with a valid command
     cmd, args = split_string(lines[0])
-    if cmd[0] != '\\' and cmd[0] != '@':
+    if not cmd or cmd[0] not in ['\\', '@']:
         return
     cmd = cmd[1:]
     if cmd not in documentation_commands:
@@ -371,7 +429,7 @@ def process_comments(tu, status: Status):
             if not token:
                 return
 
-        comment = token.spelling.strip()
+        comment = token.spelling.lstrip()
         if is_single_line_comment(comment):
             # Concatenate individual single-line comments together, but only if they are strictly
             # adjacent, and all are documentation comments
@@ -381,7 +439,7 @@ def process_comments(tu, status: Status):
                 pos = token.extent.end.line
                 token = next(it, None)
                 while token and token.kind == cindex.TokenKind.COMMENT:
-                    comment = token.spelling.strip()
+                    comment = token.spelling.lstrip()
                     if not is_single_line_comment(comment) or \
                        not is_documentation_comment(comment, '/') or \
                        pos + 1 < token.extent.start.line:
@@ -406,19 +464,57 @@ def process_comments(tu, status: Status):
 
 #--- Parsing Markdown files ---
 
+def process_markdown_command(lines, status: Status):
+    # This function processes a specific set of commands in Markdown files
+    # Similar to process_comment_command()
+
+    # Skip empty lines
+    while lines and not lines[0]:
+        lines = lines[1:]
+    if not lines:
+        return
+
+    # The comment should start with a valid command
+    cmd, args = split_string(lines[0])
+    if not cmd or cmd[0] not in ['\\', '@']:
+        return
+    cmd = cmd[1:]
+    if cmd not in documentation_commands:
+        return
+    cmd = documentation_commands[cmd]
+
+    # Everything after the first line is documentation
+    brief, doc = separate_brief('\n'.join(lines[1:]))
+
+    # Grouping commands
+    if process_grouping_command(cmd, args, brief, doc, 0, status):
+        return
+
+    # Documentation
+    process_documentation_command(DocumentationCommand(cmd, args, brief, doc, status.current_group[-1]), status)
+
 def extract_markdown(filename, status: Status):
     # Gets the Markdown blocks out of the file, and adds them in the appropriate
     # locations in status.data
-
-    # 1. Open file, read line by line
-    # 2. Skip lines starting with \comment, these are comments
-    # 3. Expect a line starting with \<cmd>, where <cmd> is in `documentation_commands`
-    # 4. Collect lines up to the next line starting with \<cmd>
-    # 5. Do stuff similarly to `process_comment_command` with these lines, but call
-    #    `process_documentation_command` immediately instead of delaying it.
-
-    # TODO
-    pass
+    with open(filename, 'r') as fp:
+        lines = []
+        for line in fp:
+            line = line.rstrip('\n')
+            cmd, args = split_string(line)
+            if cmd and cmd[0] in ['\\', '@']:
+                if cmd[1:] == 'comment':
+                    continue  # Ignore comments
+                if cmd[1:] in documentation_commands:
+                    # We found a new documentation command, which starts a new block to process.
+                    # Process previous block first, then start a new block
+                    if lines:
+                        process_markdown_command(lines, status)
+                    lines = [line]
+                    continue
+            # In all othr cases, append the line to the block and continue
+            lines.append(line)
+        # At the end of the file, process the last block we collected
+        process_markdown_command(lines, status)
 
 
 #--- Parsing header files --- extracting declarations ---
@@ -621,7 +717,7 @@ def extract_declarations(citer, parent, status: Status):
                 else:
                     comment = '\n'.join(clean_multiline_comment(comment, item.extent.start.column - 1))  # TODO: this start column is "iffy". We don't know where the comment actually starts!
                 cmd, _ = split_string(comment)
-                if not(len(cmd) > 1 and cmd[0] == '\\' and cmd[1:] in documentation_commands):
+                if not(len(cmd) > 1 and cmd[0] in ['\\', '@'] and cmd[1:] in documentation_commands):
                     brief, doc = separate_brief(comment)
                     add_doc(member, brief, doc)
 
@@ -912,12 +1008,12 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
     # Process all stored member documentation that was not associated to a declaration in the sources
     for cmd in status.unprocessed_commands:
         process_documentation_command(cmd, status)
+    status.unprocessed_commands = []
 
     # Process all additional files
     status.current_file = {}
     status.current_file_name = ''
     status.current_include_name = ''
-    status.current_group = ['']
     processed = {}
     for f in additional_files:
         # Skip file if already processed
@@ -925,6 +1021,10 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
         if f in processed:
             continue
         log.info('Processing %s', f)
+
+        # Reset the parts of status that we use
+        status.current_group = ['']
+        status.group_locations = []
 
         # Extract markdown blocks from file
         extract_markdown(f, status)
