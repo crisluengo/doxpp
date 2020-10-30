@@ -16,9 +16,9 @@ namespace transport
 {
 	/** Racing bike class.
 	 *
-	 * RacingBike is a special kind of bike which can go much faster
+	 * `RacingBike` is a special kind of bike which can go much faster
 	 * on the road, with much less effort (even uphill!). It doesn't make
-	 * sense to call <RingBell> on a racing bike for they don't have bells.
+	 * sense to call \ref RingBell on a racing bike for they don't have bells.
 	 */
 	class RacingBike : public Bicycle
 	{
@@ -26,8 +26,17 @@ namespace transport
 		/** @inherit */
 		virtual void PedalHarder();
 
-		/** RingBell is not implemented. */
+		/** `RingBell` is not implemented. */
 		virtual void RingBell();
+
+		/// What kind of gears can a `RacingBike` have?
+		enum class GearSystem {
+		   expensive, ///< These are the good gears, or maybe they're just overpriced
+		   cheap      ///< These gears won't last long
+		};
+
+		/// What kind of gears does this racing bike have?
+		GearSystem gearSystem = GearSystem::expensive;
 	};
 }
 

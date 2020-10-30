@@ -30,7 +30,8 @@ def generate_config_file(filename):
     }
     config['output'] = {
         'filename': 'dox++out.json',
-        'log level': 'warning'      # 'error', 'warning', 'info' or 'debug'
+        'use typewriter font': 'no',  # 'yes' or 'no', the Markdown output uses backticks (code formatting) around member names
+        'log level': 'warning'        # 'error', 'warning', 'info' or 'debug'
     }
     config['clang'] = {
         'compiler flags': '',       # could be '-std:c++11', for example
@@ -64,12 +65,17 @@ if not 'clang' in config:
 
 doxpp.log.setLevel(config['output'].get('log level', 'warning'))  # the default value
 
+options = {
+    'code_formatting': config['output'].get('use typewriter font', 'no')
+}
+
 data = doxpp.buildtree.buildtree(
-    config['input'].get('root directory', ''),
-    config['input'].get('header files', ''),
-    config['input'].get('markdown files', ''),
+    config['input'].get('root directory', '.'),
+    config['input'].get('header files', '*.h *.hpp'),
+    config['input'].get('markdown files', '*.md'),
     config['clang'].get('compiler flags', ''),
-    config['clang'].get('include directories', '')
+    config['clang'].get('include directories', ''),
+    options
 )
 
 filename = config['output'].get('filename', 'dox++out.json')

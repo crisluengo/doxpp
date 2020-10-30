@@ -18,7 +18,7 @@ import os, subprocess, sys, platform
 from .clang import cindex
 from . import log
 
-def flags(f):
+def get_system_includes(f):
     devnull = open(os.devnull)
 
     try:
@@ -50,9 +50,9 @@ def flags(f):
             suffix = ' (framework directory)'
             if p.endswith(suffix):
                 p = p[:-len(suffix)]
-            paths.append(p)
+            paths.append(os.path.realpath(p))
             
-    return ['-I{0}'.format(x) for x in paths] + f
+    return paths
 
 def load_libclang():
     from ctypes.util import find_library

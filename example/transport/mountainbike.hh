@@ -15,22 +15,22 @@ namespace transport
    /// \defgroup all-terrain All-terrain bicycles
    /// A group of classes representing bicycle types that can go off-road
 
-	/** Mountain bike implementation of a <Bicycle>.
+	/** Mountain bike implementation of a \ref Bicycle.
 	 *
-	 * MountainBike is an implementation of a <Bicycle>
+	 * `MountainBike` is an implementation of a \ref Bicycle
 	 * providing a bike for cycling on rough terrain. Mountain bikes
 	 * are pretty cool because they have stuff like **Suspension** (and
-	 * you can even adjust it using <SetSuspension>). If you're looking
+	 * you can even adjust it using \ref SetSuspension). If you're looking
 	 * for a bike for use on the road, you might be better off using a
-	 * <RacingBike> though.
+	 * \ref RacingBike though.
 	 */
 	class MountainBike : public Bicycle
 	{
 	public:
 		/** Set suspension stiffness.
-		 * @stiffness the suspension stiffness.
+		 * @param stiffness the suspension stiffness.
 		 *
-		 * SetSuspension changes the stiffness of the suspension
+		 * `SetSuspension` changes the stiffness of the suspension
 		 * on the bike. The method will return false if the stiffness
 		 * could not be adjusted.
 		 *
@@ -40,15 +40,15 @@ namespace transport
 		bool SetSuspension(double stiffness);
 
 		/** Change the break type.
-		 * @BreakType the break type.
-		 * @breakType the type of the break.
+		 * @tparam BreakType the break type.
+		 * @param breakType the type of the break.
 		 *
-		 * ChangesBreak changes the type of break fitted to the bike.
+		 * `ChangesBreak` changes the type of break fitted to the bike.
 		 * The method will return false if the break type could not be
 		 * fitted.
 		 *
 		 * @return true if the break was adjusted successfully.
-		 *         false otherise
+		 *         false otherwise
 		 */
 		template <typename BreakType>
 		bool ChangeBreak(BreakType breakType)

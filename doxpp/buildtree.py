@@ -99,26 +99,30 @@ access_specifier_map = {
 
 
 # These are the commands that can start a documentation block
+# Aliases are mapped to our preferred version
 documentation_commands = {
-    'addtogroup',
-    'class',
-    'def',
-    'defgroup',
-    'dir',
-    'endgroup',
-    'enum',
-    'example',
-    'file',
-    'fn',
-    'mainpage',
-    'name',
-    'namespace',
-    'overload',
-    'page',
-    'struct',
-    'typedef',
-    'union',
-    'var'
+    'addtogroup' : 'addtogroup',
+    'alias' : 'alias',
+    'class' : 'class',
+    'def' : 'macro',
+    'defgroup' : 'defgroup',
+    'dir' : 'dir',
+    'endgroup' : 'endgroup',
+    'endname' : 'endname',
+    'enum' : 'enum',
+    'file' : 'file',
+    'fn' : 'function',
+    'function' : 'function',
+    'macro' : 'macro',
+    'mainpage' : 'mainpage',
+    'name' : 'name',
+    'namespace' : 'namespace',
+    'page' : 'page',
+    'struct' : 'struct',
+    'typedef' : 'alias',
+    'union' : 'union',
+    'var' : 'variable',
+    'variable' : 'variable'
 }
 
 
@@ -131,10 +135,22 @@ class Status:
         self.group_locations = []    # Here we keep a list of (line, group_id), for the current file only. line is the line that the group starts. If group_id is '', then no group is active after that line
         self.current_file = {}       # `files[i]` dict for  the current file.
         self.current_file_name = ''  # Full file name (with absolute path).
+        self.current_include_name = ''  # File name relative to project root.
         self.groups = {}             # These dictionaries contain the same dictionaries as in 'data',
         self.files = {}              #    but indexed by their id so they're easy to find. It is the
         self.members = {}            #    *same* dictionaries, modifying these will modify 'data'.
         self.member_ids = {}         # A dictionary to translate USR to our ID for a member.
+        self.unprocessed_commands = []  # Here we keep command documentation blocks that need to be processed later.
+
+
+class DocumentationCommand:
+    def __init__(self, cmd, args, brief, doc, group):
+        self.cmd = cmd
+        self.args = args
+        self.brief = brief
+        self.doc = doc
+        self.group = group
+
 
 def expand_sources(sources):
     ret = []
@@ -237,7 +253,75 @@ def find_ingroup_cmd(member):
 
 #--- Parsing header files --- extracting and processing comments ---
 
-def process_command(lines, loc, status: Status):
+def process_documentation_command(cmd: DocumentationCommand, status: Status):
+    # This function processes commands that add documentation to members
+
+    # Here we call `find_ingroup_cmd` or a similar function to find a `\subpage` command
+
+    pass
+    # TODO
+
+
+def process_grouping_command(cmd, args, brief, doc, loc, status: Status):
+    # This function processes commands that handle grouping of members
+    # Returns True if the command was processed, false otherwise
+    # Grouping commands: this works differently than in Doxygen.
+    # \defgroup defines a group, subsequent definitions fall within the group
+    # \addtogroup makes subsequent definitions fall within the group, but doesn't provide
+    # documentation for the group itself
+    # \endgroup stops the current group
+    # Starting a group within a group causes nested groups. Also adding \ingroup to the group's
+    # documentation causes it to be nested.
+    if cmd == 'defgroup':
+        id, name = split_string(args)
+        if not id or not name:
+            log.error("\\defgroup needs an ID and a name\n   in file %s", status.current_include_name)
+            return True
+        current_group = status.current_group[-1]
+        if not id in status.groups:
+            status.groups[id] = members.new_group(id, name, brief, doc, current_group)
+            status.data['groups'].append(status.groups[id])
+        else:
+            group = status.groups[id]
+            if not group['name']:
+                group['name'] = name
+            add_doc(group, brief, doc)
+        if current_group:
+            group = status.groups[current_group]
+            if group['subgroups'].count(id) == 0:  # add group only once
+                group['subgroups'].append(id)
+        status.current_group.append(id)
+        status.group_locations.append((loc, id))
+        return True
+    if cmd == 'addtogroup':
+        id, name = split_string(args)
+        # We ignore name here
+        if not id:
+            log.error("\\addtogroup needs an ID\n   in file %s", status.current_include_name)
+            return True
+        current_group = status.current_group[-1]
+        if not id in status.groups:
+            status.groups[id] = members.new_group(id, '', '', '', current_group)
+            status.data['groups'].append(status.groups[id])
+        if current_group:
+            group = status.groups[current_group]
+            if group['subgroups'].count(id) == 0:  # add group only once
+                group['subgroups'].append(id)
+        # We also ignore the rest of the comment block
+        status.current_group.append(id)
+        status.group_locations.append((loc, id))
+        return True
+    if cmd == 'endgroup':
+        current_group = status.current_group[-1]
+        if current_group:
+            status.current_group.pop()
+            status.group_locations.append((loc, status.current_group[-1]))
+        else:
+            log.warning("\\endgroup cannot occur while not in a group\n   in file %s", status.current_include_name)
+        return True
+    return False
+
+def process_comment_command(lines, loc, status: Status):
     # This function processes a specific set of commands that should not be associated
     # to a declaration in the header file
 
@@ -254,90 +338,22 @@ def process_command(lines, loc, status: Status):
     cmd = cmd[1:]
     if not cmd in documentation_commands:
         return
+    cmd = documentation_commands[cmd]
 
-    # Grouping commands: this works differently than in Doxygen.
-    # \defgroup defines a group, subsequent definitions fall within the group
-    # \addtogroup makes subsequent definitions fall within the group, but doesn't provide
-    # documentation for the group itself
-    # \endgroup stops the current group
-    # Starting a group within a group causes nested groups. Also adding \ingroup to the group's
-    # documentation causes it to be nested.
-    if cmd == 'defgroup':
-        id, name = split_string(args)
-        if not id or not name:
-            log.error("\\defgroup needs an ID and a name\n   in file %s", status.current_file_name)
-            return
-        brief, doc = separate_brief('\n'.join(lines[1:]))
-        current_group = status.current_group[-1]
-        if not id in status.groups:
-            status.groups[id] = members.new_group(id, name, brief, doc, current_group)
-            status.data['groups'].append(status.groups[id])
-        else:
-            group = status.groups[id]
-            if not group['name']:
-                group['name'] = name
-            add_doc(group, brief, doc)
-        if current_group:
-            group = status.groups[current_group]
-            if group['subgroups'].count(id) == 0:  # add group only once
-                group['subgroups'].append(id)
-        status.current_group.append(id)
-        status.group_locations.append((loc, id))
+    # Everything after the first line is documentation
+    brief, doc = separate_brief('\n'.join(lines[1:]))
 
-    elif cmd == 'addtogroup':
-        id, name = split_string(args)
-        # We ignore name here
-        if not id:
-            log.error("\\addtogroup needs an ID\n   in file %s", status.current_file_name)
-            return
-        current_group = status.current_group[-1]
-        if not id in status.groups:
-            status.groups[id] = members.new_group(id, '', '', '', current_group)
-            status.data['groups'].append(status.groups[id])
-        if current_group:
-            group = status.groups[current_group]
-            if group['subgroups'].count(id) == 0:  # add group only once
-                group['subgroups'].append(id)
-        # We also ignore the rest of the comment block
-        status.current_group.append(id)
-        status.group_locations.append((loc, id))
-
-    elif cmd == 'endgroup':
-        current_group = status.current_group[-1]
-        if current_group:
-            status.current_group.pop()
-            status.group_locations.append((loc, status.current_group[-1]))
-        else:
-            log.warning("\\endgroup cannot occur while not in a group\n   in file %s", status.current_file_name)
+    # Grouping commands
+    if process_grouping_command(cmd, args, brief, doc, loc, status):
+        return
 
     # Documenting the current file
-    elif cmd == 'file':
-        if args:
-            canonical_name = args  # TODO: This is a mess... we need to get the canonical name here.
-            file_id = unique_id.header(canonical_name)
-            if file_id in status.files:
-                file = status.files[file_id]
-            else:
-                file = members.new_header(file_id, canonical_name)  # TODO: we need to test in the main loop over the files if this has happened
-                status.data['headers'].append(file)
-                status.files[file_id] = file
-        else:
-            file = status.current_file
-        brief, doc = separate_brief('\n'.join(lines[1:]))
-        add_doc(file, brief, doc)
+    if cmd == 'file' and not args:
+        add_doc(status.current_file, brief, doc)
+        return
 
-    # Documenting things we don't declare right here
-    # \class name
-    # \struct name
-    # \var name
-    # etc.
-    else:
-        if not args:
-            log.error("%s without a name\n   in file %s", status.current_file_name)
-            return
-        brief, doc = separate_brief('\n'.join(lines[1:]))
-        # TODO: implement
-
+    # Documenting things we don't declare right here, this we'll do after processing all header files
+    status.unprocessed_commands.append(DocumentationCommand(cmd, args, brief, doc, status.current_group[-1]))
 
 def process_comments(tu, status: Status):
     # Gets the comments out of the file, figures out what entity they belong to,
@@ -372,56 +388,80 @@ def process_comments(tu, status: Status):
                     lines.append(clean_comment(comment))
                     pos = token.extent.end.line
                     token = next(it, None)
-                process_command(lines, loc, status)
+                process_comment_command(lines, loc, status)
                 continue  # token currently is the next token, it hasn't been processed yet, we don't want to skip it
         else:
             # Multi-line comments are not concatenated with anything
             if is_documentation_comment(comment, '*'):
                 prelen = token.extent.start.column - 1
                 lines = clean_multiline_comment(comment, prelen)
-                process_command(lines, token.extent.start.line, status)
+                process_comment_command(lines, token.extent.start.line, status)
 
         token = next(it, None)
 
     while status.current_group[-1]:
-        log.warning("Missing \\endgroup for group %s\n   in file %s", status.current_group.pop(), status.current_file_name)
+        log.warning("Missing \\endgroup for group %s\n   in file %s", status.current_group.pop(), status.current_include_name)
+
+
+#--- Parsing Markdown files ---
+
+def extract_markdown(filename, status: Status):
+    # Gets the Markdown blocks out of the file, and adds them in the appropriate
+    # locations in status.data
+
+    # 1. Open file, read line by line
+    # 2. Skip lines starting with \comment, these are comments
+    # 3. Expect a line starting with \<cmd>, where <cmd> is in `documentation_commands`
+    # 4. Collect lines up to the next line starting with \<cmd>
+    # 5. Do stuff similarly to `process_comment_command` with these lines, but call
+    #    `process_documentation_command` immediately instead of delaying it.
+
+    # TODO
+    pass
+
 
 #--- Parsing header files --- extracting declarations ---
 
 def full_typename(decl):
-    meid = decl.displayname
+    type = decl.displayname
     parent = decl.semantic_parent
     if not parent or parent.kind == cindex.CursorKind.TRANSLATION_UNIT:
-        return meid
-    parval = full_typename(parent)
-    if not meid:
-        return parval
-    if parval:
-        return parval + '::' + meid
-    return meid
+        return type
+    parent_type = full_typename(parent)
+    if not type:
+        return parent_type
+    if parent_type:
+        return parent_type + '::' + type
+    return type
+
+std_namespace_match = re.compile(r"^std::__.*::(.+)*$")
 
 def process_type_recursive(type, cursor, output):
     kind = type.kind
     done = False
+    # Reference/pointer qualifiers
     if kind in type_kind_to_type_map:
         process_type_recursive(type.get_pointee(), cursor, output)
         output['qualifiers'].append(type_kind_to_type_map[kind])
         done = True
+    # Is it an array?
     if kind in type_kind_array_types:
         process_type_recursive(type.get_array_element_type(), None, output)
         output['qualifiers'].append('[]')
         done = True
+    # Const qualifier
     if type.is_const_qualified():
         output['qualifiers'].append('const')
     if done:
         return
+    # Actual type
     decl = type.get_declaration()
     if decl and decl.displayname:
         typename = full_typename(decl)
     elif kind in type_kind_to_name_map:
         typename = type_kind_to_name_map[kind]
     elif hasattr(type, 'spelling'):
-    #    canon = type.get_canonical()
+    #    canon = type.get_canonical()  # TODO: this is for function pointer types
     #    if canon.kind == cindex.TypeKind.FUNCTIONPROTO:
     #        kind = canon.kind
     #        result = process_type(canon.get_result())
@@ -431,6 +471,12 @@ def process_type_recursive(type, cursor, output):
         typename = cursor.displayname
     else:
         typename = ''
+    # Remove std namespace shenanigans
+    match = std_namespace_match.fullmatch(typename)
+    if match:
+        print(" *** Matched the regexp: ", typename, match[1])
+        typename = 'std::' + match[1]
+    # Done
     output['typename'] = typename
 
 def process_type(type, cursor=None):
@@ -547,6 +593,11 @@ def extract_declarations(citer, parent, status: Status):
             log.debug("member: kind = %s, spelling = %s, parent = %s, semantic_parent = %s", item.kind, item.spelling, parent, semantic_parent)
             #log.debug("        tokens = %s", [x.spelling for x in item.get_tokens()])
 
+            # Is the parent a namespace, or something else?
+            parent_is_namespace = False
+            if not semantic_parent or status.members[semantic_parent]['member_type'] == 'namespace':
+                parent_is_namespace = True
+
             # Process base class specifier differently
             if member_type == 'basespecifier':
                 if not semantic_parent:
@@ -559,7 +610,7 @@ def extract_declarations(citer, parent, status: Status):
             # TODO: Should we move the 'templatenontypeparameter' and 'templatetypeparameter' handling here?
 
             # Create a member data structure for this member
-            member = members.new_member('', item.spelling, member_type, semantic_parent, status.current_file_name)
+            member = members.new_member('', item.spelling, member_type, semantic_parent, status.current_include_name)
 
             # Find the associated documentation comment and parse it
             comment = item.raw_comment
@@ -578,10 +629,10 @@ def extract_declarations(citer, parent, status: Status):
             if member_type == 'functiontemplate':
                 is_template = True
                 # Could be 'methodtemplate' also
-                if semantic_parent and status.members[semantic_parent]['member_type'] in ['class', 'struct']:
-                    member_type = 'method'
-                else:
+                if parent_is_namespace:
                     member_type = 'function'
+                else:
+                    member_type = 'method'
             elif member_type == 'classtemplate':
                 is_template = True
                 member_type = 'class'
@@ -610,11 +661,12 @@ def extract_declarations(citer, parent, status: Status):
                     member['name'] = item.spelling.split('<', maxsplit=1)[0]
 
             # Find the group this member belongs to
+            if parent_is_namespace:
+                group = find_ingroup_cmd(member)
+                if not group:
+                    group = get_group_at_line(status.group_locations, item.extent.start.line)
+                member['group'] = group
             # TODO: for class or struct members, we need a separate grouping system
-            group = find_ingroup_cmd(member)
-            if not group:
-                group = get_group_at_line(status.group_locations, item.extent.start.line)
-            member['group'] = group
 
             # Associate any other information with this member
             process_children = False
@@ -638,7 +690,7 @@ def extract_declarations(citer, parent, status: Status):
                 member['value'] = item.enum_value
             elif member_type == 'enum':
                 member['scoped'] = item.is_scoped_enum()
-                member['type'] = item.enum_type
+                member['type'] = process_type(item.enum_type)
                 member['members'] = {}
                 process_children = True
             elif member_type == 'field':
@@ -724,36 +776,63 @@ def extract_declarations(citer, parent, status: Status):
 
 #--- Parsing header files --- extracting include statements ---
 
-def extract_includes(tu, file_member):
+def is_under_directory(file, path):
+    if os.path.commonpath([file, path]) == path:
+        return os.path.relpath(file, path), True
+    return file, False
+
+def extract_includes(tu, status: Status, include_dirs):
     # Gets the list of files directly included by this one (not the ones included
     # by files included here).
-    # TODO: This can be better, we might want to use the cursor to retrieve actual `#include` statements.
+    # include_dirs[0] is always the project's root dir
+    this_file_includes = status.current_file['includes']
     it = tu.get_includes()
     for f in it:
         if f.depth == 1:
-            file_member['includes'].append(f.include.name)
+            include = os.path.realpath(f.include.name)
+            include, in_project = is_under_directory(include, include_dirs[0])
+            if not in_project:
+                full_include = include
+                for dir in include_dirs[1:]:
+                    part, res = is_under_directory(full_include, dir)
+                    if res and len(part) < len(include):
+                        include = part
+            if os.path.isabs(include):
+                log.warning("Included file %s not in any of the directories on the path\n   in file %s", include, status.current_include_name)
+            this_file_includes.append({
+                'filename': include,
+                'in_project': in_project
+            })
 
-#--- Parsing Markdown files ---
-
-def extract_markdown(status: Status):
-    # Gets the Markdown blocks out of the file, and adds them in the appropriate
-    # locations in status.data
-    pass
 
 #--- Main function for this file ---
 
-def buildtree(root_dir, input_files, additional_files, compiler_flags, include_dirs):
+def buildtree(root_dir, input_files, additional_files, compiler_flags, include_dirs, options):
     """
     :param root_dir: The root directory for the header files, that you would pass to the compiler with `-I` when using the library (string)
     :param input_files: header files (with wildcards and path relative to working directory), space separated (string)
     :param additional_files: Markdown files (with wildcards and path relative to working directory), space separated (string)
     :param compiler_flags: flags to pass to the compiler (string)
     :param include_dirs: include directories to pass to the compiler (string)
+    :param options: dictionary with options for how to process things
+
+    Options can contain the keys:
+    - 'code_formatting': 'yes' or 'no', indicating whether to use "`<name>`" or "<name>" when writing the name of
+        members. The `` is Markdown for code formatting. This applies to the \ref command only, since formatting of
+        member names elsewhere is done by the backend, not this function. If a member name is not preceded by \ref,
+        this tool will not recognize it as such. Instead, manually add `` around member names if not referenced.
     """
+
+    # Process the input parameters
+    root_dir = os.path.realpath(root_dir)
     input_files = expand_sources(shlex.split(input_files))
     additional_files = expand_sources(shlex.split(additional_files))
-    compiler_flags = libclang.flags(compiler_flags.split())
-    compiler_flags += ['-I{0}'.format(x) for x in shlex.split(include_dirs, posix=False)]
+    compiler_flags = compiler_flags.split()
+    include_dirs = [os.path.realpath(x) for x in shlex.split(include_dirs, posix=False)]
+
+    # Get system include directories and figure out compiler flags
+    include_dirs = [root_dir] + libclang.get_system_includes(compiler_flags) + include_dirs
+    compiler_flags += ['-I{0}'.format(x) for x in include_dirs]
     log.debug("Compiler flags: %s", ' '.join(compiler_flags))
 
     # Build the output file data representation
@@ -768,8 +847,6 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
     # Our status
     status = Status(data)
 
-    root_dir = os.path.realpath(root_dir)
-
     # Process all header files
     index = cindex.Index.create()
     processed = {}
@@ -780,8 +857,8 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
             continue
 
         # Get the name we'd use in an #include statement
-        canonical_name = os.path.relpath(f, start=root_dir)
-        log.info('Processing %s', canonical_name)
+        status.current_include_name = os.path.relpath(f, start=root_dir)
+        log.info('Processing %s', status.current_include_name)
         status.current_file_name = f
 
         # Reset the rest of the data
@@ -789,15 +866,15 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
         status.group_locations = []
 
         # Add info for current file
-        file_id = unique_id.header(canonical_name)
-        status.current_file = members.new_header(file_id, canonical_name)
+        file_id = unique_id.header(status.current_include_name)
+        status.current_file = members.new_header(file_id, status.current_include_name)
         status.data['headers'].append(status.current_file)
         status.files[file_id] = status.current_file
 
         # Parse the file
         tu = None
         try:
-            tu = index.parse(f, compiler_flags)
+            tu = index.parse(f, compiler_flags, options=cindex.TranslationUnit.PARSE_SKIP_FUNCTION_BODIES + cindex.TranslationUnit.PARSE_INCOMPLETE)
         except cindex.TranslationUnitLoadError as e:
             log.error("Could not parse file %s", f)
             log.error(str(e))
@@ -820,7 +897,7 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
                 exit(1)
 
         # Extract list of headers included by this file
-        extract_includes(tu, status.current_file)
+        extract_includes(tu, status, include_dirs)
 
         # Extract and process documentation comments with commands
         process_comments(tu, status)
@@ -831,9 +908,14 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
         # Mark this file as complete
         processed[f] = True
 
+    # Process all stored member documentation that was not associated to a declaration in the sources
+    for cmd in status.unprocessed_commands:
+        process_documentation_command(cmd, status)
+
     # Process all additional files
     status.current_file = {}
     status.current_file_name = ''
+    status.current_include_name = ''
     status.current_group = ['']
     processed = {}
     for f in additional_files:
@@ -843,10 +925,13 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
             continue
         log.info('Processing %s', f)
 
-        # Extract markdown block from file
-        extract_markdown(status)
+        # Extract markdown blocks from file
+        extract_markdown(f, status)
 
         # Mark file as complete
         processed[f] = True
+
+    # Go through all members, identify `\ref` and `\see` commands, and identify linked members
+    # TODO
 
     return status.data

@@ -11,4 +11,4 @@ log level = debug
 
 [clang]
 compiler flags = -std=c++14
-include directories = .
+include directories =
