@@ -46,3 +46,10 @@ def new_member(id, name='', member_type='', parent='', file=''):
         'deprecated': False     # Set to True if marked 'deprecated'
     })
     return member
+
+def new_page(id, title, doc=''):
+    return {
+        'id': id,
+        'title': title,
+        'doc': doc
+    }

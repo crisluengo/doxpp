@@ -14,7 +14,7 @@ Note that we try to keep compatibility with Doxygen, but chose to make some chan
 3. Grouping has changed: We don't recognize `\{` and `\}`. Instead, `\defgroup` and
    `\addtogroup` imply the opening `\{`. The closing `\}` must be replaced by
     `\endgroup`. Furthermore, groups are disjoint, each member can only belong to
-    one group.  
+    one group.
 
 ## At the start of a documentation block
 
@@ -34,9 +34,21 @@ The remainder of the comment block is ignored.
 
 ### `\alias <name>` (or `\typedef <name>`)
 
+Documents an alias declared in the headers with `using` or `typedef`. The declaration must actually
+exist. `<name>` is the fully qualified name of the alias, or, if not fully qualified, the alias
+with the "best" match is assumed ("best" means that the fewest number of scopes have to be prepended
+to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
+`<name>` is not the fully qualified name of the matched member.
+
 `\typedef` is an alias for compatibility with Doxygen.
 
 ### `\class <name>`
+
+Documents a class declared in the headers with `class`. The declaration must actually
+exist. `<name>` is the fully qualified name of the class, or, if not fully qualified, the alias
+with the "best" match is assumed ("best" means that the fewest number of scopes have to be prepended
+to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
+`<name>` is not the fully qualified name of the matched member.
 
 ### `\defgroup <name> [<title>]`
 
@@ -49,7 +61,7 @@ a `\endgroup` command.
 
 Groups can be nested. Each group has a parent and zero or more subgroups. When defining
 a group while another group is active, the group will be a subgroup of the active group,
-and then become the active group. 
+and then become the active group.
 
 `\endgroup` causes the previously active group to become active again. It is required to
 have one of these for each `defgroup` and each `addtogroup`.
@@ -78,6 +90,12 @@ See `\defgroup`.
 
 ### `\enum <name>`
 
+Documents an enumerator declared in the headers with `enum` or `enum class`. The declaration must actually
+exist. `<name>` is the fully qualified name of the enumerator, or, if not fully qualified, the alias
+with the "best" match is assumed ("best" means that the fewest number of scopes have to be prepended
+to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
+`<name>` is not the fully qualified name of the matched member.
+
 ### `\file [<name>]`
 
 Adds documentation for the current file, or a different file if the file name is given.
@@ -89,7 +107,13 @@ The rest of the comment block is considered documentation.
 ```
 
 ### `\function <name>` (or `\fn <name>`)
-           
+
+Documents a function or class method declared in the headers. The declaration must actually
+exist. `<name>` is the fully qualified name of the function, or, if not fully qualified, the alias
+with the "best" match is assumed ("best" means that the fewest number of scopes have to be prepended
+to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
+`<name>` is not the fully qualified name of the matched member.
+
 `\fn` is an alias for compatibility with Doxygen.
 
 ### `\macro <name>` (or `\def <name>`)
@@ -98,7 +122,13 @@ The only way of documenting preprocessor macros, as Clang doesn't report on the 
 the preprocessor (well, it's possible, but it makes things a lot more complex).
 
 If you want to show the full definition of the macro, write about it in your documentation.
-We don't feel that it is useful to show how a macro is defined.
+We feel that usually it is not useful to show how a macro is defined.
+
+Because Clang doesn't report where the macro is defined, we take the file where this
+documentation block lives as the include file for the macro. Therefore, you should always
+put this command in the same file where the macro is actually defined.
+
+TODO: Maybe eventually `\headerfile` can be used to indicate which header the macro is defined in.
 
 `\def` is an alias for compatibility with Doxygen.
 
@@ -161,13 +191,13 @@ Creates a link to the entity (member or page) called `<name>`. Optionally, the l
 can be set to `text`. If left out, the link text will be the tile of the page or the
 name of the member referenced.
 
-## At the start of a line in Markdown files only 
+## At the start of a line in Markdown files only
 
 ### `\comment`
 
 The rest of the line is ignored. Use this to add comments not meant to be shown in the
 documentation, file copyright notices, etc.
- 
+
 
 ---
 
@@ -198,7 +228,7 @@ weren't found, add an indicator that this is indeed not implemented.
 - `\union <name>`
 - `\var (variable declaration)` -> We'll have an alias `\variable`
 
-## Inside a member documentation block 
+## Inside a member documentation block
 
 - `\example['{lineno}'] <file-name>`
 - `\headerfile <header-file> [<header-name>]`

@@ -129,16 +129,26 @@ class Status:
     # This defines the status of our parser
     # (it's a way to collect global information without making a global parameter...)
     def __init__(self, data):
-        self.data = data
-        self.current_group = ['']    # Here we keep a stack of current group IDs. `current_group[-1]` is the current group.
-        self.group_locations = []    # Here we keep a list of (line, group_id), for the current file only. line is the line that the group starts. If group_id is '', then no group is active after that line
-        self.current_file = {}       # `files[i]` dict for  the current file.
-        self.current_file_name = ''  # Full file name (with absolute path).
+        self.data = data                # We build the output data in here, it's just dictionaries and lists so
+                                        # it's easy to output as JSON.
+
+        self.current_group = ['']       # Here we keep a stack of current group IDs.
+                                        # `current_group[-1]` is the current group.
+        self.group_locations = []       # Here we keep a list of (line, group_id), for the current file only.
+                                        # `line` is the line that the group starts.
+                                        # If group_id is '', then no group is active after that line
+
+        self.current_file = {}          # `files[i]` dict for  the current file.
+        self.current_file_name = ''     # Full file name (with absolute path).
         self.current_include_name = ''  # File name relative to project root.
-        self.groups = {}             # These dictionaries contain the same dictionaries as in 'data',
-        self.files = {}              #    but indexed by their id so they're easy to find. It is the
-        self.members = {}            #    *same* dictionaries, modifying these will modify 'data'.
-        self.member_ids = {}         # A dictionary to translate USR to our ID for a member.
+
+        self.groups = {}                # These dictionaries contain the same dictionaries as in 'data',
+        self.files = {}                 #    but indexed by their id so they're easy to find. It is the
+        self.members = {}               #    *same* dictionaries, modifying these will modify 'data'.
+        self.pages = {}                 #
+
+        self.member_ids = {}            # A dictionary to translate USR to our ID for a member.
+
         self.unprocessed_commands = []  # Here we keep command documentation blocks that need to be processed later.
 
 
@@ -242,7 +252,7 @@ def get_group_at_line(group_locations, line):
         current_group = item[1]
     return current_group
 
-ingroup_cmd_match = re.compile(r"^\s*[\@]ingroup\s+(\S+)\s*$", re.MULTILINE)
+ingroup_cmd_match = re.compile(r'^\s*[\\@]ingroup\s+(\S+)\s*$', re.MULTILINE)
 
 def find_ingroup_cmd(member):
     doc = member['doc']
@@ -253,10 +263,75 @@ def find_ingroup_cmd(member):
         return group
     return ''
 
+subpage_cmd_match_1 = re.compile(r'[\\@]subpage\s+(\S+)')
+subpage_cmd_match_2 = re.compile(r'[\\@]subpage\s+(\S+)\s+\"[^"]\"')
+
+def find_subpage_cmd(member):
+    doc = member['doc']
+    # First we look for \subpage <name> "text"
+    m = subpage_cmd_match_2.search(doc)
+    # If that's not found, we look for \subpage <name>
+    m = subpage_cmd_match_1.search(doc)
+
+
+#--- Walking the data (might belong in a different file) ---
+
+def find_member_inner(base, names, function_params, members):
+    # TODO
+    pass
+
+split_function_args = re.compile(r'^([a-zA-Z0-9_:]+)\((.*)\)$')
+
+def find_member(name, start_id, status: Status):
+    # Finds a member with name `name`, as a direct child of `start_id`, or as a direct child of the parent
+    # of `start_id`, recursively visiting its parents too. This is equivalent to identifying a name in the
+    # context of the member `start_id`.
+    # Returns the `id` of the first match found. If `name` has parenthesis, these are assumed to contain
+    # function arguments, and will be used to disambiguate in the case of overloaded functions.
+    name = name.strip()
+    if not name:
+        return ''
+    function_params = []
+    if '(' in name:
+        match = split_function_args.fullmatch(name)
+        if not match:
+            log.error('Cannot parse "%s"', name)
+            return ''
+        name = match[1]
+        function_params = match[2].split(',')
+        # TODO: parse the `function_params` list to make them comparable to function arguments
+    names = name.split('::')
+    if not names:
+        return ''
+    base = status.members[start_id]
+    while True:
+        id = find_member_inner(base, names, function_params, status.members)
+        if id:
+            return id
+        if not base['parent']:
+            return ''
+        base = status.members[base['parent']]
+
 
 #--- Processing documentation commands ---
 
 def process_generic_command(cmd: DocumentationCommand, status: Status):
+    # \cmd <name>
+    if not cmd.args:
+        log.error("\\%s needs a name argument\n   in file %s", cmd.cmd, status.current_include_name)
+        return
+    name, args = split_string(cmd.args)
+    if args:
+        log.warning("Ignoring additional arguments to \\%s command\n   in file %s", cmd.cmd, status.current_include_name)
+    # Find which member we're talking about
+    id = find_member(name, status)
+    if not id:
+        log.error("The member '%s' has not been declared, documentation ignored.\n   in file %s", cmd.args, '<unknown>')
+        # TODO: `cmd` should contain the name of the file that contains this documentation block
+        return
+
+    # TODO
+
     # These are all handled in the same way:
     # 1. Find first member with cmd.args as name
     # 2. Produce error if there's none
@@ -270,32 +345,85 @@ def process_generic_command(cmd: DocumentationCommand, status: Status):
     pass
 
 def process_macro_command(cmd: DocumentationCommand, status: Status):
-    # 1. Check to see if a macro already exists with cmd.args as name
-    # 2. If so: add_doc(member, cmd.brief, cmd.doc)
-    # 3. Otherwise create new member
-    # 4. Don't forget the grouping thing!
-    pass
-
-def process_dir_command(cmd: DocumentationCommand, status: Status):
-    # TODO: How do we record these? Is this even useful?
-    pass
+    # \macro <name>
+    if not cmd.args:
+        log.error("\\macro needs a name argument\n   in file %s", status.current_include_name)
+        return
+    name, args = split_string(cmd.args)
+    if args:
+        log.warning("Ignoring additional arguments to \\macro command\n   in file %s", status.current_include_name)
+    # Do we already have a member for this macro?
+    id = unique_id.macro(name)
+    if id in status.members:
+        # Add data to existing member
+        member = status.members[id]
+        if member['member_type'] != 'macro':
+            log.error("Documenting a macro with ID %s that is identical to an existing non-macro\n   in file %s", id, status.current_include_name)
+            return
+        add_doc(member, cmd.brief, cmd.doc)
+        if not member['group']:
+            member['group'] = cmd.group
+    else:
+        # Create a new member
+        member = members.new_member(id, name, 'macro', '', status.current_include_name)
+        member['group'] = cmd.group
+        status.members[id] = member
+        status.data['members'].append(member)
 
 def process_file_command(cmd: DocumentationCommand, status: Status):
-    pass
+    # \file <name>
+    # Note that the no-name version has already been processed
+    if not cmd.args:
+        log.error("\\file needs a file name when not in a header file\n   in file %s", status.current_include_name)
+        return
+    # Find header file we're referring to.
+    # We look for all matches with an arbitrary set of path elements prepended. The shortest such name is the one we pick.
+    best_match = ''
+    match_length = 1e9
+    for header in status.data['headers']:
+        name = header['name']
+        if name == cmd.args:
+            best_match = header['id']
+            break
+        if len(name) < match_length and name.endswith(os.sep + cmd.args):
+            match_length = len(name)
+            best_match = header['id']
+    if not best_match:
+        log.error("The file '%s' has not been parsed, documentation ignored.\n   in file %s", cmd.args, status.current_include_name)
+        return
+    header = status.files[best_match]
+    add_doc(header, cmd.brief, cmd.doc)
+
+def create_page(name, title, brief, doc, status: Status):
+    # Pages don't have a `brief` element, so we merge it back in:
+    doc = brief + '\n' + doc
+    if name in status.pages:
+        cur_doc = status.pages[name]['doc']
+        if cur_doc:
+            doc = cur_doc + '\n\n' + doc
+        status.pages[name]['doc'] = doc
+    else:
+        members.new_page(name, title, doc)
+
 
 def process_mainpage_command(cmd: DocumentationCommand, status: Status):
-    # This one should call process_page_command(), but set name to `index`.
-    process_page_command(cmd, status)
-    pass
+    title = cmd.args
+    if not title:
+        title = "Main"
+    create_page('index', title, cmd.brief, cmd.doc, status)
 
 def process_page_command(cmd: DocumentationCommand, status: Status):
-    # Here we call `find_ingroup_cmd` or a similar function to find a `\subpage` command
-    pass
+    name, title = split_string(cmd.args)
+    if not name or not title:
+        log.error("\\page requires a name and title, documentation ignored.\n   in file %s", status.current_include_name)
+        return
+    create_page(name, title, cmd.brief, cmd.doc, status)
 
 def process_documentation_command(cmd: DocumentationCommand, status: Status):
     # This function processes commands that add documentation to members
     if cmd.cmd == 'dir':
-        process_dir_command(cmd, status)
+        # TODO: How do we record these? Is this even useful?
+        log.error("\\dir currently not implemented, documentation ignored.\n   in file %s", status.current_include_name)
         return
     if cmd.cmd == 'file':
         process_file_command(cmd, status)
@@ -325,7 +453,7 @@ def process_grouping_command(cmd, args, brief, doc, loc, status: Status):
     # documentation causes it to be nested.
     # \name and \endname work similarly, but only inside a class or struct definition.
     if cmd == 'defgroup':
-        id, name = split_string(args)
+        id, name = split_string(args.strip())
         if not id or not name:
             log.error("\\defgroup needs an ID and a name\n   in file %s", status.current_include_name)
             return True
@@ -391,7 +519,7 @@ def process_comment_command(lines, loc, status: Status):
         return
 
     # The comment should start with a valid command
-    cmd, args = split_string(lines[0])
+    cmd, args = split_string(lines[0].strip())
     if not cmd or cmd[0] not in ['\\', '@']:
         return
     cmd = cmd[1:]
@@ -475,7 +603,7 @@ def process_markdown_command(lines, status: Status):
         return
 
     # The comment should start with a valid command
-    cmd, args = split_string(lines[0])
+    cmd, args = split_string(lines[0].strip())
     if not cmd or cmd[0] not in ['\\', '@']:
         return
     cmd = cmd[1:]
@@ -500,7 +628,7 @@ def extract_markdown(filename, status: Status):
         lines = []
         for line in fp:
             line = line.rstrip('\n')
-            cmd, args = split_string(line)
+            cmd, args = split_string(line.strip())
             if cmd and cmd[0] in ['\\', '@']:
                 if cmd[1:] == 'comment':
                     continue  # Ignore comments
@@ -555,8 +683,10 @@ def process_type_recursive(type, cursor, output):
     decl = type.get_declaration()
     if decl and decl.displayname:
         typename = full_typename(decl)
+        print('Typename', typename, 'through full_typename(type.get_declaration())')
     elif kind in type_kind_to_name_map:
         typename = type_kind_to_name_map[kind]
+        print('Typename', typename, 'through type_kind_to_name_map[kind]')
     elif hasattr(type, 'spelling'):
         #canon = type.get_canonical()  # TODO: this is for function pointer types
         #if canon.kind == cindex.TypeKind.FUNCTIONPROTO:
@@ -564,8 +694,12 @@ def process_type_recursive(type, cursor, output):
         #    result = process_type(canon.get_result())
         #    arguments = [process_type(arg) for arg in canon.argument_types()]
         typename = type.spelling
+        if typename.startswith('const '):
+            typename = typename[len('const '):]
+        print('Typename', typename, 'through type.spelling')
     elif cursor:
         typename = cursor.displayname
+        print('Typename', typename, 'through cursor.displayname')
     else:
         typename = ''
     # Remove std namespace shenanigans
@@ -771,7 +905,7 @@ def extract_declarations(citer, parent, status: Status):
             if member_type in ['class', 'struct']:
                 member['templated'] = is_template
                 member['bases'] = []
-                member['members'] = {}
+                member['members'] = []
                 process_children = True
             elif member_type in ['method', 'conversionfunction', 'constructor', 'destructor']:
                 member['templated'] = is_template
@@ -781,6 +915,7 @@ def extract_declarations(citer, parent, status: Status):
                 member['const'] = item.is_const_method()
                 member['access'] = access_specifier_map[item.access_specifier]
                 member['method_type'] = member_type
+                # TODO: a child member could be cindex.CursorKind.CXX_FINAL_ATTR?
                 process_function_declaration(item, member)
                 member_type = 'function'  # write out as function
             elif member_type == 'enumvalue':
@@ -788,7 +923,7 @@ def extract_declarations(citer, parent, status: Status):
             elif member_type == 'enum':
                 member['scoped'] = item.is_scoped_enum()
                 member['type'] = process_type(item.enum_type)
-                member['members'] = {}
+                member['members'] = []
                 process_children = True
             elif member_type == 'field':
                 member['type'] = process_type(item.type, item)
@@ -802,7 +937,7 @@ def extract_declarations(citer, parent, status: Status):
                 member['templated'] = is_template
                 process_function_declaration(item, member)
             elif member_type == 'namespace':
-                member['members'] = {}
+                member['members'] = []
                 process_children = True
             elif member_type == 'templatenontypeparameter':
                 default_value = None
@@ -833,7 +968,7 @@ def extract_declarations(citer, parent, status: Status):
                 if is_template:
                     process_children = True
             elif member_type == 'union':
-                member['members'] = {}
+                member['members'] = []
                 process_children = True
             elif member_type == 'variable':
                 member['type'] = process_type(item.type, item)
@@ -858,7 +993,7 @@ def extract_declarations(citer, parent, status: Status):
                     continue  # skip the rest of this function, we're in trouble here...
                 status.members[id] = member
                 if semantic_parent:
-                    status.members[semantic_parent]['members'][id] = member
+                    status.members[semantic_parent]['members'].append(member)
                 else:
                     status.data['members'].append(member)
 
@@ -934,7 +1069,6 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
 
     # Build the output file data representation
     data = {
-        'index': '',
         'members': [],
         'headers': [],
         'groups': [],
@@ -1013,9 +1147,11 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
     # Process all additional files
     status.current_file = {}
     status.current_file_name = ''
-    status.current_include_name = ''
     processed = {}
     for f in additional_files:
+        # Record file name in `current_include_name` for use in error messages
+        status.current_include_name = f
+
         # Skip file if already processed
         f = os.path.realpath(f)  # realpath makes for better comparisons
         if f in processed:
@@ -1032,7 +1168,20 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
         # Mark file as complete
         processed[f] = True
 
-    # Go through all members, identify `\ref` and `\see` commands, and identify linked members
+    # Go through all members with a 'type' element, and replace the type name string with the type ID, or
+    # add an ID to the dict. This process must also resolve template parameters (I think?)
+    # TODO
+
+    # Go through all members, headers, groups and pages, identify `\ref` and `\see` commands, identify linked members, and replace with links
+    # TODO
+
+    # Go through all pages, identify `\subpage` commands, identify linked members, establish hierarchy, and replace with links
+    # TODO, see find_subpage_cmd()
+
+    # Go through all classes with base classes, and add links to derived class members that override virtual base class members,
+    # and links to the overridden virtual base class members.
+    # member['override'] = 'base-class-member-id'
+    # member['overridden'] = ['derived-class-member-id', 'derived-class-member-id', ...]
     # TODO
 
     return status.data

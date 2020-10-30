@@ -14,6 +14,7 @@
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import urllib.parse
+import re
 
 def header(name):
     return urllib.parse.quote(name, safe='')
@@ -27,13 +28,19 @@ qualifier_map = {
     'const': 'C'
 }
 
+def type_from_string(string):
+    # Assuming string is fully qualified type name, no qualifiers
+    # (awkward distinction between "qualified" and "qualifiers"...)
+    return re.sub('::', '-', string)
+    # TODO: There's something more to do where, for templated types
+
 def type(dict):
     qualifiers = ''.join([qualifier_map[x] for x in dict['qualifiers']])
-    id = '-' + dict['typename'] + '-' + qualifiers
+    id = '-' + type_from_string(dict['typename']) + '-' + qualifiers
     return id
 
 def member(dict, status):
-    id = dict['name']
+    id = urllib.parse.quote(dict['name'], safe='')  # This ensures `operator<` doesn't produce an invalid URL or link ID.
     if dict['parent']:
         id = status.members[dict['parent']]['id'] + '-' + id
     if 'template_parameters' in dict:
@@ -46,3 +53,7 @@ def member(dict, status):
     if 'const' in dict and dict['const']:
         id += '-C'
     return id
+
+def macro(name):
+    # TODO: do we need more than this?
+    return "-macro-" + name

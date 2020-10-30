@@ -37,7 +37,7 @@ namespace transport
 		 * @return true if the suspension was adjusted successfully,
 		 *         false otherwise.
 		 */
-		bool SetSuspension(double stiffness);
+		bool SetSuspension(const double stiffness);
 
 		/** Change the break type.
 		 * @tparam BreakType the break type.
@@ -51,7 +51,7 @@ namespace transport
 		 *         false otherwise
 		 */
 		template <typename BreakType>
-		bool ChangeBreak(BreakType breakType)
+		bool ChangeBreak(const BreakType breakType)
 		{
 			if (breakType)
 			{
