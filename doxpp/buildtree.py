@@ -42,7 +42,7 @@ cursor_kind_to_type_map = {
     cindex.CursorKind.STRUCT_DECL: 'struct',
     cindex.CursorKind.TEMPLATE_NON_TYPE_PARAMETER: 'templatenontypeparameter',
     cindex.CursorKind.TEMPLATE_TYPE_PARAMETER: 'templatetypeparameter',
-    #cindex.CursorKind.TEMPLATE_TEMPLATE_PARAMETER: 'templatetemplateparameter', # TODO: do we need to add this?
+    #cindex.CursorKind.TEMPLATE_TEMPLATE_PARAMETER: 'templatetemplateparameter',  # TODO: do we need to add this?
     cindex.CursorKind.TYPEDEF_DECL: 'typedef',
     cindex.CursorKind.TYPE_ALIAS_DECL: 'using',
     cindex.CursorKind.TYPE_ALIAS_TEMPLATE_DECL: 'usingtemplate',
@@ -101,28 +101,28 @@ access_specifier_map = {
 # These are the commands that can start a documentation block
 # Aliases are mapped to our preferred version
 documentation_commands = {
-    'addtogroup' : 'addtogroup',
-    'alias' : 'alias',
-    'class' : 'class',
-    'def' : 'macro',
-    'defgroup' : 'defgroup',
-    'dir' : 'dir',
-    'endgroup' : 'endgroup',
-    'endname' : 'endname',
-    'enum' : 'enum',
-    'file' : 'file',
-    'fn' : 'function',
-    'function' : 'function',
-    'macro' : 'macro',
-    'mainpage' : 'mainpage',
-    'name' : 'name',
-    'namespace' : 'namespace',
-    'page' : 'page',
-    'struct' : 'struct',
-    'typedef' : 'alias',
-    'union' : 'union',
-    'var' : 'variable',
-    'variable' : 'variable'
+    'addtogroup': 'addtogroup',
+    'alias': 'alias',
+    'class': 'class',
+    'def': 'macro',
+    'defgroup': 'defgroup',
+    'dir': 'dir',
+    'endgroup': 'endgroup',
+    'endname': 'endname',
+    'enum': 'enum',
+    'file': 'file',
+    'fn': 'function',
+    'function': 'function',
+    'macro': 'macro',
+    'mainpage': 'mainpage',
+    'name': 'name',
+    'namespace': 'namespace',
+    'page': 'page',
+    'struct': 'struct',
+    'typedef': 'alias',
+    'union': 'union',
+    'var': 'variable',
+    'variable': 'variable'
 }
 
 
@@ -163,10 +163,10 @@ def expand_sources(sources):
 
 def split_string(string, separator=None):
     # Separate the first part from string, the second part could be empty. Returns a tuple.
-    list = string.split(separator, maxsplit=1)
-    part1 = list[0]
-    if len(list)>1:  # never more than 2 elements
-        part2 = list[1]
+    parts = string.split(separator, maxsplit=1)
+    part1 = parts[0]
+    if len(parts) > 1:  # never more than 2 elements
+        part2 = parts[1]
     else:
         part2 = ''
     return part1, part2
@@ -201,7 +201,7 @@ def clean_comment(comment):
         line = line[1:]
     return line
 
-def clean_multiline_comment(comment, prelen = 0):
+def clean_multiline_comment(comment, prelen=0):
     lines = []
     start = 3
     if len(comment) > 4 and comment[3] == '<':
@@ -251,6 +251,7 @@ def find_ingroup_cmd(member):
         return group
     return ''
 
+
 #--- Parsing header files --- extracting and processing comments ---
 
 def process_documentation_command(cmd: DocumentationCommand, status: Status):
@@ -278,7 +279,7 @@ def process_grouping_command(cmd, args, brief, doc, loc, status: Status):
             log.error("\\defgroup needs an ID and a name\n   in file %s", status.current_include_name)
             return True
         current_group = status.current_group[-1]
-        if not id in status.groups:
+        if id not in status.groups:
             status.groups[id] = members.new_group(id, name, brief, doc, current_group)
             status.data['groups'].append(status.groups[id])
         else:
@@ -300,7 +301,7 @@ def process_grouping_command(cmd, args, brief, doc, loc, status: Status):
             log.error("\\addtogroup needs an ID\n   in file %s", status.current_include_name)
             return True
         current_group = status.current_group[-1]
-        if not id in status.groups:
+        if id not in status.groups:
             status.groups[id] = members.new_group(id, '', '', '', current_group)
             status.data['groups'].append(status.groups[id])
         if current_group:
@@ -336,7 +337,7 @@ def process_comment_command(lines, loc, status: Status):
     if cmd[0] != '\\' and cmd[0] != '@':
         return
     cmd = cmd[1:]
-    if not cmd in documentation_commands:
+    if cmd not in documentation_commands:
         return
     cmd = documentation_commands[cmd]
 
@@ -461,11 +462,11 @@ def process_type_recursive(type, cursor, output):
     elif kind in type_kind_to_name_map:
         typename = type_kind_to_name_map[kind]
     elif hasattr(type, 'spelling'):
-    #    canon = type.get_canonical()  # TODO: this is for function pointer types
-    #    if canon.kind == cindex.TypeKind.FUNCTIONPROTO:
-    #        kind = canon.kind
-    #        result = process_type(canon.get_result())
-    #        arguments = [process_type(arg) for arg in canon.argument_types()]
+        #canon = type.get_canonical()  # TODO: this is for function pointer types
+        #if canon.kind == cindex.TypeKind.FUNCTIONPROTO:
+        #    kind = canon.kind
+        #    result = process_type(canon.get_result())
+        #    arguments = [process_type(arg) for arg in canon.argument_types()]
         typename = type.spelling
     elif cursor:
         typename = cursor.displayname
@@ -509,7 +510,7 @@ def merge_member(member, new_member):
             continue
         if key == 'members':
             for m in new_member['members']:
-                if not m in member['members']:
+                if m not in member['members']:
                     member['members'].append(m)
             continue
         if key in member and not member[key]:
@@ -519,7 +520,7 @@ def insert_template_parameter(member, parent, status: Status):
     if not parent:
         log.error("Template parameter %s doesn't have a parent", member['name'])
         return
-    if not 'template_parameters' in status.members[parent]:
+    if 'template_parameters' not in status.members[parent]:
         log.error("Template parameter %s has a parent that is not a template", member['name'])
         return
     param = {
@@ -637,17 +638,17 @@ def extract_declarations(citer, parent, status: Status):
                 is_template = True
                 member_type = 'class'
                 # Could be 'structtemplate' also
-                l = list(item.get_tokens())
+                tokens = list(item.get_tokens())
                 n = 0
-                for i in range(len(l)):
-                    if l[i].kind == cindex.TokenKind.PUNCTUATION and l[i].spelling == '<':
+                for i in range(len(tokens)):
+                    if tokens[i].kind == cindex.TokenKind.PUNCTUATION and tokens[i].spelling == '<':
                         n += 1
-                    if l[i].kind == cindex.TokenKind.PUNCTUATION and l[i].spelling == '>':
+                    if tokens[i].kind == cindex.TokenKind.PUNCTUATION and tokens[i].spelling == '>':
                         n -= 1
                         if n == 0:
                             i += 1
-                            if i < len(l):
-                                if l[i].kind == cindex.TokenKind.KEYWORD and l[i].spelling == 'struct':
+                            if i < len(tokens):
+                                if tokens[i].kind == cindex.TokenKind.KEYWORD and tokens[i].spelling == 'struct':
                                     member_type = 'struct'
                             break
             elif member_type == 'usingtemplate':
