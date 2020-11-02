@@ -1,7 +1,7 @@
 Dox++
 ===
 
-This is an alternative to Doxygen. 
+This is an alternative to Doxygen.
 It uses Clang to parse headers. This is through code modified from cldoc (https://github.com/jessevdk/cldoc)
 By using that code, this project must be GPL-2.0.
 The comment syntax is closer to Doxygen's than cldoc's. But I don't want to copy all the Doxygen crazy, just
@@ -14,50 +14,51 @@ the user desires. A few accompanying programs demonstrate that: one produces HTM
 
 The JSON file has the following format:
 {
-   index: '',
-   members: [],
-   headers: [],
-   groups: [],
-   pages: []
+   "members": [],
+   "headers": [],
+   "groups": [],
+   "pages": []
 }
-
-## index
-This is a Markdown block to render the index (front) page.
 
 ## members
 This is a list of everything that is defined at the global scope. Members are listed in order
 in which they were found in the header file. Each `members[i]` is a dictionary as follows:
 {
-   id: '',           // this is a unique identifier used for referencing
-   name: '',         // should this include the fully qualified name, or depend on the hierarchy?
-   type: '',         // class/function/enum/constant/define/namespace/etc.
-   parameters: [],   // (if a function)
-   return: '',       // (if a function)
-   brief: '',        // brief description, in Markdown
-   doc: '',          // full documentation, in Markdown
-   members: [],      // if a class or namespace, recursively list members
-   group: set(),     // id of the group(s) it is in (if any)
-   file: '',         // id of the file it is in (for namespaces, the first one it is encountered in)
-   relates: '',      // (if a function) id of the class this function relates to (`\relates` command)
-   ...               // other elements with additional information as needed ("virtual", "constexpr", etc)
+   "id": "",           // this is a unique identifier used for referencing
+   "name": "",         // name of the member
+   "brief": "",        // brief description, in Markdown
+   "doc": "",          // full documentation, in Markdown
+   "member_type": "",  // class/function/enum/variable/define/namespace/etc.
+   "parent": "",       // id of parent member
+   "file": "",         // id of the file it is in (for namespaces, the first one it is encountered in)
+   "group": "",        // id of the group it is in (or empty string)
+   "deprecated": false // false or true
+
+   "parameters": [],   // (if a function)
+   "return": "",       // (if a function)
+   "members": [],      // (if a class or namespace) recursively list members
+   "related": [],      // (if a class) list of ids of functions related to this class (`\relates` command)
+   ...                 // other elements with additional information as needed ("virtual", "mutable", etc.)
 }
 
 Member IDs are not unrecognizable hash codes as Doxygen does it, but simply created from the fully
 qualified name and parameters, guaranteeing uniqueness. For example:
- - int ns::foo()                     => 'ns.foo-'
- - int ns::foo(int, double)          => 'ns.foo-int-double'
- - int ns::foo(int&, double const&)  => 'ns.foo-int&-doubleconst&'
- - class ns::bar                     => 'ns.bar'
- - ns::bar::bar(float*)              => 'ns.bar.bar-float*'
+ - int ns::foo()                     => 'ns-foo'
+ - int ns::foo(int, double)          => 'ns-foo-int--double-'
+ - int ns::foo(int&, double const&)  => 'ns-foo-int-L-double-CL'
+ - class ns::bar                     => 'ns-bar'
+ - ns::bar::bar(float*)              => 'ns-bar-bar-float-P'
+
+See `members.md` for more information on the dictionary fields for each of the types of members.
 
 ## headers
 This is a list of files. Each `headers[i]` is a dictionary as follows:
 {
-   id: '',           // unique identifier
-   name: '',         // file name, with path from project root
-   brief: '',
-   doc: '',
-   includes: []      // list of files included by the header 
+   "id": "",           // unique identifier
+   "name": "",         // file name, with path from project root
+   "brief": "",
+   "doc": "",
+   "includes": []      // list of files included by the header
 }
 
 We don't list what is defined in a file, this information can easily be gathered by iterating through
@@ -69,12 +70,12 @@ it is not explicitly stored here.
 ## groups
 A list of defined groups. Each `groups[i]` is a dictionary as follows:
 {
-   id: '',           // unique identifier
-   name: '',         // file name, with path from project root
-   brief: '',
-   doc: '',
-   parent: '',       // id of the parent group, if any
-   subgroups: []     // list of ids of child groups
+   "id": "",           // unique identifier
+   "name": "",         // file name, with path from project root
+   "brief": "",
+   "doc": "",
+   "parent": "",       // id of the parent group, if any
+   "subgroups": []     // list of ids of child groups
 }
 
 Groups can be nested.
@@ -82,16 +83,22 @@ Groups can be nested.
 ## pages
 A list of pages. Each `pages[i]` is a dictionary as follows:
 {
-   id: '',           // unique identifier
-   name: '',         // file name, with path from project root
-   brief: '',
-   doc: ''
+   "id": "",           // unique identifier
+   "title": "",        // file name, with path from project root
+   "doc": "",
+   "subpages": []      // list of ids of child pages
 }
+
+One page has the ID 'index', this is the main page, and the root of the hierarchy.
 
 ---
 
 Any Markdown in the documentation will not be parsed, this is something for the generator to do.
-However, we will look for `<foo.bar>`, and find the ID for `foo.bar`, then replace the portion
+However, we will look for `\ref`, `\ingroup` and similar commands, as described in the `commands.md`
+page. Commands that create a link are replaced by the Markdown syntax for a link, linking to
+`#<id>`. For example, `\ref foo::bar` will be replaced by `[foo::bar](#foo-bar)`, and
+`\ref foo::bar "the bar value"` will be replaced by `[the bar value](#foo-bar)`. Note that
+
 of text with a Markdown-style link: `[foo.bar](#ns.foo.bar)`. Note that this is the same formatting
 used to link to Markdown headers and such. The generator will have to identify these and change
 them to links to another page if necessary (only the generator will know where the documentation

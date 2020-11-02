@@ -59,9 +59,11 @@ Members declared after the `\defgroup` command are part of the group. The `\defg
 the newly defined group "active", and will remain so until the end of the file, or until
 a `\endgroup` command.
 
-Groups can be nested. Each group has a parent and zero or more subgroups. When defining
-a group while another group is active, the group will be a subgroup of the active group,
-and then become the active group.
+Groups can be nested. Each group has at most one parent, and can have any number of subgroups.
+When defining a group while another group is active, the group will be a subgroup of the active
+group, and then become the active group. The `\ingroup` command provides an alternative to
+defining the group hierarchy. Note that cycles in the group hierarchy are prohibited. Group
+A cannot be both an ancestor and a descendant of another group.
 
 `\endgroup` causes the previously active group to become active again. It is required to
 have one of these for each `defgroup` and each `addtogroup`.
@@ -171,6 +173,8 @@ group listed. It can also appear in the comment block of a group, to nest groups
 `\ingroup` overrules the group name of the enclosing `\defgroup`/`\endgroup` or
 `\addtogroup`/`\endgroup`.
 
+See `\defgroup` for more information on grouping.
+
 This command is expected to be on its own on a line.
 
 ### `\subpage <name> ["(text)"]`
@@ -190,6 +194,17 @@ To create links without creating hierarchical relations, use `\ref`.
 Creates a link to the entity (member or page) called `<name>`. Optionally, the link text
 can be set to `text`. If left out, the link text will be the tile of the page or the
 name of the member referenced.
+
+`<name>` will be looked up according to logical rules: in the documentation for `ns::foo`,
+`\ref bar` will see if `ns::foo::bar` exists, otherwise it will look for `ns::bar`, or
+finally `::bar`. If no match exists, the `<name>` (or `(text)`) will be output without
+linking to anything. In a page, always use the fully qualified name.
+
+To disambiguate overloaded functions, `<name>` should be the full function declaration,
+without parameter names, and the types must match exactly. For example, `\ref bar(int, double const&)`
+will match a function `bar(int, double const&)`, but not `bar(int, double const)` nor
+`bar(int, double&)` nor `bar(int, double const&, int)`
+
 
 ## At the start of a line in Markdown files only
 

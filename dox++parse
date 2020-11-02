@@ -21,6 +21,7 @@ import argparse, configparser
 import json
 import doxpp
 
+
 def generate_config_file(filename):
     config = configparser.ConfigParser()
     config['input'] = {
@@ -79,5 +80,5 @@ data = doxpp.buildtree.buildtree(
 )
 
 filename = config['output'].get('filename', 'dox++out.json')
-with open(filename, 'w') as outputfile:
-    outputfile.write(json.dumps(data))
+with open(filename, 'w') as output_file:
+    output_file.write(json.dumps(data))

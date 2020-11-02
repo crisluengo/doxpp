@@ -1,3 +1,4 @@
+# dox++
 # Copyright 2020, Cris Luengo
 #
 # This file is part of dox++.  dox++ is free software: you can
@@ -21,11 +22,11 @@ def header(name):
     #return name.replace('/','__')
 
 qualifier_map = {
-    '*': 'P',
-    '&': 'L',
-    '&&': 'R',
-    '[]': 'A',
-    'const': 'C'
+    '*': 'P',     # Pointer
+    '&': 'L',     # L-value reference
+    '&&': 'R',    # R-value reference
+    '[]': 'A',    # Array
+    'const': 'C'  # Const
 }
 
 def type_from_string(string):

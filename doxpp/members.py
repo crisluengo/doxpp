@@ -1,3 +1,4 @@
+# dox++
 # Copyright 2020, Cris Luengo
 #
 # This file is part of dox++.  dox++ is free software: you can
@@ -25,7 +26,7 @@ def new_group(id, name='', brief='', doc='', parent=''):
     group = basic(id, name, brief, doc)
     group.update({
         'parent': parent,
-        'subgroups': []
+        'subgroups': []         # IDs of sub-groups
     })
     return group
 
@@ -51,5 +52,6 @@ def new_page(id, title, doc=''):
     return {
         'id': id,
         'title': title,
-        'doc': doc
+        'doc': doc,
+        'subpages': []          # IDs of sub-pages
     }

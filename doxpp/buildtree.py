@@ -18,6 +18,7 @@
 from . import libclang
 from . import members
 from . import unique_id
+from . import walktree
 from . import log
 
 import os, sys, glob, shlex, re
@@ -153,12 +154,13 @@ class Status:
 
 
 class DocumentationCommand:
-    def __init__(self, cmd, args, brief, doc, group):
+    def __init__(self, cmd, args, brief, doc, group, file):
         self.cmd = cmd
         self.args = args
         self.brief = brief
         self.doc = doc
         self.group = group
+        self.file = file
 
 
 def expand_sources(sources):
@@ -252,16 +254,21 @@ def get_group_at_line(group_locations, line):
         current_group = item[1]
     return current_group
 
+def remove_match_from_string(string, match):
+    return string[:match.span(0)[0]] + string[match.span(0)[1]:]
+
 ingroup_cmd_match = re.compile(r'^\s*[\\@]ingroup\s+(\S+)\s*$', re.MULTILINE)
 
-def find_ingroup_cmd(member):
-    doc = member['doc']
+def find_ingroup_cmd(doc):
     m = ingroup_cmd_match.search(doc)
     if m:
         group = m.group(1)
-        member['doc'] = doc[:m.span(0)[0]]+doc[m.span(0)[1]:]
-        return group
-    return ''
+        while m:
+            doc = remove_match_from_string(doc, m)
+            # Ignore subsequent `\ingroup` commands
+            m = ingroup_cmd_match.search(doc)
+        return group, doc
+    return '', doc
 
 subpage_cmd_match_1 = re.compile(r'[\\@]subpage\s+(\S+)')
 subpage_cmd_match_2 = re.compile(r'[\\@]subpage\s+(\S+)\s+\"[^"]\"')
@@ -272,100 +279,57 @@ def find_subpage_cmd(member):
     m = subpage_cmd_match_2.search(doc)
     # If that's not found, we look for \subpage <name>
     m = subpage_cmd_match_1.search(doc)
-
-
-#--- Walking the data (might belong in a different file) ---
-
-def find_member_inner(base, names, function_params, members):
     # TODO
-    pass
-
-split_function_args = re.compile(r'^([a-zA-Z0-9_:]+)\((.*)\)$')
-
-def find_member(name, start_id, status: Status):
-    # Finds a member with name `name`, as a direct child of `start_id`, or as a direct child of the parent
-    # of `start_id`, recursively visiting its parents too. This is equivalent to identifying a name in the
-    # context of the member `start_id`.
-    # Returns the `id` of the first match found. If `name` has parenthesis, these are assumed to contain
-    # function arguments, and will be used to disambiguate in the case of overloaded functions.
-    name = name.strip()
-    if not name:
-        return ''
-    function_params = []
-    if '(' in name:
-        match = split_function_args.fullmatch(name)
-        if not match:
-            log.error('Cannot parse "%s"', name)
-            return ''
-        name = match[1]
-        function_params = match[2].split(',')
-        # TODO: parse the `function_params` list to make them comparable to function arguments
-    names = name.split('::')
-    if not names:
-        return ''
-    base = status.members[start_id]
-    while True:
-        id = find_member_inner(base, names, function_params, status.members)
-        if id:
-            return id
-        if not base['parent']:
-            return ''
-        base = status.members[base['parent']]
 
 
-#--- Processing documentation commands ---
+# --- Processing documentation commands ---
 
 def process_generic_command(cmd: DocumentationCommand, status: Status):
     # \cmd <name>
     if not cmd.args:
-        log.error("\\%s needs a name argument\n   in file %s", cmd.cmd, status.current_include_name)
+        log.error("\\%s needs a name argument\n   in file %s", cmd.cmd, cmd.file)
         return
     name, args = split_string(cmd.args)
     if args:
-        log.warning("Ignoring additional arguments to \\%s command\n   in file %s", cmd.cmd, status.current_include_name)
+        log.warning("Ignoring additional arguments to \\%s command\n   in file %s", cmd.cmd, cmd.file)
     # Find which member we're talking about
-    id = find_member(name, status)
+    id = walktree.find_member(name, '', status.members)
     if not id:
-        log.error("The member '%s' has not been declared, documentation ignored.\n   in file %s", cmd.args, '<unknown>')
-        # TODO: `cmd` should contain the name of the file that contains this documentation block
+        log.error("The member '%s' has not been declared, documentation ignored.\n   in file %s", cmd.args, cmd.file)
         return
-
-    # TODO
-
-    # These are all handled in the same way:
-    # 1. Find first member with cmd.args as name
-    # 2. Produce error if there's none
-    # 3. Do group thing below, mix in cmd.group
-    # 4. add_doc(member, cmd.brief, cmd.doc)
-
-    #group = find_ingroup_cmd(member)
-    #if not group:
-    #    group = get_group_at_line(status.group_locations, item.extent.start.line)
-    #member['group'] = group
-    pass
+    member = status.members[id]
+    group, doc = find_ingroup_cmd(cmd.doc)
+    if not group:
+        group = cmd.group
+    if member['group']:
+        if member['group'] != group:
+            log.warning("Member '%s' already is in group %s, cannot assign to group %s", id, member['group'], group)
+    else:
+        member['group'] = group
+    add_doc(member, cmd.brief, doc)
 
 def process_macro_command(cmd: DocumentationCommand, status: Status):
     # \macro <name>
     if not cmd.args:
-        log.error("\\macro needs a name argument\n   in file %s", status.current_include_name)
+        log.error("\\macro needs a name argument\n   in file %s", cmd.file)
         return
     name, args = split_string(cmd.args)
     if args:
-        log.warning("Ignoring additional arguments to \\macro command\n   in file %s", status.current_include_name)
+        log.warning("Ignoring additional arguments to \\macro command\n   in file %s", cmd.file)
     # Do we already have a member for this macro?
     id = unique_id.macro(name)
     if id in status.members:
         # Add data to existing member
         member = status.members[id]
         if member['member_type'] != 'macro':
-            log.error("Documenting a macro with ID %s that is identical to an existing non-macro\n   in file %s", id, status.current_include_name)
+            log.error("Documenting a macro with ID %s that is identical to an existing non-macro\n   in file %s", id, cmd.file)
             return
         add_doc(member, cmd.brief, cmd.doc)
         if not member['group']:
             member['group'] = cmd.group
     else:
         # Create a new member
-        member = members.new_member(id, name, 'macro', '', status.current_include_name)
+        member = members.new_member(id, name, 'macro', '', cmd.file)
         member['group'] = cmd.group
         status.members[id] = member
         status.data['members'].append(member)
@@ -374,7 +338,7 @@ def process_file_command(cmd: DocumentationCommand, status: Status):
     # \file <name>
     # Note that the no-name version has already been processed
     if not cmd.args:
-        log.error("\\file needs a file name when not in a header file\n   in file %s", status.current_include_name)
+        log.error("\\file needs a file name when not in a header file\n   in file %s", cmd.file)
         return
     # Find header file we're referring to.
     # We look for all matches with an arbitrary set of path elements prepended. The shortest such name is the one we pick.
@@ -389,7 +353,7 @@ def process_file_command(cmd: DocumentationCommand, status: Status):
             match_length = len(name)
             best_match = header['id']
     if not best_match:
-        log.error("The file '%s' has not been parsed, documentation ignored.\n   in file %s", cmd.args, status.current_include_name)
+        log.error("The file '%s' has not been parsed, documentation ignored.\n   in file %s", cmd.args, cmd.file)
         return
     header = status.files[best_match]
     add_doc(header, cmd.brief, cmd.doc)
@@ -415,7 +379,7 @@ def process_mainpage_command(cmd: DocumentationCommand, status: Status):
 def process_page_command(cmd: DocumentationCommand, status: Status):
     name, title = split_string(cmd.args)
     if not name or not title:
-        log.error("\\page requires a name and title, documentation ignored.\n   in file %s", status.current_include_name)
+        log.error("\\page requires a name and title, documentation ignored.\n   in file %s", cmd.file)
         return
     create_page(name, title, cmd.brief, cmd.doc, status)
 
@@ -423,7 +387,7 @@ def process_documentation_command(cmd: DocumentationCommand, status: Status):
     # This function processes commands that add documentation to members
     if cmd.cmd == 'dir':
         # TODO: How do we record these? Is this even useful?
-        log.error("\\dir currently not implemented, documentation ignored.\n   in file %s", status.current_include_name)
+        log.error("\\dir currently not implemented, documentation ignored.\n   in file %s", cmd.file)
         return
     if cmd.cmd == 'file':
         process_file_command(cmd, status)
@@ -506,7 +470,7 @@ def process_grouping_command(cmd, args, brief, doc, loc, status: Status):
     return False
 
 
-#--- Parsing header files --- extracting and processing comments ---
+# --- Parsing header files --- extracting and processing comments ---
 
 def process_comment_command(lines, loc, status: Status):
     # This function processes a specific set of commands that should not be associated
@@ -540,7 +504,7 @@ def process_comment_command(lines, loc, status: Status):
         return
 
     # Documenting things we don't declare right here, this we'll do after processing all header files
-    status.unprocessed_commands.append(DocumentationCommand(cmd, args, brief, doc, status.current_group[-1]))
+    status.unprocessed_commands.append(DocumentationCommand(cmd, args, brief, doc, status.current_group[-1], status.current_include_name))
 
 def process_comments(tu, status: Status):
     # Gets the comments out of the file, figures out what entity they belong to,
@@ -590,7 +554,7 @@ def process_comments(tu, status: Status):
         log.warning("Missing \\endgroup for group %s\n   in file %s", status.current_group.pop(), status.current_include_name)
 
 
-#--- Parsing Markdown files ---
+# --- Parsing Markdown files ---
 
 def process_markdown_command(lines, status: Status):
     # This function processes a specific set of commands in Markdown files
@@ -619,7 +583,7 @@ def process_markdown_command(lines, status: Status):
         return
 
     # Documentation
-    process_documentation_command(DocumentationCommand(cmd, args, brief, doc, status.current_group[-1]), status)
+    process_documentation_command(DocumentationCommand(cmd, args, brief, doc, status.current_group[-1], status.current_include_name), status)
 
 def extract_markdown(filename, status: Status):
     # Gets the Markdown blocks out of the file, and adds them in the appropriate
@@ -645,7 +609,7 @@ def extract_markdown(filename, status: Status):
         process_markdown_command(lines, status)
 
 
-#--- Parsing header files --- extracting declarations ---
+# --- Parsing header files --- extracting declarations ---
 
 def full_typename(decl):
     type = decl.displayname
@@ -834,9 +798,12 @@ def extract_declarations(citer, parent, status: Status):
                 if not semantic_parent:
                     log.error("Base class specifier has no semantic parent!?")
                     continue
-                type = process_type(item.type, item)
-                type['access'] = access_specifier_map[item.access_specifier]
-                status.members[semantic_parent]['bases'].append(type)
+                type = process_type(item.type, item)['typename']
+                access = access_specifier_map[item.access_specifier]
+                status.members[semantic_parent]['bases'].append({
+                    'typename': type,
+                    'access': access
+                })
                 continue
             # TODO: Should we move the 'templatenontypeparameter' and 'templatetypeparameter' handling here?
 
@@ -893,7 +860,7 @@ def extract_declarations(citer, parent, status: Status):
 
             # Find the group this member belongs to
             if parent_is_namespace:
-                group = find_ingroup_cmd(member)
+                group, member['doc'] = find_ingroup_cmd(member['doc'])
                 if not group:
                     group = get_group_at_line(status.group_locations, item.extent.start.line)
                 member['group'] = group
@@ -905,6 +872,7 @@ def extract_declarations(citer, parent, status: Status):
             if member_type in ['class', 'struct']:
                 member['templated'] = is_template
                 member['bases'] = []
+                member['derived'] = []
                 member['members'] = []
                 process_children = True
             elif member_type in ['method', 'conversionfunction', 'constructor', 'destructor']:
@@ -922,7 +890,7 @@ def extract_declarations(citer, parent, status: Status):
                 member['value'] = item.enum_value
             elif member_type == 'enum':
                 member['scoped'] = item.is_scoped_enum()
-                member['type'] = process_type(item.enum_type)
+                member['type'] = process_type(item.enum_type)['typename']
                 member['members'] = []
                 process_children = True
             elif member_type == 'field':
@@ -1006,7 +974,7 @@ def extract_declarations(citer, parent, status: Status):
             extract_declarations(item.get_children(), parent, status)
 
 
-#--- Parsing header files --- extracting include statements ---
+# --- Parsing header files --- extracting include statements ---
 
 def is_under_directory(file, path):
     if os.path.commonpath([file, path]) == path:
@@ -1037,13 +1005,19 @@ def extract_includes(tu, status: Status, include_dirs):
             })
 
 
-#--- Main function for this file ---
+# --- Main function for this file ---
 
 def buildtree(root_dir, input_files, additional_files, compiler_flags, include_dirs, options):
     """
-    :param root_dir: The root directory for the header files, that you would pass to the compiler with `-I` when using the library (string)
+    Builds the member tree as well as the headers, groups and pages lists, which together represent all
+    the information about the code in the C++ project that is needed to produce useful documentation for
+    the project.
+
+    :param root_dir: The root directory for the header files, that you would pass to the compiler with `-I`
+           when using the library (string)
     :param input_files: header files (with wildcards and path relative to working directory), space separated (string)
-    :param additional_files: Markdown files (with wildcards and path relative to working directory), space separated (string)
+    :param additional_files: Markdown files (with wildcards and path relative to working directory), space
+           separated (string)
     :param compiler_flags: flags to pass to the compiler (string)
     :param include_dirs: include directories to pass to the compiler (string)
     :param options: dictionary with options for how to process things
@@ -1168,8 +1142,8 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
         # Mark file as complete
         processed[f] = True
 
-    # Go through all members with a 'type' element, and replace the type name string with the type ID, or
-    # add an ID to the dict. This process must also resolve template parameters (I think?)
+    # Go through all members with a 'type' element, and replace the type name string with a Markdown link:
+    #    member['type']['typename'] = '[type name](#type-name-id)'
     # TODO
 
     # Go through all members, headers, groups and pages, identify `\ref` and `\see` commands, identify linked members, and replace with links
@@ -1178,10 +1152,13 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
     # Go through all pages, identify `\subpage` commands, identify linked members, establish hierarchy, and replace with links
     # TODO, see find_subpage_cmd()
 
-    # Go through all classes with base classes, and add links to derived class members that override virtual base class members,
-    # and links to the overridden virtual base class members.
-    # member['override'] = 'base-class-member-id'
-    # member['overridden'] = ['derived-class-member-id', 'derived-class-member-id', ...]
+    # Go through all classes with base classes, and:
+    # - add links to derived classes
+    #    member['derived'] = ['derived-class-id', 'derived-class-id', ...]
+    # - add links to derived class members that override virtual base class members
+    #    member['override'] = 'base-class-member-id'
+    # - add links to the overridden virtual base class members
+    #    member['overridden'] = ['derived-class-member-id', 'derived-class-member-id', ...]
     # TODO
 
     return status.data

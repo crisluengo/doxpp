@@ -1,3 +1,4 @@
+# dox++
 # Copyright 2013-2018, Jesse van den Kieboom
 # Copyright 2020, Cris Luengo
 #
@@ -16,3 +17,4 @@
 
 from . import log
 from . import buildtree
+from . import walktree
