@@ -37,7 +37,7 @@ namespace transport
 		 * @return true if the suspension was adjusted successfully,
 		 *         false otherwise.
 		 */
-		bool SetSuspension(const double stiffness);
+		bool SetSuspension(const double stiffness = 0);
 
 		/** Change the break type.
 		 * @tparam BreakType the break type.
@@ -65,13 +65,13 @@ namespace transport
 	/// \endgroup
 
 
-template<typename A, typename B>
+template<typename A, int B = 5>
 struct StructTemplate {
-   B member;
+   A member[B];
    int action(const A * * const * * & a);
 };
 
-template<typename A, typename B>
+template<typename A, typename B = MountainBike>
 class ClassTemplate {
    B member;
    str action(A const& a);
@@ -97,7 +97,8 @@ using FloatStruct = ClassTemplate<float, int>;
 template<typename X>
 using IXStruct = ClassTemplate<int, X>;
 
-bool MountainBike::SetSuspension(double stiffness) {}
+/// For some reason, this definition takes the documentation for the declaration, ignoring this.
+bool MountainBike::SetSuspension(const double stiffness) {}
 
 }
 

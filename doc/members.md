@@ -66,8 +66,13 @@ file it was encountered will be used.
 
 ### "group" (string)
 
-ID of the group that this member belongs to. If an empty string, the member doesn't belong
-to any groups.
+For namespace members, ID of the group that this member belongs to. If an empty string,
+the member doesn't belong to any groups.
+
+For class or struct members, the header text for the group. Can be an empty string if no
+grouping is used. 
+ 
+For members of type `"enumvalue"` (enum members), the group is always the empty string.
 
 ### "deprecated" (boolean)
 
@@ -215,11 +220,15 @@ field is additionally present:
 
 A list of dictionaries, one for each template parameter. It contains the following
 fields:
-- `"name"`: (string) name of template parameter
-- `"brief"`: (string) the short description of the parameter
-- `"doc"`: (string) the documentation for the parameter
-- `"type"`: (string) type of template parameter: `"type"` or `"nontype"`
-- `"default_type"`: A type dictionary
+- `"name"`: (string) name of template parameter.
+- `"type"`: (string) type of template parameter: `"type"` or a  type dictionary encoding the
+  parameter's type.
+- `"default"`: A type dictionary for type parameters, a string for non-type parameters,
+  or `null` (translates to `None` in Python) if no default is given.
+
+For example, for `template<typename A>`, `"type"` will be equal to `"type"`, whereas
+for `template<int A>`, `"type"` will be a dictionary containing `"typename"` equal to `"int"`
+(see below).
 
 ## The "type" dictionary
 

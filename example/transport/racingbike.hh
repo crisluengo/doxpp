@@ -23,11 +23,15 @@ namespace transport
 	class RacingBike : public Bicycle
 	{
 	public:
+	   /// \name Behavior
+
 		/** @inherit */
 		virtual void PedalHarder();
 
 		/** `RingBell` is not implemented. */
 		virtual void RingBell();
+
+		/// \name Properties
 
 		/// What kind of gears can a `RacingBike` have?
 		enum class GearSystem {
@@ -37,6 +41,8 @@ namespace transport
 
 		/// What kind of gears does this racing bike have?
 		GearSystem gearSystem = GearSystem::expensive;
+
+		/// \endname
 	};
 }
 

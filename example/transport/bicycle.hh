@@ -14,6 +14,10 @@
 /// \defgroup bikes Bicycle types
 /// A group of classes representing various bicycle types
 
+/// \macro FOOBAR
+/// A macro!
+#define FOOBAR
+
 /// The namespace for the project
 /// This is the detailed documentation for this namespace. We can extend it by writing
 /// stuff in other files too.
@@ -61,6 +65,10 @@ namespace transport
 	private:
 	   int id; ///< Something to identify a bike by
 	};
+
+	// Some pre-declaration. If we document it here, we won't see the documentation in mountainbike.hh
+	// because this file is processed earlier.
+   class MountainBike;
 }
 
 /// \endgroup

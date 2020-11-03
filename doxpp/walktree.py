@@ -14,10 +14,10 @@
 # this program; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from . import log
-
 import re
 import json
+
+from . import log
 
 
 # --- find_member ---
@@ -40,19 +40,23 @@ def parse_function_arguments(arg_list):
 def same_argument(arg1, arg2):
     return arg1['typename'] == arg2['typename'] and arg1['qualifiers'] == arg2['qualifiers']
 
-def find_member_inner(base, names, function_params, members):
+def find_member_inner(base, names, function_params):
     for member in base:
         if member['name'] == names[0]:
-            if 'members' in member:
-                return find_member_inner(member['members'], names[1:], function_params, members)
-            elif function_params:
-                if member['member_type'] == 'function':
-                    args = member['arguments']
-                    if len(args) == len(function_params) and\
-                       all([same_argument(arg1, arg2) for arg1, arg2 in zip(args, function_params)]):
-                        return member['id']
-            else:
-                return member['id']
+            if len(names) == 1:
+                # We've matched the whole name
+                if function_params:
+                    # We need to match function parameters too
+                    if member['member_type'] == 'function':
+                        args = member['arguments']
+                        if len(args) == len(function_params) and \
+                                all([same_argument(arg1, arg2) for arg1, arg2 in zip(args, function_params)]):
+                            return member['id']
+                else:
+                    # No need to match function parameters
+                    return member['id']
+            elif 'members' in member:
+                return find_member_inner(member['members'], names[1:], function_params)
     return ''
 
 def find_member(name, start_id, members):
@@ -82,21 +86,17 @@ def find_member(name, start_id, members):
     names = name.split('::')
     if not names:
         return ''
-    if start_id:
-        if 'members' in members[start_id]:
-            base = members[start_id]['members']
-        else:
-            start_id = members['parent']
-            base = members[start_id]['members']  # we expect the parent to have at least one member!
-    else:
-        base = members
+    if not 'members' in members[start_id]:
+        start_id = members['parent']
     while True:
-        id = find_member_inner(base, names, function_params, members)
+        base = members[start_id]['members']
+        id = find_member_inner(base, names, function_params)
         if id:
             return id
-        if not base['parent']:
+        if 'parent' not in members[start_id]:
             return ''
-        base = members[base['parent']]
+        start_id = members['parent']
+
 
 # --- create_member_dict ---
 
@@ -113,6 +113,11 @@ def create_member_dict(members):
     :return: dictionary.
     """
     output = {}
+    output[''] = {
+        'id': '',
+        'members': members
+        # TODO: add dictionary keys expected by code.
+    }
     create_member_dict_recursive(members, output)
     return output
 

@@ -15,9 +15,13 @@
 # this program; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import os, subprocess, sys, platform
-from .clang import cindex
+import os
+import platform
+import subprocess
+
 from . import log
+from .clang import cindex
+
 
 def get_system_includes(f):
     devnull = open(os.devnull)

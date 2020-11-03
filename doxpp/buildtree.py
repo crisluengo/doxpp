@@ -15,14 +15,17 @@
 # this program; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import glob
+import os
+import re
+import shlex
+import sys
+
 from . import libclang
+from . import log
 from . import members
 from . import unique_id
 from . import walktree
-from . import log
-
-import os, sys, glob, shlex, re
-
 
 cindex = libclang.load_libclang()
 
@@ -137,7 +140,10 @@ class Status:
                                         # `current_group[-1]` is the current group.
         self.group_locations = []       # Here we keep a list of (line, group_id), for the current file only.
                                         # `line` is the line that the group starts.
-                                        # If group_id is '', then no group is active after that line
+                                        # If group_id is '', then no group is active after that line.
+
+        self.current_member_group = ''    # These are the same as above, but for grouping class/struct members.
+        self.member_group_locations = []  # These groups do not nest, so there's no need for a stack.
 
         self.current_file = {}          # `files[i]` dict for  the current file.
         self.current_file_name = ''     # Full file name (with absolute path).
@@ -244,7 +250,8 @@ def is_single_line_comment(comment):
 def is_documentation_comment(comment, style):  # style should be '/' or '*' for // or /**/
     if style == '/':
         return len(comment) > 2 and (comment[2] == '/' or comment[2] == '!')
-    return comment[2] == '*' or comment[2] == '!'  # no need to test length, this syle comment must have at least 4 characters
+    # no need to test length, this style comment must have at least 4 characters
+    return comment[2] == '*' or comment[2] == '!'
 
 def get_group_at_line(group_locations, line):
     current_group = ''
@@ -302,7 +309,7 @@ def process_generic_command(cmd: DocumentationCommand, status: Status):
     if not group:
         group = cmd.group
     if member['group']:
-        if member['group'] != group:
+        if group and member['group'] != group:
             log.warning("Member '%s' already is in group %s, cannot assign to group %s", id, member['group'], group)
     else:
         member['group'] = group
@@ -318,19 +325,25 @@ def process_macro_command(cmd: DocumentationCommand, status: Status):
         log.warning("Ignoring additional arguments to \\macro command\n   in file %s", cmd.file)
     # Do we already have a member for this macro?
     id = unique_id.macro(name)
+    group, doc = find_ingroup_cmd(cmd.doc)
+    if not group:
+        group = cmd.group
     if id in status.members:
         # Add data to existing member
         member = status.members[id]
         if member['member_type'] != 'macro':
-            log.error("Documenting a macro with ID %s that is identical to an existing non-macro\n   in file %s", id, cmd.file)
+            log.error("Documenting a macro with ID %s that is identical to an existing non-macro\n   in file %s",
+                      id, cmd.file)
             return
-        add_doc(member, cmd.brief, cmd.doc)
+        add_doc(member, cmd.brief, doc)
         if not member['group']:
-            member['group'] = cmd.group
+            member['group'] = group
     else:
         # Create a new member
         member = members.new_member(id, name, 'macro', '', cmd.file)
-        member['group'] = cmd.group
+        member['brief'] = cmd.brief
+        member['doc'] = doc
+        member['group'] = group
         status.members[id] = member
         status.data['members'].append(member)
 
@@ -340,8 +353,8 @@ def process_file_command(cmd: DocumentationCommand, status: Status):
     if not cmd.args:
         log.error("\\file needs a file name when not in a header file\n   in file %s", cmd.file)
         return
-    # Find header file we're referring to.
-    # We look for all matches with an arbitrary set of path elements prepended. The shortest such name is the one we pick.
+    # Find header file we're referring to. We look for all matches with an arbitrary set of path elements
+    # prepended. The shortest such name is the one we pick.
     best_match = ''
     match_length = 1e9
     for header in status.data['headers']:
@@ -358,30 +371,29 @@ def process_file_command(cmd: DocumentationCommand, status: Status):
     header = status.files[best_match]
     add_doc(header, cmd.brief, cmd.doc)
 
-def create_page(name, title, brief, doc, status: Status):
-    # Pages don't have a `brief` element, so we merge it back in:
-    doc = brief + '\n' + doc
+def create_page(name, title, doc, status: Status):
     if name in status.pages:
         cur_doc = status.pages[name]['doc']
         if cur_doc:
             doc = cur_doc + '\n\n' + doc
         status.pages[name]['doc'] = doc
     else:
-        members.new_page(name, title, doc)
-
+        page = members.new_page(name, title, doc)
+        status.data['pages'].append(page)
+        status.pages[name] = page
 
 def process_mainpage_command(cmd: DocumentationCommand, status: Status):
     title = cmd.args
     if not title:
         title = "Main"
-    create_page('index', title, cmd.brief, cmd.doc, status)
+    create_page('index', title, cmd.doc, status)
 
 def process_page_command(cmd: DocumentationCommand, status: Status):
     name, title = split_string(cmd.args)
     if not name or not title:
         log.error("\\page requires a name and title, documentation ignored.\n   in file %s", cmd.file)
         return
-    create_page(name, title, cmd.brief, cmd.doc, status)
+    create_page(name, title, cmd.doc, status)
 
 def process_documentation_command(cmd: DocumentationCommand, status: Status):
     # This function processes commands that add documentation to members
@@ -464,8 +476,12 @@ def process_grouping_command(cmd, args, brief, doc, loc, status: Status):
             log.warning("\\endgroup cannot occur while not in a group\n   in file %s", status.current_include_name)
         return True
     if cmd == 'name':
+        status.current_member_group = args
+        status.group_locations.append((loc, args))
         return True
     if cmd == 'endname':
+        status.current_member_group = ''
+        status.group_locations.append((loc, ''))
         return True
     return False
 
@@ -492,7 +508,10 @@ def process_comment_command(lines, loc, status: Status):
     cmd = documentation_commands[cmd]
 
     # Everything after the first line is documentation
-    brief, doc = separate_brief('\n'.join(lines[1:]))
+    doc = '\n'.join(lines[1:])
+    brief = ''
+    if cmd not in ['page', 'mainpage']:
+        brief, doc = separate_brief(doc)
 
     # Grouping commands
     if process_grouping_command(cmd, args, brief, doc, loc, status):
@@ -504,7 +523,8 @@ def process_comment_command(lines, loc, status: Status):
         return
 
     # Documenting things we don't declare right here, this we'll do after processing all header files
-    status.unprocessed_commands.append(DocumentationCommand(cmd, args, brief, doc, status.current_group[-1], status.current_include_name))
+    status.unprocessed_commands.append(DocumentationCommand(cmd, args, brief, doc, status.current_group[-1],
+                                                            status.current_include_name))
 
 def process_comments(tu, status: Status):
     # Gets the comments out of the file, figures out what entity they belong to,
@@ -551,8 +571,10 @@ def process_comments(tu, status: Status):
         token = next(it, None)
 
     while status.current_group[-1]:
-        log.warning("Missing \\endgroup for group %s\n   in file %s", status.current_group.pop(), status.current_include_name)
-
+        log.warning("Missing \\endgroup for group %s\n   in file %s",
+                    status.current_group.pop(), status.current_include_name)
+    if status.current_member_group:
+        log.warning("Missing \\endname\n   in file %s", status.current_include_name)
 
 # --- Parsing Markdown files ---
 
@@ -583,7 +605,8 @@ def process_markdown_command(lines, status: Status):
         return
 
     # Documentation
-    process_documentation_command(DocumentationCommand(cmd, args, brief, doc, status.current_group[-1], status.current_include_name), status)
+    process_documentation_command(DocumentationCommand(cmd, args, brief, doc, status.current_group[-1],
+                                                       status.current_include_name), status)
 
 def extract_markdown(filename, status: Status):
     # Gets the Markdown blocks out of the file, and adds them in the appropriate
@@ -603,7 +626,7 @@ def extract_markdown(filename, status: Status):
                         process_markdown_command(lines, status)
                     lines = [line]
                     continue
-            # In all othr cases, append the line to the block and continue
+            # In all other cases, append the line to the block and continue
             lines.append(line)
         # At the end of the file, process the last block we collected
         process_markdown_command(lines, status)
@@ -647,10 +670,8 @@ def process_type_recursive(type, cursor, output):
     decl = type.get_declaration()
     if decl and decl.displayname:
         typename = full_typename(decl)
-        print('Typename', typename, 'through full_typename(type.get_declaration())')
     elif kind in type_kind_to_name_map:
         typename = type_kind_to_name_map[kind]
-        print('Typename', typename, 'through type_kind_to_name_map[kind]')
     elif hasattr(type, 'spelling'):
         #canon = type.get_canonical()  # TODO: this is for function pointer types
         #if canon.kind == cindex.TypeKind.FUNCTIONPROTO:
@@ -660,16 +681,13 @@ def process_type_recursive(type, cursor, output):
         typename = type.spelling
         if typename.startswith('const '):
             typename = typename[len('const '):]
-        print('Typename', typename, 'through type.spelling')
     elif cursor:
         typename = cursor.displayname
-        print('Typename', typename, 'through cursor.displayname')
     else:
         typename = ''
     # Remove std namespace shenanigans
     match = std_namespace_match.fullmatch(typename)
     if match:
-        print(" *** Matched the regexp: ", typename, match[1])
         typename = 'std::' + match[1]
     # Done
     output['typename'] = typename
@@ -679,29 +697,41 @@ def process_type(type, cursor=None):
     process_type_recursive(type, cursor, output)
     return output
 
+def find_default_value(tokens):
+    print(tokens)
+    for ii in range(len(tokens) - 1):
+        if tokens[ii] == '=':
+            return tokens[ii + 1]
+    return None
+
 def process_function_declaration(item, member):
     member['return_type'] = process_type(item.type.get_result())
     arguments = []
+    print("*** FUNCTION CHILDREN: ***")
     for child in item.get_children():
         if child.kind == cindex.CursorKind.PARM_DECL:
             name = child.spelling
             param = None
+            default = None
             for elem in child.get_children():
                 if elem.kind == cindex.CursorKind.TYPE_REF:
                     param = process_type(child.type, cursor=elem)
+                    default = find_default_value([x.spelling for x in child.get_tokens()])
                     break
             if param is None:
                 param = process_type(child.type)
+                default = find_default_value([x.spelling for x in child.get_tokens()])
             param['name'] = name
+            param['default'] = default
             arguments.append(param)
+    print("  ^ FUNCTION CHILDREN ^")
     member['arguments'] = arguments
 
 def merge_member(member, new_member):
-    # Merges the two member structures, filling in empty elements in `memeber` with new data, and appending any documentation.
-    add_doc(member, new_member['brief'], new_member['doc'])
+    # Merges the two member structures, filling in empty elements in `member` with new data.
+    # We don't append documentation, only replace, because Clang passes the same document block
+    # every time we encounter a re-declaration of a member.
     for key in new_member:
-        if key == 'doc' or key == 'brief':
-            continue
         if key == 'members':
             for m in new_member['members']:
                 if m not in member['members']:
@@ -709,26 +739,6 @@ def merge_member(member, new_member):
             continue
         if key in member and not member[key]:
             member[key] = new_member[key]
-
-def insert_template_parameter(member, parent, status: Status):
-    if not parent:
-        log.error("Template parameter %s doesn't have a parent", member['name'])
-        return
-    if 'template_parameters' not in status.members[parent]:
-        log.error("Template parameter %s has a parent that is not a template", member['name'])
-        return
-    param = {
-        'name': member['name'],
-        'brief': member['brief'],
-        'doc': member['doc'],
-    }
-    if member['member_type'] == 'templatetypeparameter':
-        param['type'] = 'type'
-        param['default_type'] = member['default_type']
-    else:
-        param['type'] = 'nontype'
-        param['default_type'] = member['default_value']
-    status.members[parent]['template_parameters'].append(param)
 
 def extract_declarations(citer, parent, status: Status):
     # Recursive AST exploration, adds data to `status`.
@@ -785,8 +795,9 @@ def extract_declarations(citer, parent, status: Status):
                     log.debug("Semantic parent not given, assuming lexical parent is semantic parent")
                     semantic_parent = parent
 
-            log.debug("member: kind = %s, spelling = %s, parent = %s, semantic_parent = %s", item.kind, item.spelling, parent, semantic_parent)
-            #log.debug("        tokens = %s", [x.spelling for x in item.get_tokens()])
+            log.debug("member: kind = %s, displayname = %s, spelling = %s, parent = %s, semantic_parent = %s",
+                      item.kind, item.displayname, item.spelling, parent, semantic_parent)
+            # log.debug("        tokens = %s", [x.spelling for x in item.get_tokens()])
 
             # Is the parent a namespace, or something else?
             parent_is_namespace = False
@@ -805,22 +816,38 @@ def extract_declarations(citer, parent, status: Status):
                     'access': access
                 })
                 continue
-            # TODO: Should we move the 'templatenontypeparameter' and 'templatetypeparameter' handling here?
 
-            # Create a member data structure for this member
-            member = members.new_member('', item.spelling, member_type, semantic_parent, status.current_include_name)
-
-            # Find the associated documentation comment and parse it
-            comment = item.raw_comment
-            if comment:
-                if is_single_line_comment(comment):
-                    comment = '\n'.join(clean_single_line_comment_block(comment))
+            # Process template parameters differently
+            if member_type in ['templatenontypeparameter', 'templatetypeparameter']:
+                name = item.spelling
+                if not semantic_parent:
+                    log.error("Template parameter %s doesn't have a parent", name)
+                    return
+                if 'template_parameters' not in status.members[semantic_parent]:
+                    log.error("Template parameter %s has a parent that is not a template", name)
+                    return
+                default = None
+                if member_type == 'templatetypeparameter':
+                    type = 'type'
+                    for child in item.get_children():
+                        if child.kind == cindex.CursorKind.TYPE_REF:
+                            default = process_type(child.type, child)
+                        break
                 else:
-                    comment = '\n'.join(clean_multiline_comment(comment, item.extent.start.column - 1))  # TODO: this start column is "iffy". We don't know where the comment actually starts!
-                cmd, _ = split_string(comment)
-                if not(len(cmd) > 1 and cmd[0] in ['\\', '@'] and cmd[1:] in documentation_commands):
-                    brief, doc = separate_brief(comment)
-                    add_doc(member, brief, doc)
+                    type = process_type(item.type, item)
+                    # TODO: This doesn't seem to work for SFINAE template parameters
+                    for child in item.get_children():
+                        if child.kind == cindex.CursorKind.TYPE_REF:
+                            continue
+                        default = ''.join([t.spelling for t in child.get_tokens()])
+                        if default:
+                            break
+                status.members[semantic_parent]['template_parameters'].append({
+                    'name': name,
+                    'type': type,
+                    'default': default
+                })
+                continue
 
             # Disambiguate templated types:
             is_template = False
@@ -852,6 +879,21 @@ def extract_declarations(citer, parent, status: Status):
                 is_template = True
                 member_type = 'using'
 
+            # Create a member data structure for this member
+            member = members.new_member('', item.spelling, member_type, semantic_parent, status.current_include_name)
+
+            # Find the associated documentation comment and parse it
+            comment = item.raw_comment
+            if comment:
+                if is_single_line_comment(comment):
+                    comment = '\n'.join(clean_single_line_comment_block(comment))
+                else:
+                    comment = '\n'.join(clean_multiline_comment(comment, item.extent.start.column - 1))
+                    # TODO: this start column is "iffy". We don't know where the comment actually starts!
+                cmd, _ = split_string(comment)
+                if not(len(cmd) > 1 and cmd[0] in ['\\', '@'] and cmd[1:] in documentation_commands):
+                    member['brief'], member['doc'] = separate_brief(comment)
+
             # Fix constructor and destructor names for templated classes
             if member_type in ['constructor', 'destructor']:
                 if item.semantic_parent.kind == cindex.CursorKind.CLASS_TEMPLATE:
@@ -859,12 +901,20 @@ def extract_declarations(citer, parent, status: Status):
                     member['name'] = item.spelling.split('<', maxsplit=1)[0]
 
             # Find the group this member belongs to
+            group, member['doc'] = find_ingroup_cmd(member['doc'])
             if parent_is_namespace:
-                group, member['doc'] = find_ingroup_cmd(member['doc'])
+                # Namespace members are grouped using "\defgroup" groups
                 if not group:
                     group = get_group_at_line(status.group_locations, item.extent.start.line)
                 member['group'] = group
-            # TODO: for class or struct members, we need a separate grouping system
+            else:
+                # Class, struct and union members are grouped using "\name" groups
+                # For the enumvalue member type we get here too, but we clear the "group" element later
+                # Also, we ignore any `\ingroup` commands
+                if group:
+                    log.warning("Ignoring \\ingroup command in documentation for %s\n   in file %s", member['name'],
+                                status.current_include_name)
+                member['group'] = get_group_at_line(status.group_locations, item.extent.start.line)
 
             # Associate any other information with this member
             process_children = False
@@ -888,6 +938,7 @@ def extract_declarations(citer, parent, status: Status):
                 member_type = 'function'  # write out as function
             elif member_type == 'enumvalue':
                 member['value'] = item.enum_value
+                member['group'] = ''  # these should not be part of a group
             elif member_type == 'enum':
                 member['scoped'] = item.is_scoped_enum()
                 member['type'] = process_type(item.enum_type)['typename']
@@ -907,32 +958,14 @@ def extract_declarations(citer, parent, status: Status):
             elif member_type == 'namespace':
                 member['members'] = []
                 process_children = True
-            elif member_type == 'templatenontypeparameter':
-                default_value = None
-                for child in item.get_children():
-                    if child.kind == cindex.CursorKind.TYPE_REF:
-                        continue
-                    default_value = ''.join([t.spelling for t in child.get_tokens()][:-1])
-                    break
-                member['default_value'] = default_value
-                insert_template_parameter(member, semantic_parent, status)
-                continue
-            elif member_type == 'templatetypeparameter':
-                default_type = None
-                for child in item.get_children():
-                    if child.kind == cindex.CursorKind.TYPE_REF:
-                        default_type = process_type(child.type, child)
-                    break
-                member['default_type'] = default_type
-                insert_template_parameter(member, semantic_parent, status)
-                continue
             elif member_type in ['typedef', 'using']:
                 member_type = 'alias'
                 type = process_type(item.underlying_typedef_type, item)
                 if type['typename']:
                     member['type'] = type
                 else:
-                    member['type'] = {}  # This happens if we're processing a 'usingtemplate'. Leave the type empty so that it can be replaced later
+                    member['type'] = {}  # This happens if we're processing a 'usingtemplate'. Leave the type
+                    #                      empty so that it can be replaced later
                 if is_template:
                     process_children = True
             elif member_type == 'union':
@@ -941,9 +974,27 @@ def extract_declarations(citer, parent, status: Status):
             elif member_type == 'variable':
                 member['type'] = process_type(item.type, item)
                 member['static'] = item.storage_class == cindex.StorageClass.STATIC
-            if is_template:  #  'classtemplate', 'structtemplate', 'functiontemplate', 'methodtemplate', 'usingtemplate'
+            if is_template:  # 'classtemplate', 'structtemplate', 'functiontemplate', 'methodtemplate', 'usingtemplate'
                 member['template_parameters'] = []
             member['member_type'] = member_type
+            # TODO: For template specializations, the following should be useful:
+            # for ii in range(item.get_num_template_arguments()):
+            #     kind = item.get_template_argument_kind(ii)
+            #     if kind == cindex.TemplateArgumentKind.NULL:
+            #         pass
+            #     elif kind == cindex.TemplateArgumentKind.TYPE:
+            #         item.get_template_argument_type(ii)
+            #     elif kind == cindex.TemplateArgumentKind.DECLARATION:
+            #         pass
+            #     elif kind == cindex.TemplateArgumentKind.NULLPTR:
+            #         pass
+            #     elif kind == cindex.TemplateArgumentKind.INTEGRAL:
+            #         item.get_template_argument_value(ii)
+            #         item.get_template_argument_unsigned_value(ii)
+            #     else:
+            #         log.error("Template parameter kind not recognized")
+            #         continue
+            #
 
             # Deal with IDs -- we do this at the end of the above so we can use all that data to generate our ID.
             usr = item.get_usr()
@@ -957,7 +1008,8 @@ def extract_declarations(citer, parent, status: Status):
                 member['id'] = id
                 status.member_ids[usr] = id
                 if id in status.members:
-                    log.error("USR was unknown, but ID was already there! This means that there is a name clash, unique_id.member is not good enough")
+                    log.error("USR was unknown, but ID was already there! This means that there is a name clash, "
+                              "unique_id.member is not good enough")
                     continue  # skip the rest of this function, we're in trouble here...
                 status.members[id] = member
                 if semantic_parent:
@@ -998,7 +1050,8 @@ def extract_includes(tu, status: Status, include_dirs):
                     if res and len(part) < len(include):
                         include = part
             if os.path.isabs(include):
-                log.warning("Included file %s not in any of the directories on the path\n   in file %s", include, status.current_include_name)
+                log.warning("Included file %s not in any of the directories on the path\n   in file %s",
+                            include, status.current_include_name)
             this_file_includes.append({
                 'filename': include,
                 'in_project': in_project
@@ -1051,6 +1104,8 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
 
     # Our status
     status = Status(data)
+    # Add a member for the base namespace, this makes traversing the tree easier.
+    status.members = walktree.create_member_dict(status.data['members'])
 
     # Process all header files
     index = cindex.Index.create()
@@ -1079,7 +1134,8 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
         # Parse the file
         tu = None
         try:
-            tu = index.parse(f, compiler_flags, options=cindex.TranslationUnit.PARSE_SKIP_FUNCTION_BODIES + cindex.TranslationUnit.PARSE_INCOMPLETE)
+            tu = index.parse(f, compiler_flags, options=cindex.TranslationUnit.PARSE_SKIP_FUNCTION_BODIES +
+                                                        cindex.TranslationUnit.PARSE_INCOMPLETE)
         except cindex.TranslationUnitLoadError as e:
             log.error("Could not parse file %s", f)
             log.error(str(e))
@@ -1146,10 +1202,12 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
     #    member['type']['typename'] = '[type name](#type-name-id)'
     # TODO
 
-    # Go through all members, headers, groups and pages, identify `\ref` and `\see` commands, identify linked members, and replace with links
+    # Go through all members, headers, groups and pages, identify `\ref` and `\see` commands,
+    # identify linked members, and replace with links
     # TODO
 
-    # Go through all pages, identify `\subpage` commands, identify linked members, establish hierarchy, and replace with links
+    # Go through all pages, identify `\subpage` commands, identify linked members, establish hierarchy,
+    # and replace with links
     # TODO, see find_subpage_cmd()
 
     # Go through all classes with base classes, and:

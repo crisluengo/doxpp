@@ -52,12 +52,17 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 
 ### `\defgroup <name> [<title>]`
 
-Defines a group. Members can be part of one group. A generator can sort members by group,
+Defines a group. Namespace members can be part of one group. A generator can sort members by group,
 instead (or additionally) to sorting them by namespace or file.
 
 Members declared after the `\defgroup` command are part of the group. The `\defgroup` makes
 the newly defined group "active", and will remain so until the end of the file, or until
 a `\endgroup` command.
+
+Documentation blocks that document members declared elsewhere are also affected by the "active" group,
+but only if the member declaration didn't already associate the member to a group. A `\ingroup`
+command in a documentation block has priority when assigning members to groups. Only the first
+such command is considered, the rest is ignored.
 
 Groups can be nested. Each group has at most one parent, and can have any number of subgroups.
 When defining a group while another group is active, the group will be a subgroup of the active
@@ -89,6 +94,10 @@ Do we need to implement this? Is it useful?
 ### `\endgroup`
 
 See `\defgroup`.
+
+### `\endname`
+
+See `\name`.
 
 ### `\enum <name>`
 
@@ -138,6 +147,21 @@ TODO: Maybe eventually `\headerfile` can be used to indicate which header the ma
 
 ### `\name (header)`
 
+Similar to `\defgroup` or `\addtogroup`, but for class or struct members.  The `(header)` text
+is used to label the group in the documentation. Each `\name` command closes the previous
+group and starts a new one. Use `\endname` rather than `\endgroup` to close off the group.
+
+Unlike with the `\defgroup` and `\addtogroup` commands, `\name` and `\endname` must enclose the
+declaration of the class or struct members, not their documentation blocks.
+
+It is not possible to reference these groups, and they cannot be nested.
+
+The parser is not very clever, and so a class/struct member group remains active in the remainder
+of the file until `\endname` is encountered, even within other classes.  
+
+The backend can choose to group class or struct members by access (private/protected/public), or
+by named grouping, or both.
+
 ### `\namespace <name>`
 
 ### `\page <name> (title)`
@@ -167,7 +191,7 @@ int foo;
 
 ### `\ingroup <name>`
 
-If this appears in the comment block for a member, the member will become part of the
+If this appears in the comment block for a namespace member, the member will become part of the
 group listed. It can also appear in the comment block of a group, to nest groups.
 
 `\ingroup` overrules the group name of the enclosing `\defgroup`/`\endgroup` or

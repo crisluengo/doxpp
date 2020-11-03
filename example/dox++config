@@ -2,8 +2,7 @@
 [input]
 root directory = .
 header files = transport/*.hh
-#header files = transport/bicycle.hh
-#markdown files = docs/*.md
+markdown files = transport/*.md
 
 [output]
 filename = transport.json

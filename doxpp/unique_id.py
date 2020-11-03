@@ -17,6 +17,7 @@
 import urllib.parse
 import re
 
+
 def header(name):
     return urllib.parse.quote(name, safe='')
     #return name.replace('/','__')
@@ -33,7 +34,7 @@ def type_from_string(string):
     # Assuming string is fully qualified type name, no qualifiers
     # (awkward distinction between "qualified" and "qualifiers"...)
     return re.sub('::', '-', string)
-    # TODO: There's something more to do where, for templated types
+    # TODO: There's something more to do here, for templated types
 
 def type(dict):
     qualifiers = ''.join([qualifier_map[x] for x in dict['qualifiers']])
