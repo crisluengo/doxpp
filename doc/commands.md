@@ -145,6 +145,9 @@ TODO: Maybe eventually `\headerfile` can be used to indicate which header the ma
 
 ### `\mainpage [(title)]`
 
+Creates a page with the ID `index`, and `(title)` as the page's title. This is the root page
+for the documentation. Text in this block is the page's text. See `\page` for more information.
+
 ### `\name (header)`
 
 Similar to `\defgroup` or `\addtogroup`, but for class or struct members.  The `(header)` text
@@ -165,6 +168,12 @@ by named grouping, or both.
 ### `\namespace <name>`
 
 ### `\page <name> (title)`
+
+Creates a page with `<name>` as ID and `(title)` as the title. Text in this block is the page's text.
+The page can be referenced by its ID.
+
+Use `\subpage` commands in a page to reference other pages and make those referenced pages sub-pages to
+this page. Use `\ref` commands to reference other pages but not impose any hierarchy.
 
 ### `\struct <name>`
 
@@ -211,13 +220,15 @@ page. Furthermore, these references should not form loops, the page hierarchy mu
 a tree structure. The page called `index` (see `\mainpage`) is the root of the hierarchy,
 by default all other pages are subordinate to it.
 
+`\subpage <name> "(text)"` uses `(text)` as the anchor text for the link.
+
 To create links without creating hierarchical relations, use `\ref`.
 
 ### `\ref <name> ["(text)"]`
 
-Creates a link to the entity (member or page) called `<name>`. Optionally, the link text
-can be set to `text`. If left out, the link text will be the tile of the page or the
-name of the member referenced.
+Creates a link to the entity (member, header, group or page) called `<name>`. Optionally,
+the link text can be set to `text`. If left out, the link text will be the tile of the page
+or the name of the member referenced.
 
 `<name>` will be looked up according to logical rules: in the documentation for `ns::foo`,
 `\ref bar` will see if `ns::foo::bar` exists, otherwise it will look for `ns::bar`, or
@@ -229,6 +240,18 @@ without parameter names, and the types must match exactly. For example, `\ref ba
 will match a function `bar(int, double const&)`, but not `bar(int, double const)` nor
 `bar(int, double&)` nor `bar(int, double const&, int)`
 
+### `\relates <name>` or `\related <name>`
+
+Added to the documentation block of a function or variable, and with `<name>` referencing
+a class, adds the function or variable to a "Related" section in the class' documentation.
+
+### `\see <name> [, <name> [, ...]` or `\sa <name> [, <name> [, ...]`
+
+Starts a paragraph with a "See also" header linking the given entities (members, headers, groups, pages).
+See `\ref` for how `<name>` is interpreted and disambiguated.
+
+Note that this inserts a `\par See also` command that the backend must interpret to create the heading,
+and optionally box the whole paragraph.
 
 ## At the start of a line in Markdown files only
 
@@ -276,8 +299,6 @@ weren't found, add an indicator that this is indeed not implemented.
 - `\ref <name> ["(text)"]`
 - `\related <name>`
 - `\relates <name>`
-- `\relatedalso <name>`
-- `\relatesalso <name>`
 - `\sa { references }` -> same as `\see`
 - `\see { references }` -> same as `\sa`
 - `\subpage <name> ["(text)"]` -> but this one happens only inside a `\page` documentation block
@@ -323,6 +344,8 @@ weren't found, add an indicator that this is indeed not implemented.
 - `\hiderefs`
 - `\internal`
 - `\overload [(function declaration)]`
+- `\relatedalso <name>`
+- `\relatesalso <name>`
 - `\showinitializer` -> this is something that the backend can do
 - `\showrefby`
 - `\showrefs`

@@ -24,6 +24,9 @@ These are two different functions, with the same name. They're overloads!
 - \ref transport::ComplexStructTemplate::ComplexStructTemplate(const ComplexStructTemplate&)
 - \ref transport::ComplexStructTemplate::ComplexStructTemplate(ComplexStructTemplate &&)
 
+Note that we can reference multiple things one one line: \ref transport::foo, \ref transport::bar.
+
+\ref transport::ComplexStructTemplate::ComplexStructTemplate(const ComplexStructTemplate&) \ref transport::ComplexStructTemplate::ComplexStructTemplate(ComplexStructTemplate &&).
 
 \class transport::Bicycle
 \brief this is ignored

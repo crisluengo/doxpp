@@ -29,9 +29,9 @@ in which they were found in the header file. Each `members[i]` is a dictionary a
    "brief": "",        // brief description, in Markdown
    "doc": "",          // full documentation, in Markdown
    "member_type": "",  // class/function/enum/variable/define/namespace/etc.
-   "parent": "",       // id of parent member
-   "file": "",         // id of the file it is in (for namespaces, the first one it is encountered in)
-   "group": "",        // id of the group it is in (or empty string)
+   "parent": "",       // ID of parent member
+   "file": "",         // ID of the file it is in (for namespaces, the first one it is encountered in)
+   "group": "",        // ID of the group it is in (or empty string)
    "deprecated": false // false or true
 
    "parameters": [],   // (if a function)
@@ -74,7 +74,7 @@ A list of defined groups. Each `groups[i]` is a dictionary as follows:
    "name": "",         // file name, with path from project root
    "brief": "",
    "doc": "",
-   "parent": "",       // id of the parent group, if any
+   "parent": "",       // ID of the parent group, if any
    "subgroups": []     // list of ids of child groups
 }
 

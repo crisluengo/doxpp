@@ -68,11 +68,12 @@ Things we'd like to add/fix/improve:
 3. Types in a (partial) template specialization are not always recorded.
 4. If a templated type is used as the type of a parameter or variable, it is not linked to
    the documentation for that type.
+5. Link override and overridden functions together.
 
 Things that CLang doesn't tell us:
 
 1. Clang doesn't easily report on pre-processor macros. Instead of making things complicated,
-we ust require adding the `\macro` (or `\def`) command at the top of the documentation block.
+we just require adding the `\macro` (or `\def`) command at the top of the documentation block.
 2. Clang doesn't say if an override function is `final`.
 
 # License

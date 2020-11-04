@@ -40,3 +40,9 @@ the fist comment line in a block:
 /// Note the empty line that separates paragraphs.
 int foo;
 ```
+
+As an alternative, you can put documentation blocks separate from the declarations,
+either in the same header file, a different header file, or a Markdown file. These
+documentation blocks must start with a command such as `\class` or `\function` to
+identify which member is being documented by that block. This member must actually
+be declared in a documented header file.

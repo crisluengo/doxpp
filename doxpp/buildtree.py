@@ -149,9 +149,9 @@ class Status:
         self.current_file_name = ''     # Full file name (with absolute path).
         self.current_include_name = ''  # File name relative to project root.
 
-        self.groups = {}                # These dictionaries contain the same dictionaries as in 'data',
-        self.files = {}                 #    but indexed by their id so they're easy to find. It is the
-        self.members = {}               #    *same* dictionaries, modifying these will modify 'data'.
+        self.members = {}               # These dictionaries contain the same dictionaries as in 'data',
+        self.headers = {}               #    but indexed by their ID so they're easy to find. It is the
+        self.groups = {}                #    *same* dictionaries, modifying these will modify 'data'.
         self.pages = {}                 #
 
         self.member_ids = {}            # A dictionary to translate USR to our ID for a member.
@@ -277,16 +277,13 @@ def find_ingroup_cmd(doc):
         return group, doc
     return '', doc
 
-subpage_cmd_match_1 = re.compile(r'[\\@]subpage\s+(\S+)')
-subpage_cmd_match_2 = re.compile(r'[\\@]subpage\s+(\S+)\s+\"[^"]\"')
+subpage_cmd_match = re.compile(r'[\\@]subpage\s+((?:\w|:)+(?:\s*\(.*?\))?)(?:\s+\"(.+?)\")?')
 
 def find_subpage_cmd(member):
     doc = member['doc']
-    # First we look for \subpage <name> "text"
-    m = subpage_cmd_match_2.search(doc)
-    # If that's not found, we look for \subpage <name>
-    m = subpage_cmd_match_1.search(doc)
-    # TODO
+    for match in subpage_cmd_match.findall(doc):
+        # TODO
+        pass
 
 
 # --- Post-process documentation to add links ---
@@ -308,6 +305,7 @@ def markup_for_type_dict(type, members):
     return name
 
 def post_process_types(members):
+    # Convert 'type' dicts to a string with optional Markdown link to the type's documentation
     for member in members.values():
         if 'type' in member and isinstance(member['type'], dict):
             member['type'] = markup_for_type_dict(member['type'], members)
@@ -338,6 +336,20 @@ def post_process_inheritance(members):
                     base_member = members[id]
                     base_member['derived'].append(member['id'])
                     # TODO: find virtual functions in base class that are overridden in derived class
+
+ref_cmd_match = re.compile(r'[\\@]ref\s+((?:\w|:)+(?:\s*\(.*?\))?)(?:\s+\"(.+?)\")?')
+
+def post_process_links(elements, status: Status):
+    # Process documentation for `\ref` and `\see` commands
+    for elem in elements.values():
+        if 'brief' in elem:  # this one not present in pages
+            for match in ref_cmd_match.findall(elem['brief']):
+                # TODO
+                pass
+        if 'doc' in elem:  # this one should always be there
+            for match in ref_cmd_match.findall(elem['doc']):
+                # TODO
+                pass
 
 
 # --- Processing documentation commands ---
@@ -419,7 +431,7 @@ def process_file_command(cmd: DocumentationCommand, status: Status):
     if not best_match:
         log.error("The file '%s' has not been parsed, documentation ignored.\n   in file %s", cmd.args, cmd.file)
         return
-    header = status.files[best_match]
+    header = status.headers[best_match]
     add_doc(header, cmd.brief, cmd.doc)
 
 def create_page(name, title, doc, status: Status):
@@ -1191,7 +1203,7 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
         file_id = unique_id.header(status.current_include_name)
         status.current_file = members.new_header(file_id, status.current_include_name)
         status.data['headers'].append(status.current_file)
-        status.files[file_id] = status.current_file
+        status.headers[file_id] = status.current_file
 
         # Parse the file
         tu = None
@@ -1269,6 +1281,12 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
 
     # Go through all members, headers, groups and pages, identify `\ref` and `\see` commands,
     # identify linked members, and replace with links
+    post_process_links(status.members, status)
+    post_process_links(status.headers, status)
+    post_process_links(status.groups, status)
+    post_process_links(status.pages, status)
+
+    # Go through all members and resolve the `\relates` commands
     # TODO
 
     # Go through all pages, identify `\subpage` commands, identify linked members, establish hierarchy,
