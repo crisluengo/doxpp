@@ -289,22 +289,25 @@ def find_subpage_cmd(member):
     # TODO
 
 
-# --- Post-process types ---
+# --- Post-process documentation to add links ---
 
 def markup_for_type_dict(type, members):
     name = type['typename']
     id = walktree.find_member(name, '', members)
+    # TODO: How to handle template types?
     if id:
         name = '[{}](#{})'.format(name, id)
-    quals = ''.join(type['qualifiers'])
-    if quals:
-        name = name + ' ' + quals
+    qualifiers = ''.join(type['qualifiers'])
+    if qualifiers:
+        if qualifiers[0].isalpha():  # == 'c' really, there's no other possible letter here
+            # We need a space in between the type name and the 'const' qualifier
+            name = name + ' ' + qualifiers
+        else:
+            # We don't want a space between the type name and the '&' or '*' or '[]' qualifiers
+            name = name + qualifiers
     return name
 
 def post_process_types(members):
-    #    member['type'] = markup_for_type_dict(member['type'], status.members)
-    # For functions, 'return_type' and 'arguments'.
-    # For templated members, 'template_parameters'. If 'type' == 'type', examine 'default', otherwise examine 'type'.
     for member in members.values():
         if 'type' in member and isinstance(member['type'], dict):
             member['type'] = markup_for_type_dict(member['type'], members)
@@ -315,8 +318,27 @@ def post_process_types(members):
                 arg['type'] = markup_for_type_dict(arg, members)
                 arg.pop('typename')
                 arg.pop('qualifiers')
-            pass
-    pass
+        # TODO: 'template_parameters'. If 'type' == 'type', examine 'default', otherwise examine 'type'.
+
+def post_process_inheritance(members):
+    # - add links to base and derived classes
+    #    member['bases'][ii] = '[name](#name)'
+    #    member['derived'] = ['derived-class-id', 'derived-class-id', ...]
+    # - add links to derived class members that override virtual base class members
+    #    member['override'] = 'base-class-member-id'
+    # - add links to the overridden virtual base class members
+    #    member['overridden'] = ['derived-class-member-id', 'derived-class-member-id', ...]
+    for member in members.values():
+        if 'bases' in member:
+            for base in member['bases']:
+                name = base['type']
+                id = walktree.find_member(name, '', members)
+                if id:
+                    base['type'] = '[{}](#{})'.format(name, id)
+                    base_member = members[id]
+                    base_member['derived'].append(member['id'])
+                    # TODO: find virtual functions in base class that are overridden in derived class
+
 
 # --- Processing documentation commands ---
 
@@ -847,7 +869,7 @@ def extract_declarations(citer, parent, status: Status):
                 type = process_type(item.type, item)['typename']
                 access = access_specifier_map[item.access_specifier]
                 status.members[semantic_parent]['bases'].append({
-                    'typename': type,
+                    'type': type,
                     'access': access
                 })
                 continue
@@ -1241,14 +1263,9 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
     # Go through all members with a 'type' element, and replace the type dictionary with a string
     post_process_types(status.members)
 
-    # Go through all classes with base classes, and:
-    # - add links to derived classes
-    #    member['derived'] = ['derived-class-id', 'derived-class-id', ...]
-    # - add links to derived class members that override virtual base class members
-    #    member['override'] = 'base-class-member-id'
-    # - add links to the overridden virtual base class members
-    #    member['overridden'] = ['derived-class-member-id', 'derived-class-member-id', ...]
-    # TODO
+    # Go through all classes with base classes, and add references from base to derived, as well
+    # as links back and forth between overridden functions
+    post_process_inheritance(status.members)
 
     # Go through all members, headers, groups and pages, identify `\ref` and `\see` commands,
     # identify linked members, and replace with links

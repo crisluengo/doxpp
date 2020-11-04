@@ -26,10 +26,10 @@ namespace transport
 	   /// \name Behavior
 
 		/** @inherit */
-		virtual void PedalHarder();
+		void PedalHarder() override;
 
 		/** `RingBell` is not implemented. */
-		virtual void RingBell();
+		void RingBell() override;
 
 		/// \name Properties
 
