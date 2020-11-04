@@ -157,7 +157,7 @@ declaration of the class or struct members, not their documentation blocks.
 It is not possible to reference these groups, and they cannot be nested.
 
 The parser is not very clever, and so a class/struct member group remains active in the remainder
-of the file until `\endname` is encountered, even within other classes.  
+of the file until `\endname` is encountered, even within other classes.
 
 The backend can choose to group class or struct members by access (private/protected/public), or
 by named grouping, or both.

@@ -289,6 +289,35 @@ def find_subpage_cmd(member):
     # TODO
 
 
+# --- Post-process types ---
+
+def markup_for_type_dict(type, members):
+    name = type['typename']
+    id = walktree.find_member(name, '', members)
+    if id:
+        name = '[{}](#{})'.format(name, id)
+    quals = ''.join(type['qualifiers'])
+    if quals:
+        name = name + ' ' + quals
+    return name
+
+def post_process_types(members):
+    #    member['type'] = markup_for_type_dict(member['type'], status.members)
+    # For functions, 'return_type' and 'arguments'.
+    # For templated members, 'template_parameters'. If 'type' == 'type', examine 'default', otherwise examine 'type'.
+    for member in members.values():
+        if 'type' in member and isinstance(member['type'], dict):
+            member['type'] = markup_for_type_dict(member['type'], members)
+        if 'return_type' in member and isinstance(member['return_type'], dict):
+            member['return_type'] = markup_for_type_dict(member['return_type'], members)
+        if 'arguments' in member:
+            for arg in member['arguments']:
+                arg['type'] = markup_for_type_dict(arg, members)
+                arg.pop('typename')
+                arg.pop('qualifiers')
+            pass
+    pass
+
 # --- Processing documentation commands ---
 
 def process_generic_command(cmd: DocumentationCommand, status: Status):
@@ -1210,11 +1239,7 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
         processed[f] = True
 
     # Go through all members with a 'type' element, and replace the type dictionary with a string
-
-    #    member['type']['typename'] = '[type name](#type-name-id) ' + ''.join(type['qualifiers'])
-    # TODO
-    # For functions, 'return_type' and 'arguments'.
-    # For templated members, 'template_parameters'. If 'type' == 'type', examine 'default', otherwise examine 'type'.
+    post_process_types(status.members)
 
     # Go through all classes with base classes, and:
     # - add links to derived classes

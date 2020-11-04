@@ -25,7 +25,7 @@ additional pages. It links references to members to the members across the proje
 Typesetting, creating indices, etc. is left to the generator (or back-end), which keeps
 the program simple.
 
-**TODO** Eventually we'll have several generators here, to produce HTML output, PDF, whatever. 
+**TODO** Eventually we'll have several generators here, to produce HTML output, PDF, whatever.
 
 
 # How code is parsed and documented
@@ -65,18 +65,20 @@ Things we'd like to add/fix/improve:
 2. SFINAE template parameters are hard to parse. The current solution is to record "<SFINAE>"
    as the type of any template parameter without a name. This is obviously not right, but it
    works for me for now.
-3. Types in a (partial) template specialization are not recorded.
+3. Types in a (partial) template specialization are not always recorded.
+4. If a templated type is used as the type of a parameter or variable, it is not linked to
+   the documentation for that type.
 
 Things that CLang doesn't tell us:
 
 1. Clang doesn't easily report on pre-processor macros. Instead of making things complicated,
 we ust require adding the `\macro` (or `\def`) command at the top of the documentation block.
-
+2. Clang doesn't say if an override function is `final`.
 
 # License
 
 Copyright 2020, Cris Luengo  
-All code and documentation in this project is distributed with the GPL-2.0 license.
+All code and documentation in this project is distributed with the GPL-2.0 license.  
 See the file `COPYING` for details.
 
 Some code and ideas are derived from [cldoc](https://github.com/jessevdk/cldoc):  

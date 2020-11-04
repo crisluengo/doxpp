@@ -70,8 +70,8 @@ For namespace members, ID of the group that this member belongs to. If an empty 
 the member doesn't belong to any groups.
 
 For class or struct members, the header text for the group. Can be an empty string if no
-grouping is used. 
- 
+grouping is used.
+
 For members of type `"enumvalue"` (enum members), the group is always the empty string.
 
 ### "deprecated" (boolean)
@@ -152,6 +152,7 @@ A list of dictionaries listing the input arguments. It contains the following fi
 - `"type"` (string): The argument's type. Will contain a Markdown link if the type is declared
   in the project being documented.
 - `"name"` (string): The name of the argument.
+- `"default"` (string): The default value for the argument.
 
 
 ## function-specific fields, if class or struct member
