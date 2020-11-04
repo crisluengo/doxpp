@@ -1,12 +1,12 @@
 # dox++ configuration file for the 'transport' example project
 [input]
 root directory = .
-header files = transport/*.hh
+header files = transport/*.h
 markdown files = transport/*.md
 
 [output]
 filename = transport.json
-log level = debug
+log level = info
 
 [clang]
 compiler flags = -std=c++14
