@@ -16,7 +16,11 @@
 
 /// \macro FOOBAR
 /// A macro!
-#define FOOBAR
+#define FOOBAR 6
+
+/// \macro BARBAZ(a,b)
+/// Another macro!
+#define BARBAZ(a,b) ((a) + (b))
 
 /// The namespace for the project
 /// This is the detailed documentation for this namespace. We can extend it by writing

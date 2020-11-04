@@ -81,9 +81,10 @@ For members of type `"enumvalue"` (enum members), the group is always the empty 
 
 ## alias-specific fields
 
-### "type" (dictionary)
+### "type" (string)
 
-The type dictionary encoding the type aliased, see below.
+The type that the alias represents, will contain a Markdown link if the type is declared
+in the project being documented.
 
 
 ## class- or struct-specific fields
@@ -95,7 +96,8 @@ The type dictionary encoding the type aliased, see below.
 ### "bases" (list)
 
 A list of dictionaries listing the base classes. It contains the following fields:
-- `"typename"` (string): the fully qualified name of the base class.
+- `"type"` (string): the fully qualified name of the base class. Will contain a Markdown link
+  if the type is declared in the project being documented.
 - `"access"` (string): set to a string `"public"`, `"protected"` or `"private"`.
 
 ### "derived" (list)
@@ -135,34 +137,50 @@ The value of the enumerator constant.
 
 `true` if this is a function template.
 
-### "return_type" (dictionary)
+### "constexpr" (boolean)
 
-The type dictionary encoding the function's return type, see below.
+`true` if this is a `constexpr` function.
+
+### "return_type" (string)
+
+The function's return type. It will contain a Markdown link if the type is declared in the
+project being documented.
 
 ### "arguments" (list)
 
-A list with the type dictionaries encoding the input arguments, see below.
-
-These dictionaries carry an additional `"name"` field, for the argument name.
+A list of dictionaries listing the input arguments. It contains the following fields:
+- `"type"` (string): The argument's type. Will contain a Markdown link if the type is declared
+  in the project being documented.
+- `"name"` (string): The name of the argument.
 
 
 ## function-specific fields, if class or struct member
 
 If the function is a class or struct member, it additionally has the following fields:
 
-### "static"
+### "static" (boolean)
 
-### "virtual"
+`true` or `false` depending on if the function is declared static or not.
 
-### "pure_virtual"
+### "virtual" (boolean)
 
-### "const"
+`true` or `false` depending on if the function is declared virtual or not.
+
+### "pure_virtual" (boolean)
+
+`true` or `false` depending on if the function is pure virtual or not.
+
+### "const" (boolean)
+
+`true` or `false` depending on if the function is declared const or not.
 
 ### "access" (string)
 
 Set to a string `"public"`, `"protected"` or `"private"`.
 
-### "method_type"
+### "method_type" (string)
+
+Set to a string `"method"`, `"conversionfunction"`, `"constructor"` or `"destructor"`.
 
 
 ## namespace-specific fields
@@ -181,13 +199,18 @@ The list of dictionaries for the child members.
 
 ## variable-specific fields
 
-### "type" (dictionary)
+### "type" (string)
 
-The type dictionary encoding the variable's type, see below.
+The variable's type, will contain a Markdown link if the type is declared in the project
+being documented.
 
 ### "static" (boolean)
 
 `true` or `false` depending on if the variable is declared static or not.
+
+### "constexpr" (boolean)
+
+`true` if this is a `constexpr` value.
 
 
 ## variable-specific fields, if class, struct or union member
@@ -211,6 +234,7 @@ If the variable is a bitfield, it additionally has the following field:
 
 The bitfield width.
 
+
 ## template-specific fields
 
 For members that are a class template, struct template, or function template, the following
@@ -221,33 +245,11 @@ field is additionally present:
 A list of dictionaries, one for each template parameter. It contains the following
 fields:
 - `"name"`: (string) name of template parameter.
-- `"type"`: (string) type of template parameter: `"type"` or a  type dictionary encoding the
-  parameter's type.
+- `"type"`: (string) type of template parameter: `"type"` or a string encoding the type
+  in case of a non-type template parameter. In the latter case, it will contain a Markdown
+  link if the type is declared in the project being documented.
 - `"default"`: A type dictionary for type parameters, a string for non-type parameters,
   or `null` (translates to `None` in Python) if no default is given.
 
 For example, for `template<typename A>`, `"type"` will be equal to `"type"`, whereas
-for `template<int A>`, `"type"` will be a dictionary containing `"typename"` equal to `"int"`
-(see below).
-
-## The "type" dictionary
-
-The two elements of this dictionary can be combined to form the full type specification:
-```
-full_type = type['typename'] + ' '.join(type['qualifiers'])
-```
-The resulting string might have some superfluous spaces that can be removed if one is so inclined.
-
-## "typename" (string)
-
-The name of the type. Can contain a link in Markdown format (linking to the ID of the type,
-if it is described in the documentation).
-
-## "qualifiers" (list)
-
-A list of strings, specifying the type's qualifiers. Strings can be one of:
-- `'const'`
-- `'*'`
-- `'&'`
-- `'&&'`
-- `'[]'`
+for `template<int A>`, `"type"` will be `"int"`.

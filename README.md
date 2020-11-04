@@ -21,8 +21,9 @@ is C++ code, not C code, and so some C features might be overlooked on purpose.
 all the information needed to produce documentation. It contains documentation for all
 namespaces, classes, functions, variables, etc., even those without explicit documentation
 blocks. It contains documentation for each header file and for each group, and it contains
-additional pages. It contains across the project. Typesetting, creating indices, etc. is
-left to the generator (or back-end). This keeps the program simple.
+additional pages. It links references to members to the members across the project.
+Typesetting, creating indices, etc. is left to the generator (or back-end), which keeps
+the program simple.
 
 **TODO** Eventually we'll have several generators here, to produce HTML output, PDF, whatever. 
 
@@ -55,19 +56,21 @@ Doxygen generates. This should allow the generator to create more meaningful URL
 
 ## What is missing
 
-I'm sure there are lots of things missing I'm not even aware of. Here are a few things
+I'm sure there are lots of things missing I'm not even aware of. Here are a few missing things
 I am aware of.
 
-Things we'd like to add:
+Things we'd like to add/fix/improve:
 
 1. Function pointer types.
-2. SFINAE template parameters are hard to parse, and currently show up blank or as partial text.
+2. SFINAE template parameters are hard to parse. The current solution is to record "<SFINAE>"
+   as the type of any template parameter without a name. This is obviously not right, but it
+   works for me for now.
+3. Types in a (partial) template specialization are not recorded.
 
 Things that CLang doesn't tell us:
 
 1. Clang doesn't easily report on pre-processor macros. Instead of making things complicated,
 we ust require adding the `\macro` (or `\def`) command at the top of the documentation block.
-2. Clang doesn't say if a function or variable is `constexpr`. 
 
 
 # License

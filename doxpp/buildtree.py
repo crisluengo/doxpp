@@ -698,16 +698,23 @@ def process_type(type, cursor=None):
     return output
 
 def find_default_value(tokens):
-    print(tokens)
     for ii in range(len(tokens) - 1):
         if tokens[ii] == '=':
             return tokens[ii + 1]
     return None
 
+def is_constexpr(item):
+    name = item.spelling
+    for t in item.get_tokens():
+        if t.spelling == 'constexpr':
+            return True
+        if t.spelling == name:
+            return False
+    return False
+
 def process_function_declaration(item, member):
     member['return_type'] = process_type(item.type.get_result())
     arguments = []
-    print("*** FUNCTION CHILDREN: ***")
     for child in item.get_children():
         if child.kind == cindex.CursorKind.PARM_DECL:
             name = child.spelling
@@ -724,7 +731,6 @@ def process_function_declaration(item, member):
             param['name'] = name
             param['default'] = default
             arguments.append(param)
-    print("  ^ FUNCTION CHILDREN ^")
     member['arguments'] = arguments
 
 def merge_member(member, new_member):
@@ -834,14 +840,15 @@ def extract_declarations(citer, parent, status: Status):
                             default = process_type(child.type, child)
                         break
                 else:
-                    type = process_type(item.type, item)
-                    # TODO: This doesn't seem to work for SFINAE template parameters
-                    for child in item.get_children():
-                        if child.kind == cindex.CursorKind.TYPE_REF:
-                            continue
-                        default = ''.join([t.spelling for t in child.get_tokens()])
-                        if default:
-                            break
+                    if not name:
+                        # This happens for SFINAE template parameters
+                        # TODO: This would happen for any parameter that is not named. What to do?
+                        type = '<SFINAE>'
+                        # TODO: To get a proper representation of this template parameter we'd need to
+                        #       process the tokens manually.
+                    else:
+                        type = process_type(item.type, item)
+                    default = find_default_value([x.spelling for x in item.get_tokens()])
                 status.members[semantic_parent]['template_parameters'].append({
                     'name': name,
                     'type': type,
@@ -932,6 +939,7 @@ def extract_declarations(citer, parent, status: Status):
                 member['pure_virtual'] = item.is_pure_virtual_method()
                 member['const'] = item.is_const_method()
                 member['access'] = access_specifier_map[item.access_specifier]
+                member['constexpr'] = is_constexpr(item)
                 member['method_type'] = member_type
                 # TODO: a child member could be cindex.CursorKind.CXX_FINAL_ATTR?
                 process_function_declaration(item, member)
@@ -949,11 +957,13 @@ def extract_declarations(citer, parent, status: Status):
                 member['static'] = item.storage_class == cindex.StorageClass.STATIC
                 member['mutable'] = item.is_mutable_field()
                 member['access'] = access_specifier_map[item.access_specifier]
+                member['constexpr'] = is_constexpr(item)
                 if item.is_bitfield():
                     member['width'] = item.get_bitfield_width()
                 member_type = 'variable'
             elif member_type == 'function':
                 member['templated'] = is_template
+                member['constexpr'] = is_constexpr(item)
                 process_function_declaration(item, member)
             elif member_type == 'namespace':
                 member['members'] = []
@@ -974,6 +984,7 @@ def extract_declarations(citer, parent, status: Status):
             elif member_type == 'variable':
                 member['type'] = process_type(item.type, item)
                 member['static'] = item.storage_class == cindex.StorageClass.STATIC
+                member['constexpr'] = is_constexpr(item)
             if is_template:  # 'classtemplate', 'structtemplate', 'functiontemplate', 'methodtemplate', 'usingtemplate'
                 member['template_parameters'] = []
             member['member_type'] = member_type
@@ -1198,17 +1209,12 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
         # Mark file as complete
         processed[f] = True
 
-    # Go through all members with a 'type' element, and replace the type name string with a Markdown link:
-    #    member['type']['typename'] = '[type name](#type-name-id)'
-    # TODO
+    # Go through all members with a 'type' element, and replace the type dictionary with a string
 
-    # Go through all members, headers, groups and pages, identify `\ref` and `\see` commands,
-    # identify linked members, and replace with links
+    #    member['type']['typename'] = '[type name](#type-name-id) ' + ''.join(type['qualifiers'])
     # TODO
-
-    # Go through all pages, identify `\subpage` commands, identify linked members, establish hierarchy,
-    # and replace with links
-    # TODO, see find_subpage_cmd()
+    # For functions, 'return_type' and 'arguments'.
+    # For templated members, 'template_parameters'. If 'type' == 'type', examine 'default', otherwise examine 'type'.
 
     # Go through all classes with base classes, and:
     # - add links to derived classes
@@ -1218,5 +1224,13 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
     # - add links to the overridden virtual base class members
     #    member['overridden'] = ['derived-class-member-id', 'derived-class-member-id', ...]
     # TODO
+
+    # Go through all members, headers, groups and pages, identify `\ref` and `\see` commands,
+    # identify linked members, and replace with links
+    # TODO
+
+    # Go through all pages, identify `\subpage` commands, identify linked members, establish hierarchy,
+    # and replace with links
+    # TODO, see find_subpage_cmd()
 
     return status.data

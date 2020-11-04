@@ -68,11 +68,12 @@ namespace transport
 template<typename A, int B = 5>
 struct StructTemplate {
    A member[B];
-   int action(const A * * const * * & a);
+   constexpr int action(const A * * const * * & a);
 };
 
 template<typename A, typename B = MountainBike>
 class ClassTemplate {
+   static constexpr double value = 0;
    B member;
    str action(A const& a);
 };
@@ -99,6 +100,9 @@ using IXStruct = ClassTemplate<int, X>;
 
 /// For some reason, this definition takes the documentation for the declaration, ignoring this.
 bool MountainBike::SetSuspension(const double stiffness) {}
+
+/// A constexpr declaration
+static constexpr int CONST = 5;
 
 }
 
