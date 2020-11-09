@@ -53,5 +53,6 @@ def new_page(id, title, doc=''):
         'id': id,
         'title': title,
         'doc': doc,
+        'parent': '',           # ID of parent
         'subpages': []          # IDs of sub-pages
     }

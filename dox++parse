@@ -27,16 +27,17 @@ def generate_config_file(filename):
     config['input'] = {
         'root directory': '.',        # the include path recorded for header files will be relative to this
         'header files': '*.h *.hpp',  # do give a path here, relative to working directory, for example: '*.h lib/*.h'
-        'markdown files': '*.md'      # additional files to read
+        'markdown files': '*.md',     # additional files to read
+        'tab size': '4'               # size of a TAB character
     }
     config['output'] = {
         'filename': 'dox++out.json',
-        'use typewriter font': 'no',  # 'yes' or 'no', the Markdown output uses backticks (code formatting) around member names
+        'use typewriter font': 'no',  # 'yes' or 'no', the Markdown output uses backticks (code formatting) around type names
         'log level': 'warning'        # 'error', 'warning', 'info' or 'debug'
     }
     config['clang'] = {
-        'compiler flags': '',       # could be '-std:c++11', for example
-        'include directories': '',  # make these space-separated
+        'compiler flags': '',         # could be '-std=c++11', for example
+        'include directories': '',    # make these space-separated
     }
     with open(filename, 'w') as configfile:
         configfile.write('# Default dox++ configuration file\n')
@@ -67,7 +68,8 @@ if not 'clang' in config:
 doxpp.log.setLevel(config['output'].get('log level', 'warning'))  # the default value
 
 options = {
-    'code_formatting': config['output'].get('use typewriter font', 'no')
+    'code_formatting': config['output'].get('use typewriter font', 'no'),
+    'tab_size': int(config['input'].get('tab size','4'))
 }
 
 data = doxpp.buildtree.buildtree(

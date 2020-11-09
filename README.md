@@ -53,6 +53,7 @@ recognized.
 8. Directories are not documented, only the header files themselves.
 9. Unique identifiers for members are fairly readable, and don't look like the hashes that
 Doxygen generates. This should allow the generator to create more meaningful URLs.
+10. There is no "autolink", all links must be explicitly made with `\ref`.
 
 ## What is missing
 
@@ -69,12 +70,16 @@ Things we'd like to add/fix/improve:
 4. If a templated type is used as the type of a parameter or variable, it is not linked to
    the documentation for that type.
 5. Link override and overridden functions together.
+6. There's no way to have the literal text "`\ref`" (and similar commands) in the documentation,
+   we need to avoid matching commands inside backticks or in code blocks.
+
 
 Things that CLang doesn't tell us:
 
 1. Clang doesn't easily report on pre-processor macros. Instead of making things complicated,
 we just require adding the `\macro` (or `\def`) command at the top of the documentation block.
 2. Clang doesn't say if an override function is `final`.
+3. Clang doesn't say if a variable or function is `constexpr`, but we worked our way around that.
 
 # License
 

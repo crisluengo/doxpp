@@ -16,6 +16,20 @@ Note that we try to keep compatibility with Doxygen, but chose to make some chan
     `\endgroup`. Furthermore, groups are disjoint, each member can only belong to
     one group.
 
+4. There is no "autolink", all member names must be preceded by the `\ref` command
+   to create a link to the member documentation. `\ref` is used to link to anything
+   in the documentation, not just pages and sections.
+
+5. All Doxygen commands related to markup are not recognized. Any non-recognized
+   command is kept in the output JSON file, so that the backend can act on it if it
+   desires. It is typically simpler to use Markdown syntax for markup anyway.
+   It is also possible to use HTML tags for markup, if the backend can handle it.
+
+Note that commands are recognized and processed outside of any Markdown parsing, so
+commands inside of backticks or code fences are processed the same way as outside
+of them.
+
+
 ## At the start of a documentation block
 
 These define what the documentation block does. The first line of the block must start
@@ -145,7 +159,7 @@ TODO: Maybe eventually `\headerfile` can be used to indicate which header the ma
 
 ### `\mainpage [(title)]`
 
-Creates a page with the ID `index`, and `(title)` as the page's title. This is the root page
+Creates a page with the ID `index`, and `(title)` as the page's title. This is the start page
 for the documentation. Text in this block is the page's text. See `\page` for more information.
 
 ### `\name (header)`
@@ -175,6 +189,8 @@ The page can be referenced by its ID.
 Use `\subpage` commands in a page to reference other pages and make those referenced pages sub-pages to
 this page. Use `\ref` commands to reference other pages but not impose any hierarchy.
 
+By default, all pages are at the same level, not subordinate to any other page.
+
 ### `\struct <name>`
 
 ### `\union <name>`
@@ -185,6 +201,12 @@ this page. Use `\ref` commands to reference other pages but not impose any hiera
 
 
 ## Inside documentation blocks
+
+### `\anchor <name>`
+
+Anywhere in a documentation block, adds an anchor that can be referenced elsewhere with `\ref`.
+
+Is replaced by `{#<name>}` in the Markdown output.
 
 ### `\brief`
 
@@ -210,20 +232,6 @@ See `\defgroup` for more information on grouping.
 
 This command is expected to be on its own on a line.
 
-### `\subpage <name> ["(text)"]`
-
-This is similar to `\ref`, but for pages. It can only occur inside a page (see `\page`).
-`\subpage <name>` creates a link to page `<name>` and additionally builds a hierarchy
-structure, indicating that the linked page is subordinate to the current page. Only
-one `\subpage` command can reference each page, such that each page has only one "parent"
-page. Furthermore, these references should not form loops, the page hierarchy must form
-a tree structure. The page called `index` (see `\mainpage`) is the root of the hierarchy,
-by default all other pages are subordinate to it.
-
-`\subpage <name> "(text)"` uses `(text)` as the anchor text for the link.
-
-To create links without creating hierarchical relations, use `\ref`.
-
 ### `\ref <name> ["(text)"]`
 
 Creates a link to the entity (member, header, group or page) called `<name>`. Optionally,
@@ -232,18 +240,44 @@ or the name of the member referenced.
 
 `<name>` will be looked up according to logical rules: in the documentation for `ns::foo`,
 `\ref bar` will see if `ns::foo::bar` exists, otherwise it will look for `ns::bar`, or
-finally `::bar`. If no match exists, the `<name>` (or `(text)`) will be output without
-linking to anything. In a page, always use the fully qualified name.
+finally `::bar`. If no match exists, `<name>` will be interpreted as an ID. Use the ID
+to link to a member, a header, a group, a page, a section or an anchor. If `<name>` does not
+match any IDs either, then `<name>` (or `(text)`) will be output without linking to anything.
+In a page, always use the fully qualified name for members, or their ID.
 
+If `bar` is a function with multiple overloads, then `\ref bar` will match the first function with that name.
 To disambiguate overloaded functions, `<name>` should be the full function declaration,
 without parameter names, and the types must match exactly. For example, `\ref bar(int, double const&)`
 will match a function `bar(int, double const&)`, but not `bar(int, double const)` nor
-`bar(int, double&)` nor `bar(int, double const&, int)`
+`bar(int, double&)` nor `bar(int, double const&, int)`.
+
+To link to a header file, give its ID, or specify the file name (optionally with a partial path)
+in quotes, for example `\ref "path/header.h" "link text"`. When giving a file name, the header
+with a matching name and the fewest path elements prepended will be linked to. The link text,
+if not given explicitly, is the header file name with path starting at the project root
+(as specified in the options).
 
 ### `\relates <name>` or `\related <name>`
 
 Added to the documentation block of a function or variable, and with `<name>` referencing
 a class, adds the function or variable to a "Related" section in the class' documentation.
+
+Note that this command should not be placed in class, struct, union or enum members, only
+in namespace members (including global scope).
+
+This command is expected to be on its own on a line. Each member can only have one `\relates`
+command.
+
+### `\section <name> (title)`
+
+Starts a new section within a documentation block or a page. `<name>` is the ID that can
+be used with `\ref` to reference the section.
+
+This is replaced by the Markdown code `# (title) {#name}`. The `#` represents a level 1 heading,
+but this will be demoted by the backend to be a lower level than the containing block.
+
+One can also directly write `# My Title {#my-title}`, but then the `\ref` command will not recognize
+`my-title` as something that can be referenced.
 
 ### `\see <name> [, <name> [, ...]` or `\sa <name> [, <name> [, ...]`
 
@@ -253,6 +287,32 @@ See `\ref` for how `<name>` is interpreted and disambiguated.
 Note that this inserts a `\par See also` command that the backend must interpret to create the heading,
 and optionally box the whole paragraph.
 
+This command is expected to be on its own on a line. Cannot occur inside the brief description.
+
+### `\subpage <name> ["(text)"]`
+
+This is similar to `\ref`, but for pages. It can only occur inside a page (see `\page`).
+`\subpage <name>` creates a link to page `<name>` and additionally builds a hierarchy
+structure, indicating that the linked page is subordinate to the current page. Only
+one `\subpage` command can reference each page, such that each page has only one "parent"
+page. Furthermore, these references should not form loops, the page hierarchy must form
+a tree structure.
+
+The page called `index` (see `\mainpage`) should not be made a subpage of another page.
+
+`\subpage <name> "(text)"` uses `(text)` as the anchor text for the link.
+
+To create links without creating hierarchical relations, use `\ref`.
+
+### `\subsection <name> (title)`
+
+Like `\section`, but for a level 2 heading (`##` in Markdown).
+
+### `\subsubsection <name> (title)`
+
+Like `\section`, but for a level 3 heading (`###` in Markdown).
+
+
 ## At the start of a line in Markdown files only
 
 ### `\comment`
@@ -260,48 +320,6 @@ and optionally box the whole paragraph.
 The rest of the line is ignored. Use this to add comments not meant to be shown in the
 documentation, file copyright notices, etc.
 
-
----
-
-# Doxygen commands, and what we'll do with them
-
-## Grouping commands
-
-- `\addtogroup <name>`
-- `\defgroup <name> (group title)`
-- `\name [(header)]`
-
-## Documenting members without using the actual declaration in the header file
-
-These should still point to things that the parser found, though. Or maybe if they
-weren't found, add an indicator that this is indeed not implemented.
-
-- `\class <name>`
-- `\def <name>` -> We'll have an alias `\macro`
-- `\dir [<path fragment>]`
-- `\enum <name>`
-- `\file [<name>]`
-- `\fn (function declaration)` -> We'll have an alias `\function`
-- `\mainpage [(title)]`
-- `\namespace <name>`
-- `\page <name> (title)`
-- `\struct <name>`
-- `\typedef (typedef declaration)` -> We'll have an alias `\alias`
-- `\union <name>`
-- `\var (variable declaration)` -> We'll have an alias `\variable`
-
-## Inside a member documentation block
-
-- `\example['{lineno}'] <file-name>`
-- `\headerfile <header-file> [<header-name>]`
-- `\ingroup <groupname>` -> But we'll do a single group here
-- `\nosubgrouping`
-- `\ref <name> ["(text)"]`
-- `\related <name>`
-- `\relates <name>`
-- `\sa { references }` -> same as `\see`
-- `\see { references }` -> same as `\sa`
-- `\subpage <name> ["(text)"]` -> but this one happens only inside a `\page` documentation block
 
 ---
 
@@ -334,15 +352,14 @@ weren't found, add an indicator that this is indeed not implemented.
 
 - `\callergraph`
 - `\callgraph`
-- `\cond` -> dude, just don't document if you don't want it documented...
-- `\endcond`
-- `\endinternal`
+- `\cond` / `\endcond` -> dude, just don't document if you don't want it documented...
 - `\hidecallergraph`
 - `\hidecallgraph`
 - `\hideinitializer` -> this is something that the backend can do
 - `\hiderefby`
 - `\hiderefs`
-- `\internal`
+- `\internal` / `\endinternal`
+- `\link` / `\endlink` -> we're using `\ref` for everything
 - `\overload [(function declaration)]`
 - `\relatedalso <name>`
 - `\relatesalso <name>`
@@ -359,7 +376,6 @@ weren't found, add an indicator that this is indeed not implemented.
 
 - `\a`
 - `\addindex`
-- `\anchor`
 - `\arg`
 - `\attention`
 - `\author`
@@ -370,7 +386,7 @@ weren't found, add an indicator that this is indeed not implemented.
 - `\c`
 - `\category`
 - `\cite`
-- `\code`
+- `\code` / `\endcode`
 - `\copybrief`
 - `\copydetails`
 - `\copydoc`
@@ -380,53 +396,32 @@ weren't found, add an indicator that this is indeed not implemented.
 - `\details`
 - `\diafile`
 - `\docbookinclude`
-- `\docbookonly`
+- `\docbookonly` / `\enddocbookonly`
 - `\dontinclude`
-- `\dot`
+- `\dot` / `\enddot`
 - `\dotfile`
 - `\e`
-- `\else`
-- `\elseif`
 - `\em`
 - `\emoji`
-- `\endcode`
-- `\enddocbookonly`
-- `\enddot`
-- `\endhtmlonly`
-- `\endif`
-- `\endlatexonly`
-- `\endlink`
-- `\endmanonly`
-- `\endmsc`
-- `\endparblock`
-- `\endrtfonly`
-- `\endsecreflist`
-- `\endverbatim`
-- `\enduml`
-- `\endxmlonly`
 - `\exception`
 - `\f$`
-- `\f[`
-- `\f]`
-- `\f{`
-- `\f}`
+- `\f[` / `\f]`
+- `\f{` / `\f}`
 - `\htmlinclude`
-- `\htmlonly`
-- `\if`
-- `\ifnot`
+- `\htmlonly` / `\endhtmlonly`
+- `\if` / `\ifnot` / `\elseif` / `\else` / `\endif`
 - `\image`
 - `\include`
 - `\includedoc`
 - `\includelineno`
 - `\invariant`
 - `\latexinclude`
-- `\latexonly`
+- `\latexonly` / `\endlatexonly`
 - `\li`
 - `\line`
-- `\link`
 - `\maninclude`
-- `\manonly`
-- `\msc`
+- `\manonly` / `\endmanonly`
+- `\msc` / `\endmsc`
 - `\mscfile`
 - `\n`
 - `\note`
@@ -434,7 +429,7 @@ weren't found, add an indicator that this is indeed not implemented.
 - `\par`
 - `\paragraph`
 - `\param`
-- `\parblock`
+- `\parblock` / `\endparblock`
 - `\post`
 - `\pre`
 - `\refitem`
@@ -445,9 +440,8 @@ weren't found, add an indicator that this is indeed not implemented.
 - `\returns`
 - `\retval`
 - `\rtfinclude`
-- `\rtfonly`
-- `\secreflist`
-- `\section`
+- `\rtfonly` / `\endrtfonly`
+- `\secreflist` / `\endsecreflist`
 - `\short`
 - `\since`
 - `\skip`
@@ -455,9 +449,7 @@ weren't found, add an indicator that this is indeed not implemented.
 - `\snippet`
 - `\snippetdoc`
 - `\snippetlineno`
-- `\startuml`
-- `\subsection`
-- `\subsubsection`
+- `\startuml` / `\enduml`
 - `\tableofcontents`
 - `\test`
 - `\throw`
@@ -465,12 +457,12 @@ weren't found, add an indicator that this is indeed not implemented.
 - `\todo`
 - `\tparam`
 - `\until`
-- `\verbatim`
+- `\verbatim` / `\endverbatim`
 - `\verbinclude`
 - `\version`
 - `\warning`
 - `\xmlinclude`
-- `\xmlonly`
+- `\xmlonly` / `\endxmlonly`
 - `\xrefitem`
 - `\$`
 - `\@`

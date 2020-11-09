@@ -27,6 +27,10 @@ from . import members
 from . import unique_id
 from . import walktree
 
+# Some global "constants" we set from the options
+code_formatting = False
+tab_size = 4
+
 cindex = libclang.load_libclang()
 
 cursor_kind_to_type_map = {
@@ -156,6 +160,8 @@ class Status:
 
         self.member_ids = {}            # A dictionary to translate USR to our ID for a member.
 
+        self.anchors = {}               # A dictionary translating header anchors (IDs) to their text.
+
         self.unprocessed_commands = []  # Here we keep command documentation blocks that need to be processed later.
 
 
@@ -213,6 +219,7 @@ def add_doc(member, brief, doc):
 
 def clean_comment(comment):
     # Removes first few characters from single-line documentation comment
+    comment = comment.expandtabs(tab_size)
     line = comment[3:]  # removes '///' or '//!'
     if len(line) > 0 and line[0] == '<':
         # This is if the comment is in the style "///< ..."
@@ -221,27 +228,64 @@ def clean_comment(comment):
         line = line[1:]
     return line
 
-def clean_multiline_comment(comment, prelen=0):
-    lines = []
-    start = 3
-    if len(comment) > 4 and comment[3] == '<':
-        # This is if the comment is in the style "/**< ... */"
-        start = 4
-    for line in comment[start:-2].splitlines():
-        if prelen == 0 or line[0:prelen].isspace():
-            line = line[prelen:]
-            if line.startswith(' *') or line.startswith('  '):
-                line = line[2:]
-                if len(line) > 0 and line[0] == ' ':
-                    line = line[1:]
-        lines.append(line)
-    return lines
-
 def clean_single_line_comment_block(comment):
     lines = []
     for line in comment.splitlines():
         line = clean_comment(line.lstrip())
         lines.append(line)
+    return lines
+
+def clean_multiline_comment(comment, prelen=None):
+    comment = comment.expandtabs(tab_size)
+    start = 3
+    if start < len(comment)  and comment[start] == '<':
+        # This is if the comment is in the style "/**< ... */"
+        start = 4
+    lines = comment[start:-2].strip().splitlines()
+    # At this point, the first line is fixed, but the other lines might be indented uniformly
+    if prelen:
+        # Assume each line starting at 1 has `prelen` spaces in front. Let's remove them.
+        for ii in range(1, len(lines)):
+            if lines[ii][0:prelen].isspace():
+                lines[ii] = lines[ii][prelen:]
+            else:
+                # TODO: should we warn here about shenanigans?
+                pass
+    if len(lines) == 1:
+        return lines
+    # At this point, all but the first line might have some uniform indentation, depending on the style
+    # of the comment:
+    #
+    #   /*! foo             /*! foo             /** foo             /** foo
+    #    * some text            some text       some text           *** some text
+    #
+    # We want to remove the same stuff from each of those lines. We look for a combination of spaces
+    # and asterisks in the first line, compare all other lines to ensure they're all the same, then
+    # remove that prefix. We should ignore empty lines though.
+    if len(lines) == 2:
+        # If there's only one additional line, strip any combination of spaces and asterisks at the left and be done.
+        lines[1] = lines[1].lstrip(' *')
+        return lines
+    # Now we look for a common prefix
+    tmp_lines = []
+    for line in lines[1:]:
+        if line.rstrip():
+            tmp_lines.append(line)
+    line1 = min(tmp_lines)
+    line2 = max(tmp_lines)
+    if line1 == line2:
+        # This is a weird situation... Not sure what to do
+        return lines
+    prefix = os.path.commonprefix([line1, line2])
+    if prefix:
+        # All lines start with `prefix`. Ensure it is only spaces and asterisks.
+        prelen = len(prefix) - len(prefix.lstrip(' *'))
+        if len(line1) == prelen:
+            # One of the lines only has our prefix. Can we add a space?
+            if line2[prelen] == ' ':
+                prelen += 1
+        for ii in range(1, len(lines)):
+            lines[ii] = lines[ii][prelen:]
     return lines
 
 def is_single_line_comment(comment):
@@ -261,42 +305,161 @@ def get_group_at_line(group_locations, line):
         current_group = item[1]
     return current_group
 
-def remove_match_from_string(string, match):
-    return string[:match.span(0)[0]] + string[match.span(0)[1]:]
-
 ingroup_cmd_match = re.compile(r'^\s*[\\@]ingroup\s+(\S+)\s*$', re.MULTILINE)
 
 def find_ingroup_cmd(doc):
+    # Finds `\ingroup <name>`, removes it from the documentation block, and returns `<name>`
     m = ingroup_cmd_match.search(doc)
     if m:
         group = m.group(1)
-        while m:
-            doc = remove_match_from_string(doc, m)
-            # Ignore subsequent `\ingroup` commands
-            m = ingroup_cmd_match.search(doc)
+        doc = ingroup_cmd_match.sub('', doc)
         return group, doc
     return '', doc
 
-subpage_cmd_match = re.compile(r'[\\@]subpage\s+((?:\w|:)+(?:\s*\(.*?\))?)(?:\s+\"(.+?)\")?')
+section_cmd_match = re.compile(r'^\s*[\\@]((?:sub){,2})section\s+((?:\w|-)+)\s+(.*?)\s*$', re.MULTILINE)
+anchor_cmd_match = re.compile(r'[\\@]anchor\s+((?:\w|-)+)')
 
-def find_subpage_cmd(member):
-    doc = member['doc']
-    for match in subpage_cmd_match.findall(doc):
-        # TODO
-        pass
+def find_anchor_cmds(doc, status: Status):
+    # Finds section headings and explicit anchors, and adds them to a list.
+    # `\section name title`, `\subsection name title`, `\subsubsection name title`, `\anchor name`
+    # We're replacing with:
+    # `# title {#name}`,     `## title {#name}`,       `### title {#name}`,         `{#name}`
+    # We're listing them in the status.anchors dictionary.
+
+    def section_cmd_replace(match):
+        level = len(match[1]) // 3 + 1
+        name = match[2]
+        title = match[3]
+        if name in status.anchors:
+            log.error("Anchor %s already exists, ignored.", name)
+            return '{} {}'.format('#' * level, title)
+        status.anchors[name] = title
+        return '{} {} {{#{}}}'.format('#' * level, title, name)
+
+    def anchor_cmd_replace(match):
+        name = match[1]
+        if name in status.anchors:
+            log.error("Anchor %s already exists, ignored.", name)
+            return ''
+        status.anchors[name] = ''
+        return '{{#{}}}'.format(name)
+
+    doc = section_cmd_match.sub(section_cmd_replace, doc)
+    doc = anchor_cmd_match.sub(anchor_cmd_replace, doc)
+    return doc
+
+
+# --- find_member ---
+
+split_function_arg_parts = re.compile(r'(?:\w|:)+|\*|&+|\[]')  # Split qualifiers
+split_function_args = re.compile(r'^((?:\w|:)+)\((.*)\)$')     # Split function from arguments
+
+def parse_function_arguments(arg_list):
+    arguments = []
+    for arg in arg_list:
+        parts = split_function_arg_parts.findall(arg)
+        if len(parts) > 1 and parts[0] == 'const':
+            parts[0], parts[1] = parts[1], parts[0]  # Move the 'const' to after the type
+        arguments.append({
+            'typename': parts[0],
+            'qualifiers': parts[1:]
+        })
+    return arguments
+
+def same_argument(arg1, arg2):
+    return arg1['typename'] == arg2['typename'] and arg1['qualifiers'] == arg2['qualifiers']
+
+def find_member_inner(member_list, names, function_params):
+    for member in member_list:
+        if member['name'] == names[0]:
+            if len(names) == 1:
+                # We've matched the whole name
+                if function_params:
+                    # We need to match function parameters too
+                    if member['member_type'] == 'function':
+                        args = member['arguments']
+                        if len(args) == len(function_params) and \
+                                all([same_argument(arg1, arg2) for arg1, arg2 in zip(args, function_params)]):
+                            return member['id']
+                    # TODO: We need to distinguish const member functions from the non-const version.
+                    #       This requires improving the matching for the type...
+                else:
+                    # No need to match function parameters
+                    return member['id']
+            elif 'members' in member:
+                return find_member_inner(member['members'], names[1:], function_params)
+    return ''
+
+def find_member(name, start_id, members):
+    """
+    :param name: Name of the member to be found (string).
+    :param start_id: ID of the member in whose context `name` is given (string).
+    :param members: The member dictionary, as returned by `create_member_dict`.
+    :return: ID of the member `name`, or an empty string if no match exists.
+
+    Finds a member with name `name`, as a direct child of `start_id`, or as a direct child of the parent
+    of `start_id`, recursively visiting its parents too. This is equivalent to identifying a name in the
+    context of the member `start_id`.
+    Returns the `id` of the first match found. If `name` has parenthesis, these are assumed to contain
+    function arguments, and will be used to disambiguate in the case of overloaded functions.
+    """
+    name = name.strip()
+    if not name:
+        return ''
+    function_params = []
+    if '(' in name:
+        match = split_function_args.fullmatch(name)
+        if not match:
+            log.error('Cannot parse "%s"', name)
+            return ''
+        name = match[1]
+        function_params = parse_function_arguments(match[2].split(','))
+    names = name.split('::')
+    if not names:
+        return ''
+    base = members[start_id]
+    if not 'members' in base:
+        base = members[base['parent']]
+    while True:
+        id = find_member_inner(base['members'], names, function_params)
+        if id:
+            return id
+        if 'parent' not in base:
+            return ''
+        base = members[base['parent']]
+
+
+def find_file(name, headers):
+    # Find header file we're referring to. We look for all matches with an arbitrary set of path elements
+    # prepended. The one with fewest such prepended path elements is the one we pick.
+    best_match = ''
+    match_length = 1e9  # some number larger than any possible number of path elements, basically Infty.
+    for header in headers.values():
+        hdr = header['name']
+        if hdr == name:
+            return header['id']
+        n = hdr.count(os.sep)
+        if n < match_length and hdr.endswith(os.sep + name):
+            match_length = n
+            best_match = header['id']
+    return best_match
 
 
 # --- Post-process documentation to add links ---
 
 def markup_for_type_dict(type, members):
     name = type['typename']
-    id = walktree.find_member(name, '', members)
+    id = find_member(name, '', members)
     # TODO: How to handle template types?
+    if code_formatting:
+        name = '`{}`'.format(name)
     if id:
         name = '[{}](#{})'.format(name, id)
     qualifiers = ''.join(type['qualifiers'])
     if qualifiers:
-        if qualifiers[0].isalpha():  # == 'c' really, there's no other possible letter here
+        if code_formatting:
+            qualifiers = '`{}`'.format(qualifiers)
+        if qualifiers[1].isalpha():  # == 'c' really, there's no other possible letter here
             # We need a space in between the type name and the 'const' qualifier
             name = name + ' ' + qualifiers
         else:
@@ -308,15 +471,40 @@ def post_process_types(members):
     # Convert 'type' dicts to a string with optional Markdown link to the type's documentation
     for member in members.values():
         if 'type' in member and isinstance(member['type'], dict):
-            member['type'] = markup_for_type_dict(member['type'], members)
+            member['type']['string'] = markup_for_type_dict(member['type'], members)
         if 'return_type' in member and isinstance(member['return_type'], dict):
-            member['return_type'] = markup_for_type_dict(member['return_type'], members)
+            member['return_type']['string'] = markup_for_type_dict(member['return_type'], members)
         if 'arguments' in member:
             for arg in member['arguments']:
-                arg['type'] = markup_for_type_dict(arg, members)
+                arg['string'] = markup_for_type_dict(arg, members)
+                # arg.pop('typename')
+                # arg.pop('qualifiers')
+        if 'template_parameters' in member:
+            for arg in member['template_parameters']:
+                if isinstance(arg['default'], dict):
+                    arg['default']['string'] = markup_for_type_dict(arg['default'], members)
+                elif isinstance(arg['type'], dict):
+                    arg['type']['string'] = markup_for_type_dict(arg['type'], members)
+
+def cleanup_types(members):
+    # Replace 'type' dicts with their 'string' element.
+    for member in members.values():
+        if 'type' in member and isinstance(member['type'], dict):
+            member['type'] = member['type']['string']
+        if 'return_type' in member and isinstance(member['return_type'], dict):
+            member['return_type'] = member['return_type']['string']
+        if 'arguments' in member:
+            for arg in member['arguments']:
+                arg['type'] = arg['string']
                 arg.pop('typename')
                 arg.pop('qualifiers')
-        # TODO: 'template_parameters'. If 'type' == 'type', examine 'default', otherwise examine 'type'.
+                arg.pop('string')
+        if 'template_parameters' in member:
+            for arg in member['template_parameters']:
+                if isinstance(arg['default'], dict):
+                    arg['default'] = arg['default']['string']
+                elif isinstance(arg['type'], dict):
+                    arg['type'] = arg['type']['string']
 
 def post_process_inheritance(members):
     # - add links to base and derived classes
@@ -330,26 +518,167 @@ def post_process_inheritance(members):
         if 'bases' in member:
             for base in member['bases']:
                 name = base['type']
-                id = walktree.find_member(name, '', members)
+                id = find_member(name, '', members)
+                if code_formatting:
+                    name = '`{}`'.format(name)
                 if id:
                     base['type'] = '[{}](#{})'.format(name, id)
                     base_member = members[id]
                     base_member['derived'].append(member['id'])
                     # TODO: find virtual functions in base class that are overridden in derived class
+                else:
+                    base['type'] = name
 
-ref_cmd_match = re.compile(r'[\\@]ref\s+((?:\w|:)+(?:\s*\(.*?\))?)(?:\s+\"(.+?)\")?')
+ref_cmd_match = re.compile(r'[\\@]ref\s+((?:\w|:|%|-)+(?:\s*\(.*?\))?)(?:\s+\"(.*?)\")?')
+ref_cmd_hdr_match = re.compile(r'[\\@]ref\s+\"(.+?)\"(?:\s+\"(.*?)\")?')
+see_cmd_match = re.compile(r'^\s*[\\@](?:see|sa)\s+(.+)\s*$', re.MULTILINE)
+see_arg_match = re.compile(r'([^,(]+(?:\(.*?\))?)')  # Split \see command arguments
 
 def post_process_links(elements, status: Status):
     # Process documentation for `\ref` and `\see` commands
     for elem in elements.values():
+
+        def find_and_format_name(name, text):
+            parent = elem['id']
+            if parent not in status.members:
+                parent = ''
+            id = find_member(name, parent, status.members)
+            if id:
+                if not text:
+                    text = name
+                if code_formatting:
+                    text = '`{}`'.format(text)
+            else:
+                if name in status.members:
+                    id = name
+                    if not text:
+                        text = status.members[id]['name']
+                    if code_formatting:
+                        text = '`{}`'.format(text)
+                elif name in status.groups:
+                    id = name
+                    if not text:
+                        text = status.groups[id]['name']
+                elif name in status.pages:
+                    id = name
+                    if not text:
+                        text = status.pages[id]['title']
+                elif name in status.headers:
+                    id = name
+                    if not text:
+                        text = status.headers[id]['name']
+                elif name in status.anchors:
+                    id = name
+                    if not text:
+                        text = status.anchors[id]
+            if not text:
+                text = name
+            if not id:
+                log.error("Reference to %s could not be matched.\n   in documentation for %s", name, elem['id'])
+                return text
+            return '[{}](#{})'.format(text, id)
+
+        def ref_cmd_replace(match):
+            # For matches of member name, or any ID
+            return find_and_format_name(match[1], match[2])
+
+        def ref_cmd_hdr_replace(match):
+            # For matches of header name
+            name = match[1]
+            text = match[2]
+            id = find_file(name, status.headers)
+            if not id:
+                log.error("Reference to file %s could not be matched.\n   in documentation for %s", name, elem['id'])
+                return name
+            if not text:
+                text = status.headers[id]['name']
+            return '[{}](#{})'.format(text, id)
+
+        def see_cmd_replace(match):
+            # For matches of a `\see` or `\sa` command.
+            output = '!!! see_also "See also"\n    '
+            first = True
+            for element in see_arg_match.findall(match[1]):
+                element = element.strip()
+                if element[0] == '"':
+                    name = element[1:-1]
+                    id = find_file(name, status.headers)
+                    if not id:
+                        log.error("Reference to file %s could not be matched.\n   in documentation for %s", name, elem['id'])
+                        continue
+                    link = '[{}](#{})'.format(status.headers[id]['name'], id)
+                else:
+                    link = find_and_format_name(element, '')
+                if first:
+                    first = False
+                else:
+                    output += ', '
+                output += link
+            output += '\n\n'
+            return output
+
         if 'brief' in elem:  # this one not present in pages
-            for match in ref_cmd_match.findall(elem['brief']):
-                # TODO
-                pass
-        if 'doc' in elem:  # this one should always be there
-            for match in ref_cmd_match.findall(elem['doc']):
-                # TODO
-                pass
+            elem['brief'] = ref_cmd_match.sub(ref_cmd_replace, elem['brief'])
+            elem['brief'] = ref_cmd_hdr_match.sub(ref_cmd_hdr_replace, elem['brief'])
+        if 'doc' in elem:  # this one is missing if elem is status.members['']
+            elem['doc'] = ref_cmd_match.sub(ref_cmd_replace, elem['doc'])
+            elem['doc'] = ref_cmd_hdr_match.sub(ref_cmd_hdr_replace, elem['doc'])
+            elem['doc'] = see_cmd_match.sub(see_cmd_replace, elem['doc'])
+
+relates_cmd_match = re.compile(r'^\s*[\\@]relate[sd]\s+(.+?)\s*$', re.MULTILINE)
+
+def post_process_relates(members):
+    # Process documentation for `\relates` commands (and `\related` synonym)
+    for member in members.values():
+
+        def relates_cmd_replace(match):
+            id = find_member(match[1], member['id'], members)
+            if id and members[id]['member_type'] in ['class', 'struct']:
+                members[id]['related'] = member['id']
+            else:
+                log.error("Reference %s could not be matched to class or struct.\n   in documentation for %s", match[1], member['id'])
+            return ''
+
+        if 'doc' in member:  # this one is missing if member is status.members['']
+            parent = member['parent']
+            # We only look for the command in documentation to namespace members (not class, struct, union or enum members)
+            if not parent or members[parent]['member_type'] == 'namespace':
+                member['doc'] = relates_cmd_match.sub(relates_cmd_replace, member['doc'], count=1)
+                # count=1 means we only handle the first occurrence of the command. Delete any further commands:
+                member['doc'] = relates_cmd_match.sub('', member['doc'])
+                # TODO: produce error if there are more of these commands?
+
+subpage_cmd_match = re.compile(r'[\\@]subpage\s+((?:\w|-)+(?:\s*\(.*?\))?)(?:\s+\"(.*?)\")?')
+
+def post_process_subpages(pages):
+    # Process documentation for `\subpage` commands
+    for page in pages.values():
+
+        def subpage_cmd_replace(match):
+            id = match[1]
+            text = match[2]
+            if not text:
+                text = pages[id]['title']
+            if id not in pages:
+                log.error("Page reference %s could not be matched.\n   in documentation for %s", id, page['id'])
+                return text
+            # Check to ensure `id` doesn't already have a parent
+            if pages[id]['parent']:
+                log.error("Page %s already has a parent.\n   in documentation for %s", id, page['id'])
+                return text
+            # Check to ensure `id` is not an ancestor of `page`
+            parent = page['parent']
+            while parent:
+                if parent == id:
+                    log.error("Page %s is an ancestor of %s.\n   in documentation for %s", id, page['id'], page['id'])
+                    return text
+                parent = pages[parent]['parent']
+            page['subpages'].append(id)
+            pages[id]['parent'] = page['id']
+            return '[{}](#{})'.format(text, id)
+
+        page['doc'] = subpage_cmd_match.sub(subpage_cmd_replace, page['doc'])
+        pass
 
 
 # --- Processing documentation commands ---
@@ -363,7 +692,7 @@ def process_generic_command(cmd: DocumentationCommand, status: Status):
     if args:
         log.warning("Ignoring additional arguments to \\%s command\n   in file %s", cmd.cmd, cmd.file)
     # Find which member we're talking about
-    id = walktree.find_member(name, '', status.members)
+    id = find_member(name, '', status.members)
     if not id:
         log.error("The member '%s' has not been declared, documentation ignored.\n   in file %s", cmd.args, cmd.file)
         return
@@ -376,6 +705,7 @@ def process_generic_command(cmd: DocumentationCommand, status: Status):
             log.warning("Member '%s' already is in group %s, cannot assign to group %s", id, member['group'], group)
     else:
         member['group'] = group
+    doc = find_anchor_cmds(doc, status)
     add_doc(member, cmd.brief, doc)
 
 def process_macro_command(cmd: DocumentationCommand, status: Status):
@@ -398,6 +728,7 @@ def process_macro_command(cmd: DocumentationCommand, status: Status):
             log.error("Documenting a macro with ID %s that is identical to an existing non-macro\n   in file %s",
                       id, cmd.file)
             return
+        doc = find_anchor_cmds(doc, status)
         add_doc(member, cmd.brief, doc)
         if not member['group']:
             member['group'] = group
@@ -405,6 +736,7 @@ def process_macro_command(cmd: DocumentationCommand, status: Status):
         # Create a new member
         member = members.new_member(id, name, 'macro', '', cmd.file)
         member['brief'] = cmd.brief
+        doc = find_anchor_cmds(doc, status)
         member['doc'] = doc
         member['group'] = group
         status.members[id] = member
@@ -416,31 +748,31 @@ def process_file_command(cmd: DocumentationCommand, status: Status):
     if not cmd.args:
         log.error("\\file needs a file name when not in a header file\n   in file %s", cmd.file)
         return
-    # Find header file we're referring to. We look for all matches with an arbitrary set of path elements
-    # prepended. The shortest such name is the one we pick.
-    best_match = ''
-    match_length = 1e9
-    for header in status.data['headers']:
-        name = header['name']
-        if name == cmd.args:
-            best_match = header['id']
-            break
-        if len(name) < match_length and name.endswith(os.sep + cmd.args):
-            match_length = len(name)
-            best_match = header['id']
-    if not best_match:
+    id = find_file(cmd.args, status.headers)
+    if not id:
         log.error("The file '%s' has not been parsed, documentation ignored.\n   in file %s", cmd.args, cmd.file)
         return
-    header = status.headers[best_match]
-    add_doc(header, cmd.brief, cmd.doc)
+    header = status.headers[id]
+    doc = find_anchor_cmds(cmd.doc, status)
+    add_doc(header, cmd.brief, doc)
 
-def create_page(name, title, doc, status: Status):
+valid_name_match = re.compile(r'^(\w|-)+$')
+
+def create_page(name, title, doc, file, status: Status):
     if name in status.pages:
+        # Page already exists, append documentation
+        doc = find_anchor_cmds(doc, status)
         cur_doc = status.pages[name]['doc']
         if cur_doc:
             doc = cur_doc + '\n\n' + doc
         status.pages[name]['doc'] = doc
     else:
+        # Validate `name` to have only {\w|-} characters
+        if not valid_name_match.fullmatch(name):
+            log.error("\\page has invalid name '%s', documentation ignored.\n   in file %s", name, file)
+            return
+        # Create new page
+        doc = find_anchor_cmds(doc, status)
         page = members.new_page(name, title, doc)
         status.data['pages'].append(page)
         status.pages[name] = page
@@ -449,14 +781,14 @@ def process_mainpage_command(cmd: DocumentationCommand, status: Status):
     title = cmd.args
     if not title:
         title = "Main"
-    create_page('index', title, cmd.doc, status)
+    create_page('index', title, cmd.doc, cmd.file, status)
 
 def process_page_command(cmd: DocumentationCommand, status: Status):
     name, title = split_string(cmd.args)
     if not name or not title:
         log.error("\\page requires a name and title, documentation ignored.\n   in file %s", cmd.file)
         return
-    create_page(name, title, cmd.doc, status)
+    create_page(name, title, cmd.doc, cmd.file, status)
 
 def process_documentation_command(cmd: DocumentationCommand, status: Status):
     # This function processes commands that add documentation to members
@@ -498,12 +830,14 @@ def process_grouping_command(cmd, args, brief, doc, loc, status: Status):
             return True
         current_group = status.current_group[-1]
         if id not in status.groups:
+            doc = find_anchor_cmds(doc, status)
             status.groups[id] = members.new_group(id, name, brief, doc, current_group)
             status.data['groups'].append(status.groups[id])
         else:
             group = status.groups[id]
             if not group['name']:
                 group['name'] = name
+            doc = find_anchor_cmds(doc, status)
             add_doc(group, brief, doc)
         if current_group:
             group = status.groups[current_group]
@@ -582,6 +916,7 @@ def process_comment_command(lines, loc, status: Status):
 
     # Documenting the current file
     if cmd == 'file' and not args:
+        doc = find_anchor_cmds(doc, status)
         add_doc(status.current_file, brief, doc)
         return
 
@@ -661,7 +996,10 @@ def process_markdown_command(lines, status: Status):
     cmd = documentation_commands[cmd]
 
     # Everything after the first line is documentation
-    brief, doc = separate_brief('\n'.join(lines[1:]))
+    doc = '\n'.join(lines[1:])
+    brief = ''
+    if cmd not in ['page', 'mainpage']:
+        brief, doc = separate_brief(doc)
 
     # Grouping commands
     if process_grouping_command(cmd, args, brief, doc, 0, status):
@@ -858,7 +1196,7 @@ def extract_declarations(citer, parent, status: Status):
                     if semantic_parent in status.member_ids:
                         semantic_parent = status.member_ids[semantic_parent]
                     else:
-                        log.error("USR of semantic parent was unknown, using lexical parent instead")
+                        log.error("USR of semantic parent for %s was unknown, using lexical parent instead", item.displayname)
                         semantic_parent = parent
                 else:
                     log.debug("Semantic parent not given, assuming lexical parent is semantic parent")
@@ -958,11 +1296,11 @@ def extract_declarations(citer, parent, status: Status):
                 if is_single_line_comment(comment):
                     comment = '\n'.join(clean_single_line_comment_block(comment))
                 else:
-                    comment = '\n'.join(clean_multiline_comment(comment, item.extent.start.column - 1))
-                    # TODO: this start column is "iffy". We don't know where the comment actually starts!
+                    comment = '\n'.join(clean_multiline_comment(comment))
                 cmd, _ = split_string(comment)
                 if not(len(cmd) > 1 and cmd[0] in ['\\', '@'] and cmd[1:] in documentation_commands):
                     member['brief'], member['doc'] = separate_brief(comment)
+                    member['doc'] = find_anchor_cmds(member['doc'], status)
 
             # Fix constructor and destructor names for templated classes
             if member_type in ['constructor', 'destructor']:
@@ -994,6 +1332,7 @@ def extract_declarations(citer, parent, status: Status):
                 member['bases'] = []
                 member['derived'] = []
                 member['members'] = []
+                member['related'] = []
                 process_children = True
             elif member_type in ['method', 'conversionfunction', 'constructor', 'destructor']:
                 member['templated'] = is_template
@@ -1012,7 +1351,10 @@ def extract_declarations(citer, parent, status: Status):
                 member['group'] = ''  # these should not be part of a group
             elif member_type == 'enum':
                 member['scoped'] = item.is_scoped_enum()
-                member['type'] = process_type(item.enum_type)['typename']
+                type = process_type(item.enum_type)['typename']
+                if code_formatting:
+                    type = '`{}`'.format(type)
+                member['type'] = type
                 member['members'] = []
                 process_children = True
             elif member_type == 'field':
@@ -1082,8 +1424,8 @@ def extract_declarations(citer, parent, status: Status):
                 member['id'] = id
                 status.member_ids[usr] = id
                 if id in status.members:
-                    log.error("USR was unknown, but ID was already there! This means that there is a name clash, "
-                              "unique_id.member is not good enough")
+                    log.error("USR for member %s was unknown, but ID %s was already there! This means that there is a name clash, "
+                              "unique_id.member is not good enough", member['name'], id)
                     continue  # skip the rest of this function, we're in trouble here...
                 status.members[id] = member
                 if semantic_parent:
@@ -1156,6 +1498,11 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
         this tool will not recognize it as such. Instead, manually add `` around member names if not referenced.
     """
 
+    # Set global "constants" according to options
+    global code_formatting, tab_size
+    code_formatting = options['code_formatting']
+    tab_size = options['tab_size']
+
     # Process the input parameters
     root_dir = os.path.realpath(root_dir)
     input_files = expand_sources(shlex.split(input_files))
@@ -1166,6 +1513,7 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
     # Get system include directories and figure out compiler flags
     include_dirs = [root_dir] + libclang.get_system_includes(compiler_flags) + include_dirs
     compiler_flags += ['-I{0}'.format(x) for x in include_dirs]
+    compiler_flags.insert(0, '-xc++')
     log.debug("Compiler flags: %s", ' '.join(compiler_flags))
 
     # Build the output file data representation
@@ -1272,12 +1620,16 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
         # Mark file as complete
         processed[f] = True
 
-    # Go through all members with a 'type' element, and replace the type dictionary with a string
+    # Go through all members with a 'type' element, and add a 'string' member representing the type,
+    # possibly with a link in Markdown format
     post_process_types(status.members)
 
     # Go through all classes with base classes, and add references from base to derived, as well
     # as links back and forth between overridden functions
     post_process_inheritance(status.members)
+
+    # Go through all members and resolve the `\relates` commands
+    post_process_relates(status.members)
 
     # Go through all members, headers, groups and pages, identify `\ref` and `\see` commands,
     # identify linked members, and replace with links
@@ -1286,11 +1638,12 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
     post_process_links(status.groups, status)
     post_process_links(status.pages, status)
 
-    # Go through all members and resolve the `\relates` commands
-    # TODO
-
     # Go through all pages, identify `\subpage` commands, identify linked members, establish hierarchy,
     # and replace with links
-    # TODO, see find_subpage_cmd()
+    post_process_subpages(status.pages)
+
+    # Go through all members, and clean up the redundant information in the 'type' element,
+    # mostly setting `member['type'] = member['type']['string']`
+    cleanup_types(status.members)
 
     return status.data

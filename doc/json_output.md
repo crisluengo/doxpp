@@ -37,7 +37,7 @@ in which they were found in the header file. Each `members[i]` is a dictionary a
    "parameters": [],   // (if a function)
    "return": "",       // (if a function)
    "members": [],      // (if a class or namespace) recursively list members
-   "related": [],      // (if a class) list of ids of functions related to this class (`\relates` command)
+   "related": [],      // (if a class) list of IDs of functions related to this class (`\relates` command)
    ...                 // other elements with additional information as needed ("virtual", "mutable", etc.)
 }
 
@@ -75,7 +75,7 @@ A list of defined groups. Each `groups[i]` is a dictionary as follows:
    "brief": "",
    "doc": "",
    "parent": "",       // ID of the parent group, if any
-   "subgroups": []     // list of ids of child groups
+   "subgroups": []     // list of IDs of child groups
 }
 
 Groups can be nested.
@@ -86,7 +86,8 @@ A list of pages. Each `pages[i]` is a dictionary as follows:
    "id": "",           // unique identifier
    "title": "",        // file name, with path from project root
    "doc": "",
-   "subpages": []      // list of ids of child pages
+   "parent": "",       // ID of the parent page, if any
+   "subpages": []      // list of IDs of child pages
 }
 
 One page has the ID 'index', this is the main page, and the root of the hierarchy.

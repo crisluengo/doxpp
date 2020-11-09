@@ -19,8 +19,8 @@ import re
 
 
 def header(name):
-    return urllib.parse.quote(name, safe='')
-    #return name.replace('/','__')
+    id = 'file--' + urllib.parse.quote(name, safe='')
+    return id.replace('.','-')
 
 qualifier_map = {
     '*': 'P',     # Pointer
@@ -57,5 +57,7 @@ def member(dict, status):
     return id
 
 def macro(name):
-    # TODO: do we need more than this?
-    return "-macro-" + name
+    ii = name.find('(')
+    if ii > 0:
+        name = name[:ii]
+    return "macro--" + name

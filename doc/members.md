@@ -108,6 +108,11 @@ A list of strings, the IDs of derived classes.
 
 The list of dictionaries for the child members.
 
+### "related" (list)
+
+A list of strings, the IDs of related members. These are not child members, but are related
+to the class and their documentation could be shown together with that of the class' members.
+
 
 ## enum-specific fields
 
