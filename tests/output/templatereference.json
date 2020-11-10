@@ -1,0 +1,87 @@
+{
+  "members": [
+    {
+      "id": "foo",
+      "name": "foo",
+      "brief": "Foo method.",
+      "doc": "",
+      "member_type": "function",
+      "parent": "",
+      "file": "templatereference.h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "constexpr": false,
+      "return_type": "`std::basic_string<char> > >`",
+      "arguments": []
+    },
+    {
+      "id": "WithInner-T",
+      "name": "WithInner",
+      "brief": "",
+      "doc": "",
+      "member_type": "struct",
+      "parent": "",
+      "file": "templatereference.h",
+      "group": "",
+      "deprecated": false,
+      "templated": true,
+      "bases": [],
+      "derived": [],
+      "members": [
+        {
+          "id": "WithInner-T-Type",
+          "name": "Type",
+          "brief": "",
+          "doc": "",
+          "member_type": "alias",
+          "parent": "WithInner-T",
+          "file": "templatereference.h",
+          "group": "",
+          "deprecated": false,
+          "type": "`T`"
+        }
+      ],
+      "related": [],
+      "template_parameters": [
+        {
+          "name": "T",
+          "type": "type",
+          "default": null
+        }
+      ]
+    },
+    {
+      "id": "WithInnerIntType",
+      "name": "WithInnerIntType",
+      "brief": "",
+      "doc": "",
+      "member_type": "alias",
+      "parent": "",
+      "file": "templatereference.h",
+      "group": "",
+      "deprecated": false,
+      "type": "`std::allocator<int> >`"
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--templatereference-h",
+      "name": "templatereference.h",
+      "brief": "",
+      "doc": "",
+      "includes": [
+        {
+          "filename": "string",
+          "in_project": false
+        },
+        {
+          "filename": "list",
+          "in_project": false
+        }
+      ]
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

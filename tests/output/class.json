@@ -1,0 +1,74 @@
+{
+  "members": [
+    {
+      "id": "A",
+      "name": "A",
+      "brief": "The class A.",
+      "doc": "A longer description of A.",
+      "member_type": "class",
+      "parent": "",
+      "file": "class.h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "bases": [],
+      "derived": [],
+      "members": [
+        {
+          "id": "A-A",
+          "name": "A",
+          "brief": "Constructor.",
+          "doc": "The constructor of A.",
+          "member_type": "function",
+          "parent": "A",
+          "file": "class.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": false,
+          "pure_virtual": false,
+          "const": false,
+          "access": "public",
+          "constexpr": false,
+          "method_type": "constructor",
+          "return_type": "`void`",
+          "arguments": []
+        },
+        {
+          "id": "A-~A",
+          "name": "~A",
+          "brief": "Destructor.",
+          "doc": "The destructor of A.",
+          "member_type": "function",
+          "parent": "A",
+          "file": "class.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": false,
+          "pure_virtual": false,
+          "const": false,
+          "access": "public",
+          "constexpr": false,
+          "method_type": "destructor",
+          "return_type": "`void`",
+          "arguments": []
+        }
+      ],
+      "related": []
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--class-h",
+      "name": "class.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

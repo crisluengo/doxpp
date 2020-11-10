@@ -1,17 +1,13 @@
-#!/usr/bin/env python
+#! /usr/bin/env python3
 
-import sys, os
-
-lcldoc = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.insert(0, lcldoc)
-
+import sys, os, inspect, glob
 import unittest
-from cldoc import cmdgenerate
 
-from cldoc import fs
-import glob, os
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir)
+import doxpp
 
-from xml import etree
 
 class Regression(unittest.TestCase):
     def setUp(self):
@@ -20,81 +16,32 @@ class Regression(unittest.TestCase):
     def tearDown(self):
         pass
 
-def create_test(name, files, ofiles):
+def create_test(name, root, h_file, md_file, json_file):
+    options = {
+        'code_formatting': 'no',
+        'tab_size': 4
+    }
     def t(self):
-        fs.fs = fs.Virtual
+        data = doxpp.buildtree.buildtree(root, h_file, md_file, '-std=c++11', '', options)
+        expected = doxpp.walktree.load_data_from_json_file(json_file)
 
-        cmdgenerate.run(['--', '--quiet', '--type', 'xml', '--output', 'xml'] + files)
-
-        for f in ofiles:
-            b = os.path.basename(f)
-            xmlname = b[len(name)+1:]
-
-            gf = fs.fs.open(os.path.join('xml', 'xml', xmlname))
-
-            got = gf.read()
-            exp = open(f).read()
-
-            self.maxDiff = None
-            self.assertMultiLineEqual(got, exp)
-
-        fs.fs.clear()
+        self.maxDiff = None
+        self.assertEqual(data, expected)
 
     t.__name__ = 'test_' + name
     return t
 
-def create_test_static(name, files, ofiles):
-    def t(self):
-        fs.fs = fs.System
-
-        tmpdir = fs.fs.mkdtemp()
-        gendir = os.path.join(tmpdir, 'static')
-
-        cmdgenerate.run(['--', '--quiet', '--type', 'html', '--static', '--output', gendir] + files)
-
-        for f in ofiles:
-            b = os.path.basename(f)
-            htmlname = b[len(name)+1:len(b)-7]
-
-            gf = fs.fs.open(os.path.join(gendir, htmlname))
-
-            got = gf.read()
-            exp = open(f).read()
-
-            self.maxDiff = None
-            self.assertMultiLineEqual(got, exp)
-
-        fs.fs.rmtree(gendir)
-
-    t.__name__ = 'test_static_' + name
-    return t
-
 def generate_tests():
-    dname = os.path.join(os.path.dirname(__file__))
-    hfiles = glob.glob(os.path.join(dname, 'input', '*.hh')) + glob.glob(os.path.join(dname, 'input', '*.h'))
-
-    for hfile in hfiles:
-        (hname, hext) = os.path.splitext(os.path.basename(hfile))
-
-        files = [hfile]
-
-        ccfile = os.path.join(os.path.dirname(hfile), hname + '.cc')
-        cfile = os.path.join(os.path.dirname(hfile), hname + '.c')
-
-        if os.path.exists(ccfile):
-            files.append(ccfile)
-
-        if os.path.exists(cfile):
-            files.append(cfile)
-
-        ofiles = glob.glob(os.path.join(dname, 'output', hname + '-*.xml'))
-
-        t = create_test(hname, files, ofiles)
-        setattr(Regression, t.__name__, t)
-
-        ofiles = glob.glob(os.path.join(dname, 'output', hname + '-*.html.static'))
-
-        t = create_test_static(hname, files, ofiles)
+    for file in glob.glob(os.path.join(currentdir, 'input', '*')):
+        name, ext = os.path.splitext(os.path.basename(file))
+        json_file = os.path.join(currentdir, 'output', name + '.json')
+        if ext == '.md':
+            h_file = ''
+            md_file = file
+        else:
+            h_file = file
+            md_file = ''
+        t = create_test(name, os.path.join(currentdir, 'input'), h_file, md_file, json_file)
         setattr(Regression, t.__name__, t)
 
 os.environ['CLDOC_DEV'] = '1'
@@ -103,5 +50,3 @@ generate_tests()
 
 if __name__ == '__main__':
     unittest.main()
-
-# vi:ts=4:et

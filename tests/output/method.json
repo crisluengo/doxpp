@@ -1,0 +1,59 @@
+{
+  "members": [
+    {
+      "id": "A",
+      "name": "A",
+      "brief": "",
+      "doc": "",
+      "member_type": "class",
+      "parent": "",
+      "file": "method.h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "bases": [],
+      "derived": [],
+      "members": [
+        {
+          "id": "A-f-A-P",
+          "name": "f",
+          "brief": "A function of A.",
+          "doc": "@a the argument.\n\nA longer description of f. Use <a> to pass <A>.\n\n@returns a number.",
+          "member_type": "function",
+          "parent": "A",
+          "file": "method.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": false,
+          "pure_virtual": false,
+          "const": false,
+          "access": "public",
+          "constexpr": false,
+          "method_type": "method",
+          "return_type": "`int`",
+          "arguments": [
+            {
+              "name": "a",
+              "default": null,
+              "type": "[`A`](#A)`*`"
+            }
+          ]
+        }
+      ],
+      "related": []
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--method-h",
+      "name": "method.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

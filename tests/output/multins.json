@@ -1,0 +1,60 @@
+{
+  "members": [
+    {
+      "id": "foo",
+      "name": "foo",
+      "brief": "",
+      "doc": "",
+      "member_type": "namespace",
+      "parent": "",
+      "file": "multins.h",
+      "group": "",
+      "deprecated": false,
+      "members": [
+        {
+          "id": "foo-A",
+          "name": "A",
+          "brief": "",
+          "doc": "",
+          "member_type": "class",
+          "parent": "foo",
+          "file": "multins.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "bases": [],
+          "derived": [],
+          "members": [],
+          "related": []
+        },
+        {
+          "id": "foo-B",
+          "name": "B",
+          "brief": "",
+          "doc": "",
+          "member_type": "class",
+          "parent": "foo",
+          "file": "multins.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "bases": [],
+          "derived": [],
+          "members": [],
+          "related": []
+        }
+      ]
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--multins-h",
+      "name": "multins.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

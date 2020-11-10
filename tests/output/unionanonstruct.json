@@ -1,0 +1,109 @@
+{
+  "members": [
+    {
+      "id": "A",
+      "name": "A",
+      "brief": "The union A.",
+      "doc": "A longer description of A.",
+      "member_type": "union",
+      "parent": "",
+      "file": "unionanonstruct.h",
+      "group": "",
+      "deprecated": false,
+      "members": [
+        {
+          "id": "A-",
+          "name": "",
+          "brief": "",
+          "doc": "",
+          "member_type": "struct",
+          "parent": "A",
+          "file": "unionanonstruct.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "bases": [],
+          "derived": [],
+          "members": [
+            {
+              "id": "A--a",
+              "name": "a",
+              "brief": "The a field.",
+              "doc": "",
+              "member_type": "variable",
+              "parent": "A-",
+              "file": "unionanonstruct.h",
+              "group": "",
+              "deprecated": false,
+              "type": "`float`",
+              "static": false,
+              "mutable": false,
+              "access": "public",
+              "constexpr": false
+            },
+            {
+              "id": "A--b",
+              "name": "b",
+              "brief": "The b field.",
+              "doc": "",
+              "member_type": "variable",
+              "parent": "A-",
+              "file": "unionanonstruct.h",
+              "group": "",
+              "deprecated": false,
+              "type": "`float`",
+              "static": false,
+              "mutable": false,
+              "access": "public",
+              "constexpr": false
+            },
+            {
+              "id": "A--x",
+              "name": "x",
+              "brief": "The x field.",
+              "doc": "",
+              "member_type": "variable",
+              "parent": "A-",
+              "file": "unionanonstruct.h",
+              "group": "",
+              "deprecated": false,
+              "type": "`float`",
+              "static": false,
+              "mutable": false,
+              "access": "public",
+              "constexpr": false
+            },
+            {
+              "id": "A--y",
+              "name": "y",
+              "brief": "The y field.",
+              "doc": "",
+              "member_type": "variable",
+              "parent": "A-",
+              "file": "unionanonstruct.h",
+              "group": "",
+              "deprecated": false,
+              "type": "`float`",
+              "static": false,
+              "mutable": false,
+              "access": "public",
+              "constexpr": false
+            }
+          ],
+          "related": []
+        }
+      ]
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--unionanonstruct-h",
+      "name": "unionanonstruct.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

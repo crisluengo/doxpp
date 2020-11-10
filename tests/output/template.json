@@ -1,0 +1,67 @@
+{
+  "members": [
+    {
+      "id": "A-T",
+      "name": "A",
+      "brief": "The class A.",
+      "doc": "@T the template parameter T.\n\nA longer description of A.",
+      "member_type": "class",
+      "parent": "",
+      "file": "template.h",
+      "group": "",
+      "deprecated": false,
+      "templated": true,
+      "bases": [],
+      "derived": [],
+      "members": [
+        {
+          "id": "A-T-a-T-TT-",
+          "name": "a",
+          "brief": "The a function.",
+          "doc": "@TT the TT template.\n\nThe long description of a.\n\n@return the value.",
+          "member_type": "function",
+          "parent": "A-T",
+          "file": "template.h",
+          "group": "",
+          "deprecated": false,
+          "templated": true,
+          "static": false,
+          "virtual": false,
+          "pure_virtual": false,
+          "const": false,
+          "access": "public",
+          "constexpr": false,
+          "method_type": "method",
+          "return_type": "`int`",
+          "arguments": [
+            {
+              "name": "tt",
+              "default": null,
+              "type": "`TT`"
+            }
+          ],
+          "template_parameters": []
+        }
+      ],
+      "related": [],
+      "template_parameters": [
+        {
+          "name": "T",
+          "type": "type",
+          "default": null
+        }
+      ]
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--template-h",
+      "name": "template.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

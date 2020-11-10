@@ -1,0 +1,147 @@
+{
+  "members": [
+    {
+      "id": "A",
+      "name": "A",
+      "brief": "The struct A.",
+      "doc": "A longer description of A.",
+      "member_type": "struct",
+      "parent": "",
+      "file": "struct.h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "bases": [],
+      "derived": [],
+      "members": [
+        {
+          "id": "A-I",
+          "name": "I",
+          "brief": "",
+          "doc": "",
+          "member_type": "variable",
+          "parent": "A",
+          "file": "struct.h",
+          "group": "",
+          "deprecated": false,
+          "type": "`int`",
+          "static": false,
+          "mutable": false,
+          "access": "public",
+          "constexpr": false
+        },
+        {
+          "id": "A-F",
+          "name": "F",
+          "brief": "",
+          "doc": "",
+          "member_type": "variable",
+          "parent": "A",
+          "file": "struct.h",
+          "group": "",
+          "deprecated": false,
+          "type": "`float`",
+          "static": false,
+          "mutable": false,
+          "access": "public",
+          "constexpr": false
+        }
+      ],
+      "related": [
+        "a_new",
+        "a_free-A-P",
+        "a_i-A-P",
+        "a_f-A-P"
+      ]
+    },
+    {
+      "id": "a_new",
+      "name": "a_new",
+      "brief": "A \"constructor\" function",
+      "doc": "",
+      "member_type": "function",
+      "parent": "",
+      "file": "struct.h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "constexpr": false,
+      "return_type": "[`A`](#A)`*`",
+      "arguments": []
+    },
+    {
+      "id": "a_free-A-P",
+      "name": "a_free",
+      "brief": "A \"destructor\" function",
+      "doc": "",
+      "member_type": "function",
+      "parent": "",
+      "file": "struct.h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "constexpr": false,
+      "return_type": "`void`",
+      "arguments": [
+        {
+          "name": "a",
+          "default": null,
+          "type": "[`A`](#A)`*`"
+        }
+      ]
+    },
+    {
+      "id": "a_i-A-P",
+      "name": "a_i",
+      "brief": "A \"getter\" function",
+      "doc": "",
+      "member_type": "function",
+      "parent": "",
+      "file": "struct.h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "constexpr": false,
+      "return_type": "`int`",
+      "arguments": [
+        {
+          "name": "a",
+          "default": null,
+          "type": "[`A`](#A)`*`"
+        }
+      ]
+    },
+    {
+      "id": "a_f-A-P",
+      "name": "a_f",
+      "brief": "Another \"getter\" function",
+      "doc": "",
+      "member_type": "function",
+      "parent": "",
+      "file": "struct.h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "constexpr": false,
+      "return_type": "`float`",
+      "arguments": [
+        {
+          "name": "a",
+          "default": null,
+          "type": "[`A`](#A)`*`"
+        }
+      ]
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--struct-h",
+      "name": "struct.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

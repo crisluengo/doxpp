@@ -1,0 +1,54 @@
+{
+  "members": [
+    {
+      "id": "A",
+      "name": "A",
+      "brief": "The enum A.",
+      "doc": "The enum A longer description.",
+      "member_type": "enum",
+      "parent": "",
+      "file": "enum.h",
+      "group": "",
+      "deprecated": false,
+      "scoped": false,
+      "type": "`unsigned int`",
+      "members": [
+        {
+          "id": "A-A_1",
+          "name": "A_1",
+          "brief": "The A_1 value",
+          "doc": "",
+          "member_type": "enumvalue",
+          "parent": "A",
+          "file": "enum.h",
+          "group": "",
+          "deprecated": false,
+          "value": 0
+        },
+        {
+          "id": "A-A_2",
+          "name": "A_2",
+          "brief": "The A_2 value",
+          "doc": "",
+          "member_type": "enumvalue",
+          "parent": "A",
+          "file": "enum.h",
+          "group": "",
+          "deprecated": false,
+          "value": 1
+        }
+      ]
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--enum-h",
+      "name": "enum.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

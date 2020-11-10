@@ -1,0 +1,98 @@
+{
+  "members": [
+    {
+      "id": "A",
+      "name": "A",
+      "brief": "The namespace A.",
+      "doc": "Longer description of namespace A.",
+      "member_type": "namespace",
+      "parent": "",
+      "file": "namespace.h",
+      "group": "",
+      "deprecated": false,
+      "members": [
+        {
+          "id": "A-B",
+          "name": "B",
+          "brief": "Class B.",
+          "doc": "Class B in namespace A.",
+          "member_type": "class",
+          "parent": "A",
+          "file": "namespace.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "bases": [],
+          "derived": [],
+          "members": [],
+          "related": []
+        },
+        {
+          "id": "A-b",
+          "name": "b",
+          "brief": "Function b.",
+          "doc": "Function b in namespace A.",
+          "member_type": "function",
+          "parent": "A",
+          "file": "namespace.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "constexpr": false,
+          "return_type": "`void`",
+          "arguments": []
+        },
+        {
+          "id": "A-E",
+          "name": "E",
+          "brief": "Enum E.",
+          "doc": "Enum E in namespace A.",
+          "member_type": "enum",
+          "parent": "A",
+          "file": "namespace.h",
+          "group": "",
+          "deprecated": false,
+          "scoped": false,
+          "type": "`unsigned int`",
+          "members": [
+            {
+              "id": "A-E-E_1",
+              "name": "E_1",
+              "brief": "E_1 value.",
+              "doc": "",
+              "member_type": "enumvalue",
+              "parent": "A-E",
+              "file": "namespace.h",
+              "group": "",
+              "deprecated": false,
+              "value": 0
+            },
+            {
+              "id": "A-E-E_2",
+              "name": "E_2",
+              "brief": "E_2 value.",
+              "doc": "",
+              "member_type": "enumvalue",
+              "parent": "A-E",
+              "file": "namespace.h",
+              "group": "",
+              "deprecated": false,
+              "value": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--namespace-h",
+      "name": "namespace.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

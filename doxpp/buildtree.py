@@ -241,7 +241,7 @@ def clean_multiline_comment(comment, prelen=None):
     if start < len(comment)  and comment[start] == '<':
         # This is if the comment is in the style "/**< ... */"
         start = 4
-    lines = comment[start:-2].strip().splitlines()
+    lines = comment[start:-2].strip(' ').splitlines()
     # At this point, the first line is fixed, but the other lines might be indented uniformly
     if prelen:
         # Assume each line starting at 1 has `prelen` spaces in front. Let's remove them.
@@ -634,7 +634,7 @@ def post_process_relates(members):
         def relates_cmd_replace(match):
             id = find_member(match[1], member['id'], members)
             if id and members[id]['member_type'] in ['class', 'struct']:
-                members[id]['related'] = member['id']
+                members[id]['related'].append(member['id'])
             else:
                 log.error("Reference %s could not be matched to class or struct.\n   in documentation for %s", match[1], member['id'])
             return ''
@@ -1297,6 +1297,7 @@ def extract_declarations(citer, parent, status: Status):
                     comment = '\n'.join(clean_single_line_comment_block(comment))
                 else:
                     comment = '\n'.join(clean_multiline_comment(comment))
+                comment = comment.strip()
                 cmd, _ = split_string(comment)
                 if not(len(cmd) > 1 and cmd[0] in ['\\', '@'] and cmd[1:] in documentation_commands):
                     member['brief'], member['doc'] = separate_brief(comment)

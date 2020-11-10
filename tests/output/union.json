@@ -1,0 +1,27 @@
+{
+  "members": [
+    {
+      "id": "A",
+      "name": "A",
+      "brief": "The union A.",
+      "doc": "A longer description of A.",
+      "member_type": "union",
+      "parent": "",
+      "file": "union.h",
+      "group": "",
+      "deprecated": false,
+      "members": []
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--union-h",
+      "name": "union.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

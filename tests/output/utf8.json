@@ -1,0 +1,31 @@
+{
+  "members": [
+    {
+      "id": "A",
+      "name": "A",
+      "brief": "Copyright \u00a9",
+      "doc": "",
+      "member_type": "class",
+      "parent": "",
+      "file": "utf8.h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "bases": [],
+      "derived": [],
+      "members": [],
+      "related": []
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--utf8-h",
+      "name": "utf8.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

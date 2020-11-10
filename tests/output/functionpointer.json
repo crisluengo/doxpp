@@ -1,0 +1,36 @@
+{
+  "members": [
+    {
+      "id": "sort_ints-int (int, int)-P",
+      "name": "sort_ints",
+      "brief": "",
+      "doc": "",
+      "member_type": "function",
+      "parent": "",
+      "file": "functionpointer.h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "constexpr": false,
+      "return_type": "`void`",
+      "arguments": [
+        {
+          "name": "comparator",
+          "default": null,
+          "type": "`int (int, int)``*`"
+        }
+      ]
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--functionpointer-h",
+      "name": "functionpointer.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

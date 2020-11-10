@@ -83,4 +83,4 @@ data = doxpp.buildtree.buildtree(
 
 filename = config['output'].get('filename', 'dox++out.json')
 with open(filename, 'w') as output_file:
-    output_file.write(json.dumps(data))
+    output_file.write(json.dumps(data, separators=(',', ':')))

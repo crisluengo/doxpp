@@ -1,0 +1,98 @@
+{
+  "members": [
+    {
+      "id": "N",
+      "name": "N",
+      "brief": "",
+      "doc": "",
+      "member_type": "namespace",
+      "parent": "",
+      "file": "operator.h",
+      "group": "",
+      "deprecated": false,
+      "members": [
+        {
+          "id": "N-A",
+          "name": "A",
+          "brief": "",
+          "doc": "",
+          "member_type": "struct",
+          "parent": "N",
+          "file": "operator.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "bases": [],
+          "derived": [],
+          "members": [
+            {
+              "id": "N-A-operator%3C-N-A-CL",
+              "name": "operator<",
+              "brief": "",
+              "doc": "",
+              "member_type": "function",
+              "parent": "N-A",
+              "file": "operator.h",
+              "group": "",
+              "deprecated": false,
+              "templated": false,
+              "static": false,
+              "virtual": false,
+              "pure_virtual": false,
+              "const": false,
+              "access": "public",
+              "constexpr": false,
+              "method_type": "method",
+              "return_type": "`bool`",
+              "arguments": [
+                {
+                  "name": "other",
+                  "default": null,
+                  "type": "[`N::A`](#N-A) `const&`"
+                }
+              ]
+            }
+          ],
+          "related": []
+        },
+        {
+          "id": "N-operator%3D%3D-N-A-CL-N-A-CL",
+          "name": "operator==",
+          "brief": "",
+          "doc": "",
+          "member_type": "function",
+          "parent": "N",
+          "file": "operator.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "constexpr": false,
+          "return_type": "`bool`",
+          "arguments": [
+            {
+              "name": "a",
+              "default": null,
+              "type": "[`N::A`](#N-A) `const&`"
+            },
+            {
+              "name": "b",
+              "default": null,
+              "type": "[`N::A`](#N-A) `const&`"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--operator-h",
+      "name": "operator.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

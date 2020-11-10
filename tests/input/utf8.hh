@@ -1,4 +1,0 @@
-/* Copyright © */
-class A
-{
-};
