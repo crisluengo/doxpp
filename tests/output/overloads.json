@@ -1,0 +1,257 @@
+{
+  "members": [
+    {
+      "id": "AClass",
+      "name": "AClass",
+      "brief": "",
+      "doc": "",
+      "member_type": "class",
+      "parent": "",
+      "file": "overloads.h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "bases": [],
+      "derived": [],
+      "members": [
+        {
+          "id": "AClass-member",
+          "name": "member",
+          "brief": "A member",
+          "doc": "",
+          "member_type": "variable",
+          "parent": "AClass",
+          "file": "overloads.h",
+          "group": "",
+          "deprecated": false,
+          "type": "`int`",
+          "static": false,
+          "mutable": false,
+          "access": "private",
+          "constexpr": false
+        },
+        {
+          "id": "AClass-array",
+          "name": "array",
+          "brief": "Another member",
+          "doc": "",
+          "member_type": "variable",
+          "parent": "AClass",
+          "file": "overloads.h",
+          "group": "",
+          "deprecated": false,
+          "type": "`float``[]`",
+          "static": false,
+          "mutable": false,
+          "access": "private",
+          "constexpr": false
+        },
+        {
+          "id": "AClass-AClass-double-A-int-",
+          "name": "AClass",
+          "brief": "Overloaded constructor 1",
+          "doc": "",
+          "member_type": "function",
+          "parent": "AClass",
+          "file": "overloads.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": false,
+          "pure_virtual": false,
+          "const": false,
+          "access": "public",
+          "constexpr": false,
+          "method_type": "constructor",
+          "return_type": "`void`",
+          "arguments": [
+            {
+              "name": "x",
+              "default": null,
+              "type": "`double``[]`"
+            },
+            {
+              "name": "y",
+              "default": null,
+              "type": "`int`"
+            }
+          ]
+        },
+        {
+          "id": "AClass-AClass-double-CA-int-",
+          "name": "AClass",
+          "brief": "Overloaded constructor 2",
+          "doc": "",
+          "member_type": "function",
+          "parent": "AClass",
+          "file": "overloads.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": false,
+          "pure_virtual": false,
+          "const": false,
+          "access": "public",
+          "constexpr": false,
+          "method_type": "constructor",
+          "return_type": "`void`",
+          "arguments": [
+            {
+              "name": "x",
+              "default": null,
+              "type": "`double` `const[]`"
+            },
+            {
+              "name": "y",
+              "default": null,
+              "type": "`int`"
+            }
+          ]
+        },
+        {
+          "id": "AClass-AClass-AClass-CL",
+          "name": "AClass",
+          "brief": "Copy constructor",
+          "doc": "",
+          "member_type": "function",
+          "parent": "AClass",
+          "file": "overloads.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": false,
+          "pure_virtual": false,
+          "const": false,
+          "access": "public",
+          "constexpr": false,
+          "method_type": "constructor",
+          "return_type": "`void`",
+          "arguments": [
+            {
+              "name": "",
+              "default": null,
+              "type": "[`AClass`](#AClass) `const&`"
+            }
+          ]
+        },
+        {
+          "id": "AClass-AClass-AClass-R",
+          "name": "AClass",
+          "brief": "Move constructor",
+          "doc": "",
+          "member_type": "function",
+          "parent": "AClass",
+          "file": "overloads.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": false,
+          "pure_virtual": false,
+          "const": false,
+          "access": "public",
+          "constexpr": false,
+          "method_type": "constructor",
+          "return_type": "`void`",
+          "arguments": [
+            {
+              "name": "",
+              "default": null,
+              "type": "[`AClass`](#AClass)`&&`"
+            }
+          ]
+        },
+        {
+          "id": "AClass-~AClass",
+          "name": "~AClass",
+          "brief": "Destructor",
+          "doc": "",
+          "member_type": "function",
+          "parent": "AClass",
+          "file": "overloads.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": false,
+          "pure_virtual": false,
+          "const": false,
+          "access": "public",
+          "constexpr": false,
+          "method_type": "destructor",
+          "return_type": "`void`",
+          "arguments": []
+        },
+        {
+          "id": "AClass-operator%3D-AClass-CL",
+          "name": "operator=",
+          "brief": "Copy assignment",
+          "doc": "",
+          "member_type": "function",
+          "parent": "AClass",
+          "file": "overloads.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": false,
+          "pure_virtual": false,
+          "const": false,
+          "access": "public",
+          "constexpr": false,
+          "method_type": "method",
+          "return_type": "[`AClass`](#AClass)`&`",
+          "arguments": [
+            {
+              "name": "",
+              "default": null,
+              "type": "[`AClass`](#AClass) `const&`"
+            }
+          ]
+        },
+        {
+          "id": "AClass-operator%3D-AClass-R",
+          "name": "operator=",
+          "brief": "Move assignment",
+          "doc": "",
+          "member_type": "function",
+          "parent": "AClass",
+          "file": "overloads.h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": false,
+          "pure_virtual": false,
+          "const": false,
+          "access": "public",
+          "constexpr": false,
+          "method_type": "method",
+          "return_type": "[`AClass`](#AClass)`&`",
+          "arguments": [
+            {
+              "name": "",
+              "default": null,
+              "type": "[`AClass`](#AClass)`&&`"
+            }
+          ]
+        }
+      ],
+      "related": []
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--overloads-h",
+      "name": "overloads.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

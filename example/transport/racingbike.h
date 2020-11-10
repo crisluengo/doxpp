@@ -25,6 +25,9 @@ namespace transport
    public:
       /// \name Behavior
 
+      /** An overloaded function, doesn't override \ref Bicycle::PedalHarder. */
+      void PedalHarder(double speed);
+
       /** @inherit */
       void PedalHarder() override;
 

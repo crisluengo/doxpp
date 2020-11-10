@@ -51,52 +51,15 @@ namespace transport
        *         false otherwise
        */
       template <typename BreakType>
-      bool ChangeBreak(const BreakType breakType)
-      {
-         if (breakType)
-         {
+      bool ChangeBreak(const BreakType breakType) {
+         if (breakType) {
             return true;
          }
-
          return false;
       }
    };
 
    /// \endgroup
-
-
-template<typename A, int B = 5>
-struct StructTemplate {
-   A member[B];
-   constexpr int action(const A * * const * * & a);
-};
-
-template<typename A, typename B = MountainBike>
-class ClassTemplate {
-   static constexpr double value = 0;
-   B member;
-   str action(A const& a);
-};
-
-template< typename A, typename std::enable_if_t< !std::numeric_limits< A >::has_infinity, int > = 0 >
-struct ComplexStructTemplate {
-   A member;
-   float array[5];
-   ComplexStructTemplate(double x[], A& y);
-   ComplexStructTemplate(double const x[], A& y);
-   ~ComplexStructTemplate();
-   ComplexStructTemplate(const ComplexStructTemplate &) = default;
-   ComplexStructTemplate(ComplexStructTemplate &&) = default;
-   ComplexStructTemplate& operator=(const ComplexStructTemplate &) = default;
-   ComplexStructTemplate& operator=(ComplexStructTemplate &&) = default;
-};
-
-typedef ClassTemplate<int, int> IntStruct;
-
-using FloatStruct = ClassTemplate<float, int>;
-
-template<typename X>
-using IXStruct = ClassTemplate<int, X>;
 
 /// For some reason, this definition takes the documentation for the declaration, ignoring this.
 bool MountainBike::SetSuspension(const double stiffness) {}

@@ -15,17 +15,12 @@ classes.
 /// \defgroup bikes Bicycle types
 /// A group of classes representing various bicycle types
 
-/// \macro FOOBAR
+/// \macro FOOBAR(a,b)
 /// A macro!
-#define FOOBAR 6
-
-/// \macro BARBAZ(a,b)
-/// Another macro!
-#define BARBAZ(a,b) ((a) + (b))
+#define FOOBAR(a,b) ((a) + (b))
 
 /// The namespace for the project
-/// This is the detailed documentation for this namespace. We can extend it by writing
-/// stuff in other files too.
+/// This is the detailed documentation for this namespace.
 namespace transport
 {
 
@@ -72,7 +67,7 @@ namespace transport
    };
 
    // Some forward declaration. If we document it here, we won't see the documentation
-   // in `mountainbike.hh` because this file is processed earlier.
+   // in `mountainbike.h` because this file is processed earlier.
    class MountainBike;
 }
 

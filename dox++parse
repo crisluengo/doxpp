@@ -33,7 +33,8 @@ def generate_config_file(filename):
     config['output'] = {
         'filename': 'dox++out.json',
         'use typewriter font': 'no',  # 'yes' or 'no', the Markdown output uses backticks (code formatting) around type names
-        'log level': 'warning'        # 'error', 'warning', 'info' or 'debug'
+        'log level': 'warning',       # 'error', 'warning', 'info' or 'debug'
+        'json formatting': 'compact'  # 'compact' or 'readable'
     }
     config['clang'] = {
         'compiler flags': '',         # could be '-std=c++11', for example
@@ -82,5 +83,9 @@ data = doxpp.buildtree.buildtree(
 )
 
 filename = config['output'].get('filename', 'dox++out.json')
+if config['output'].get('json formatting', 'compact') == 'readable':
+    format = {'indent': 2}
+else:
+    format = {'separators': (',', ':')}
 with open(filename, 'w') as output_file:
-    output_file.write(json.dumps(data, separators=(',', ':')))
+    output_file.write(json.dumps(data, **format))

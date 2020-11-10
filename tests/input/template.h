@@ -17,3 +17,9 @@ public:
 	template <typename TT>
 	int a(TT tt);
 };
+
+/// A struct where `A` is the template type, not `class A`.
+template<typename A, int B = 5>
+struct X {
+   A member[B];
+};

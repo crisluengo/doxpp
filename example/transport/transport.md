@@ -33,18 +33,16 @@ Let's add some references to members of the \ref transport namespace:
 - \ref transport::MountainBike is a derived class
 - \ref transport::RacingBike is the other derived class
 
-These are four different constructors for the this one class, they're overloads:
+Here we reference specific versions of overloaded methods:
 
-- \ref transport::ComplexStructTemplate::ComplexStructTemplate(double[], A&)
-- \ref transport::ComplexStructTemplate::ComplexStructTemplate(double const[], A&)
-- \ref transport::ComplexStructTemplate::ComplexStructTemplate(const transport::ComplexStructTemplate&)
-- \ref transport::ComplexStructTemplate::ComplexStructTemplate(transport::ComplexStructTemplate &&)
+- \ref transport::RacingBike::PedalHarder()
+- \ref transport::RacingBike::PedalHarder(double)
 
 We can reference the first one of the two using this ambiguous reference:
-\ref transport::ComplexStructTemplate::ComplexStructTemplate. Note that we can reference
-multiple things one one line: \ref transport::foo, \ref macro--BARBAZ.
+\ref transport::RacingBike::PedalHarder. Note that we can reference
+multiple things one one line: \ref transport::foo, \ref macro--FOOBAR.
 
-\see transport::Bicycle, transport::MountainBike, transport::RacingBike, transport::ComplexStructTemplate::ComplexStructTemplate(const transport::ComplexStructTemplate&), transport::ComplexStructTemplate::ComplexStructTemplate(transport::ComplexStructTemplate &&), transport::foo, macro--BARBAZ
+\see transport::Bicycle, transport::MountainBike, transport::RacingBike, transport::RacingBike::PedalHarder(double), transport::RacingBike::PedalHarder(), transport::foo, macro--FOOBAR
 
 We can reference back to \ref index "the main page" right here, but also to random
 anchors in it, for example \ref anchor-in-main "this one" or \ref main-test-refs-sa.

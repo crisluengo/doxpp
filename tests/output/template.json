@@ -51,6 +51,51 @@
           "default": null
         }
       ]
+    },
+    {
+      "id": "X-T",
+      "name": "X",
+      "brief": "A struct where `A` is the template type, not `class A`.",
+      "doc": "",
+      "member_type": "struct",
+      "parent": "",
+      "file": "template.h",
+      "group": "",
+      "deprecated": false,
+      "templated": true,
+      "bases": [],
+      "derived": [],
+      "members": [
+        {
+          "id": "X-T-member",
+          "name": "member",
+          "brief": "",
+          "doc": "",
+          "member_type": "variable",
+          "parent": "X-T",
+          "file": "template.h",
+          "group": "",
+          "deprecated": false,
+          "type": "[`A`](#A-T)`[]`",
+          "static": false,
+          "mutable": false,
+          "access": "public",
+          "constexpr": false
+        }
+      ],
+      "related": [],
+      "template_parameters": [
+        {
+          "name": "A",
+          "type": "type",
+          "default": null
+        },
+        {
+          "name": "B",
+          "type": "`int`",
+          "default": "5"
+        }
+      ]
     }
   ],
   "headers": [

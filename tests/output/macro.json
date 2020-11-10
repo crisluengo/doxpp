@@ -1,0 +1,58 @@
+{
+  "members": [
+    {
+      "id": "function-int-",
+      "name": "function",
+      "brief": "",
+      "doc": "",
+      "member_type": "function",
+      "parent": "",
+      "file": "macro.h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "constexpr": false,
+      "return_type": "`int`",
+      "arguments": [
+        {
+          "name": "x",
+          "default": null,
+          "type": "`int`"
+        }
+      ]
+    },
+    {
+      "id": "macro--NAME",
+      "name": "NAME",
+      "brief": "A macro.",
+      "doc": "Detailed documentation here.",
+      "member_type": "macro",
+      "parent": "",
+      "file": "macro.h",
+      "group": "",
+      "deprecated": false
+    },
+    {
+      "id": "macro--TYPE",
+      "name": "TYPE",
+      "brief": "Another macro.",
+      "doc": "",
+      "member_type": "macro",
+      "parent": "",
+      "file": "macro.h",
+      "group": "",
+      "deprecated": false
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--macro-h",
+      "name": "macro.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

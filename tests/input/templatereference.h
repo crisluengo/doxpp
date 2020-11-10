@@ -8,7 +8,7 @@ std::list<std::string> foo();
 
 template <typename T>
 struct WithInner {
-    typedef T Type;
+    using Type = T;
 };
 
-typedef std::list<WithInner<int>::Type> WithInnerIntType;
+using WithInnerIntType = std::list<WithInner<int>::Type>;

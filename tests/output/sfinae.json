@@ -1,0 +1,69 @@
+{
+  "members": [
+    {
+      "id": "S-T",
+      "name": "S",
+      "brief": "A struct template that can only be instantiated for types that can represent infinity.",
+      "doc": "",
+      "member_type": "struct",
+      "parent": "",
+      "file": "sfinae.h",
+      "group": "",
+      "deprecated": false,
+      "templated": true,
+      "bases": [],
+      "derived": [],
+      "members": [
+        {
+          "id": "S-T-member",
+          "name": "member",
+          "brief": "",
+          "doc": "",
+          "member_type": "variable",
+          "parent": "S-T",
+          "file": "sfinae.h",
+          "group": "",
+          "deprecated": false,
+          "type": "`A`",
+          "static": false,
+          "mutable": false,
+          "access": "public",
+          "constexpr": false
+        }
+      ],
+      "related": [],
+      "template_parameters": [
+        {
+          "name": "A",
+          "type": "type",
+          "default": null
+        },
+        {
+          "name": "",
+          "type": "<SFINAE>",
+          "default": "0"
+        }
+      ]
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--sfinae-h",
+      "name": "sfinae.h",
+      "brief": "",
+      "doc": "",
+      "includes": [
+        {
+          "filename": "type_traits",
+          "in_project": false
+        },
+        {
+          "filename": "limits",
+          "in_project": false
+        }
+      ]
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

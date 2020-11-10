@@ -1,0 +1,22 @@
+{
+  "members": [],
+  "headers": [
+    {
+      "id": "file--page-h",
+      "name": "page.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": [
+    {
+      "id": "onepage",
+      "title": "A page",
+      "doc": "This is the text for a page",
+      "parent": "",
+      "subpages": []
+    }
+  ]
+}

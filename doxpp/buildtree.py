@@ -305,7 +305,7 @@ def get_group_at_line(group_locations, line):
         current_group = item[1]
     return current_group
 
-ingroup_cmd_match = re.compile(r'^\s*[\\@]ingroup\s+(\S+)\s*$', re.MULTILINE)
+ingroup_cmd_match = re.compile(r'^ *[\\@]ingroup +(.+?) *$', re.MULTILINE)
 
 def find_ingroup_cmd(doc):
     # Finds `\ingroup <name>`, removes it from the documentation block, and returns `<name>`
@@ -316,8 +316,8 @@ def find_ingroup_cmd(doc):
         return group, doc
     return '', doc
 
-section_cmd_match = re.compile(r'^\s*[\\@]((?:sub){,2})section\s+((?:\w|-)+)\s+(.*?)\s*$', re.MULTILINE)
-anchor_cmd_match = re.compile(r'[\\@]anchor\s+((?:\w|-)+)')
+section_cmd_match = re.compile(r'^ *[\\@]((?:sub){,2})section +((?:\w|-)+) +(.*?) *$', re.MULTILINE)
+anchor_cmd_match = re.compile(r'[\\@]anchor +((?:\w|-)+)')
 
 def find_anchor_cmds(doc, status: Status):
     # Finds section headings and explicit anchors, and adds them to a list.
@@ -355,6 +355,8 @@ split_function_arg_parts = re.compile(r'(?:\w|:)+|\*|&+|\[]')  # Split qualifier
 split_function_args = re.compile(r'^((?:\w|:)+)\((.*)\)$')     # Split function from arguments
 
 def parse_function_arguments(arg_list):
+    if arg_list == ['']:  # This happens if the function is specified as `funcname()`.
+        return []
     arguments = []
     for arg in arg_list:
         parts = split_function_arg_parts.findall(arg)
@@ -374,7 +376,7 @@ def find_member_inner(member_list, names, function_params):
         if member['name'] == names[0]:
             if len(names) == 1:
                 # We've matched the whole name
-                if function_params:
+                if function_params is not None:
                     # We need to match function parameters too
                     if member['member_type'] == 'function':
                         args = member['arguments']
@@ -406,7 +408,7 @@ def find_member(name, start_id, members):
     name = name.strip()
     if not name:
         return ''
-    function_params = []
+    function_params = None
     if '(' in name:
         match = split_function_args.fullmatch(name)
         if not match:
@@ -529,9 +531,9 @@ def post_process_inheritance(members):
                 else:
                     base['type'] = name
 
-ref_cmd_match = re.compile(r'[\\@]ref\s+((?:\w|:|%|-)+(?:\s*\(.*?\))?)(?:\s+\"(.*?)\")?')
-ref_cmd_hdr_match = re.compile(r'[\\@]ref\s+\"(.+?)\"(?:\s+\"(.*?)\")?')
-see_cmd_match = re.compile(r'^\s*[\\@](?:see|sa)\s+(.+)\s*$', re.MULTILINE)
+ref_cmd_match = re.compile(r'[\\@]ref +((?:\w|:|%|-)+(?: *\(.*?\))?)(?: +\"(.*?)\")?')
+ref_cmd_hdr_match = re.compile(r'[\\@]ref +\"(.+?)\"(?: +\"(.*?)\")?')
+see_cmd_match = re.compile(r'^ *[\\@](?:see|sa) +(.+?) *$', re.MULTILINE)
 see_arg_match = re.compile(r'([^,(]+(?:\(.*?\))?)')  # Split \see command arguments
 
 def post_process_links(elements, status: Status):
@@ -625,7 +627,7 @@ def post_process_links(elements, status: Status):
             elem['doc'] = ref_cmd_hdr_match.sub(ref_cmd_hdr_replace, elem['doc'])
             elem['doc'] = see_cmd_match.sub(see_cmd_replace, elem['doc'])
 
-relates_cmd_match = re.compile(r'^\s*[\\@]relate[sd]\s+(.+?)\s*$', re.MULTILINE)
+relates_cmd_match = re.compile(r'^ *[\\@]relate[sd] +(.+?) *$', re.MULTILINE)
 
 def post_process_relates(members):
     # Process documentation for `\relates` commands (and `\related` synonym)
@@ -648,7 +650,7 @@ def post_process_relates(members):
                 member['doc'] = relates_cmd_match.sub('', member['doc'])
                 # TODO: produce error if there are more of these commands?
 
-subpage_cmd_match = re.compile(r'[\\@]subpage\s+((?:\w|-)+(?:\s*\(.*?\))?)(?:\s+\"(.*?)\")?')
+subpage_cmd_match = re.compile(r'[\\@]subpage +((?:\w|-)+(?: *\(.*?\))?)(?: +\"(.*?)\")?')
 
 def post_process_subpages(pages):
     # Process documentation for `\subpage` commands
@@ -905,7 +907,7 @@ def process_comment_command(lines, loc, status: Status):
     cmd = documentation_commands[cmd]
 
     # Everything after the first line is documentation
-    doc = '\n'.join(lines[1:])
+    doc = '\n'.join(lines[1:]).strip()
     brief = ''
     if cmd not in ['page', 'mainpage']:
         brief, doc = separate_brief(doc)
@@ -996,7 +998,7 @@ def process_markdown_command(lines, status: Status):
     cmd = documentation_commands[cmd]
 
     # Everything after the first line is documentation
-    doc = '\n'.join(lines[1:])
+    doc = '\n'.join(lines[1:]).strip()
     brief = ''
     if cmd not in ['page', 'mainpage']:
         brief, doc = separate_brief(doc)
