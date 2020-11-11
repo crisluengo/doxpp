@@ -8,5 +8,11 @@ public:
 	 *
 	 * @returns a number.
 	 */
-	int f(A* a) { return 0; }
+	int f(A* a);
+
+	/** A const function of A. */
+   int f(A* a) const;
+
+	/** A static function of A. */
+   int s(A& a);
 };

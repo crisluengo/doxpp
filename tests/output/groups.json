@@ -1,0 +1,127 @@
+{
+  "members": [
+    {
+      "id": "var1_in_base",
+      "name": "var1_in_base",
+      "brief": "",
+      "doc": "",
+      "member_type": "variable",
+      "parent": "",
+      "header": "file--groups-h",
+      "group": "base",
+      "deprecated": false,
+      "type": "`int`",
+      "static": false,
+      "constexpr": false
+    },
+    {
+      "id": "var1_in_group1",
+      "name": "var1_in_group1",
+      "brief": "",
+      "doc": "",
+      "member_type": "variable",
+      "parent": "",
+      "header": "file--groups-h",
+      "group": "group1",
+      "deprecated": false,
+      "type": "`int`",
+      "static": false,
+      "constexpr": false
+    },
+    {
+      "id": "var2_in_base",
+      "name": "var2_in_base",
+      "brief": "",
+      "doc": "",
+      "member_type": "variable",
+      "parent": "",
+      "header": "file--groups-h",
+      "group": "base",
+      "deprecated": false,
+      "type": "`int`",
+      "static": false,
+      "constexpr": false
+    },
+    {
+      "id": "var2_in_group1",
+      "name": "var2_in_group1",
+      "brief": "Some variable",
+      "doc": "",
+      "member_type": "variable",
+      "parent": "",
+      "header": "file--groups-h",
+      "group": "group1",
+      "deprecated": false,
+      "type": "`int`",
+      "static": false,
+      "constexpr": false
+    },
+    {
+      "id": "var1_in_group2",
+      "name": "var1_in_group2",
+      "brief": "",
+      "doc": "",
+      "member_type": "variable",
+      "parent": "",
+      "header": "file--groups-h",
+      "group": "group2",
+      "deprecated": false,
+      "type": "`int`",
+      "static": false,
+      "constexpr": false
+    },
+    {
+      "id": "var3_in_base",
+      "name": "var3_in_base",
+      "brief": "",
+      "doc": "",
+      "member_type": "variable",
+      "parent": "",
+      "header": "file--groups-h",
+      "group": "base",
+      "deprecated": false,
+      "type": "`int`",
+      "static": false,
+      "constexpr": false
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--groups-h",
+      "name": "groups.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [
+    {
+      "id": "base",
+      "name": "A group",
+      "brief": "",
+      "doc": "",
+      "parent": "",
+      "subgroups": [
+        "group1",
+        "group2"
+      ]
+    },
+    {
+      "id": "group1",
+      "name": "A sub-group",
+      "brief": "",
+      "doc": "",
+      "parent": "base",
+      "subgroups": []
+    },
+    {
+      "id": "group2",
+      "name": "Another sub-group",
+      "brief": "",
+      "doc": "",
+      "parent": "base",
+      "subgroups": []
+    }
+  ],
+  "pages": []
+}

@@ -1,0 +1,51 @@
+{
+  "members": [
+    {
+      "id": "function_constexpr",
+      "name": "function_constexpr",
+      "brief": "",
+      "doc": "",
+      "member_type": "function",
+      "parent": "",
+      "header": "file--function-h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "constexpr": true,
+      "return_type": "`double`",
+      "arguments": []
+    },
+    {
+      "id": "function_const-int-C",
+      "name": "function_const",
+      "brief": "",
+      "doc": "",
+      "member_type": "function",
+      "parent": "",
+      "header": "file--function-h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "constexpr": false,
+      "return_type": "`double`",
+      "arguments": [
+        {
+          "name": "a",
+          "default": null,
+          "type": "`int` `const`"
+        }
+      ]
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--function-h",
+      "name": "function.h",
+      "brief": "",
+      "doc": "",
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

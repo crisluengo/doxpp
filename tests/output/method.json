@@ -40,6 +40,60 @@
               "type": "[`A`](#A)`*`"
             }
           ]
+        },
+        {
+          "id": "A-f-A-P-C",
+          "name": "f",
+          "brief": "A const function of A.",
+          "doc": "",
+          "member_type": "function",
+          "parent": "A",
+          "header": "file--method-h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": false,
+          "pure_virtual": false,
+          "const": true,
+          "access": "public",
+          "constexpr": false,
+          "method_type": "method",
+          "return_type": "`int`",
+          "arguments": [
+            {
+              "name": "a",
+              "default": null,
+              "type": "[`A`](#A)`*`"
+            }
+          ]
+        },
+        {
+          "id": "A-s-A-L",
+          "name": "s",
+          "brief": "A static function of A.",
+          "doc": "",
+          "member_type": "function",
+          "parent": "A",
+          "header": "file--method-h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": false,
+          "pure_virtual": false,
+          "const": false,
+          "access": "public",
+          "constexpr": false,
+          "method_type": "method",
+          "return_type": "`int`",
+          "arguments": [
+            {
+              "name": "a",
+              "default": null,
+              "type": "[`A`](#A)`&`"
+            }
+          ]
         }
       ],
       "related": []

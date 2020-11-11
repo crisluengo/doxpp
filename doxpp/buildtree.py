@@ -166,10 +166,9 @@ class Status:
 
 
 class DocumentationCommand:
-    def __init__(self, cmd, args, brief, doc, group, file, header_id=''):
+    def __init__(self, cmd, args, doc, group, file, header_id=''):
         self.cmd = cmd
         self.args = args
-        self.brief = brief
         self.doc = doc
         self.group = group
         self.file = file
@@ -701,6 +700,7 @@ def post_process_subpages(pages):
 
 def process_generic_command(cmd: DocumentationCommand, status: Status):
     # \cmd <name>
+    # \cmd <id>
     if not cmd.args:
         log.error("\\%s needs a name argument\n   in file %s", cmd.cmd, cmd.file)
         return
@@ -708,7 +708,10 @@ def process_generic_command(cmd: DocumentationCommand, status: Status):
     if args:
         log.warning("Ignoring additional arguments to \\%s command\n   in file %s", cmd.cmd, cmd.file)
     # Find which member we're talking about
-    id = find_member(name, '', status.members)
+    if name in status.members:
+        id = name
+    else:
+        id = find_member(name, '', status.members)
     if not id:
         log.error("The member '%s' has not been declared, documentation ignored.\n   in file %s", cmd.args, cmd.file)
         return
@@ -721,8 +724,9 @@ def process_generic_command(cmd: DocumentationCommand, status: Status):
             log.warning("Member '%s' already is in group %s, cannot assign to group %s", id, member['group'], group)
     else:
         member['group'] = group
+    brief, doc = separate_brief(doc)
     doc = find_anchor_cmds(doc, status)
-    add_doc(member, cmd.brief, doc)
+    add_doc(member, brief, doc)
 
 def process_macro_command(cmd: DocumentationCommand, status: Status):
     # \macro <name>
@@ -744,15 +748,17 @@ def process_macro_command(cmd: DocumentationCommand, status: Status):
             log.error("Documenting a macro with ID %s that is identical to an existing non-macro\n   in file %s",
                       id, cmd.file)
             return
+        brief, doc = separate_brief(doc)
         doc = find_anchor_cmds(doc, status)
-        add_doc(member, cmd.brief, doc)
+        add_doc(member, brief, doc)
         if not member['group']:
             member['group'] = group
     else:
         # Create a new member
         member = members.new_member(id, name, 'macro', '', cmd.header_id)
-        member['brief'] = cmd.brief
+        brief, doc = separate_brief(doc)
         doc = find_anchor_cmds(doc, status)
+        member['brief'] = brief
         member['doc'] = doc
         member['group'] = group
         status.members[id] = member
@@ -769,10 +775,9 @@ def process_file_command(cmd: DocumentationCommand, status: Status):
         log.error("The file '%s' has not been parsed, documentation ignored.\n   in file %s", cmd.args, cmd.file)
         return
     header = status.headers[id]
-    doc = find_anchor_cmds(cmd.doc, status)
-    add_doc(header, cmd.brief, doc)
-
-valid_name_match = re.compile(r'^(\w|-)+$')
+    brief, doc = separate_brief(cmd.doc)
+    doc = find_anchor_cmds(doc, status)
+    add_doc(header, brief, doc)
 
 def create_page(name, title, doc, file, status: Status):
     if name in status.pages:
@@ -784,7 +789,7 @@ def create_page(name, title, doc, file, status: Status):
         status.pages[name]['doc'] = doc
     else:
         # Validate `name` to have only {\w|-} characters
-        if not valid_name_match.fullmatch(name):
+        if not unique_id.is_valid(name):
             log.error("\\page has invalid name '%s', documentation ignored.\n   in file %s", name, file)
             return
         # Create new page
@@ -827,7 +832,7 @@ def process_documentation_command(cmd: DocumentationCommand, status: Status):
     # Handle namespace, class, struct, union, enum, alias, function, variable
     process_generic_command(cmd, status)
 
-def process_grouping_command(cmd, args, brief, doc, loc, status: Status):
+def process_grouping_command(cmd, args, doc, loc, status: Status):
     # This function processes commands that handle grouping of members.
     # Returns True if the command was processed, false otherwise.
     #
@@ -842,18 +847,23 @@ def process_grouping_command(cmd, args, brief, doc, loc, status: Status):
     if cmd == 'defgroup':
         id, name = split_string(args.strip())
         if not id or not name:
-            log.error("\\defgroup needs an ID and a name\n   in file %s", status.current_header_name)
+            log.error("\\defgroup needs a name and a title\n   in file %s", status.current_header_name)
             return True
-        current_group = status.current_group[-1]
+        if not unique_id.is_valid(id):
+            log.error("\\defgroup has invalid name '%s', ignored.\n   in file %s", id, status.current_header_name)
+            return True
+        current_group, doc = find_ingroup_cmd(doc)
+        if not current_group:
+            current_group = status.current_group[-1]
+        brief, doc = separate_brief(doc)
+        doc = find_anchor_cmds(doc, status)
         if id not in status.groups:
-            doc = find_anchor_cmds(doc, status)
             status.groups[id] = members.new_group(id, name, brief, doc, current_group)
             status.data['groups'].append(status.groups[id])
         else:
             group = status.groups[id]
             if not group['name']:
                 group['name'] = name
-            doc = find_anchor_cmds(doc, status)
             add_doc(group, brief, doc)
         if current_group:
             group = status.groups[current_group]
@@ -866,8 +876,14 @@ def process_grouping_command(cmd, args, brief, doc, loc, status: Status):
         id, name = split_string(args)
         # We ignore name here
         if not id:
-            log.error("\\addtogroup needs an ID\n   in file %s", status.current_header_name)
+            log.error("\\addtogroup needs a name\n   in file %s", status.current_header_name)
             return True
+        if not unique_id.is_valid(id):
+            log.error("\\addtogroup has invalid name '%s', ignored.\n   in file %s", id, status.current_header_name)
+            return True
+        if doc:
+            log.warning("Ignoring documentation block associated to \\addtogroup command\n   in file %s",
+                        status.current_header_name)
         current_group = status.current_group[-1]
         if id not in status.groups:
             status.groups[id] = members.new_group(id, '', '', '', current_group)
@@ -876,7 +892,6 @@ def process_grouping_command(cmd, args, brief, doc, loc, status: Status):
             group = status.groups[current_group]
             if group['subgroups'].count(id) == 0:  # add group only once
                 group['subgroups'].append(id)
-        # We also ignore the rest of the comment block
         status.current_group.append(id)
         status.group_locations.append((loc, id))
         return True
@@ -887,14 +902,17 @@ def process_grouping_command(cmd, args, brief, doc, loc, status: Status):
             status.group_locations.append((loc, status.current_group[-1]))
         else:
             log.warning("\\endgroup cannot occur while not in a group\n   in file %s", status.current_header_name)
+        if doc:
+            log.warning("Ignoring documentation block associated to \\endgroup command\n   in file %s",
+                        status.current_header_name)
         return True
     if cmd == 'name':
         status.current_member_group = args
-        status.group_locations.append((loc, args))
+        status.member_group_locations.append((loc, args))
         return True
     if cmd == 'endname':
         status.current_member_group = ''
-        status.group_locations.append((loc, ''))
+        status.member_group_locations.append((loc, ''))
         return True
     return False
 
@@ -922,22 +940,20 @@ def process_comment_command(lines, loc, status: Status):
 
     # Everything after the first line is documentation
     doc = '\n'.join(lines[1:]).strip()
-    brief = ''
-    if cmd not in ['page', 'mainpage']:
-        brief, doc = separate_brief(doc)
 
     # Grouping commands
-    if process_grouping_command(cmd, args, brief, doc, loc, status):
+    if process_grouping_command(cmd, args, doc, loc, status):
         return
 
     # Documenting the current file
     if cmd == 'file' and not args:
+        brief, doc = separate_brief(doc)
         doc = find_anchor_cmds(doc, status)
         add_doc(status.current_header, brief, doc)
         return
 
     # Documenting things we don't declare right here, this we'll do after processing all header files
-    status.unprocessed_commands.append(DocumentationCommand(cmd, args, brief, doc, status.current_group[-1],
+    status.unprocessed_commands.append(DocumentationCommand(cmd, args, doc, status.current_group[-1],
                                                             status.current_header_name, status.current_header['id']))
 
 def process_comments(tu, status: Status):
@@ -1013,16 +1029,13 @@ def process_markdown_command(lines, status: Status):
 
     # Everything after the first line is documentation
     doc = '\n'.join(lines[1:]).strip()
-    brief = ''
-    if cmd not in ['page', 'mainpage']:
-        brief, doc = separate_brief(doc)
 
     # Grouping commands
-    if process_grouping_command(cmd, args, brief, doc, 0, status):
+    if process_grouping_command(cmd, args, doc, 0, status):
         return
 
     # Documentation
-    process_documentation_command(DocumentationCommand(cmd, args, brief, doc, status.current_group[-1],
+    process_documentation_command(DocumentationCommand(cmd, args, doc, status.current_group[-1],
                                                        status.current_header_name), status)
 
 def extract_markdown(filename, status: Status):
@@ -1307,6 +1320,7 @@ def extract_declarations(citer, parent, status: Status):
             member = members.new_member('', item.spelling, member_type, semantic_parent, status.current_header['id'])
 
             # Find the associated documentation comment and parse it
+            group = ''
             comment = item.raw_comment
             if comment:
                 if is_single_line_comment(comment):
@@ -1316,6 +1330,7 @@ def extract_declarations(citer, parent, status: Status):
                 comment = comment.strip()
                 cmd, _ = split_string(comment)
                 if not(len(cmd) > 1 and cmd[0] in ['\\', '@'] and cmd[1:] in documentation_commands):
+                    group, comment = find_ingroup_cmd(comment)
                     member['brief'], member['doc'] = separate_brief(comment)
                     member['doc'] = find_anchor_cmds(member['doc'], status)
 
@@ -1326,7 +1341,6 @@ def extract_declarations(citer, parent, status: Status):
                     member['name'] = item.spelling.split('<', maxsplit=1)[0]
 
             # Find the group this member belongs to
-            group, member['doc'] = find_ingroup_cmd(member['doc'])
             if parent_is_namespace:
                 # Namespace members are grouped using "\defgroup" groups
                 if not group:
@@ -1339,7 +1353,7 @@ def extract_declarations(citer, parent, status: Status):
                 if group:
                     log.warning("Ignoring \\ingroup command in documentation for %s\n   in file %s", member['name'],
                                 status.current_header_name)
-                member['group'] = get_group_at_line(status.group_locations, item.extent.start.line)
+                member['group'] = get_group_at_line(status.member_group_locations, item.extent.start.line)
 
             # Associate any other information with this member
             process_children = False
@@ -1562,6 +1576,8 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
         # Reset the rest of the data
         status.current_group = ['']
         status.group_locations = []
+        status.current_member_group = ''
+        status.member_group_locations = []
 
         # Add info for current file
         file_id = unique_id.header(status.current_header_name)
@@ -1629,6 +1645,8 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
         # Reset the parts of status that we use
         status.current_group = ['']
         status.group_locations = []
+        status.current_member_group = ''
+        status.member_group_locations = []
 
         # Extract markdown blocks from file
         extract_markdown(f, status)

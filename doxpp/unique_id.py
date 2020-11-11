@@ -61,3 +61,8 @@ def macro(name):
     if ii > 0:
         name = name[:ii]
     return "macro--" + name
+
+valid_name_match = re.compile(r'(\w|-)+')
+
+def is_valid(id):
+    return bool(valid_name_match.fullmatch(id))

@@ -52,17 +52,19 @@ Documents an alias declared in the headers with `using` or `typedef`. The declar
 exist. `<name>` is the fully qualified name of the alias, or, if not fully qualified, the alias
 with the "best" match is assumed ("best" means that the fewest number of scopes have to be prepended
 to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
-`<name>` is not the fully qualified name of the matched member.
+`<name>` is not the fully qualified name of the matched alias.
 
 `\typedef` is an alias for compatibility with Doxygen.
 
-### `\class <name>`
+### `\class <name>`, `\class <id>`
 
 Documents a class declared in the headers with `class`. The declaration must actually
-exist. `<name>` is the fully qualified name of the class, or, if not fully qualified, the alias
+exist. `<name>` is the fully qualified name of the class, or, if not fully qualified, the class
 with the "best" match is assumed ("best" means that the fewest number of scopes have to be prepended
 to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
-`<name>` is not the fully qualified name of the matched member.
+`<name>` is not the fully qualified name of the matched class.
+
+Alternatively, provide the ID for the class.
 
 ### `\defgroup <name> [<title>]`
 
@@ -113,13 +115,15 @@ See `\defgroup`.
 
 See `\name`.
 
-### `\enum <name>`
+### `\enum <name>`, `\enum <id>`
 
 Documents an enumerator declared in the headers with `enum` or `enum class`. The declaration must actually
-exist. `<name>` is the fully qualified name of the enumerator, or, if not fully qualified, the alias
+exist. `<name>` is the fully qualified name of the enumerator, or, if not fully qualified, the enumerator
 with the "best" match is assumed ("best" means that the fewest number of scopes have to be prepended
 to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
-`<name>` is not the fully qualified name of the matched member.
+`<name>` is not the fully qualified name of the matched enumerator.
+
+Alternatively, provide the ID for the enumerator.
 
 ### `\file [<name>]`
 
@@ -131,13 +135,20 @@ The rest of the comment block is considered documentation.
 /// This is the detailed description right here.
 ```
 
-### `\function <name>` (or `\fn <name>`)
+### `\function <name>`, `\function <id>` (`\fn` is an alias)
 
 Documents a function or class method declared in the headers. The declaration must actually
-exist. `<name>` is the fully qualified name of the function, or, if not fully qualified, the alias
+exist. `<name>` is the fully qualified name of the function, or, if not fully qualified, the function
 with the "best" match is assumed ("best" means that the fewest number of scopes have to be prepended
 to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
-`<name>` is not the fully qualified name of the matched member.
+`<name>` is not the fully qualified name of the matched function.
+
+To disambiguate overloaded functions, provide in `<name>` the argument list types, for example:
+```
+/// \function namesp::funcname(int, double*)
+```
+
+Alternatively, provide the ID for the function.
 
 `\fn` is an alias for compatibility with Doxygen.
 
@@ -171,15 +182,26 @@ group and starts a new one. Use `\endname` rather than `\endgroup` to close off 
 Unlike with the `\defgroup` and `\addtogroup` commands, `\name` and `\endname` must enclose the
 declaration of the class or struct members, not their documentation blocks.
 
-It is not possible to reference these groups, and they cannot be nested.
+These groups cannot be nested, so a `\name` command will close a previous member group. `\endname`
+is only needed at the end of a class, or before the declaration of members that should not be
+in any group.
 
 The parser is not very clever, and so a class/struct member group remains active in the remainder
 of the file until `\endname` is encountered, even within other classes.
 
+It is not possible to reference these groups.
 The backend can choose to group class or struct members by access (private/protected/public), or
-by named grouping, or both.
+by `\name` grouping, or both.
 
-### `\namespace <name>`
+### `\namespace <name>`, `\namespace <id>`
+
+Documents a namespace declared in the headers. The declaration must actually exist. `<name>` is the
+fully qualified name of the namespace, or, if not fully qualified, the namespace with the "best"
+match is assumed ("best" means that the fewest number of scopes have to be prepended to make the
+match). In case of ambiguity, the first match is chosen. A warning is produced if `<name>` is not
+the fully qualified name of the matched namespace.
+
+Alternatively, provide the ID for the namespace.
 
 ### `\page <name> (title)`
 
@@ -191,11 +213,35 @@ this page. Use `\ref` commands to reference other pages but not impose any hiera
 
 By default, all pages are at the same level, not subordinate to any other page.
 
-### `\struct <name>`
+### `\struct <name>`, `\struct <id>`
 
-### `\union <name>`
+Documents a struct declared in the headers. The declaration must actually exist.
+`<name>` is the fully qualified name of the struct, or, if not fully qualified, the struct
+with the "best" match is assumed ("best" means that the fewest number of scopes have to be prepended
+to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
+`<name>` is not the fully qualified name of the matched struct.
 
-### `\variable <name>` (or `\var <name>`)
+Alternatively, provide the ID for the struct.
+
+### `\union <name>`, `\union <id>`
+
+Documents a union or constant declared in the headers. The declaration must actually exist.
+`<name>` is the fully qualified name of the union, or, if not fully qualified, the union
+with the "best" match is assumed ("best" means that the fewest number of scopes have to be prepended
+to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
+`<name>` is not the fully qualified name of the matched union.
+
+Alternatively, provide the ID for the union.
+
+### `\variable <name>`, `\variable <id>` (`\var` is an alias)
+
+Documents a variable or constant declared in the headers. The declaration must actually exist.
+`<name>` is the fully qualified name of the variable, or, if not fully qualified, the variable
+with the "best" match is assumed ("best" means that the fewest number of scopes have to be prepended
+to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
+`<name>` is not the fully qualified name of the matched variable.
+
+Alternatively, provide the ID for the variable.
 
 `\var` is an alias for compatibility with Doxygen.
 
