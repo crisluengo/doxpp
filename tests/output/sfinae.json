@@ -7,7 +7,7 @@
       "doc": "",
       "member_type": "struct",
       "parent": "",
-      "file": "sfinae.h",
+      "header": "file--sfinae-h",
       "group": "",
       "deprecated": false,
       "templated": true,
@@ -21,7 +21,7 @@
           "doc": "",
           "member_type": "variable",
           "parent": "S-T",
-          "file": "sfinae.h",
+          "header": "file--sfinae-h",
           "group": "",
           "deprecated": false,
           "type": "`A`",
@@ -53,14 +53,8 @@
       "brief": "",
       "doc": "",
       "includes": [
-        {
-          "filename": "type_traits",
-          "in_project": false
-        },
-        {
-          "filename": "limits",
-          "in_project": false
-        }
+        "<type_traits>",
+        "<limits>"
       ]
     }
   ],

@@ -59,10 +59,10 @@ One of:
 
 ID of the parent member.
 
-### "file" (string)
+### "header" (string)
 
-File where the member is declared. If the declaration appears in multiple files, the first
-file it was encountered will be used.
+ID of the header file where the member is declared. If the declaration appears in multiple files, the first
+one it was encountered in will be used.
 
 ### "group" (string)
 

@@ -7,7 +7,7 @@
       "doc": "",
       "member_type": "function",
       "parent": "",
-      "file": "macro.h",
+      "header": "file--macro-h",
       "group": "",
       "deprecated": false,
       "templated": false,
@@ -28,7 +28,7 @@
       "doc": "Detailed documentation here.",
       "member_type": "macro",
       "parent": "",
-      "file": "macro.h",
+      "header": "file--macro-h",
       "group": "",
       "deprecated": false
     },
@@ -39,7 +39,7 @@
       "doc": "",
       "member_type": "macro",
       "parent": "",
-      "file": "macro.h",
+      "header": "file--macro-h",
       "group": "",
       "deprecated": false
     }

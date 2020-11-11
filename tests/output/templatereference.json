@@ -7,7 +7,7 @@
       "doc": "",
       "member_type": "function",
       "parent": "",
-      "file": "templatereference.h",
+      "header": "file--templatereference-h",
       "group": "",
       "deprecated": false,
       "templated": false,
@@ -22,7 +22,7 @@
       "doc": "",
       "member_type": "struct",
       "parent": "",
-      "file": "templatereference.h",
+      "header": "file--templatereference-h",
       "group": "",
       "deprecated": false,
       "templated": true,
@@ -36,7 +36,7 @@
           "doc": "",
           "member_type": "alias",
           "parent": "WithInner-T",
-          "file": "templatereference.h",
+          "header": "file--templatereference-h",
           "group": "",
           "deprecated": false,
           "type": "`T`"
@@ -58,7 +58,7 @@
       "doc": "",
       "member_type": "alias",
       "parent": "",
-      "file": "templatereference.h",
+      "header": "file--templatereference-h",
       "group": "",
       "deprecated": false,
       "type": "`std::allocator<int> >`"
@@ -71,14 +71,8 @@
       "brief": "",
       "doc": "",
       "includes": [
-        {
-          "filename": "string",
-          "in_project": false
-        },
-        {
-          "filename": "list",
-          "in_project": false
-        }
+        "<string>",
+        "<list>"
       ]
     }
   ],

@@ -37,12 +37,12 @@ def new_header(id, name='', brief='', doc=''):
     })
     return header
 
-def new_member(id, name='', member_type='', parent='', file=''):
+def new_member(id, name='', member_type='', parent='', header=''):
     member = basic(id, name)
     member.update({
         'member_type': member_type,
         'parent': parent,       # ID of the parent member, empty string if declared in global namespace
-        'file': file,           # ID of the first file this member was encountered
+        'header': header,       # ID of the first header file this member was encountered in
         'group': '',            # ID of the group it is in, if any
         'deprecated': False     # Set to True if marked 'deprecated'
     })

@@ -7,7 +7,7 @@
       "doc": "A longer description of A.",
       "member_type": "union",
       "parent": "",
-      "file": "union.h",
+      "header": "file--union-h",
       "group": "",
       "deprecated": false,
       "members": []

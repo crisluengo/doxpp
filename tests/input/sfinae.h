@@ -6,3 +6,5 @@ template< typename A, typename std::enable_if< !std::numeric_limits< A >::has_in
 struct S {
    A member;
 };
+
+// TODO: This doesn't work very nicely yet.

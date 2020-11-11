@@ -7,7 +7,7 @@
       "doc": "The enum A longer description.",
       "member_type": "enum",
       "parent": "",
-      "file": "enum.h",
+      "header": "file--enum-h",
       "group": "",
       "deprecated": false,
       "scoped": false,
@@ -20,7 +20,7 @@
           "doc": "",
           "member_type": "enumvalue",
           "parent": "A",
-          "file": "enum.h",
+          "header": "file--enum-h",
           "group": "",
           "deprecated": false,
           "value": 0
@@ -32,7 +32,7 @@
           "doc": "",
           "member_type": "enumvalue",
           "parent": "A",
-          "file": "enum.h",
+          "header": "file--enum-h",
           "group": "",
           "deprecated": false,
           "value": 1

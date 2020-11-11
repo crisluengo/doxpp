@@ -30,7 +30,7 @@ in which they were found in the header file. Each `members[i]` is a dictionary a
    "doc": "",          // full documentation, in Markdown
    "member_type": "",  // class/function/enum/variable/define/namespace/etc.
    "parent": "",       // ID of parent member
-   "file": "",         // ID of the file it is in (for namespaces, the first one it is encountered in)
+   "header": "",       // ID of the header file it is in (or the first one it is encountered in)
    "group": "",        // ID of the group it is in (or empty string)
    "deprecated": false // false or true
 
@@ -99,11 +99,9 @@ However, we will look for `\ref`, `\ingroup` and similar commands, as described 
 page. Commands that create a link are replaced by the Markdown syntax for a link, linking to
 `#<id>`. For example, `\ref foo::bar` will be replaced by `[foo::bar](#foo-bar)`, and
 `\ref foo::bar "the bar value"` will be replaced by `[the bar value](#foo-bar)`. Note that
-
-of text with a Markdown-style link: `[foo.bar](#ns.foo.bar)`. Note that this is the same formatting
-used to link to Markdown headers and such. The generator will have to identify these and change
-them to links to another page if necessary (only the generator will know where the documentation
-for a given member is).
+this is the same formatting used to link to Markdown headers and such. The generator will have
+to identify these and change them to links to another page if necessary (only the generator
+will know where the documentation for a given member is).
 
 Also `@cmd` and `\cmd` will be found, and acted upon if necessary. For example, `\warning` will remain
 unchanged, the generator needs to take care of that; but `\ingroup` will set the `group` value of the member,
