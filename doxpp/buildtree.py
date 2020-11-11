@@ -449,10 +449,12 @@ def find_file(name, headers):
 
 # --- Post-process documentation to add links ---
 
-def markup_for_type_dict(type, members):
+def markup_for_type_dict(type, template_params, members):
     name = type['typename']
-    id = find_member(name, '', members)
-    # TODO: How to handle template types?
+    if name in template_params:
+        id = ''
+    else:
+        id = find_member(name, '', members)
     if code_formatting:
         name = '`{}`'.format(name)
     if id:
@@ -469,24 +471,38 @@ def markup_for_type_dict(type, members):
             name = name + qualifiers
     return name
 
+def collect_template_params(member, template_params, members):
+    # Recurse through `member` and its ancestors, noting any template parameter names they have
+    if 'templated' in member and member['templated']:
+        for t in member['template_parameters']:
+            if t['type'] == 'type':
+                template_params.add(t['name'])
+    if 'parent' in member and member['parent']:
+        collect_template_params(members[member['parent']], template_params, members)
+
 def post_process_types(members):
     # Convert 'type' dicts to a string with optional Markdown link to the type's documentation
     for member in members.values():
+        print('Processing types for', member['id'])
+        template_params = set()
+        collect_template_params(member, template_params, members)
+        if template_params:
+            print('template_params:', template_params)
         if 'type' in member and isinstance(member['type'], dict):
-            member['type']['string'] = markup_for_type_dict(member['type'], members)
+            member['type']['string'] = markup_for_type_dict(member['type'], template_params, members)
         if 'return_type' in member and isinstance(member['return_type'], dict):
-            member['return_type']['string'] = markup_for_type_dict(member['return_type'], members)
+            member['return_type']['string'] = markup_for_type_dict(member['return_type'], template_params, members)
         if 'arguments' in member:
             for arg in member['arguments']:
-                arg['string'] = markup_for_type_dict(arg, members)
+                arg['string'] = markup_for_type_dict(arg, template_params, members)
                 # arg.pop('typename')
                 # arg.pop('qualifiers')
         if 'template_parameters' in member:
             for arg in member['template_parameters']:
                 if isinstance(arg['default'], dict):
-                    arg['default']['string'] = markup_for_type_dict(arg['default'], members)
+                    arg['default']['string'] = markup_for_type_dict(arg['default'], template_params, members)
                 elif isinstance(arg['type'], dict):
-                    arg['type']['string'] = markup_for_type_dict(arg['type'], members)
+                    arg['type']['string'] = markup_for_type_dict(arg['type'], template_params, members)
 
 def cleanup_types(members):
     # Replace 'type' dicts with their 'string' element.

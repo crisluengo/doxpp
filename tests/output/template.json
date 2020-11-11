@@ -76,7 +76,7 @@
           "file": "template.h",
           "group": "",
           "deprecated": false,
-          "type": "[`A`](#A-T)`[]`",
+          "type": "`A``[]`",
           "static": false,
           "mutable": false,
           "access": "public",
