@@ -1,5 +1,4 @@
 # dox++
-# Copyright 2013-2018, Jesse van den Kieboom
 # Copyright 2020, Cris Luengo
 #
 # This file is part of dox++.  dox++ is free software: you can

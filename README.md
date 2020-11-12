@@ -21,7 +21,7 @@ is C++ code, not C code, and so some C features might be overlooked on purpose.
 all the information needed to produce documentation. It contains documentation for all
 namespaces, classes, functions, variables, etc., even those without explicit documentation
 blocks. It contains documentation for each header file and for each group, and it contains
-additional pages. It links references to members to the members across the project.
+additional pages. It links references to members across the project.
 Typesetting, creating indices, etc. is left to the generator (or back-end), which keeps
 the program simple.
 
@@ -40,7 +40,7 @@ to parse.
 3. It is meant to parse header files only, not the implementation files. It documents the API
 of a library, not all the code in a project.
 4. It documents everything declared in the header files, even if no documentation block
-is associated. The generator can choose what to output.
+is associated to the declaration. The generator can choose what to output.
 5. Commands intended to document members cannot define non-existing members. For example,
 the `\class <name>` command adds documentation to a class. The class must be declared somewhere
 in the header files.
@@ -58,7 +58,7 @@ Doxygen generates. This should allow the generator to create more meaningful URL
 ## What is missing
 
 I'm sure there are lots of things missing I'm not even aware of. Here are a few missing things
-I am aware of.
+that I am aware of.
 
 Things we'd like to add/fix/improve:
 
