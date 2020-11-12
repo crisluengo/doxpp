@@ -9,3 +9,7 @@
 
 /// A function called `function`.
 TYPE NAME(TYPE x);
+
+/// \macro FUNC(x, y)
+/// A function macro.
+#define FUNC(x, y) ((x)+(y))

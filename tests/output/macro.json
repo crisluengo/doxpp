@@ -42,6 +42,17 @@
       "header": "file--macro-h",
       "group": "",
       "deprecated": false
+    },
+    {
+      "id": "macro--FUNC",
+      "name": "FUNC(x, y)",
+      "brief": "A function macro.",
+      "doc": "",
+      "member_type": "macro",
+      "parent": "",
+      "header": "file--macro-h",
+      "group": "",
+      "deprecated": false
     }
   ],
   "headers": [

@@ -11,10 +11,9 @@ Note that we try to keep compatibility with Doxygen, but chose to make some chan
 2. Documenting a preprocessor macro with `\def` (new better name: `\macro`) must always
    carry the macro name. Clang doesn't preserve preprocessor directives in its AST.
 
-3. Grouping has changed: We don't recognize `\{` and `\}`. Instead, `\defgroup` and
-   `\addtogroup` imply the opening `\{`. The closing `\}` must be replaced by
-    `\endgroup`. Furthermore, groups are disjoint, each member can only belong to
-    one group.
+3. Grouping has changed: We don't recognize `\{` and `\}`. Instead, `\addtogroup`
+   implies the opening `\{`. The closing `\}` must be replaced by `\endgroup`.
+   Furthermore, groups are disjoint, each member can only belong to one group.
 
 4. There is no "autolink", all member names must be preceded by the `\ref` command
    to create a link to the member documentation. `\ref` is used to link to anything
@@ -38,11 +37,11 @@ with one of these commands, otherwise it will be associated to the next declarat
 
 ### `\addtogroup <name>`
 
-Sets `id` as the active group. It does not matter if the group is not yet defined or not.
-If no matching `\defgroup` exists in the project, the group will not be documented, but will
-exist. Must be matched by a `endgroup`.
+Sets `id` as the active group. If the group is not defined, a new group will be created
+with no name and no documentation. Use `\defgroup` to name and document the group.
+Must be matched by a `endgroup`.
 
-See `defgroup` for more information on grouping.
+See `grouping.md` for more information on grouping.
 
 The remainder of the comment block is ignored.
 
@@ -68,26 +67,7 @@ Alternatively, provide the ID for the class.
 
 ### `\defgroup <name> [<title>]`
 
-Defines a group. Namespace members can be part of one group. A generator can sort members by group,
-instead (or additionally) to sorting them by namespace or file.
-
-Members declared after the `\defgroup` command are part of the group. The `\defgroup` makes
-the newly defined group "active", and will remain so until the end of the file, or until
-a `\endgroup` command.
-
-Documentation blocks that document members declared elsewhere are also affected by the "active" group,
-but only if the member declaration didn't already associate the member to a group. A `\ingroup`
-command in a documentation block has priority when assigning members to groups. Only the first
-such command is considered, the rest is ignored.
-
-Groups can be nested. Each group has at most one parent, and can have any number of subgroups.
-When defining a group while another group is active, the group will be a subgroup of the active
-group, and then become the active group. The `\ingroup` command provides an alternative to
-defining the group hierarchy. Note that cycles in the group hierarchy are prohibited. Group
-A cannot be both an ancestor and a descendant of another group.
-
-`\endgroup` causes the previously active group to become active again. It is required to
-have one of these for each `defgroup` and each `addtogroup`.
+Documents a group.
 
 `id` is the unique identifier for the group.
 
@@ -101,6 +81,8 @@ A second `\defgroup` encountered with the same `id` will add documentation to th
 but the `name` and `brief` string will be ignored. Thus, multiple `\defgroup` commands
 can co-exist, but only the first one encountered can set the `name` and `brief` strings.
 
+See `grouping.md` for more information on grouping.
+
 ### `\dir [<path fragment>]`
 
 Currently not implemented
@@ -109,7 +91,7 @@ Do we need to implement this? Is it useful?
 
 ### `\endgroup`
 
-See `\defgroup`.
+Closes the nearest previous `\addtogroup`. See `grouping.md` for more information.
 
 ### `\endname`
 
@@ -175,16 +157,15 @@ for the documentation. Text in this block is the page's text. See `\page` for mo
 
 ### `\name (header)`
 
-Similar to `\defgroup` or `\addtogroup`, but for class or struct members.  The `(header)` text
+Creates a group for class or struct members.  The `(header)` text
 is used to label the group in the documentation. Each `\name` command closes the previous
-group and starts a new one. Use `\endname` rather than `\endgroup` to close off the group.
+group and starts a new one. Use `\endname` to close off the group without starting a new one.
 
-Unlike with the `\defgroup` and `\addtogroup` commands, `\name` and `\endname` must enclose the
-declaration of the class or struct members, not their documentation blocks.
+Any members declared in between a `\name` and the next `\name` or `\endname` belong to the
+group introduced by that first `\name` command.
 
-These groups cannot be nested, so a `\name` command will close a previous member group. `\endname`
-is only needed at the end of a class, or before the declaration of members that should not be
-in any group.
+Unlike with the `\addtogroup` command, `\name` and `\endname` must enclose the declaration
+of the class or struct members, not their documentation blocks.
 
 The parser is not very clever, and so a class/struct member group remains active in the remainder
 of the file until `\endname` is encountered, even within other classes.

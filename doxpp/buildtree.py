@@ -735,7 +735,11 @@ def process_macro_command(cmd: DocumentationCommand, status: Status):
         return
     name, args = split_string(cmd.args)
     if args:
-        log.warning("Ignoring additional arguments to \\macro command\n   in file %s", cmd.file)
+        if '(' in name:
+            name = name + ' ' + args
+            # TODO: verify that `name` is valid in the form `macro(arg, arg, ...)`
+        else:
+            log.warning("Ignoring additional arguments to \\macro command\n   in file %s", cmd.file)
     # Do we already have a member for this macro?
     id = unique_id.macro(name)
     group, doc = find_ingroup_cmd(cmd.doc)
@@ -837,11 +841,10 @@ def process_grouping_command(cmd, args, doc, loc, status: Status):
     # Returns True if the command was processed, false otherwise.
     #
     # Grouping commands work differently than in Doxygen:
-    # \defgroup defines a group, subsequent definitions fall within the group.
-    # \addtogroup makes subsequent definitions fall within the group, but doesn't provide
-    # documentation for the group itself.
+    # \defgroup defines a group.
+    # \addtogroup makes subsequent definitions fall within the group.
     # \endgroup stops the current group.
-    # Starting a group within a group causes nested groups. Also adding \ingroup to the group's
+    # Defining a group within a group causes nested groups. Also adding \ingroup to the group's
     # documentation causes it to be nested.
     # \name and \endname work similarly, but only inside a class or struct definition.
     if cmd == 'defgroup':
@@ -852,25 +855,32 @@ def process_grouping_command(cmd, args, doc, loc, status: Status):
         if not unique_id.is_valid(id):
             log.error("\\defgroup has invalid name '%s', ignored.\n   in file %s", id, status.current_header_name)
             return True
-        current_group, doc = find_ingroup_cmd(doc)
-        if not current_group:
-            current_group = status.current_group[-1]
+        parent_group, doc = find_ingroup_cmd(doc)
+        if not parent_group:
+            parent_group = status.current_group[-1]
         brief, doc = separate_brief(doc)
         doc = find_anchor_cmds(doc, status)
         if id not in status.groups:
-            status.groups[id] = members.new_group(id, name, brief, doc, current_group)
+            status.groups[id] = members.new_group(id, name, brief, doc, parent_group)
             status.data['groups'].append(status.groups[id])
         else:
             group = status.groups[id]
             if not group['name']:
                 group['name'] = name
+            if group['parent']:
+                parent_group = ''  # ignore the parent group chosen here. TODO: if \ingroup was given, we should print a warning
+            else:
+                group['parent'] = parent_group
             add_doc(group, brief, doc)
-        if current_group:
-            group = status.groups[current_group]
+        if parent_group:
+            if parent_group in status.groups:
+                group = status.groups[parent_group]
+            else:
+                group = members.new_group(parent_group)
+                status.groups[parent_group] = group
+                status.data['groups'].append(group)
             if group['subgroups'].count(id) == 0:  # add group only once
                 group['subgroups'].append(id)
-        status.current_group.append(id)
-        status.group_locations.append((loc, id))
         return True
     if cmd == 'addtogroup':
         id, name = split_string(args)
@@ -884,24 +894,19 @@ def process_grouping_command(cmd, args, doc, loc, status: Status):
         if doc:
             log.warning("Ignoring documentation block associated to \\addtogroup command\n   in file %s",
                         status.current_header_name)
-        current_group = status.current_group[-1]
         if id not in status.groups:
-            status.groups[id] = members.new_group(id, '', '', '', current_group)
+            status.groups[id] = members.new_group(id)
             status.data['groups'].append(status.groups[id])
-        if current_group:
-            group = status.groups[current_group]
-            if group['subgroups'].count(id) == 0:  # add group only once
-                group['subgroups'].append(id)
         status.current_group.append(id)
         status.group_locations.append((loc, id))
         return True
     if cmd == 'endgroup':
-        current_group = status.current_group[-1]
-        if current_group:
+        parent_group = status.current_group[-1]
+        if parent_group:
             status.current_group.pop()
             status.group_locations.append((loc, status.current_group[-1]))
         else:
-            log.warning("\\endgroup cannot occur while not in a group\n   in file %s", status.current_header_name)
+            log.warning("\\endgroup must occur after an \\addtogroup command\n   in file %s", status.current_header_name)
         if doc:
             log.warning("Ignoring documentation block associated to \\endgroup command\n   in file %s",
                         status.current_header_name)
