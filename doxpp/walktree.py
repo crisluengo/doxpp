@@ -20,6 +20,26 @@ import json
 from . import log
 
 
+# --- get_fully_qualified_name ---
+
+def get_fully_qualified_name(id, members):
+    """
+    Creates a string with the fully qualified name of the member `id`.
+    :param id: string.
+    :param members: dictionary created by `create_member_dict`.
+    :return: string.
+    """
+    output = ''
+    while id:
+        part = members[id]['name']
+        if output:
+            output = part + '::' + output
+        else:
+            output = part
+        id = members[id]['parent']
+    return output
+
+
 # --- create_member_dict ---
 
 def create_member_dict_recursive(members, output):

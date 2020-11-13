@@ -313,7 +313,7 @@ def find_ingroup_cmd(doc):
     m = ingroup_cmd_match.search(doc)
     if m:
         group = m.group(1)
-        doc = ingroup_cmd_match.sub('', doc)
+        doc = ingroup_cmd_match.sub('', doc).strip()
         return group, doc
     return '', doc
 
@@ -355,7 +355,7 @@ def find_anchor_cmds(doc, status: Status):
 split_function_arg_parts = re.compile(r'(?:\w|:)+|\*|&+|\[]')  # Split qualifiers
 split_function_args = re.compile(r'^((?:\w|:)+)\((.*)\)$')     # Split function from arguments
 
-def parse_function_arguments(arg_list):
+def parse_function_arguments(arg_list, start_id, members):
     if arg_list == ['']:  # This happens if the function is specified as `funcname()`.
         return []
     arguments = []
@@ -363,6 +363,8 @@ def parse_function_arguments(arg_list):
         parts = split_function_arg_parts.findall(arg)
         if len(parts) > 1 and parts[0] == 'const':
             parts[0], parts[1] = parts[1], parts[0]  # Move the 'const' to after the type
+        id = find_member(parts[0], start_id, members)
+        parts[0] = walktree.get_fully_qualified_name(id, members)
         arguments.append({
             'typename': parts[0],
             'qualifiers': parts[1:]
@@ -377,7 +379,10 @@ def find_member_inner(member_list, names, function_params):
         if member['name'] == names[0]:
             if len(names) == 1:
                 # We've matched the whole name
-                if function_params is not None:
+                if function_params is None:
+                    # No need to match function parameters
+                    return member['id']
+                else:
                     # We need to match function parameters too
                     if member['member_type'] == 'function':
                         args = member['arguments']
@@ -386,9 +391,6 @@ def find_member_inner(member_list, names, function_params):
                             return member['id']
                     # TODO: We need to distinguish const member functions from the non-const version.
                     #       This requires improving the matching for the type...
-                else:
-                    # No need to match function parameters
-                    return member['id']
             elif 'members' in member:
                 return find_member_inner(member['members'], names[1:], function_params)
     return ''
@@ -410,14 +412,53 @@ def find_member(name, start_id, members):
     if not name:
         return ''
     function_params = None
-    if '(' in name:
-        match = split_function_args.fullmatch(name)
-        if not match:
-            log.error('Cannot parse "%s"', name)
+    if name.startswith('operator'):
+        part = name[len('operator'):].strip()
+        # We can have:
+        # - <op>     + - * / % ^ & | ~ ! = < > += -= *= /= %= ^= &= |= << >> >>= <<= == != <= >= <=> && || ++ -- , ->* -> () []
+        # - <type>
+        # - new
+        # - new[]
+        # - delete
+        # - delete[]
+        # - ""<name>
+        # - co_await  (new in C++20)
+        if not part:
+            log.warning('I see "operator" as a member name, forgot quotes?')
             return ''
-        name = match[1]
-        function_params = parse_function_arguments(match[2].split(','))
-    names = name.split('::')
+        if part[0] == '(':
+            if part[1] != ')':
+                log.error('Cannot parse "%s" as member name', name)
+                return ''
+            name = 'operator()'
+            args = part[2:].strip()
+            if args:
+                if args[0] != '(' or args[-1] != ')':
+                    log.error('Cannot parse "%s" as member name', name)
+                    return ''
+                args = args[1:-1]
+        else:
+            part, args = split_string(part, '(')
+            args = args.strip()
+            if args:
+                if args[-1] != ')':
+                    log.error('Cannot parse "%s" as member name', name)
+                    return ''
+                args = args[0:-1]
+            if part[0].isalpha():
+                part = ' ' + part
+            name = ('operator' + part).strip()
+        if args:
+            function_params = parse_function_arguments(args.split(','), start_id, members)
+    else:
+        if '(' in name:
+            match = split_function_args.fullmatch(name)
+            if not match:
+                log.error('Cannot parse "%s" as member name', name)
+                return ''
+            name = match[1]
+            function_params = parse_function_arguments(match[2].split(','), start_id, members)
+    names = name.split('::')  # TODO: This goes wrong with `operator ns::type`.
     if not names:
         return ''
     base = members[start_id]
@@ -545,8 +586,8 @@ def post_process_inheritance(members):
                 else:
                     base['type'] = name
 
-ref_cmd_match = re.compile(r'[\\@]ref +((?:\w|:|%|-)+(?: *\(.*?\))?)(?: +\"(.*?)\")?')
-ref_cmd_hdr_match = re.compile(r'[\\@]ref +\"(.+?)\"(?: +\"(.*?)\")?')
+ref_cmd_match = re.compile(r'[\\@]ref +((?:\w|:|%|-)+(?: *\(.*?\))?)(?: +"(.*?)")?')
+ref_cmd_quotes_match = re.compile(r'[\\@]ref +"((?:[^"]|"")+)"(?: +"(.*?)")?')
 see_cmd_match = re.compile(r'^ *[\\@](?:see|sa) +(.+?) *$', re.MULTILINE)
 see_arg_match = re.compile(r'([^,(]+(?:\(.*?\))?)')  # Split \see command arguments
 
@@ -554,7 +595,7 @@ def post_process_links(elements, status: Status):
     # Process documentation for `\ref` and `\see` commands
     for elem in elements.values():
 
-        def find_and_format_name(name, text):
+        def find_if_member(name, text):
             parent = elem['id']
             if parent not in status.members:
                 parent = ''
@@ -564,7 +605,12 @@ def post_process_links(elements, status: Status):
                     text = name
                 if code_formatting:
                     text = '`{}`'.format(text)
-            else:
+            return id, text
+
+        def find_and_format_name(name, text):
+            # For matches of member name, or any ID
+            id, text = find_if_member(name, text)
+            if not id:
                 if name in status.members:
                     id = name
                     if not text:
@@ -587,42 +633,38 @@ def post_process_links(elements, status: Status):
                     id = name
                     if not text:
                         text = status.anchors[id]
-            if not text:
-                text = name
+                else:
+                    log.error("Reference to '%s' could not be matched.\n   in documentation for %s", name, elem['id'])
+                    return text
+            return '[{}](#{})'.format(text, id)
+
+        def find_and_format_quotes_name(name, text):
+            # For matches of member or header name, when given quotes
+            id, text = find_if_member(name, text)
             if not id:
-                log.error("Reference to %s could not be matched.\n   in documentation for %s", name, elem['id'])
-                return text
+                id = find_file(name, status.headers)
+                if not id:
+                    log.error("Reference to '%s' could not be matched.\n   in documentation for %s", name, elem['id'])
+                    return name
+                if not text:
+                    text = status.headers[id]['name']
             return '[{}](#{})'.format(text, id)
 
         def ref_cmd_replace(match):
-            # For matches of member name, or any ID
             return find_and_format_name(match[1], match[2])
 
-        def ref_cmd_hdr_replace(match):
-            # For matches of header name
-            name = match[1]
-            text = match[2]
-            id = find_file(name, status.headers)
-            if not id:
-                log.error("Reference to file %s could not be matched.\n   in documentation for %s", name, elem['id'])
-                return name
-            if not text:
-                text = status.headers[id]['name']
-            return '[{}](#{})'.format(text, id)
+        def ref_cmd_quotes_replace(match):
+            return find_and_format_quotes_name(match[1], match[2])
 
         def see_cmd_replace(match):
             # For matches of a `\see` or `\sa` command.
             output = '!!! see_also "See also"\n    '
             first = True
             for element in see_arg_match.findall(match[1]):
+                # TODO: the regexp above doesn't work for `operator,`
                 element = element.strip()
                 if element[0] == '"':
-                    name = element[1:-1]
-                    id = find_file(name, status.headers)
-                    if not id:
-                        log.error("Reference to file %s could not be matched.\n   in documentation for %s", name, elem['id'])
-                        continue
-                    link = '[{}](#{})'.format(status.headers[id]['name'], id)
+                    link = find_and_format_quotes_name(element[1:-1], '')
                 else:
                     link = find_and_format_name(element, '')
                 if first:
@@ -635,10 +677,10 @@ def post_process_links(elements, status: Status):
 
         if 'brief' in elem:  # this one not present in pages
             elem['brief'] = ref_cmd_match.sub(ref_cmd_replace, elem['brief'])
-            elem['brief'] = ref_cmd_hdr_match.sub(ref_cmd_hdr_replace, elem['brief'])
+            elem['brief'] = ref_cmd_quotes_match.sub(ref_cmd_quotes_replace, elem['brief'])
         if 'doc' in elem:  # this one is missing if elem is status.members['']
             elem['doc'] = ref_cmd_match.sub(ref_cmd_replace, elem['doc'])
-            elem['doc'] = ref_cmd_hdr_match.sub(ref_cmd_hdr_replace, elem['doc'])
+            elem['doc'] = ref_cmd_quotes_match.sub(ref_cmd_quotes_replace, elem['doc'])
             elem['doc'] = see_cmd_match.sub(see_cmd_replace, elem['doc'])
 
 relates_cmd_match = re.compile(r'^ *[\\@]relate[sd] +(.+?) *$', re.MULTILINE)
@@ -664,7 +706,7 @@ def post_process_relates(members):
                 member['doc'] = relates_cmd_match.sub('', member['doc'])
                 # TODO: produce error if there are more of these commands?
 
-subpage_cmd_match = re.compile(r'[\\@]subpage +((?:\w|-)+(?: *\(.*?\))?)(?: +\"(.*?)\")?')
+subpage_cmd_match = re.compile(r'[\\@]subpage +((?:\w|-)+(?: *\(.*?\))?)(?: +"(.*?)")?')
 
 def post_process_subpages(pages):
     # Process documentation for `\subpage` commands
@@ -722,7 +764,8 @@ def process_generic_command(cmd: DocumentationCommand, status: Status):
         group = cmd.group
     if member['group']:
         if group and member['group'] != group:
-            log.warning("Member '%s' already is in group %s, cannot assign to group %s", id, member['group'], group)
+            log.warning("Member '%s' already is in group %s, cannot assign to group %s.\n   in file %s",
+                        id, member['group'], group, cmd.file)
     else:
         member['group'] = group
     brief, doc = separate_brief(doc)
@@ -732,15 +775,21 @@ def process_generic_command(cmd: DocumentationCommand, status: Status):
 def process_macro_command(cmd: DocumentationCommand, status: Status):
     # \macro <name>
     if not cmd.args:
-        log.error("\\macro needs a name argument\n   in file %s", cmd.file)
+        log.error("\\macro needs a name argument.\n   in file %s", cmd.file)
         return
-    name, args = split_string(cmd.args)
-    if args:
-        if '(' in name:
-            name = name + ' ' + args
-            # TODO: verify that `name` is valid in the form `macro(arg, arg, ...)`
-        else:
-            log.warning("Ignoring additional arguments to \\macro command\n   in file %s", cmd.file)
+    name = cmd.args
+    macro_params = []
+    if '(' in name:
+        match = split_function_args.fullmatch(name)
+        if not match:
+            log.error("Cannot parse macro name '%s', ignoring documentation.\n   in file %s", name, cmd.file)
+            return
+        name = match[1]
+        macro_params = match[2].split(',')
+        for ii in range(len(macro_params)):
+            macro_params[ii] = macro_params[ii].strip()
+    if not unique_id.is_valid(name):
+        log.error("'%s' is not a valid name for a macro, ignoring documentation.\n   in file %s", name, cmd.file)
     # Do we already have a member for this macro?
     id = unique_id.macro(name)
     group, doc = find_ingroup_cmd(cmd.doc)
@@ -750,9 +799,12 @@ def process_macro_command(cmd: DocumentationCommand, status: Status):
         # Add data to existing member
         member = status.members[id]
         if member['member_type'] != 'macro':
-            log.error("Documenting a macro with ID %s that is identical to an existing non-macro\n   in file %s",
+            log.error("Documenting a macro with ID %s that is identical to an existing non-macro.\n   in file %s",
                       id, cmd.file)
             return
+        if member['macro_params'] != macro_params:
+            log.warning("Documenting a previously documented macro, this time the parameters are different.\n" +
+                        "   in file %s", id, cmd.file)
         brief, doc = separate_brief(doc)
         doc = find_anchor_cmds(doc, status)
         add_doc(member, brief, doc)
@@ -766,6 +818,7 @@ def process_macro_command(cmd: DocumentationCommand, status: Status):
         member['brief'] = brief
         member['doc'] = doc
         member['group'] = group
+        member['macro_params'] = macro_params
         status.members[id] = member
         status.data['members'].append(member)
 
@@ -852,7 +905,7 @@ def process_grouping_command(cmd, args, doc, loc, status: Status):
     if cmd == 'group':
         id, name = split_string(args.strip())
         if not id or not name:
-            log.error("\\group needs a name and a title\n   in file %s", status.current_header_name)
+            log.error("\\group needs a name and a title.\n   in file %s", status.current_header_name)
             return True
         if not unique_id.is_valid(id):
             log.error("\\group has invalid name '%s', ignored.\n   in file %s", id, status.current_header_name)
@@ -919,7 +972,8 @@ def process_grouping_command(cmd, args, doc, loc, status: Status):
             status.current_group.pop()
             status.group_locations.append((loc, status.current_group[-1]))
         else:
-            log.warning("\\endgroup must occur after an \\addtogroup command\n   in file %s", status.current_header_name)
+            log.warning("\\endgroup must occur after an \\addtogroup command\n   in file %s",
+                        status.current_header_name)
         if doc:
             log.warning("Ignoring documentation block associated to \\endgroup command\n   in file %s",
                         status.current_header_name)
@@ -1243,10 +1297,16 @@ def extract_declarations(citer, parent, status: Status):
                     if semantic_parent in status.member_ids:
                         semantic_parent = status.member_ids[semantic_parent]
                     else:
-                        log.error("USR of semantic parent for %s was unknown, using lexical parent instead", item.displayname)
-                        semantic_parent = parent
+                        log.error("USR of semantic parent for %s was unknown, ignoring member.\n   in file %s",
+                                  item.displayname, status.current_header_name)
+                        # This seems to happen in template specializations.
+                        # It also also when a class member definition is in a header file that is not the
+                        # header file where the class is defined, and that header file is processed first, such
+                        # that the class is yet unknown.
+                        continue
                 else:
-                    log.debug("Semantic parent not given, assuming lexical parent is semantic parent")
+                    log.debug("Semantic parent for %s not given, assuming lexical parent is semantic parent.\n" +
+                              "   in file %s", item.displayname, status.current_header_name)
                     semantic_parent = parent
 
             log.debug("member: kind = %s, displayname = %s, spelling = %s, parent = %s, semantic_parent = %s",
@@ -1275,10 +1335,12 @@ def extract_declarations(citer, parent, status: Status):
             if member_type in ['templatenontypeparameter', 'templatetypeparameter']:
                 name = item.spelling
                 if not semantic_parent:
-                    log.error("Template parameter %s doesn't have a parent", name)
+                    log.error("Template parameter %s doesn't have a parent.\n   in file %s",
+                              name, status.current_header_name)
                     return
                 if 'template_parameters' not in status.members[semantic_parent]:
-                    log.error("Template parameter %s has a parent that is not a template", name)
+                    log.error("Template parameter %s has a parent that is not a template.\n   in file %s",
+                              name, status.current_header_name)
                     return
                 default = None
                 if member_type == 'templatetypeparameter':
@@ -1369,8 +1431,8 @@ def extract_declarations(citer, parent, status: Status):
                 # For the enumvalue member type we get here too, but we clear the "group" element later
                 # Also, we ignore any `\ingroup` commands
                 if group:
-                    log.warning("Ignoring \\ingroup command in documentation for %s\n   in file %s", member['name'],
-                                status.current_header_name)
+                    log.warning("Ignoring \\ingroup command in documentation for %s\n   in file %s",
+                                member['name'], status.current_header_name)
                 member['group'] = get_group_at_line(status.member_group_locations, item.extent.start.line)
 
             # Associate any other information with this member
@@ -1473,8 +1535,9 @@ def extract_declarations(citer, parent, status: Status):
                 member['id'] = id
                 status.member_ids[usr] = id
                 if id in status.members:
-                    log.error("USR for member %s was unknown, but ID %s was already there! This means that there is a name clash, "
-                              "unique_id.member is not good enough", member['name'], id)
+                    log.error("USR for member %s was unknown, but ID %s was already there! This means that " +
+                              "there is a name clash, unique_id.member is not good enough.\n   in file %s",
+                              member['name'], id, status.current_header_name)
                     continue  # skip the rest of this function, we're in trouble here...
                 status.members[id] = member
                 if semantic_parent:

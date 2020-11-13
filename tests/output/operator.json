@@ -3,8 +3,8 @@
     {
       "id": "N",
       "name": "N",
-      "brief": "",
-      "doc": "",
+      "brief": "Namespace N",
+      "doc": "Contains [`operator==`](#N-operator%3D%3D-N-A-CL-N-A-CL), and [`operator\"\"_w`](#N-operator%22%22_w-long double-), as well as struct [`A`](#N-A).\n\nWe should be able to reference [`operator==`](#N-operator%3D%3D-N-A-CL-N-A-CL) or [`operator==(const A &, const A &)`](#N-operator%3D%3D-N-A-CL-N-A-CL)",
       "member_type": "namespace",
       "parent": "",
       "header": "file--operator-h",
@@ -14,8 +14,8 @@
         {
           "id": "N-A",
           "name": "A",
-          "brief": "",
-          "doc": "",
+          "brief": "Struct N::A",
+          "doc": "Contains [`operator<`](#N-A-operator%3C-N-A-CL), and [`operator int *`](#N-A-operator%20int%20%2A-C).",
           "member_type": "struct",
           "parent": "N",
           "header": "file--operator-h",
@@ -51,6 +51,27 @@
                   "type": "[`N::A`](#N-A) `const&`"
                 }
               ]
+            },
+            {
+              "id": "N-A-operator%20int%20%2A-C",
+              "name": "operator int *",
+              "brief": "",
+              "doc": "",
+              "member_type": "function",
+              "parent": "N-A",
+              "header": "file--operator-h",
+              "group": "",
+              "deprecated": false,
+              "templated": false,
+              "static": false,
+              "virtual": false,
+              "pure_virtual": false,
+              "const": true,
+              "access": "public",
+              "constexpr": false,
+              "method_type": "conversionfunction",
+              "return_type": "`int``*`",
+              "arguments": []
             }
           ],
           "related": []
@@ -58,7 +79,7 @@
         {
           "id": "N-operator%3D%3D-N-A-CL-N-A-CL",
           "name": "operator==",
-          "brief": "",
+          "brief": "operator==",
           "doc": "",
           "member_type": "function",
           "parent": "N",
@@ -80,6 +101,111 @@
               "type": "[`N::A`](#N-A) `const&`"
             }
           ]
+        },
+        {
+          "id": "N-operator%22%22_w-long double-",
+          "name": "operator\"\"_w",
+          "brief": "operator \"\" _w() allows us to write `34.5_w` to create an object of type [`A`](#N-A).",
+          "doc": "",
+          "member_type": "function",
+          "parent": "N",
+          "header": "file--operator-h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "constexpr": false,
+          "return_type": "[`N::A`](#N-A)",
+          "arguments": [
+            {
+              "name": "",
+              "default": null,
+              "type": "`long double`"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "operator%20new-size_t-",
+      "name": "operator new",
+      "brief": "",
+      "doc": "",
+      "member_type": "function",
+      "parent": "",
+      "header": "file--operator-h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "constexpr": false,
+      "return_type": "`void``*`",
+      "arguments": [
+        {
+          "name": "",
+          "default": null,
+          "type": "`size_t`"
+        }
+      ]
+    },
+    {
+      "id": "operator%20new%5B%5D-size_t-",
+      "name": "operator new[]",
+      "brief": "",
+      "doc": "",
+      "member_type": "function",
+      "parent": "",
+      "header": "file--operator-h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "constexpr": false,
+      "return_type": "`void``*`",
+      "arguments": [
+        {
+          "name": "",
+          "default": null,
+          "type": "`size_t`"
+        }
+      ]
+    },
+    {
+      "id": "operator%20delete-void-P",
+      "name": "operator delete",
+      "brief": "",
+      "doc": "",
+      "member_type": "function",
+      "parent": "",
+      "header": "file--operator-h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "constexpr": false,
+      "return_type": "`void`",
+      "arguments": [
+        {
+          "name": "",
+          "default": null,
+          "type": "`void``*`"
+        }
+      ]
+    },
+    {
+      "id": "operator%20delete%5B%5D-void-P",
+      "name": "operator delete[]",
+      "brief": "",
+      "doc": "",
+      "member_type": "function",
+      "parent": "",
+      "header": "file--operator-h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "constexpr": false,
+      "return_type": "`void`",
+      "arguments": [
+        {
+          "name": "",
+          "default": null,
+          "type": "`void``*`"
         }
       ]
     }
@@ -90,7 +216,9 @@
       "name": "operator.h",
       "brief": "",
       "doc": "",
-      "includes": []
+      "includes": [
+        "<new>"
+      ]
     }
   ],
   "groups": [],

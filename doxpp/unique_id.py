@@ -57,9 +57,6 @@ def member(dict, status):
     return id
 
 def macro(name):
-    ii = name.find('(')
-    if ii > 0:
-        name = name[:ii]
     return "macro--" + name
 
 valid_name_match = re.compile(r'(\w|-)+')

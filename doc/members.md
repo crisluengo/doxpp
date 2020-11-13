@@ -3,7 +3,7 @@
 These are the member types that will be output by dox++, and how they nest.
 
 - `namespace`
-    - can contain anything
+    - can contain anything except `macro`
 - `class` or `struct`
     - `function`
     - `variable`
@@ -15,6 +15,7 @@ These are the member types that will be output by dox++, and how they nest.
 - `alias` (identical for `using` and `typedef` style aliases, we don't distinguish them)
 - `function`
 - `variable`
+- `macro`
 
 Below we give a description of all the dictionary fields for each of these types of member.
 
@@ -50,6 +51,7 @@ One of:
 - `"enum"`
 - `"enumvalue"`
 - `"function"`
+- `"macro"`
 - `"namespace"`
 - `"struct"`
 - `"union"`
@@ -187,6 +189,15 @@ Set to a string `"public"`, `"protected"` or `"private"`.
 ### "method_type" (string)
 
 Set to a string `"method"`, `"conversionfunction"`, `"constructor"` or `"destructor"`.
+
+
+## macro-specific fields
+
+For a macro, the `"parent"` field is always the empty string.
+
+### "macro_params" (list)
+
+List of strings containing macro parameters, if given.
 
 
 ## namespace-specific fields

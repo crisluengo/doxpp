@@ -30,7 +30,8 @@
       "parent": "",
       "header": "file--macro-h",
       "group": "",
-      "deprecated": false
+      "deprecated": false,
+      "macro_params": []
     },
     {
       "id": "macro--TYPE",
@@ -41,18 +42,23 @@
       "parent": "",
       "header": "file--macro-h",
       "group": "",
-      "deprecated": false
+      "deprecated": false,
+      "macro_params": []
     },
     {
       "id": "macro--FUNC",
-      "name": "FUNC(x, y)",
+      "name": "FUNC",
       "brief": "A function macro.",
       "doc": "",
       "member_type": "macro",
       "parent": "",
       "header": "file--macro-h",
       "group": "",
-      "deprecated": false
+      "deprecated": false,
+      "macro_params": [
+        "x",
+        "y"
+      ]
     }
   ],
   "headers": [

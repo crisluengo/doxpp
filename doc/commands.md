@@ -140,6 +140,9 @@ can co-exist, but only the first one encountered can set the `name` and `brief` 
 The documentation group can end with `\addtogroup`, in which case the group with ID `<name>`
 will become active.
 
+`\defgroup` is an alias for compatibility with Doxygen, even tough the command is used
+somewhat differently.
+
 See `grouping.md` for more information on grouping.
 
 ### `\macro <name>` (or `\def <name>`)
@@ -147,8 +150,15 @@ See `grouping.md` for more information on grouping.
 The only way of documenting preprocessor macros, as Clang doesn't report on the work of
 the preprocessor (well, it's possible, but it makes things a lot more complex).
 
-If you want to show the full definition of the macro, write about it in your documentation.
-We feel that usually it is not useful to show how a macro is defined.
+`<name>` can contain the argument list in parenthesis, but doesn't need to. For example:
+```cpp
+/// \macro FOO
+#define FOO(a)
+/// \macro BAR(b)
+# define BAR(b)
+```
+The backend has the option of showing `b` as the argument to macro `BAR`, but will not
+know anything about `a`, the argument to macro `FOO`.
 
 Because Clang doesn't report where the macro is defined, we take the file where this
 documentation block lives as the include file for the macro. Therefore, you should always
@@ -158,14 +168,14 @@ TODO: Maybe eventually `\headerfile` can be used to indicate which header the ma
 
 `\def` is an alias for compatibility with Doxygen.
 
-### `\mainpage [(title)]`
+### `\mainpage [<title>]`
 
-Creates a page with the ID `index`, and `(title)` as the page's title. This is the start page
+Creates a page with the ID `index`, and `<title>` as the page's title. This is the start page
 for the documentation. Text in this block is the page's text. See `\page` for more information.
 
-### `\name (header)`
+### `\name <header>`
 
-Creates a group for class or struct members.  The `(header)` text
+Creates a group for class or struct members.  The `<header>` text
 is used to label the group in the documentation. Each `\name` command closes the previous
 group and starts a new one. Use `\endname` to close off the group without starting a new one.
 
@@ -192,9 +202,9 @@ the fully qualified name of the matched namespace.
 
 Alternatively, provide the ID for the namespace.
 
-### `\page <name> (title)`
+### `\page <name> <title>`
 
-Creates a page with `<name>` as ID and `(title)` as the title. Text in this block is the page's text.
+Creates a page with `<name>` as ID and `<title>` as the title. Text in this block is the page's text.
 The page can be referenced by its ID.
 
 Use `\subpage` commands in a page to reference other pages and make those referenced pages sub-pages to
@@ -266,17 +276,17 @@ See `grouping.md` for more information on grouping.
 
 This command is expected to be on its own on a line.
 
-### `\ref <name> ["(text)"]`
+### `\ref <name> ["<text>"]` or `\ref "<name>" ["<text>"]`
 
 Creates a link to the entity (member, header, group or page) called `<name>`. Optionally,
-the link text can be set to `text`. If left out, the link text will be the tile of the page
+the link text can be set to `<text>`. If left out, the link text will be the tile of the page
 or the name of the member referenced.
 
 `<name>` will be looked up according to logical rules: in the documentation for `ns::foo`,
 `\ref bar` will see if `ns::foo::bar` exists, otherwise it will look for `ns::bar`, or
 finally `::bar`. If no match exists, `<name>` will be interpreted as an ID. Use the ID
 to link to a member, a header, a group, a page, a section or an anchor. If `<name>` does not
-match any IDs either, then `<name>` (or `(text)`) will be output without linking to anything.
+match any IDs either, then `<name>` (or `<text>`) will be output without linking to anything.
 In a page, always use the fully qualified name for members, or their ID.
 
 If `bar` is a function with multiple overloads, then `\ref bar` will match the first function with that name.
@@ -291,6 +301,16 @@ with a matching name and the fewest path elements prepended will be linked to. T
 if not given explicitly, is the header file name with path starting at the project root
 (as specified in the options).
 
+Quotes around `<name>` are also required if the member is a function that overloads an operator,
+since operators contain characters that are otherwise not seen as part of `<name>`. For example,
+`\ref operator==` will see the `==` as not being part of `<name>`, and will try to find a member
+called `operator` (which is an illegal member name, since it's a reserved keyword in C++). Instead,
+use `\ref "operator=="`.
+
+When using quotes around `<name>`, the space between the closing quotes and the opening quotes
+for `<text>` is mandatory. Two sequential quotes are considered part of an operator name,
+such as in `\ref "operator""_w"`. 
+
 ### `\relates <name>` or `\related <name>`
 
 Added to the documentation block of a function or variable, and with `<name>` referencing
@@ -302,18 +322,18 @@ in namespace members (including global scope).
 This command is expected to be on its own on a line. Each member can only have one `\relates`
 command.
 
-### `\section <name> (title)`
+### `\section <name> <title>`
 
 Starts a new section within a documentation block or a page. `<name>` is the ID that can
 be used with `\ref` to reference the section.
 
-This is replaced by the Markdown code `# (title) {#name}`. The `#` represents a level 1 heading,
+This is replaced by the Markdown code `# <title> {#name}`. The `#` represents a level 1 heading,
 but this will be demoted by the backend to be a lower level than the containing block.
 
 One can also directly write `# My Title {#my-title}`, but then the `\ref` command will not recognize
 `my-title` as something that can be referenced.
 
-### `\see <name> [, <name> [, ...]` or `\sa <name> [, <name> [, ...]`
+### `\see <name> [, <name> [, ...]` (`\sa` is an alias)
 
 Starts a paragraph with a "See also" header linking the given entities (members, headers, groups, pages).
 See `\ref` for how `<name>` is interpreted and disambiguated.
@@ -323,7 +343,7 @@ and optionally box the whole paragraph.
 
 This command is expected to be on its own on a line. Cannot occur inside the brief description.
 
-### `\subpage <name> ["(text)"]`
+### `\subpage <name> ["<text>"]`
 
 This is similar to `\ref`, but for pages. It can only occur inside a page (see `\page`).
 `\subpage <name>` creates a link to page `<name>` and additionally builds a hierarchy
@@ -334,15 +354,15 @@ a tree structure.
 
 The page called `index` (see `\mainpage`) should not be made a subpage of another page.
 
-`\subpage <name> "(text)"` uses `(text)` as the anchor text for the link.
+`\subpage <name> "<text>"` uses `<text>` as the anchor text for the link.
 
 To create links without creating hierarchical relations, use `\ref`.
 
-### `\subsection <name> (title)`
+### `\subsection <name> <title>`
 
 Like `\section`, but for a level 2 heading (`##` in Markdown).
 
-### `\subsubsection <name> (title)`
+### `\subsubsection <name> <title>`
 
 Like `\section`, but for a level 3 heading (`###` in Markdown).
 
@@ -386,7 +406,7 @@ documentation, file copyright notices, etc.
 
 - `\callergraph`
 - `\callgraph`
-- `\cond` / `\endcond` -> dude, just don't document if you don't want it documented...
+- `\cond` / `\endcond` -> use an `#ifdef` conditional compilation to exclude things from the documentation
 - `\hidecallergraph`
 - `\hidecallgraph`
 - `\hideinitializer` -> this is something that the backend can do
@@ -401,7 +421,7 @@ documentation, file copyright notices, etc.
 - `\showrefby`
 - `\showrefs`
 - `\weakgroup`
-- `\{` -> is implicit in dox++
+- `\{` -> we use `\addtogroup` instead
 - `\}` -> we use `\endgroup` instead
 
 ### All the stuff that is related to markup, which we delegate to the backend
