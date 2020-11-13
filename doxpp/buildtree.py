@@ -112,7 +112,7 @@ documentation_commands = {
     'alias': 'alias',
     'class': 'class',
     'def': 'macro',
-    'defgroup': 'defgroup',
+    'defgroup': 'group',
     'dir': 'dir',
     'endgroup': 'endgroup',
     'endname': 'endname',
@@ -120,6 +120,7 @@ documentation_commands = {
     'file': 'file',
     'fn': 'function',
     'function': 'function',
+    'group': 'group',
     'macro': 'macro',
     'mainpage': 'mainpage',
     'name': 'name',
@@ -841,23 +842,30 @@ def process_grouping_command(cmd, args, doc, loc, status: Status):
     # Returns True if the command was processed, false otherwise.
     #
     # Grouping commands work differently than in Doxygen:
-    # \defgroup defines a group.
+    # \group defines a group.
     # \addtogroup makes subsequent definitions fall within the group.
     # \endgroup stops the current group.
     # Defining a group within a group causes nested groups. Also adding \ingroup to the group's
     # documentation causes it to be nested.
-    # \name and \endname work similarly, but only inside a class or struct definition.
-    if cmd == 'defgroup':
+    # \name and \endname open and close a class member group, they can appear anywhere but they
+    # only have an effect on class (or struct) members.
+    if cmd == 'group':
         id, name = split_string(args.strip())
         if not id or not name:
-            log.error("\\defgroup needs a name and a title\n   in file %s", status.current_header_name)
+            log.error("\\group needs a name and a title\n   in file %s", status.current_header_name)
             return True
         if not unique_id.is_valid(id):
-            log.error("\\defgroup has invalid name '%s', ignored.\n   in file %s", id, status.current_header_name)
+            log.error("\\group has invalid name '%s', ignored.\n   in file %s", id, status.current_header_name)
             return True
         parent_group, doc = find_ingroup_cmd(doc)
+        has_ingroup = True
         if not parent_group:
             parent_group = status.current_group[-1]
+            has_ingroup = False
+        open_group = False
+        if doc.endswith('\\addtogroup'):
+            open_group = True
+            doc = doc[:-len('\\addtogroup')].strip()
         brief, doc = separate_brief(doc)
         doc = find_anchor_cmds(doc, status)
         if id not in status.groups:
@@ -868,7 +876,9 @@ def process_grouping_command(cmd, args, doc, loc, status: Status):
             if not group['name']:
                 group['name'] = name
             if group['parent']:
-                parent_group = ''  # ignore the parent group chosen here. TODO: if \ingroup was given, we should print a warning
+                if has_ingroup and parent_group != group['parent']:
+                    log.warning("\\ingroup command ignored, group %s already has a parent.\n   in file %s", id, status.current_header_name)
+                parent_group = ''  # ignore the parent group chosen here.
             else:
                 group['parent'] = parent_group
             add_doc(group, brief, doc)
@@ -881,6 +891,9 @@ def process_grouping_command(cmd, args, doc, loc, status: Status):
                 status.data['groups'].append(group)
             if group['subgroups'].count(id) == 0:  # add group only once
                 group['subgroups'].append(id)
+        if open_group:
+            status.current_group.append(id)
+            status.group_locations.append((loc, id))
         return True
     if cmd == 'addtogroup':
         id, name = split_string(args)

@@ -11,9 +11,11 @@ Note that we try to keep compatibility with Doxygen, but chose to make some chan
 2. Documenting a preprocessor macro with `\def` (new better name: `\macro`) must always
    carry the macro name. Clang doesn't preserve preprocessor directives in its AST.
 
-3. Grouping has changed: We don't recognize `\{` and `\}`. Instead, `\addtogroup`
-   implies the opening `\{`. The closing `\}` must be replaced by `\endgroup`.
-   Furthermore, groups are disjoint, each member can only belong to one group.
+3. Grouping has improved, but this comes with some syntax changes.
+   We don't recognize `\{` and `\}`. Instead, use `\addtogroup` instead of the opening `\{`,
+   and `\endgroup` instead of the closing `\}`. `\defgroup` is still recognized, but works
+   the same way as `\group`, which is not exactly the same way that `\defgroup` works in
+   Doxygen. Furthermore, groups are disjoint, each member can only belong to one group.
 
 4. There is no "autolink", all member names must be preceded by the `\ref` command
    to create a link to the member documentation. `\ref` is used to link to anything
@@ -37,9 +39,12 @@ with one of these commands, otherwise it will be associated to the next declarat
 
 ### `\addtogroup <name>`
 
-Sets `id` as the active group. If the group is not defined, a new group will be created
-with no name and no documentation. Use `\defgroup` to name and document the group.
+Sets `<name>` as the active group. If the group is not defined, a new group will be created
+with no name and no documentation. Use `\group` to name and document the group.
 Must be matched by a `endgroup`.
+
+`\addtogroup` can also be used at the end of a `\group` documentation block. In this
+case it must not have a `<name>` parameter.
 
 See `grouping.md` for more information on grouping.
 
@@ -64,24 +69,6 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 `<name>` is not the fully qualified name of the matched class.
 
 Alternatively, provide the ID for the class.
-
-### `\defgroup <name> [<title>]`
-
-Documents a group.
-
-`id` is the unique identifier for the group.
-
-`name` is the name for the group, everything after the `id` and until the first newline
-is considered the `name`.
-
-The remainder of the comment block is the documentation, the first line being the "brief"
-string.
-
-A second `\defgroup` encountered with the same `id` will add documentation to the group,
-but the `name` and `brief` string will be ignored. Thus, multiple `\defgroup` commands
-can co-exist, but only the first one encountered can set the `name` and `brief` strings.
-
-See `grouping.md` for more information on grouping.
 
 ### `\dir [<path fragment>]`
 
@@ -133,6 +120,27 @@ To disambiguate overloaded functions, provide in `<name>` the argument list type
 Alternatively, provide the ID for the function.
 
 `\fn` is an alias for compatibility with Doxygen.
+
+### `\group <name> [<title>]` (`\defgroup` is an alias)
+
+Documents a group.
+
+`<name>` is the unique identifier for the group.
+
+`<title>` is the title for the group, everything after the `<name>` and until the first newline
+is considered the title.
+
+The remainder of the comment block is the documentation, the first line being the "brief"
+string.
+
+A second `\group` command encountered with the same `id` will add documentation to the group,
+but the `name` and `brief` string will be ignored. Thus, multiple `\group` commands
+can co-exist, but only the first one encountered can set the `name` and `brief` strings.
+
+The documentation group can end with `\addtogroup`, in which case the group with ID `<name>`
+will become active.
+
+See `grouping.md` for more information on grouping.
 
 ### `\macro <name>` (or `\def <name>`)
 
@@ -252,10 +260,9 @@ int foo;
 If this appears in the comment block for a namespace member, the member will become part of the
 group listed. It can also appear in the comment block of a group, to nest groups.
 
-`\ingroup` overrules the group name of the enclosing `\defgroup`/`\endgroup` or
-`\addtogroup`/`\endgroup`.
+`\ingroup` overrules the group name of the enclosing `\addtogroup`/`\endgroup`.
 
-See `\defgroup` for more information on grouping.
+See `grouping.md` for more information on grouping.
 
 This command is expected to be on its own on a line.
 

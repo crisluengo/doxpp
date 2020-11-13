@@ -12,8 +12,9 @@ so this file is even better when combined with other files that define derived
 classes.
 */
 
-/// \defgroup bikes Bicycle types
+/// \group bikes Bicycle types
 /// A group of classes representing various bicycle types
+/// \addtogroup
 
 /// \macro FOOBAR(a,b)
 /// A macro!
@@ -24,8 +25,9 @@ classes.
 namespace transport
 {
 
-   /// \defgroup types Types used by bicycles
+   /// \group types Types used by bicycles
    /// Stuff in this group is silly
+   /// \addtogroup
 
    /// A string
    using str = std::string;

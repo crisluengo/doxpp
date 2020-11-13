@@ -12,8 +12,9 @@
 namespace transport
 {
 
-   /// \defgroup all-terrain All-terrain bicycles
+   /// \group all-terrain All-terrain bicycles
    /// A group of classes representing bicycle types that can go off-road
+   /// \addtogroup
 
    /** Mountain bike implementation of a \ref Bicycle.
     *

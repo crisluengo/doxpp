@@ -1,12 +1,10 @@
-/// \defgroup base A group
-
-/// \addtogroup base
+/// \group base A group
+/// \addtogroup
 
 int var1_in_base;
 
 /// \defgroup group1 A sub-group
-
-/// \addtogroup group1
+/// \addtogroup
 
 int var1_in_group1;
 
@@ -22,10 +20,9 @@ int var2_in_base;
 int var2_in_group1;
 
 
-/// \defgroup group2 Another sub-group
+/// \group group2 Another sub-group
 /// \ingroup base
-
-/// \addtogroup group2
+/// \addtogroup
 
 int var1_in_group2;
 
