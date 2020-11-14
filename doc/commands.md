@@ -307,6 +307,11 @@ since operators contain characters that are otherwise not seen as part of `<name
 called `operator` (which is an illegal member name, since it's a reserved keyword in C++). Instead,
 use `\ref "operator=="`.
 
+Finally, if a link must be immediately followed by a character that is considered part of `<name>`
+by the parser, one can use quotes to disambiguate: `\ref foo--` would try to match "`foo--`" (maybe
+as the ID of a function), whereas `\ref "foo"--` will correctly match "`foo`" and put two dashes
+after the link.
+
 When using quotes around `<name>`, the space between the closing quotes and the opening quotes
 for `<text>` is mandatory. Two sequential quotes are considered part of an operator name,
 such as in `\ref "operator""_w"`. 

@@ -586,9 +586,9 @@ def post_process_inheritance(members):
                 else:
                     base['type'] = name
 
-ref_cmd_match = re.compile(r'[\\@]ref +((?:\w|:|%|-)+(?: *\(.*?\))?)(?: +"(.*?)")?')
+ref_cmd_match = re.compile(r'[\\@]ref +((?:\w|::|%|-)+(?: *\(.*?\))?)(?: +"(.*?)")?')
 ref_cmd_quotes_match = re.compile(r'[\\@]ref +"((?:[^"]|"")+)"(?: +"(.*?)")?')
-see_cmd_match = re.compile(r'^ *[\\@](?:see|sa) +(.+?) *$', re.MULTILINE)
+see_cmd_match = re.compile(r'^ *[\\@](?:see|sa) +(.+?) *$', re.MULTILINE)  # TODO: multiline `\see`?
 see_arg_match = re.compile(r'([^,(]+(?:\(.*?\))?)')  # Split \see command arguments
 
 def post_process_links(elements, status: Status):
@@ -639,16 +639,13 @@ def post_process_links(elements, status: Status):
             return '[{}](#{})'.format(text, id)
 
         def find_and_format_quotes_name(name, text):
-            # For matches of member or header name, when given quotes
-            id, text = find_if_member(name, text)
-            if not id:
-                id = find_file(name, status.headers)
-                if not id:
-                    log.error("Reference to '%s' could not be matched.\n   in documentation for %s", name, elem['id'])
-                    return name
+            # For matches of header name, member name, or any ID, when given in quotes
+            id = find_file(name, status.headers)
+            if id:
                 if not text:
                     text = status.headers[id]['name']
-            return '[{}](#{})'.format(text, id)
+                return '[{}](#{})'.format(text, id)
+            return find_and_format_name(name, text)
 
         def ref_cmd_replace(match):
             return find_and_format_name(match[1], match[2])
@@ -1297,8 +1294,8 @@ def extract_declarations(citer, parent, status: Status):
                     if semantic_parent in status.member_ids:
                         semantic_parent = status.member_ids[semantic_parent]
                     else:
-                        log.error("USR of semantic parent for %s was unknown, ignoring member.\n   in file %s",
-                                  item.displayname, status.current_header_name)
+                        log.warning("USR of semantic parent for %s was unknown, ignoring member.\n   in file %s",
+                                    item.displayname, status.current_header_name)
                         # This seems to happen in template specializations.
                         # It also also when a class member definition is in a header file that is not the
                         # header file where the class is defined, and that header file is processed first, such
