@@ -15,5 +15,6 @@
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from . import log
+from . import config
 from . import buildtree
 from . import walktree

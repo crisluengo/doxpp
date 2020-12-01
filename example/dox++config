@@ -1,16 +1,19 @@
 # dox++ configuration file for the 'transport' example project
+
+[clang]
+compiler flags = -xc++ -std=c++14
+include directories =
+
+[log]
+level = debug
+
 [input]
 root directory = .
 header files = transport/*.h
 markdown files = transport/*.md
 tab size = 3
 
-[output]
+[json]
 filename = transport.json
 use typewriter font = yes
-log level = info
-json formatting = readable
-
-[clang]
-compiler flags = -xc++ -std=c++14
-include directories =
+formatting = readable

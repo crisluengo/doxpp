@@ -17,34 +17,10 @@
 # this program; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import argparse, configparser
+import argparse
 import json
 import doxpp
 
-
-def generate_config_file(filename):
-    config = configparser.ConfigParser()
-    config['input'] = {
-        'root directory': '.',        # the include path recorded for header files will be relative to this
-        'header files': '*.h *.hpp',  # do give a path here, relative to working directory, for example: '*.h lib/*.h'
-        'markdown files': '*.md',     # additional files to read
-        'tab size': '4'               # size of a TAB character
-    }
-    config['output'] = {
-        'filename': 'dox++out.json',
-        'use typewriter font': 'no',  # 'yes' or 'no', the Markdown output uses backticks (code formatting) around type names
-        'log level': 'warning',       # 'error', 'warning', 'info' or 'debug'
-        'json formatting': 'compact'  # 'compact' or 'readable'
-    }
-    config['clang'] = {
-        'compiler flags': '',         # could be '-std=c++11', for example
-        'include directories': '',    # make these space-separated
-    }
-    with open(filename, 'w') as configfile:
-        configfile.write('# Default dox++ configuration file\n')
-        config.write(configfile)
-
-# Main
 
 parser = argparse.ArgumentParser(description='Clang based documentation generator.')
 parser.add_argument('-g', action='store_true', help='generate a default configuration file')
@@ -53,26 +29,20 @@ args = parser.parse_args()
 
 # Generate configuration file if requested, then quit
 if args.g:
-    generate_config_file(args.config_file)
+    doxpp.config.generate(args.config_file)
     exit(0)
 
-# Read configuration file, ensure all sections are present
-config = configparser.ConfigParser()
-config.read(args.config_file)
-if not 'input' in config:
-    config['input'] = {}
-if not 'output' in config:
-    config['output'] = {}
-if not 'clang' in config:
-    config['clang'] = {}
+# Processing options
+config = doxpp.config.read(args.config_file)
 
-doxpp.log.setLevel(config['output'].get('log level', 'warning'))  # the default value
+doxpp.log.setLevel(config['log'].get('level', 'warning'))  # the default value
 
 options = {
-    'code_formatting': config['output'].get('use typewriter font', 'no'),
+    'code_formatting': config['json'].get('use typewriter font', 'no'),
     'tab_size': int(config['input'].get('tab size','4'))
 }
 
+# Process files
 data = doxpp.buildtree.buildtree(
     config['input'].get('root directory', '.'),
     config['input'].get('header files', '*.h *.hpp'),
@@ -82,8 +52,9 @@ data = doxpp.buildtree.buildtree(
     options
 )
 
-filename = config['output'].get('filename', 'dox++out.json')
-if config['output'].get('json formatting', 'compact') == 'readable':
+# Write JSON file
+filename = config['json'].get('filename', 'dox++out.json')
+if config['json'].get('formatting', 'compact') == 'readable':
     format = {'indent': 2}
 else:
     format = {'separators': (',', ':')}
