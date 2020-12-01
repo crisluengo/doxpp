@@ -364,7 +364,8 @@ def parse_function_arguments(arg_list, start_id, members):
         if len(parts) > 1 and parts[0] == 'const':
             parts[0], parts[1] = parts[1], parts[0]  # Move the 'const' to after the type
         id = find_member(parts[0], start_id, members)
-        parts[0] = walktree.get_fully_qualified_name(id, members)
+        if id:
+            parts[0] = walktree.get_fully_qualified_name(id, members)
         arguments.append({
             'typename': parts[0],
             'qualifiers': parts[1:]
