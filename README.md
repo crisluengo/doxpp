@@ -25,7 +25,11 @@ additional pages. It links references to members across the project.
 Typesetting, creating indices, etc. is left to the generator (or back-end), which keeps
 the program simple.
 
-**TODO** Eventually we'll have several generators here, to produce HTML output, PDF, whatever.
+**dox++generate** produces a series of HTML files documenting the project, using the
+JSON created by dox++parse.
+
+**TODO** Eventually we'll have other generators here, for example to generate PDF through
+Pandoc.
 
 
 # How code is parsed and documented

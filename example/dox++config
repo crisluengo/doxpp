@@ -17,3 +17,6 @@ tab size = 3
 filename = transport.json
 use typewriter font = yes
 formatting = readable
+
+[html]
+output directory = html

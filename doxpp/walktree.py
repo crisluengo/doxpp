@@ -63,6 +63,18 @@ def create_member_dict(members):
     create_member_dict_recursive(members, output)
     return output
 
+def create_element_dict(elements):
+    """
+    Creates a dictionary that maps IDs to the data. Can be used for headers,
+    groups or pages. For members, use `create_member_dict`.
+    :param elements: data read in from the JSON file.
+    :return: dictionary.
+    """
+    output = {}
+    for element in elements:
+        output[element['id']] = element
+    return output
+
 # --- load_data_from_json_file ---
 
 def load_data_from_json_file(filename):

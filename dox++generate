@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 # dox++
 # Copyright 2020, Cris Luengo
 #
@@ -14,7 +16,29 @@
 # this program; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from . import log
-from . import config
-from . import buildtree
-from . import createhtml
+import argparse
+import os
+import doxpp
+
+
+parser = argparse.ArgumentParser(description='dox++, C++ documentation, back-end generator.')
+parser.add_argument('config_file', nargs='?', default='dox++config', help='name of the configuration file')
+args = parser.parse_args()
+
+# Processing options
+config = doxpp.config.read(args.config_file)
+
+doxpp.log.setLevel(config['log'].get('level', 'warning'))  # the default value
+
+options = {
+}
+
+outdir = config['html'].get('output directory', '')
+os.makedirs(outdir, exist_ok=True)
+
+# Generate HTML
+data = doxpp.createhtml.createhtml(
+    config['json'].get('filename', 'dox++out.json'),
+    outdir,
+    options
+)

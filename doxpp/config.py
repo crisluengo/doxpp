@@ -37,6 +37,9 @@ def generate(filename):
         'use typewriter font': 'no',  # 'yes' or 'no', the Markdown output uses backticks (code formatting) around type names
         'formatting': 'compact'       # 'compact' or 'readable'
     }
+    config['html'] = {
+        'output directory' : 'html'   # the directory where the HTML output is generated
+    }
     with open(filename, 'w') as configfile:
         configfile.write('# Default dox++ configuration file\n\n')
         config.write(configfile)

@@ -22,7 +22,7 @@ import json
 import doxpp
 
 
-parser = argparse.ArgumentParser(description='Clang based documentation generator.')
+parser = argparse.ArgumentParser(description='dox++, C++ documentation, front-end parser.')
 parser.add_argument('-g', action='store_true', help='generate a default configuration file')
 parser.add_argument('config_file', nargs='?', default='dox++config', help='name of the configuration file')
 args = parser.parse_args()
