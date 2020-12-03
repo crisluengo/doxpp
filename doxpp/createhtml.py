@@ -14,6 +14,7 @@
 # this program; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import os
 import markdown
 
 from . import log
@@ -52,42 +53,108 @@ class Status:
         # This dictionary links each unique ID to a page where it can be found.
         # To link to an ID, link to "<page>.html#<ID>", unless page==ID, in which case
         # it suffices to link to "<page>.html".
+        # Items not in here are not documented.
         self.id_map = {}
 
-        self.html_pages = set()
+        # This dictionary links each page to the things that will be listed there (with or without
+        # detailed documentation). Things can be listed on multiple pages.
+        self.html_pages_index = {}
+
+        # This dictionary links each page to the things that will be documented there (with or without
+        # detailed documentation). Things are documented in only one page. This is the inverse of `id_map`.
+        self.html_pages_detailed = {}
+
+
+def list_item_on_page(item, page, status: Status):
+    if page not in status.html_pages_index:
+        status.html_pages_index[page] = set()
+    status.html_pages_index[page].add(item)
+
+
+def document_item_on_page(item, page, status: Status):
+    status.id_map[item] = page
+    if page not in status.html_pages_detailed:
+        status.html_pages_detailed[page] = set()
+    status.html_pages_detailed[page].add(item)
+    list_item_on_page(item, page, status)
 
 
 def assign_page(status: Status):
+    # All header files and groups will have a page, whether they're documented or not
+    for header in status.headers.values():
+        html_page = header['id']
+        status.id_map[html_page] = html_page
+        status.html_pages_index[html_page] = set()
+    for group in status.groups.values():
+        html_page = group['id']
+        status.id_map[html_page] = html_page
+        status.html_pages_index[html_page] = set()
+        for child in group['subgroups']:
+            # Subgroups listed in parent group's page
+            list_item_on_page(child, html_page, status)
+    # All members with at least brief docs will be shown:
     # - If it is a class/struct member, it goes in the class/struct page
     # - If it has a group name, it goes in the group page
     # - If it is in a namespace, it goes in the namespace page
     # - Otherwise it goes in the header page
     for member in status.members.values():
-        if not member['id']:
+        id = member['id']
+        if not id:
             # This is the "root" member
             continue
         if member['member_type'] == 'enumvalue':
             # These are added to the page that their parent is in. Because of the way we generate the members list,
-            # the parent has already been processed
-            html_page = status.id_map[member['parent']]
-        elif member['member_type'] in ['class', 'struct', 'namespace']:
-            # class, struct and namespace go in their own page
-            html_page = member['id']
+            # the parent has already been processed. This is shown in the documentation even if not documented,
+            # as long as the parent is.
+            if status.members[member['parent']]['brief']:
+                document_item_on_page(id, status.id_map[member['parent']], status)
+            continue
+        if not member['brief']:
+            # Undocumented, ignore
+            continue
+        if member['member_type'] in ['class', 'struct', 'namespace']:
+            # Class, struct and namespace go in their own page
+            html_page = id
         elif member['parent'] and status.members[member['parent']]['member_type'] in ['class', 'struct']:
-            # class or struct members go in the class/struct page
-            html_page = member['parent']
+            # Class or struct members go in the class/struct page
+            document_item_on_page(id, member['parent'], status)
+            # Don't list anywhere else
+            continue
         elif member['group']:
-            # otherwise, if group member, go in the group page
+            # Otherwise, if group member, go in the group page
             html_page = member['group']
         elif member['parent']:
-            # otherwise, if namespace member, go in the namespace page
+            # Otherwise, if namespace member, go in the namespace page
             html_page = member['parent']
         else:
-            # otherwise, go in the header page
+            # Otherwise, go in the header page
             html_page = member['header']
-        print(member['id'], html_page)
-        status.id_map[member['id']] = html_page
-        status.html_pages.add(html_page)
+        document_item_on_page(id, html_page, status)
+        # Additionally, they're listed in the group page, the namespace page and the header page
+        list_item_on_page(id, member['header'], status)
+        if member['group']:
+            list_item_on_page(id, member['group'], status)
+        if member['parent'] and status.members[member['parent']]['member_type'] == 'namespace':
+            list_item_on_page(id, member['parent'], status)
+
+
+def generate_member_page(page, status: Status):
+    # Generate the index with brief documentation (parsed by Markdown)
+    # Add the corresponding detailed documentation (parsed by Markdown)
+    # TODO
+    return ''
+
+
+def generate_page_page(page, status: Status):
+    # Add documentation (parsed by Markdown)
+    # TODO
+    return ''
+
+
+def fix_links(html, status: Status):
+    # Fix links in HTML document to point to the right page
+    # TODO
+    return html
 
 
 def createhtml(input_file, output_dir, options):
@@ -105,19 +172,30 @@ def createhtml(input_file, output_dir, options):
     # Load data
     status = Status(walktree.load_data_from_json_file(input_file))
 
-    # Find out in which page the detailed documentation for each member has to go
+    # Find out which pages to create, what is listed in each, and in which page
+    # the detailed documentation for each member has to go
     assign_page(status)
-    print(status.html_pages)
+    #print('\n\nhtml_pages_index', status.html_pages_index)
+    #print('\n\nhtml_pages_detailed', status.html_pages_detailed)
+    #print('\n\nid_map', status.id_map)
 
     # Generate the pages
-    # - For each element in `status.html_pages`:
-    #   - Generate the index with brief documentation (parsed by Markdown)
-    #   - Add the corresponding detailed documentation (parsed by Markdown)
-    #   - Fix links to point to the right page
-    # - For each element in `status.pages`:
-    #   - Add documentation (parsed by Markdown)
-    #   - Fix links to point to the right page
+    for page in status.html_pages_index.keys():
+        html = generate_member_page(page, status)
+        html = fix_links(html, status)
+        with open(os.path.join(output_dir, page + '.html'), 'w') as file:
+            file.write(html)
+    for page in status.pages.values():
+        html = generate_page_page(page, status)
+        html = fix_links(html, status)
+        with open(os.path.join(output_dir, page['id'] + '.html'), 'w') as file:
+            file.write(html)
+    if 'index' not in status.pages:
+        # TODO: create an index
+        pass
 
     # Generate indexes for pages, groups (==modules), namespaces/classes/structs (==classes), and headers
+    # TODO
 
     # Generate search data
+    # TODO
