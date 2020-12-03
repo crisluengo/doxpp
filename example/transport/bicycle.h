@@ -68,8 +68,7 @@ namespace transport
       int id; ///< Something to identify a bike by
    };
 
-   // Some forward declaration. If we document it here, we won't see the documentation
-   // in `mountainbike.h` because this file is processed earlier.
+   // Some forward declaration. This should be ignored.
    class MountainBike;
 }
 

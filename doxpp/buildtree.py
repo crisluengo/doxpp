@@ -1437,6 +1437,9 @@ def extract_declarations(citer, parent, status: Status):
             process_children = False
             member['deprecated'] = item.availability == cindex.AvailabilityKind.DEPRECATED
             if member_type in ['class', 'struct']:
+                if not item.is_definition():
+                    # This is a forward declaration, let's skip it
+                    continue
                 member['templated'] = is_template
                 member['bases'] = []
                 member['derived'] = []
