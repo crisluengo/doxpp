@@ -43,12 +43,18 @@
               "access": "public",
               "constexpr": false,
               "method_type": "method",
-              "return_type": "`bool`",
+              "return_type": {
+                "typename": "bool",
+                "qualifiers": "",
+                "id": ""
+              },
               "arguments": [
                 {
+                  "typename": "N::A",
+                  "qualifiers": "const&",
                   "name": "other",
                   "default": null,
-                  "type": "[`N::A`](#N-A) `const&`"
+                  "id": "N-A"
                 }
               ]
             },
@@ -70,7 +76,11 @@
               "access": "public",
               "constexpr": false,
               "method_type": "conversionfunction",
-              "return_type": "`int``*`",
+              "return_type": {
+                "typename": "int",
+                "qualifiers": "*",
+                "id": ""
+              },
               "arguments": []
             }
           ],
@@ -88,17 +98,25 @@
           "deprecated": false,
           "templated": false,
           "constexpr": false,
-          "return_type": "`bool`",
+          "return_type": {
+            "typename": "bool",
+            "qualifiers": "",
+            "id": ""
+          },
           "arguments": [
             {
+              "typename": "N::A",
+              "qualifiers": "const&",
               "name": "a",
               "default": null,
-              "type": "[`N::A`](#N-A) `const&`"
+              "id": "N-A"
             },
             {
+              "typename": "N::A",
+              "qualifiers": "const&",
               "name": "b",
               "default": null,
-              "type": "[`N::A`](#N-A) `const&`"
+              "id": "N-A"
             }
           ]
         },
@@ -114,12 +132,18 @@
           "deprecated": false,
           "templated": false,
           "constexpr": false,
-          "return_type": "[`N::A`](#N-A)",
+          "return_type": {
+            "typename": "N::A",
+            "qualifiers": "",
+            "id": "N-A"
+          },
           "arguments": [
             {
+              "typename": "long double",
+              "qualifiers": "",
               "name": "",
               "default": null,
-              "type": "`long double`"
+              "id": ""
             }
           ]
         }
@@ -137,12 +161,18 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
-      "return_type": "`void``*`",
+      "return_type": {
+        "typename": "void",
+        "qualifiers": "*",
+        "id": ""
+      },
       "arguments": [
         {
+          "typename": "size_t",
+          "qualifiers": "",
           "name": "",
           "default": null,
-          "type": "`size_t`"
+          "id": ""
         }
       ]
     },
@@ -158,12 +188,18 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
-      "return_type": "`void``*`",
+      "return_type": {
+        "typename": "void",
+        "qualifiers": "*",
+        "id": ""
+      },
       "arguments": [
         {
+          "typename": "size_t",
+          "qualifiers": "",
           "name": "",
           "default": null,
-          "type": "`size_t`"
+          "id": ""
         }
       ]
     },
@@ -179,12 +215,18 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
-      "return_type": "`void`",
+      "return_type": {
+        "typename": "void",
+        "qualifiers": "",
+        "id": ""
+      },
       "arguments": [
         {
+          "typename": "void",
+          "qualifiers": "*",
           "name": "",
           "default": null,
-          "type": "`void``*`"
+          "id": ""
         }
       ]
     },
@@ -200,12 +242,18 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
-      "return_type": "`void`",
+      "return_type": {
+        "typename": "void",
+        "qualifiers": "",
+        "id": ""
+      },
       "arguments": [
         {
+          "typename": "void",
+          "qualifiers": "*",
           "name": "",
           "default": null,
-          "type": "`void``*`"
+          "id": ""
         }
       ]
     }

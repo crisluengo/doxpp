@@ -12,7 +12,11 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
-      "return_type": "`std::basic_string<char> > >`",
+      "return_type": {
+        "typename": "std::basic_string<char> > >",
+        "qualifiers": "",
+        "id": ""
+      },
       "arguments": []
     },
     {
@@ -39,7 +43,11 @@
           "header": "file--templatereference-h",
           "group": "",
           "deprecated": false,
-          "type": "`T`"
+          "type": {
+            "typename": "T",
+            "qualifiers": "",
+            "id": ""
+          }
         }
       ],
       "related": [],
@@ -61,7 +69,11 @@
       "header": "file--templatereference-h",
       "group": "",
       "deprecated": false,
-      "type": "`std::allocator<int> >`"
+      "type": {
+        "typename": "std::allocator<int> >",
+        "qualifiers": "",
+        "id": ""
+      }
     }
   ],
   "headers": [

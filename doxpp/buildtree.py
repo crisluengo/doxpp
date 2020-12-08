@@ -94,7 +94,7 @@ type_kind_to_name_map = {
     cindex.TypeKind.FLOAT: 'float',
     cindex.TypeKind.DOUBLE: 'double',
     cindex.TypeKind.LONGDOUBLE: 'long double',
-    cindex.TypeKind.NULLPTR: 'nullptr_t',
+    cindex.TypeKind.NULLPTR: 'std::nullptr_t',
 }
 
 access_specifier_map = {
@@ -368,7 +368,7 @@ def parse_function_arguments(arg_list, start_id, members):
             parts[0] = walktree.get_fully_qualified_name(id, members)
         arguments.append({
             'typename': parts[0],
-            'qualifiers': parts[1:]
+            'qualifiers': ''.join(parts[1:])
         })
     return arguments
 
@@ -451,14 +451,16 @@ def find_member(name, start_id, members):
             name = ('operator' + part).strip()
         if args:
             function_params = parse_function_arguments(args.split(','), start_id, members)
-    else:
-        if '(' in name:
-            match = split_function_args.fullmatch(name)
-            if not match:
-                log.error('Cannot parse "%s" as member name', name)
-                return ''
-            name = match[1]
-            function_params = parse_function_arguments(match[2].split(','), start_id, members)
+    elif '(' in name:
+        match = split_function_args.fullmatch(name)
+        if not match:
+            log.error('Cannot parse "%s" as member name', name)
+            return ''
+        name = match[1]
+        function_params = parse_function_arguments(match[2].split(','), start_id, members)
+    elif name in type_kind_to_name_map.values():
+        # Ignore standard types
+        return ''
     names = name.split('::')  # TODO: This goes wrong with `operator ns::type`.
     if not names:
         return ''
@@ -492,27 +494,11 @@ def find_file(name, headers):
 
 # --- Post-process documentation to add links ---
 
-def markup_for_type_dict(type, template_params, members):
-    name = type['typename']
-    if name in template_params:
-        id = ''
+def get_type_id_or_empty_string(type, template_params, members):
+    if type['typename'] in template_params:
+        return ''
     else:
-        id = find_member(name, '', members)
-    if code_formatting:
-        name = '`{}`'.format(name)
-    if id:
-        name = '[{}](#{})'.format(name, id)
-    qualifiers = ''.join(type['qualifiers'])
-    if qualifiers:
-        if code_formatting:
-            qualifiers = '`{}`'.format(qualifiers)
-        if qualifiers[1].isalpha():  # == 'c' really, there's no other possible letter here
-            # We need a space in between the type name and the 'const' qualifier
-            name = name + ' ' + qualifiers
-        else:
-            # We don't want a space between the type name and the '&' or '*' or '[]' qualifiers
-            name = name + qualifiers
-    return name
+        return find_member(type['typename'], '', members)
 
 def collect_template_params(member, template_params, members):
     # Recurse through `member` and its ancestors, noting any template parameter names they have
@@ -524,45 +510,39 @@ def collect_template_params(member, template_params, members):
         collect_template_params(members[member['parent']], template_params, members)
 
 def post_process_types(members):
-    # Convert 'type' dicts to a string with optional Markdown link to the type's documentation
+    # Add 'id' member to 'type' dicts
     for member in members.values():
         template_params = set()
         collect_template_params(member, template_params, members)
         if 'type' in member and isinstance(member['type'], dict):
-            member['type']['string'] = markup_for_type_dict(member['type'], template_params, members)
+            member['type']['id'] = get_type_id_or_empty_string(member['type'], template_params, members)
         if 'return_type' in member and isinstance(member['return_type'], dict):
-            member['return_type']['string'] = markup_for_type_dict(member['return_type'], template_params, members)
+            member['return_type']['id'] = get_type_id_or_empty_string(member['return_type'], template_params, members)
         if 'arguments' in member:
             for arg in member['arguments']:
-                arg['string'] = markup_for_type_dict(arg, template_params, members)
-                # arg.pop('typename')
-                # arg.pop('qualifiers')
+                arg['id'] = get_type_id_or_empty_string(arg, template_params, members)
         if 'template_parameters' in member:
             for arg in member['template_parameters']:
                 if isinstance(arg['default'], dict):
-                    arg['default']['string'] = markup_for_type_dict(arg['default'], template_params, members)
+                    arg['default']['id'] = get_type_id_or_empty_string(arg['default'], template_params, members)
                 elif isinstance(arg['type'], dict):
-                    arg['type']['string'] = markup_for_type_dict(arg['type'], template_params, members)
+                    arg['type']['id'] = get_type_id_or_empty_string(arg['type'], template_params, members)
 
-def cleanup_types(members):
-    # Replace 'type' dicts with their 'string' element.
-    for member in members.values():
-        if 'type' in member and isinstance(member['type'], dict):
-            member['type'] = member['type']['string']
-        if 'return_type' in member and isinstance(member['return_type'], dict):
-            member['return_type'] = member['return_type']['string']
-        if 'arguments' in member:
-            for arg in member['arguments']:
-                arg['type'] = arg['string']
-                arg.pop('typename')
-                arg.pop('qualifiers')
-                arg.pop('string')
-        if 'template_parameters' in member:
-            for arg in member['template_parameters']:
-                if isinstance(arg['default'], dict):
-                    arg['default'] = arg['default']['string']
-                elif isinstance(arg['type'], dict):
-                    arg['type'] = arg['type']['string']
+def cleanup_qualifiers(member):
+    # Replace 'qualifiers' member in 'type' dicts with a string
+    if 'type' in member and isinstance(member['type'], dict):
+        member['type']['qualifiers'] = ''.join(member['type']['qualifiers'])
+    if 'return_type' in member and isinstance(member['return_type'], dict):
+        member['return_type']['qualifiers'] = ''.join(member['return_type']['qualifiers'])
+    if 'arguments' in member:
+        for arg in member['arguments']:
+            arg['qualifiers'] = ''.join(arg['qualifiers'])
+    if 'template_parameters' in member:
+        for arg in member['template_parameters']:
+            if isinstance(arg['default'], dict):
+                arg['default']['qualifiers'] = ''.join(arg['default']['qualifiers'])
+            elif isinstance(arg['type'], dict):
+                arg['type']['qualifiers'] = ''.join(arg['type']['qualifiers'])
 
 def post_process_inheritance(members):
     # - add links to base and derived classes
@@ -575,17 +555,13 @@ def post_process_inheritance(members):
     for member in members.values():
         if 'bases' in member:
             for base in member['bases']:
-                name = base['type']
+                name = base['typename']
                 id = find_member(name, '', members)
-                if code_formatting:
-                    name = '`{}`'.format(name)
                 if id:
-                    base['type'] = '[{}](#{})'.format(name, id)
+                    base['id'] = id
                     base_member = members[id]
                     base_member['derived'].append(member['id'])
                     # TODO: find virtual functions in base class that are overridden in derived class
-                else:
-                    base['type'] = name
 
 ref_cmd_match = re.compile(r'[\\@]ref +((?:\w|::|%|-)+(?: *\(.*?\))?)(?: +"(.*?)")?')
 ref_cmd_quotes_match = re.compile(r'[\\@]ref +"((?:[^"]|"")+)"(?: +"(.*?)")?')
@@ -1324,7 +1300,7 @@ def extract_declarations(citer, parent, status: Status):
                 type = process_type(item.type, item)['typename']
                 access = access_specifier_map[item.access_specifier]
                 status.members[semantic_parent]['bases'].append({
-                    'type': type,
+                    'typename': type,
                     'access': access
                 })
                 continue
@@ -1529,6 +1505,7 @@ def extract_declarations(citer, parent, status: Status):
             if usr in status.member_ids:
                 id = status.member_ids[usr]
                 log.debug("Member %s (%s) already exists, merging.", id, usr)
+                cleanup_qualifiers(member)
                 merge_member(status.members[id], member)
             else:
                 id = unique_id.member(member, status)
@@ -1540,6 +1517,7 @@ def extract_declarations(citer, parent, status: Status):
                               "there is a name clash, unique_id.member is not good enough.\n   in file %s",
                               member['name'], id, status.current_header_name)
                     continue  # skip the rest of this function, we're in trouble here...
+                cleanup_qualifiers(member)
                 status.members[id] = member
                 if semantic_parent:
                     status.members[semantic_parent]['members'].append(member)
@@ -1736,8 +1714,7 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
         # Mark file as complete
         processed[f] = True
 
-    # Go through all members with a 'type' element, and add a 'string' member representing the type,
-    # possibly with a link in Markdown format
+    # Go through all members with a 'type' element, and add an 'id' member representing the type
     post_process_types(status.members)
 
     # Go through all classes with base classes, and add references from base to derived, as well
@@ -1757,9 +1734,5 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
     # Go through all pages, identify `\subpage` commands, identify linked members, establish hierarchy,
     # and replace with links
     post_process_subpages(status.pages)
-
-    # Go through all members, and clean up the redundant information in the 'type' element,
-    # mostly setting `member['type'] = member['type']['string']`
-    cleanup_types(status.members)
 
     return status.data

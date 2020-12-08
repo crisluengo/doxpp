@@ -24,7 +24,11 @@
           "header": "file--struct-h",
           "group": "",
           "deprecated": false,
-          "type": "`int`",
+          "type": {
+            "typename": "int",
+            "qualifiers": "",
+            "id": ""
+          },
           "static": false,
           "mutable": false,
           "access": "public",
@@ -40,7 +44,11 @@
           "header": "file--struct-h",
           "group": "",
           "deprecated": false,
-          "type": "`float`",
+          "type": {
+            "typename": "float",
+            "qualifiers": "",
+            "id": ""
+          },
           "static": false,
           "mutable": false,
           "access": "public",
@@ -66,7 +74,11 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
-      "return_type": "[`A`](#A)`*`",
+      "return_type": {
+        "typename": "A",
+        "qualifiers": "*",
+        "id": "A"
+      },
       "arguments": []
     },
     {
@@ -81,12 +93,18 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
-      "return_type": "`void`",
+      "return_type": {
+        "typename": "void",
+        "qualifiers": "",
+        "id": ""
+      },
       "arguments": [
         {
+          "typename": "A",
+          "qualifiers": "*",
           "name": "a",
           "default": null,
-          "type": "[`A`](#A)`*`"
+          "id": "A"
         }
       ]
     },
@@ -102,12 +120,18 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
-      "return_type": "`int`",
+      "return_type": {
+        "typename": "int",
+        "qualifiers": "",
+        "id": ""
+      },
       "arguments": [
         {
+          "typename": "A",
+          "qualifiers": "*",
           "name": "a",
           "default": null,
-          "type": "[`A`](#A)`*`"
+          "id": "A"
         }
       ]
     },
@@ -123,12 +147,18 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
-      "return_type": "`float`",
+      "return_type": {
+        "typename": "float",
+        "qualifiers": "",
+        "id": ""
+      },
       "arguments": [
         {
+          "typename": "A",
+          "qualifiers": "*",
           "name": "a",
           "default": null,
-          "type": "[`A`](#A)`*`"
+          "id": "A"
         }
       ]
     }

@@ -34,7 +34,11 @@
           "access": "public",
           "constexpr": false,
           "method_type": "method",
-          "return_type": "`void`",
+          "return_type": {
+            "typename": "void",
+            "qualifiers": "",
+            "id": ""
+          },
           "arguments": []
         }
       ],
@@ -53,8 +57,9 @@
       "templated": false,
       "bases": [
         {
-          "type": "[`Base`](#Base)",
-          "access": "public"
+          "typename": "Base",
+          "access": "public",
+          "id": "Base"
         }
       ],
       "derived": [],
@@ -77,7 +82,11 @@
           "access": "public",
           "constexpr": false,
           "method_type": "method",
-          "return_type": "`void`",
+          "return_type": {
+            "typename": "void",
+            "qualifiers": "",
+            "id": ""
+          },
           "arguments": []
         }
       ],

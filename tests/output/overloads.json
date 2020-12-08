@@ -24,7 +24,11 @@
           "header": "file--overloads-h",
           "group": "",
           "deprecated": false,
-          "type": "`int`",
+          "type": {
+            "typename": "int",
+            "qualifiers": "",
+            "id": ""
+          },
           "static": false,
           "mutable": false,
           "access": "private",
@@ -40,7 +44,11 @@
           "header": "file--overloads-h",
           "group": "",
           "deprecated": false,
-          "type": "`float``[]`",
+          "type": {
+            "typename": "float",
+            "qualifiers": "[]",
+            "id": ""
+          },
           "static": false,
           "mutable": false,
           "access": "private",
@@ -64,17 +72,25 @@
           "access": "public",
           "constexpr": false,
           "method_type": "constructor",
-          "return_type": "`void`",
+          "return_type": {
+            "typename": "void",
+            "qualifiers": "",
+            "id": ""
+          },
           "arguments": [
             {
+              "typename": "double",
+              "qualifiers": "[]",
               "name": "x",
               "default": null,
-              "type": "`double``[]`"
+              "id": ""
             },
             {
+              "typename": "int",
+              "qualifiers": "",
               "name": "y",
               "default": null,
-              "type": "`int`"
+              "id": ""
             }
           ]
         },
@@ -96,17 +112,25 @@
           "access": "public",
           "constexpr": false,
           "method_type": "constructor",
-          "return_type": "`void`",
+          "return_type": {
+            "typename": "void",
+            "qualifiers": "",
+            "id": ""
+          },
           "arguments": [
             {
+              "typename": "double",
+              "qualifiers": "const[]",
               "name": "x",
               "default": null,
-              "type": "`double` `const[]`"
+              "id": ""
             },
             {
+              "typename": "int",
+              "qualifiers": "",
               "name": "y",
               "default": null,
-              "type": "`int`"
+              "id": ""
             }
           ]
         },
@@ -128,12 +152,18 @@
           "access": "public",
           "constexpr": false,
           "method_type": "constructor",
-          "return_type": "`void`",
+          "return_type": {
+            "typename": "void",
+            "qualifiers": "",
+            "id": ""
+          },
           "arguments": [
             {
+              "typename": "AClass",
+              "qualifiers": "const&",
               "name": "",
               "default": null,
-              "type": "[`AClass`](#AClass) `const&`"
+              "id": "AClass"
             }
           ]
         },
@@ -155,12 +185,18 @@
           "access": "public",
           "constexpr": false,
           "method_type": "constructor",
-          "return_type": "`void`",
+          "return_type": {
+            "typename": "void",
+            "qualifiers": "",
+            "id": ""
+          },
           "arguments": [
             {
+              "typename": "AClass",
+              "qualifiers": "&&",
               "name": "",
               "default": null,
-              "type": "[`AClass`](#AClass)`&&`"
+              "id": "AClass"
             }
           ]
         },
@@ -182,7 +218,11 @@
           "access": "public",
           "constexpr": false,
           "method_type": "destructor",
-          "return_type": "`void`",
+          "return_type": {
+            "typename": "void",
+            "qualifiers": "",
+            "id": ""
+          },
           "arguments": []
         },
         {
@@ -203,12 +243,18 @@
           "access": "public",
           "constexpr": false,
           "method_type": "method",
-          "return_type": "[`AClass`](#AClass)`&`",
+          "return_type": {
+            "typename": "AClass",
+            "qualifiers": "&",
+            "id": "AClass"
+          },
           "arguments": [
             {
+              "typename": "AClass",
+              "qualifiers": "const&",
               "name": "",
               "default": null,
-              "type": "[`AClass`](#AClass) `const&`"
+              "id": "AClass"
             }
           ]
         },
@@ -230,12 +276,18 @@
           "access": "public",
           "constexpr": false,
           "method_type": "method",
-          "return_type": "[`AClass`](#AClass)`&`",
+          "return_type": {
+            "typename": "AClass",
+            "qualifiers": "&",
+            "id": "AClass"
+          },
           "arguments": [
             {
+              "typename": "AClass",
+              "qualifiers": "&&",
               "name": "",
               "default": null,
-              "type": "[`AClass`](#AClass)`&&`"
+              "id": "AClass"
             }
           ]
         }

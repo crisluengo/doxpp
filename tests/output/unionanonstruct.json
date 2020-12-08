@@ -35,7 +35,11 @@
               "header": "file--unionanonstruct-h",
               "group": "",
               "deprecated": false,
-              "type": "`float`",
+              "type": {
+                "typename": "float",
+                "qualifiers": "",
+                "id": ""
+              },
               "static": false,
               "mutable": false,
               "access": "public",
@@ -51,7 +55,11 @@
               "header": "file--unionanonstruct-h",
               "group": "",
               "deprecated": false,
-              "type": "`float`",
+              "type": {
+                "typename": "float",
+                "qualifiers": "",
+                "id": ""
+              },
               "static": false,
               "mutable": false,
               "access": "public",
@@ -67,7 +75,11 @@
               "header": "file--unionanonstruct-h",
               "group": "",
               "deprecated": false,
-              "type": "`float`",
+              "type": {
+                "typename": "float",
+                "qualifiers": "",
+                "id": ""
+              },
               "static": false,
               "mutable": false,
               "access": "public",
@@ -83,7 +95,11 @@
               "header": "file--unionanonstruct-h",
               "group": "",
               "deprecated": false,
-              "type": "`float`",
+              "type": {
+                "typename": "float",
+                "qualifiers": "",
+                "id": ""
+              },
               "static": false,
               "mutable": false,
               "access": "public",

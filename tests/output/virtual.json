@@ -32,12 +32,18 @@
           "access": "public",
           "constexpr": false,
           "method_type": "method",
-          "return_type": "`int`",
+          "return_type": {
+            "typename": "int",
+            "qualifiers": "",
+            "id": ""
+          },
           "arguments": [
             {
+              "typename": "A",
+              "qualifiers": "*",
               "name": "a",
               "default": null,
-              "type": "[`A`](#A)`*`"
+              "id": "A"
             }
           ]
         }

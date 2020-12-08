@@ -32,7 +32,11 @@
           "access": "public",
           "constexpr": false,
           "method_type": "constructor",
-          "return_type": "`void`",
+          "return_type": {
+            "typename": "void",
+            "qualifiers": "",
+            "id": ""
+          },
           "arguments": []
         },
         {
@@ -53,7 +57,11 @@
           "access": "public",
           "constexpr": false,
           "method_type": "destructor",
-          "return_type": "`void`",
+          "return_type": {
+            "typename": "void",
+            "qualifiers": "",
+            "id": ""
+          },
           "arguments": []
         }
       ],

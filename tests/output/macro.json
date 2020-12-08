@@ -12,12 +12,18 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
-      "return_type": "`int`",
+      "return_type": {
+        "typename": "int",
+        "qualifiers": "",
+        "id": ""
+      },
       "arguments": [
         {
+          "typename": "int",
+          "qualifiers": "",
           "name": "x",
           "default": null,
-          "type": "`int`"
+          "id": ""
         }
       ]
     },

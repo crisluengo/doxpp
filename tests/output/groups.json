@@ -10,7 +10,11 @@
       "header": "file--groups-h",
       "group": "base",
       "deprecated": false,
-      "type": "`int`",
+      "type": {
+        "typename": "int",
+        "qualifiers": "",
+        "id": ""
+      },
       "static": false,
       "constexpr": false
     },
@@ -24,7 +28,11 @@
       "header": "file--groups-h",
       "group": "group1",
       "deprecated": false,
-      "type": "`int`",
+      "type": {
+        "typename": "int",
+        "qualifiers": "",
+        "id": ""
+      },
       "static": false,
       "constexpr": false
     },
@@ -38,7 +46,11 @@
       "header": "file--groups-h",
       "group": "base",
       "deprecated": false,
-      "type": "`int`",
+      "type": {
+        "typename": "int",
+        "qualifiers": "",
+        "id": ""
+      },
       "static": false,
       "constexpr": false
     },
@@ -52,7 +64,11 @@
       "header": "file--groups-h",
       "group": "group1",
       "deprecated": false,
-      "type": "`int`",
+      "type": {
+        "typename": "int",
+        "qualifiers": "",
+        "id": ""
+      },
       "static": false,
       "constexpr": false
     },
@@ -66,7 +82,11 @@
       "header": "file--groups-h",
       "group": "group2",
       "deprecated": false,
-      "type": "`int`",
+      "type": {
+        "typename": "int",
+        "qualifiers": "",
+        "id": ""
+      },
       "static": false,
       "constexpr": false
     },
@@ -80,7 +100,11 @@
       "header": "file--groups-h",
       "group": "base",
       "deprecated": false,
-      "type": "`int`",
+      "type": {
+        "typename": "int",
+        "qualifiers": "",
+        "id": ""
+      },
       "static": false,
       "constexpr": false
     }

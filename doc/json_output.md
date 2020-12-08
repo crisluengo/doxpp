@@ -99,13 +99,14 @@ One page has the ID 'index', this is the main page, and the root of the hierarch
 
 Any Markdown in the documentation will not be parsed, this is something for the generator to do.
 However, we will look for `\ref`, `\ingroup` and similar commands, as described in the `commands.md`
-page. Commands that create a link are replaced by the Markdown syntax for a link, linking to
+page.
+
+Commands that create a link are replaced by the Markdown syntax for a link, linking to
 `#<id>`. For example, `\ref foo::bar` will be replaced by `[foo::bar](#foo-bar)`, and
 `\ref foo::bar "the bar value"` will be replaced by `[the bar value](#foo-bar)`. Note that
 this is Markdown syntax to link to an anchor within the same page. The generator will have
 to identify these and change them to links to another page if necessary (only the generator
 will know what page the documentation for a given member is put in).
 
-Also `@cmd` and `\cmd` will be found, and acted upon if necessary. For example, `\warning` will remain
-unchanged, the generator needs to take care of that; but `\ingroup` will set the `group` value of the member,
-and be removed from the Markdown block.
+Other recognized commands will be similarly replaced with Markdown or removed, as appropriate.
+Any command not listed in in the `commands.md` page will be left as-is.

@@ -83,10 +83,9 @@ For members of type `"enumvalue"` (enum members), the group is always the empty 
 
 ## alias-specific fields
 
-### "type" (string)
+### "type" (dictionary)
 
-The type that the alias represents, will contain a Markdown link if the type is declared
-in the project being documented.
+See below under "The type dictionary".
 
 
 ## class- or struct-specific fields
@@ -98,8 +97,8 @@ in the project being documented.
 ### "bases" (list)
 
 A list of dictionaries listing the base classes. It contains the following fields:
-- `"type"` (string): the fully qualified name of the base class. Will contain a Markdown link
-  if the type is declared in the project being documented.
+- `"typename"` (string): the fully qualified name of the base class.
+- `"id"` (string): ID of the type, if declared in the project being documented.
 - `"access"` (string): set to a string `"public"`, `"protected"` or `"private"`.
 
 ### "derived" (list)
@@ -148,16 +147,14 @@ The value of the enumerator constant.
 
 `true` if this is a `constexpr` function.
 
-### "return_type" (string)
+### "return_type"  (dictionary)
 
-The function's return type. It will contain a Markdown link if the type is declared in the
-project being documented.
+The function's return type. See below under "The type dictionary".
 
 ### "arguments" (list)
 
-A list of dictionaries listing the input arguments. It contains the following fields:
-- `"type"` (string): The argument's type. Will contain a Markdown link if the type is declared
-  in the project being documented.
+A list of dictionaries listing the input arguments. It contains the standard "type" fields
+(see below under "The type dictionary") as well as the following fields:
 - `"name"` (string): The name of the argument.
 - `"default"` (string): The default value for the argument.
 
@@ -216,10 +213,9 @@ The list of dictionaries for the child members.
 
 ## variable-specific fields
 
-### "type" (string)
+### "type" (dictionary)
 
-The variable's type, will contain a Markdown link if the type is declared in the project
-being documented.
+The variable's type. See below under "The type dictionary".
 
 ### "static" (boolean)
 
@@ -261,12 +257,20 @@ field is additionally present:
 
 A list of dictionaries, one for each template parameter. It contains the following
 fields:
-- `"name"`: (string) name of template parameter.
-- `"type"`: (string) type of template parameter: `"type"` or a string encoding the type
-  in case of a non-type template parameter. In the latter case, it will contain a Markdown
-  link if the type is declared in the project being documented.
+- `"name"` (string): name of template parameter.
+- `"type"`: Type of template parameter: `"type"` or a dictionary encoding
+  the type in case of a non-type template parameter, see below under "The type dictionary".
 - `"default"`: A type dictionary for type parameters, a string for non-type parameters,
   or `null` (translates to `None` in Python) if no default is given.
 
 For example, for `template<typename A>`, `"type"` will be equal to `"type"`, whereas
 for `template<int A>`, `"type"` will be `"int"`.
+
+## The type dictionary
+
+Types are encoded as a dictionary with the following fields:
+- `"typename"` (string): name of the type.
+- `"id"` (string): ID of the type, if declared in the project being documented.
+- `"qualifiers"` (string): qualifiers.
+
+The type could be rendered in Markdown as follows: `[typename](#id) qualifiers`.

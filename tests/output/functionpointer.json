@@ -12,12 +12,18 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
-      "return_type": "`void`",
+      "return_type": {
+        "typename": "void",
+        "qualifiers": "",
+        "id": ""
+      },
       "arguments": [
         {
+          "typename": "int (int, int)",
+          "qualifiers": "*",
           "name": "comparator",
           "default": null,
-          "type": "`int (int, int)``*`"
+          "id": ""
         }
       ]
     }

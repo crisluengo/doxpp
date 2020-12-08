@@ -24,7 +24,11 @@
           "header": "file--sfinae-h",
           "group": "",
           "deprecated": false,
-          "type": "`A`",
+          "type": {
+            "typename": "A",
+            "qualifiers": "",
+            "id": ""
+          },
           "static": false,
           "mutable": false,
           "access": "public",

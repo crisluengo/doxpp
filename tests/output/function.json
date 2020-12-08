@@ -12,7 +12,11 @@
       "deprecated": false,
       "templated": false,
       "constexpr": true,
-      "return_type": "`double`",
+      "return_type": {
+        "typename": "double",
+        "qualifiers": "",
+        "id": ""
+      },
       "arguments": []
     },
     {
@@ -27,12 +31,18 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
-      "return_type": "`double`",
+      "return_type": {
+        "typename": "double",
+        "qualifiers": "",
+        "id": ""
+      },
       "arguments": [
         {
+          "typename": "int",
+          "qualifiers": "const",
           "name": "a",
           "default": null,
-          "type": "`int` `const`"
+          "id": ""
         }
       ]
     }
