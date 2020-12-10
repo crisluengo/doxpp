@@ -1,0 +1,10 @@
+            <dt{% if not variable.has_details and variable.base_url == compound.url %} id="{{ variable.id }}"{% endif %}>
+              {% if variable.templates != None %}
+              {% set j = joiner(', ') %}
+              <div class="m-doc-template">template&lt;{% for t in variable.templates %}{{ j() }}{{ t.type }}{% if t.name %} {{ t.name }}{% endif %}{% if t.default %} = {{ t.default }}{% endif%}{% endfor %}&gt;</div>
+              {% endif %}
+              {%+ if variable.is_static %}static {% endif %}{{ variable.type }} <a href="{% if variable.base_url != compound.url %}{{ variable.base_url }}{% endif %}#{{ variable.id }}" class="m-doc{% if not variable.has_details and variable.base_url == compound.url %}-self{% endif %}">{{ variable.name }}</a>{% if variable.deprecated %} <span class="m-label m-danger">{{ variable.deprecated }}</span>{% endif %}{% if mark_nonpublic and variable.is_protected %} <span class="m-label m-flat m-warning">protected</span>{% endif %}{% if variable.is_constexpr %} <span class="m-label m-flat m-primary">constexpr</span>{% endif %}{% if variable.since %} {{ variable.since }}{% endif %}
+              {# This empty line needs to be there otherwise it's eaten #}
+
+            </dt>
+            <dd>{{ variable.brief }}</dd>

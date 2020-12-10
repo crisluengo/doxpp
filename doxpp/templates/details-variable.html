@@ -1,0 +1,47 @@
+          <section class="m-doc-details" id="{{ variable.id }}"><div>
+            <h3>
+              {% if compound.templates != None or variable.templates != None  %}
+              {% if variable.include %}
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ variable.include[1] }}">{{ variable.include[0] }}</a></div>
+              {% endif %}
+              <div class="m-doc-template">
+                {% if compound.templates != None %}
+                {% set j = joiner(', ') %}
+                template&lt;{% for t in compound.templates %}{{ j() }}{{ t.type }} {% if t.name %}{{ t.name }}{% else %}_{{ loop.index }}{% endif %}{% endfor %}&gt;
+                {% if variable.templates != None %}<br>{% endif %}
+                {% endif %}
+                {% if variable.templates != None %}
+                {% set j = joiner(', ') %}
+                template&lt;{% for t in variable.templates %}{{ j() }}{{ t.type }}{% if t.name %} {{ t.name }}{% endif %}{% if t.default %} = {{ t.default }}{% endif %}{% endfor %}&gt;
+                {% endif %}
+              </div>
+              {% endif %}
+              {%+ if variable.is_static %}static {% endif %}{{ variable.type }} {{ prefix }}<a href="#{{ variable.id }}" class="m-doc-self">{{ variable.name }}</a>{% if variable.is_protected %} <span class="m-label m-warning">protected</span>{% endif %}{% if variable.is_constexpr %} <span class="m-label m-primary">constexpr</span>{% endif %}{% if variable.since %} {{ variable.since }}{% endif %}
+              {# the empty line needs to be here to prevent the lines from merging #}
+
+              {% if variable.include and compound.templates == None and variable.templates == None %}
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ variable.include[1] }}">{{ variable.include[0] }}</a></div>
+              {% endif %}
+            </h3>
+            {% if variable.brief %}
+            <p>{{ variable.brief }}</p>
+            {% endif %}
+            {% if variable.has_template_details %}
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Template parameters</th></tr>
+              </thead>
+              <tbody>
+                {% for template in variable.templates|selectattr('name') %}
+                <tr>
+                  <td{% if loop.index == 1 %} style="width: 1%"{% endif %}>{{ template.name }}</td>
+                  <td>{{ template.description }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% endif %}
+            {% if variable.description %}
+{{ variable.description }}
+            {% endif %}
+          </div></section>

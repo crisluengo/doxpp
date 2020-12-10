@@ -1,0 +1,40 @@
+          <section class="m-doc-details" id="{{ macro.id }}"><div>
+            <h3>
+              {% set j = joiner(', ') %}
+              <span class="m-doc-wrap-bumper">#define <a href="#{{ macro.id }}" class="m-doc-self">{{ macro.name }}</a>{% if macro.params != None %}(</span><span class="m-doc-wrap">{% for param in macro.params %}{{ j() }}{{ param[0] }}{% endfor %}){% endif %}{% if macro.since %} {{ macro.since }}{% endif %}</span>
+              {% if macro.include %}
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ macro.include[1] }}">{{ macro.include[0] }}</a></div>
+              {% endif %}
+            </h3>
+            {% if macro.brief %}
+            <p>{{ macro.brief }}</p>
+            {% endif %}
+            {% if macro.has_param_details or macro.return_value %}
+            <table class="m-table m-fullwidth m-flat">
+              {% if macro.has_param_details %}
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                {% for name, description in macro.params %}
+                <tr>
+                  <td{% if loop.index == 1 %} style="width: 1%"{% endif %}>{{ name }}</td>
+                  <td>{{ description }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+              {% endif %}
+              {% if macro.return_value %}
+              <tfoot>
+                <tr>
+                  <th{% if not macro.has_param_details %} style="width: 1%"{% endif %}>Returns</th>
+                  <td>{{ macro.return_value }}</td>
+                </tr>
+              </tfoot>
+              {% endif %}
+            </table>
+            {% endif %}
+            {% if macro.description %}
+{{ macro.description }}
+            {% endif %}
+          </div></section>

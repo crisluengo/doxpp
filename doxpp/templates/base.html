@@ -152,9 +152,9 @@
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
         {% if FINE_PRINT == '[default]' %}
-        <p>{{ PROJECT_NAME }}{% if PROJECT_BRIEF %} {{ PROJECT_BRIEF }}{% endif %}. Created with {% if DOXYGEN_VERSION %}<a href="https://doxygen.org/">Doxygen</a> {{ DOXYGEN_VERSION }} and {% endif %}<a href="https://mcss.mosra.cz/">m.css</a>.</p>
+        <p>{{ PROJECT_NAME }}{% if PROJECT_BRIEF %}, {{ PROJECT_BRIEF }}{% endif %}. Documentation compiled with <a href="https://github.com/crisluengo/doxpp">dox++</a> and styled with <a href="https://mcss.mosra.cz/">m.css</a>.</p>
         {% else %}
-        {{ FINE_PRINT|replace('{doxygen_version}', DOXYGEN_VERSION) }}
+        {{ FINE_PRINT }}
         {% endif %}
       </div>
     </div>
@@ -165,5 +165,4 @@
 </html>
 {#- sanity checks for variables that should be always defined -#}
 {% if FILENAME is not defined %}{{ FILENAME.is_not_defined_the_script_is_broken }}{% endif %}
-{% if DOXYGEN_VERSION is not defined %}{{ DOXYGEN_VERSION.is_not_defined_the_script_is_broken }}{% endif %}
 {% if SEARCHDATA_FORMAT_VERSION is not defined %}{{ SEARCHDATA_FORMAT_VERSION.is_not_defined_the_script_is_broken }}{% endif %}

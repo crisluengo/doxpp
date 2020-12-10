@@ -1,0 +1,51 @@
+          <section class="m-doc-details" id="{{ alias.id }}"><div>
+            <h3>
+              {% if compound.templates != None or alias.templates != None %}
+              {% if alias.include %}
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ alias.include[1] }}">{{ alias.include[0] }}</a></div>
+              {% endif %}
+              <div class="m-doc-template">
+                {% if compound.templates != None %}
+                {% set j = joiner(', ') %}
+                template&lt;{% for t in compound.templates %}{{ j() }}{{ t.type }} {% if t.name %}{{ t.name }}{% else %}_{{ loop.index }}{% endif %}{% endfor %}&gt;
+                {% if alias.templates != None %}<br>{% endif %}
+                {% endif %}
+                {% if alias.templates != None %}
+                {% set j = joiner(', ') %}
+                template&lt;{% for t in alias.templates %}{{ j() }}{{ t.type }}{% if t.name %} {{ t.name }}{% endif %}{% if t.default %} = {{ t.default }}{% endif %}{% endfor %}&gt;
+                {% endif %}
+              </div>
+              {% endif %}
+              {% if alias.is_using %}
+              using {{ prefix }}<a href="#{{ alias.id }}" class="m-doc-self">{{ alias.name }}</a> = {{ alias.type }}{{ alias.args }}{% if alias.is_protected %} <span class="m-label m-warning">protected</span>{% endif %}{% if alias.since %} {{ alias.since }}{% endif %}
+              {% else %}
+              typedef {{ alias.type }}{% if not alias.args %} {% endif %}{{ prefix }}<a href="#{{ alias.id }}" class="m-doc-self">{{ alias.name }}</a>{{ alias.args }}{% if alias.is_protected %} <span class="m-label m-warning">protected</span>{% endif %}{% if alias.since %} {{ alias.since }}{% endif %}
+              {% endif %}
+              {# the empty line has to be here to prevent the lines from merging #}
+
+              {% if alias.include and compound.templates == None and alias.templates == None %}
+              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ alias.include[1] }}">{{ alias.include[0] }}</a></div>
+              {% endif %}
+            </h3>
+            {% if alias.brief %}
+            <p>{{ alias.brief }}</p>
+            {% endif %}
+            {% if alias.has_template_details %}
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Template parameters</th></tr>
+              </thead>
+              <tbody>
+                {% for template in alias.templates|selectattr('name') %}
+                <tr>
+                  <td{% if loop.index == 1 %} style="width: 1%"{% endif %}>{{ template.name }}</td>
+                  <td>{{ template.description }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% endif %}
+            {% if alias.description %}
+{{ alias.description }}
+            {% endif %}
+          </div></section>
