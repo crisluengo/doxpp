@@ -25,8 +25,9 @@ additional pages. It links references to members across the project.
 Typesetting, creating indices, etc. is left to the generator (or back-end), which keeps
 the program simple.
 
-**dox++generate** produces a series of HTML files documenting the project, using the
-JSON created by dox++parse.
+**dox++html** produces a series of HTML files documenting the project, using the
+JSON created by dox++parse. The generated HTML is based on [m.css](https://mcss.mosra.cz/)
+by Vladimír Vondruš.
 
 **TODO** Eventually we'll have other generators here, for example to generate PDF through
 Pandoc.
@@ -78,7 +79,7 @@ Things we'd like to add/fix/improve:
    we need to avoid matching commands inside backticks or in code blocks.
 
 
-Things that CLang doesn't tell us:
+Things that Clang doesn't tell us:
 
 1. Clang doesn't easily report on pre-processor macros. Instead of making things complicated,
 we just require adding the `\macro` (or `\def`) command at the top of the documentation block.
@@ -88,18 +89,22 @@ we just require adding the `\macro` (or `\def`) command at the top of the docume
 # License
 
 Copyright 2020, Cris Luengo  
-All code and documentation in this project is distributed with the GPL-2.0 license.  
-See the file `COPYING` for details.
+Most code and documentation in this project is distributed with the GPL-2.0 license.  
+See the file `COPYING` for details.  
+Some files have more permissive licenses.
 
 Some code and ideas are derived from [cldoc](https://github.com/jessevdk/cldoc):  
 Copyright 2013-2018, Jesse van den Kieboom  
-cldoc uses the GPL-2.0 license as well.
+cldoc uses the GPL-2.0 license.
+
+Some code and ideas are derived from [m.css](https://mcss.mosra.cz/):  
+Copyright 2017-2020 Vladimír Vondruš  
+m.css uses the MIT license.
 
 
 # Requirements
 
-dox++ requires Python 3, and has been tested (so far) with Python 3.8.
+dox++ requires Python 3, and has been tested (so far) with Python 3.9.
 
-dox++ requires clang to be installed on the system. I don't know which is the minimal
+dox++ requires Clang to be installed on the system. I don't know which is the minimal
 version, but there's no reason to use a very old one.
-
