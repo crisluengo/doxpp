@@ -78,8 +78,14 @@ def document_item_on_page(item, page, status: Status):
     status.html_pages_detailed[page].add(item)
     list_item_on_page(item, page, status)
 
+def show_member(member, show_private, show_undocumented):
+    if not (show_undocumented or member['brief']):
+        return False
+    if not (show_private or ('access' in member and member['access'] == 'private')):
+        return False
+    return True
 
-def assign_page(status: Status):
+def assign_page(status: Status, show_private, show_undocumented):
     # All header files and groups will have a page, whether they're documented or not
     for header in status.headers.values():
         html_page = header['id']
@@ -92,11 +98,7 @@ def assign_page(status: Status):
         for child in group['subgroups']:
             # Subgroups listed in parent group's page
             list_item_on_page(child, html_page, status)
-    # All members with at least brief docs will be shown:
-    # - If it is a class/struct member, it goes in the class/struct page
-    # - If it has a group name, it goes in the group page
-    # - If it is in a namespace, it goes in the namespace page
-    # - Otherwise it goes in the header page
+    # Assign members to a specific page
     for member in status.members.values():
         id = member['id']
         if not id:
@@ -106,30 +108,29 @@ def assign_page(status: Status):
             # These are added to the page that their parent is in. Because of the way we generate the members list,
             # the parent has already been processed. This is shown in the documentation even if not documented,
             # as long as the parent is.
-            if status.members[member['parent']]['brief']:
+            if show_member(status.members[member['parent']], show_private, show_undocumented):
                 document_item_on_page(id, status.id_map[member['parent']], status)
             continue
-        if not member['brief']:
-            # Undocumented, ignore
+        if not show_member(member, show_private, show_undocumented):
+            # Undocumented or private, ignore
             continue
-        if member['member_type'] in ['class', 'struct', 'namespace']:
-            # Class, struct and namespace go in their own page
-            html_page = id
-        elif member['parent'] and status.members[member['parent']]['member_type'] in ['class', 'struct']:
-            # Class or struct members go in the class/struct page
+        if member['member_type'] in ['class', 'struct', 'union', 'namespace']:
+            # Class, struct, union and namespace go in their own page
+            document_item_on_page(id, id, status)
+        elif member['parent'] and status.members[member['parent']]['member_type'] in ['class', 'struct', 'union']:
+            # Class or struct members go in the class/struct/union page
             document_item_on_page(id, member['parent'], status)
             # Don't list anywhere else
             continue
         elif member['group']:
             # Otherwise, if group member, go in the group page
-            html_page = member['group']
+            document_item_on_page(id, member['group'], status)
         elif member['parent']:
             # Otherwise, if namespace member, go in the namespace page
-            html_page = member['parent']
+            document_item_on_page(id, member['parent'], status)
         else:
             # Otherwise, go in the header page
-            html_page = member['header']
-        document_item_on_page(id, html_page, status)
+            document_item_on_page(id, member['header'], status)
         # Additionally, they're listed in the group page, the namespace page and the header page
         list_item_on_page(id, member['header'], status)
         if member['group']:
@@ -165,8 +166,10 @@ def createhtml(input_file, output_dir, options):
     :param output_dir: directory where the HTML files will be written (string)
     :param options: dictionary with options for how to process things
 
-    Options can contain the keys:
-    - '':
+    Options must contain the keys:
+    - 'show_private': include private members in the documentation
+    - 'show_undocumented': include undocumented members in the documentation
+    Options should also contain keys used in the HTML templates.
     """
 
     # Load data
@@ -174,7 +177,7 @@ def createhtml(input_file, output_dir, options):
 
     # Find out which pages to create, what is listed in each, and in which page
     # the detailed documentation for each member has to go
-    assign_page(status)
+    assign_page(status, options['show_private'], options['show_undocumented'])
     #print('\n\nhtml_pages_index', status.html_pages_index)
     #print('\n\nhtml_pages_detailed', status.html_pages_detailed)
     #print('\n\nid_map', status.id_map)
@@ -194,7 +197,7 @@ def createhtml(input_file, output_dir, options):
         # TODO: create an index
         pass
 
-    # Generate indexes for pages, groups (==modules), namespaces/classes/structs (==classes), and headers
+    # Generate indexes for pages, groups (==modules), namespaces/classes/structs (==classes), and headers (==files)
     # TODO
 
     # Generate search data

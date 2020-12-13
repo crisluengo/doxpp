@@ -17,35 +17,59 @@
 import configparser
 
 
-def generate(filename):
-    config = configparser.ConfigParser()
-    config['clang'] = {
+default_config_values = {
+    'default_clang': {
         'compiler flags': '',         # could be '-std=c++11', for example
         'include directories': '',    # make these space-separated
-    }
-    config['log'] = {
+    },
+    'default_log': {
         'level': 'warning',           # 'error', 'warning', 'info' or 'debug'
-    }
-    config['input'] = {
+    },
+    'default_input': {
         'root directory': '.',        # the include path recorded for header files will be relative to this
         'header files': '*.h *.hpp',  # do give a path here, relative to working directory, for example: '*.h lib/*.h'
         'markdown files': '*.md',     # additional files to read
         'tab size': '4'               # size of a TAB character
-    }
-    config['json'] = {
+    },
+    'default_json': {
         'filename': 'dox++out.json',
         'use typewriter font': 'no',  # 'yes' or 'no', the Markdown output uses backticks (code formatting) around type names
         'formatting': 'compact'       # 'compact' or 'readable'
+    },
+    'default_project': {
+        'name': 'Project Name',
+        'brief': 'Short project description',
+        'logo': ''
+    },
+    'default_html': {
+        'output directory' : 'html',  # relative path to where the HTML output is generated
+        'document private members': 'yes',
+        'document undocumented members': 'no',
+        'theme color': '#22272e',
+        'favicon': '',
+        'stylesheets': '',
+        'extra files': '',
+        'html header': '', # HTML code to add to the <head> section of each HTML page
+        'page header': '', # HTML code to add to the top of each page
+        'fine print': '[default]' # text to use at the bottom of each page, leave empty for no footer
     }
-    config['html'] = {
-        'output directory' : 'html'   # the directory where the HTML output is generated
-    }
+}
+
+
+def generate(filename: str):
+    config = configparser.ConfigParser()
+    config['clang'] = default_config_values['clang']
+    config['log'] = default_config_values['log']
+    config['input'] = default_config_values['input']
+    config['json'] = default_config_values['json']
+    config['project'] = default_config_values['project']
+    config['html'] = default_config_values['html']
     with open(filename, 'w') as configfile:
         configfile.write('# Default dox++ configuration file\n\n')
         config.write(configfile)
 
 
-def read(filename):
+def read(filename: str):
     config = configparser.ConfigParser()
     config.read(filename)
     if not 'clang' in config:
@@ -56,4 +80,12 @@ def read(filename):
         config['input'] = {}
     if not 'json' in config:
         config['json'] = {}
+    if not 'project' in config:
+        config['project'] = {}
+    if not 'html' in config:
+        config['html'] = {}
     return config
+
+
+def get(config: configparser.ConfigParser, section: str, value: str):
+    config[section].get(value, default_config_values[section][value])

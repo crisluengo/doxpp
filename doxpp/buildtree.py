@@ -1582,11 +1582,12 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
     :param include_dirs: include directories to pass to the compiler (string)
     :param options: dictionary with options for how to process things
 
-    Options can contain the keys:
+    Options must contain the keys:
     - 'code_formatting': 'yes' or 'no', indicating whether to use "`<name>`" or "<name>" when writing the name of
         members. The `` is Markdown for code formatting. This applies to the \ref command only, since formatting of
         member names elsewhere is done by the backend, not this function. If a member name is not preceded by \ref,
         this tool will not recognize it as such. Instead, manually add `` around member names if not referenced.
+    - 'tab_size': integer value for how many spaces each tab character advances.
     """
 
     # Set global "constants" according to options

@@ -3,7 +3,7 @@
 # dox++
 # Copyright 2020, Cris Luengo
 #
-# This file is part of dox++.  dox++ is free software: you can
+# This file is part of dox++.  dox++ is free software),
 # redistribute it and/or modify it under the terms of the GNU General Public
 # License as published by the Free Software Foundation, version 2.
 #
@@ -28,17 +28,59 @@ args = parser.parse_args()
 # Processing options
 config = doxpp.config.read(args.config_file)
 
-doxpp.log.setLevel(config['log'].get('level', 'warning'))  # the default value
+doxpp.log.setLevel(doxpp.config.get(config, 'log', 'level'))
 
 options = {
+    'PROJECT_NAME': doxpp.config.get(config, 'project', 'name'),
+    'PROJECT_BRIEF': doxpp.config.get(config, 'project', 'brief'),
+    'MAIN_PROJECT_URL': doxpp.config.get(config, 'project', 'brief'),
+    'PROJECT_LOGO': doxpp.config.get(config, 'project', 'logo'),
+    'THEME_COLOR': doxpp.config.get(config, 'html', 'theme color'),
+    'FAVICON': doxpp.config.get(config, 'html', 'favicon'),
+    'STYLESHEETS': doxpp.config.get(config, 'html', 'stylesheets'),
+    'EXTRA_FILES': doxpp.config.get(config, 'html', 'extra files'),
+    'HTML_HEADER': doxpp.config.get(config, 'html', 'html header'),
+    'PAGE_HEADER': doxpp.config.get(config, 'html', 'page header'),
+    'FINE_PRINT': doxpp.config.get(config, 'html', 'fine print'),
+    'LINKS_NAVBAR1': [
+        ("Pages", 'pages', []),
+        ("Namespaces", 'namespaces', [])
+    ],
+    'LINKS_NAVBAR2': [
+        ("Classes", 'annotated', []),
+        ("Files", 'files', [])
+    ],
+    'FILE_INDEX_EXPAND_LEVELS': 1,
+    'CLASS_INDEX_EXPAND_LEVELS': 1,
+    'CLASS_INDEX_EXPAND_INNER': False,
+    'SEARCH_DISABLED': False,
+    'SEARCH_DOWNLOAD_BINARY': False,
+    'SEARCH_HELP':
+        """<p class="m-noindent">Search for symbols, directories, files, pages or
+        modules. You can omit any prefix from the symbol or file path; adding a
+        <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+        directory.</p>
+        <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span>
+        / <span class="m-label m-dim">&uarr;</span> to navigate through the list,
+        <span class="m-label m-dim">Enter</span> to go.
+        <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+        copy a link to the result using <span class="m-label m-dim">⌘</span>
+        <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+        <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+        """,
+    'SEARCH_BASE_URL': None,
+    'SEARCH_EXTERNAL_URL': None,
+
+    'show_private': doxpp.config.get(config, 'html', 'document private members'),
+    'show_undocumented': doxpp.config.get(config, 'html', 'document undocumented members')
 }
 
-outdir = config['html'].get('output directory', '')
+outdir = doxpp.config.get(config, 'html', 'output directory')
 os.makedirs(outdir, exist_ok=True)
 
 # Generate HTML
 data = doxpp.createhtml.createhtml(
-    config['json'].get('filename', 'dox++out.json'),
+    doxpp.config.get(config, 'json', 'filename'),
     outdir,
     options
 )

@@ -35,26 +35,26 @@ if args.g:
 # Processing options
 config = doxpp.config.read(args.config_file)
 
-doxpp.log.setLevel(config['log'].get('level', 'warning'))  # the default value
+doxpp.log.setLevel(doxpp.config.get(config, 'log', 'level'))
 
 options = {
-    'code_formatting': config['json'].get('use typewriter font', 'no'),
-    'tab_size': int(config['input'].get('tab size','4'))
+    'code_formatting': doxpp.config.get(config, 'json', 'use typewriter font'),
+    'tab_size': int(doxpp.config.get(config, 'input', 'tab size'))
 }
 
 # Process files
 data = doxpp.buildtree.buildtree(
-    config['input'].get('root directory', '.'),
-    config['input'].get('header files', '*.h *.hpp'),
-    config['input'].get('markdown files', '*.md'),
-    config['clang'].get('compiler flags', ''),
-    config['clang'].get('include directories', ''),
+    doxpp.config.get(config, 'input', 'root directory'),
+    doxpp.config.get(config, 'input', 'header files'),
+    doxpp.config.get(config, 'input', 'markdown files'),
+    doxpp.config.get(config, 'clang', 'compiler flags'),
+    doxpp.config.get(config, 'clang', 'include directories'),
     options
 )
 
 # Write JSON file
-filename = config['json'].get('filename', 'dox++out.json')
-if config['json'].get('formatting', 'compact') == 'readable':
+filename = doxpp.config.get(config, 'json', 'filename')
+if doxpp.config.get(config, 'json', 'formatting') == 'readable':
     format = {'indent': 2}
 else:
     format = {'separators': (',', ':')}
