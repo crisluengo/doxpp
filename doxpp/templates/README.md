@@ -36,34 +36,6 @@ The biggest changes to these templates are:
 - Renamed details-var.html -> details-variable.html and entry-var.html -> entry-variable.html
 - ... and of course some changes to the templates themselves.
 
-TODO:
-- In class documentation, we want to document private stuff just as well as public and protected stuff.
-    - base_classes
-    - derived_classes
-    - typeless_funcs (public, protected and private)
-    - groups (move these here, instead of at the bottom)
-    - public_types
-    - public_funcs
-    - public_vars
-    - public_static_funcs
-    - public_static_vars
-    - protected_types
-    - protected_funcs
-    - protected_vars
-    - protected_static_funcs
-    - protected_static_vars
-    - private_types (to add)
-    - private_funcs
-    - private_vars (to add)
-    - private_static_funcs (to add)
-    - private_static_vars (to add)
-    - friend_funcs (should we remove this?)
-    - related
-    -- I think friend functions and classes should automatically be labeled "related", unless they have an explicit `\relates` command.
-
-Note:
-sections contains the section headers, used only to generate the table of contents for classes/structs, files, namespaces and modules.
-
 ---
 
 # Templates
@@ -123,15 +95,16 @@ File/module/namespace reference pages, `compound` contains:
 - `files`
 - `namespaces`
 - `classes`
+- `enums`
 - `aliases`
-- `variables`
+- `functions`
 - `variables`
 - `macros`
-- `description`
+- `doc`
 - `has_enum_details`
 - `has_alias_details`
-- `has_func_details`
-- `has_var_details`
+- `has_function_details`
+- `has_variable_details`
 - `has_macro_details`
 Class/struct/union reference pages, `compound` contains:
 - `breadcrumb`
@@ -144,28 +117,31 @@ Class/struct/union reference pages, `compound` contains:
 - `brief`
 - `has_template_details`
 - `sections`
-- `public_types`
-- `public_static_funcs`
-- `typeless_funcs`
-- `public_funcs`
-- `public_static_vars`
-- `public_vars`
-- `protected_types`
-- `protected_static_funcs`
-- `protected_funcs`
-- `protected_static_vars`
-- `protected_vars`
-- `private_funcs`
-- `groups`
-- `friend_funcs`
-- `related`
 - `base_classes`
 - `derived_classes`
-- `description`
+- `typeless_functions`
+- `groups`
+- `public_types`
+- `public_functions`
+- `public_vars`
+- `public_static_functions`
+- `public_static_vars`
+- `protected_types`
+- `protected_functions`
+- `protected_vars`
+- `protected_static_functions`
+- `protected_static_vars`
+- `private_types`
+- `private_functions`
+- `private_vars`
+- `private_static_functions`
+- `private_static_vars`
+- `related`
+- `doc`
 - `has_enum_details`
 - `has_alias_details`
-- `has_func_details`
-- `has_var_details`
+- `has_function_details`
+- `has_variable_details`
 - `has_macro_details`
 Page reference pages, `compound` contains:
 - `breadcrumb`
@@ -173,8 +149,7 @@ Page reference pages, `compound` contains:
 - `since`
 - `brief`
 - `sections`
-- `description`
-
+- `doc`
 All index pages define:
 - `index`
 Classes/Namespaces index pages, `index` contains:
@@ -185,6 +160,9 @@ Modules index pages, `index` contains:
 - `modules`
 Pages index pages, `index` contains:
 - `pages`
+
+Note:
+- `sections` contains the section headers, used only to generate the table of contents for classes/structs, files, namespaces and modules.
 
 For Entries:
 
@@ -202,7 +180,7 @@ alias.brief
 alias.include
 alias.is_using
 alias.has_template_details
-alias.description
+alias.doc
 
 class.templates
 class.kind
@@ -228,7 +206,7 @@ enum.since
 enum.brief
 enum.include
 enum is inside
-enum.description
+enum.doc
 enum.has_value_details
 
 file.url
@@ -269,7 +247,7 @@ function.has_param_details
 function.return_value
 function.return_values
 function.exceptions
-function.description
+function.doc
 
 macro.has_details
 macro.base_url
@@ -282,7 +260,7 @@ macro.brief
 macro.include
 macro.has_param_details
 macro.return_value
-macro.description
+macro.doc
 
 module.url
 module.name
@@ -311,4 +289,4 @@ variable.since
 variable.brief
 variable.include
 variable.has_template_details
-variable.description
+variable.doc

@@ -35,13 +35,13 @@
                 {% for template in variable.templates|selectattr('name') %}
                 <tr>
                   <td{% if loop.index == 1 %} style="width: 1%"{% endif %}>{{ template.name }}</td>
-                  <td>{{ template.description }}</td>
+                  <td>{{ template.doc }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>
             {% endif %}
-            {% if variable.description %}
-{{ variable.description }}
+            {% if variable.doc %}
+{{ variable.doc }}
             {% endif %}
           </div></section>

@@ -39,13 +39,13 @@
                 {% for template in alias.templates|selectattr('name') %}
                 <tr>
                   <td{% if loop.index == 1 %} style="width: 1%"{% endif %}>{{ template.name }}</td>
-                  <td>{{ template.description }}</td>
+                  <td>{{ template.doc }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>
             {% endif %}
-            {% if alias.description %}
-{{ alias.description }}
+            {% if alias.doc %}
+{{ alias.doc }}
             {% endif %}
           </div></section>

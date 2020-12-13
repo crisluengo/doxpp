@@ -16,10 +16,10 @@
                 <tr><th colspan="2">Parameters</th></tr>
               </thead>
               <tbody>
-                {% for name, description in macro.params %}
+                {% for name, doc in macro.params %}
                 <tr>
                   <td{% if loop.index == 1 %} style="width: 1%"{% endif %}>{{ name }}</td>
-                  <td>{{ description }}</td>
+                  <td>{{ doc }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -34,7 +34,7 @@
               {% endif %}
             </table>
             {% endif %}
-            {% if macro.description %}
-{{ macro.description }}
+            {% if macro.doc %}
+{{ macro.doc }}
             {% endif %}
           </div></section>

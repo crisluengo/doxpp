@@ -20,8 +20,8 @@
             {% if enum.brief %}{# brief can be omitted for anonymous enums #}
             <p>{{ enum.brief }}</p>
             {% endif %}
-            {% if enum.description %}
-{{ enum.description }}
+            {% if enum.doc %}
+{{ enum.doc }}
             {% endif %}
             {% if enum.has_value_details %}
             <table class="m-table m-fullwidth m-flat m-doc">
@@ -34,8 +34,8 @@
                   {% if value.brief %}{# brief is not required for values #}
                   <p>{{ value.brief }}</p>
                   {% endif %}
-                  {% if value.description %}{# it can be only brief tho #}
-{{ value.description }}
+                  {% if value.doc %}{# it can be only brief tho #}
+{{ value.doc }}
                   {% endif %}
                   </td>
                 </tr>

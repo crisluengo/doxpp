@@ -42,8 +42,8 @@
           </ul>
         </div>
         {% endif %}
-        {% if compound.description %}
-{{ compound.description }}
+        {% if compound.doc %}
+{{ compound.doc }}
         {% endif %}
         {% if compound.footer_navigation %}
         <div class="m-note m-dim m-thin m-text-center">{% if compound.footer_navigation[0] %}<a href="{{ compound.footer_navigation[0][0] }}" class="m-doc">&laquo; {{ compound.footer_navigation[0][1] }}</a> | {% endif %}<a href="{{ compound.footer_navigation[1][0] }}" class="m-doc">{{ compound.footer_navigation[1][1] }}</a>{% if compound.footer_navigation[2] %} | <a href="{{ compound.footer_navigation[2][0] }}" class="m-doc">{{ compound.footer_navigation[2][1] }} &raquo;</a>{% endif %}</div>

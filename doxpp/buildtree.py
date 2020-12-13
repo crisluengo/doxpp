@@ -1499,6 +1499,7 @@ def extract_declarations(citer, parent, status: Status):
             #         log.error("Template parameter kind not recognized")
             #         continue
             #
+            # TODO: Friend functions and classes should automatically be added to the 'related' field.
 
             # Deal with IDs -- we do this at the end of the above so we can use all that data to generate our ID.
             usr = item.get_usr()

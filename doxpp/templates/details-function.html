@@ -35,7 +35,7 @@
                 {% for template in function.templates|selectattr('name') %}
                 <tr>
                   <td{% if loop.index == 1 %} style="width: 1%"{% endif %}>{{ template.name }}</td>
-                  <td>{{ template.description }}</td>
+                  <td>{{ template.doc }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -48,7 +48,7 @@
                 {% for param in function.params|selectattr('name') %}
                 <tr>
                   <td{% if loop.index == 1 and not function.has_template_details %} style="width: 1%"{% endif %}>{{ param.name }}{% if param.direction == 'in' %}&nbsp;<span class="m-label m-flat m-info">in</span>{% elif param.direction == 'out' %}&nbsp;<span class="m-label m-flat m-warning">out</span>{% elif param.direction == 'inout' %}&nbsp;<span class="m-label m-flat m-danger">in/out</span>{% endif %}</td>
-                  <td>{{ param.description }}</td>
+                  <td>{{ param.doc }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -67,10 +67,10 @@
               {% endif %}
               {% if function.return_values %}
               <tbody>
-                {% for value, description in function.return_values %}
+                {% for value, doc in function.return_values %}
                 <tr>
                   <td{% if loop.index == 1 and not function.has_template_details and not function.has_param_details and not function.return_value %} style="width: 1%"{% endif %}>{{ value }}</td>
-                  <td>{{ description }}</td>
+                  <td>{{ doc }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -80,17 +80,17 @@
                 <tr><th colspan="2">Exceptions</th></tr>
               </thead>
               <tbody>
-                {% for exception, description in function.exceptions %}
+                {% for exception, doc in function.exceptions %}
                 <tr>
                   <td{% if loop.index == 1 and not function.has_template_details and not function.has_param_details and not function.return_value and not function.return_values %} style="width: 1%"{% endif %}>{{ exception }}</td>
-                  <td>{{ description }}</td>
+                  <td>{{ doc }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
               {% endif %}
             </table>
             {% endif %}
-            {% if function.description %}
-{{ function.description }}
+            {% if function.doc %}
+{{ function.doc }}
             {% endif %}
           </div></section>

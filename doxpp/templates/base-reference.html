@@ -77,8 +77,8 @@
           </ul>
         </div>
         {% endif %}
-{% if compound.description %}
-{{ compound.description }}
+{% if compound.doc %}
+{{ compound.doc }}
 {% endif %}
         {% if compound.modules %}
         <section id="modules">
@@ -190,7 +190,7 @@
           {% endfor %}
         </section>
         {% endif %}
-        {% if compound.has_func_details %}
+        {% if compound.has_function_details %}
         <section>
           <h2>Function documentation</h2>
           {% for function in compound.variables %}
@@ -200,7 +200,7 @@
           {% endfor %}
         </section>
         {% endif %}
-        {% if compound.has_var_details %}
+        {% if compound.has_variable_details %}
         <section>
           <h2>Variable documentation</h2>
           {% for variable in compound.variables %}
