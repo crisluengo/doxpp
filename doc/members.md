@@ -43,6 +43,10 @@ This description can be shown in a list of members.
 The full documentation, excluding the first line, which is in `"brief"`.['derived-class-member-id', 'derived-class-member-id', ...]
 Should be rendered through a Markdown processor.
 
+### "anchors" (list)
+
+List of strings with anchor IDs present in the "doc" string.
+
 ### "member_type" (string)
 
 One of:
@@ -60,6 +64,11 @@ One of:
 ### "parent" (string)
 
 ID of the parent member.
+
+### "relates" (string)
+
+ID of a class/struct that this member relates to. The class/struct will list this member in its "related"
+list. This value can only be set in functions, variables, enums, aliases and macros.
 
 ### "header" (string)
 

@@ -19,7 +19,8 @@ def basic(id, name='', brief='', doc=''):
         'id': id,
         'name': name,
         'brief': brief,
-        'doc': doc
+        'doc': doc,
+        'anchors': []
     }
 
 def new_group(id, name='', brief='', doc='', parent=''):
@@ -42,6 +43,7 @@ def new_member(id, name='', member_type='', parent='', header=''):
     member.update({
         'member_type': member_type,
         'parent': parent,       # ID of the parent member, empty string if declared in global namespace
+        'relates': '',          # ID of a class/struct that this member relates to
         'header': header,       # ID of the first header file this member was encountered in
         'group': '',            # ID of the group it is in, if any
         'deprecated': False     # Set to True if marked 'deprecated'

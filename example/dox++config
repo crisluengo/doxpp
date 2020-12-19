@@ -18,5 +18,11 @@ filename = transport.json
 use typewriter font = yes
 formatting = readable
 
+[project]
+name = Example
+brief = An example project
+
 [html]
 output directory = html
+document private members = yes
+document undocumented members = yes

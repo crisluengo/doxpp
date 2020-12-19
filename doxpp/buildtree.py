@@ -327,6 +327,8 @@ def find_anchor_cmds(doc, status: Status):
     # `# title {#name}`,     `## title {#name}`,       `### title {#name}`,         `{#name}`
     # We're listing them in the status.anchors dictionary.
 
+    anchors = []
+
     def section_cmd_replace(match):
         level = len(match[1]) // 3 + 1
         name = match[2]
@@ -335,6 +337,7 @@ def find_anchor_cmds(doc, status: Status):
             log.error("Anchor %s already exists, ignored.", name)
             return '{} {}'.format('#' * level, title)
         status.anchors[name] = title
+        anchors.append(name)
         return '{} {} {{#{}}}'.format('#' * level, title, name)
 
     def anchor_cmd_replace(match):
@@ -343,11 +346,12 @@ def find_anchor_cmds(doc, status: Status):
             log.error("Anchor %s already exists, ignored.", name)
             return ''
         status.anchors[name] = ''
+        anchors.append(name)
         return '{{#{}}}'.format(name)
 
     doc = section_cmd_match.sub(section_cmd_replace, doc)
     doc = anchor_cmd_match.sub(anchor_cmd_replace, doc)
-    return doc
+    return doc, anchors
 
 
 # --- find_member ---
@@ -667,18 +671,21 @@ def post_process_relates(members):
             id = find_member(match[1], member['id'], members)
             if id and members[id]['member_type'] in ['class', 'struct']:
                 members[id]['related'].append(member['id'])
+                member['relates'] = id
             else:
                 log.error("Reference %s could not be matched to class or struct.\n   in documentation for %s", match[1], member['id'])
             return ''
 
         if 'doc' in member:  # this one is missing if member is status.members['']
-            parent = member['parent']
-            # We only look for the command in documentation to namespace members (not class, struct, union or enum members)
-            if not parent or members[parent]['member_type'] == 'namespace':
-                member['doc'] = relates_cmd_match.sub(relates_cmd_replace, member['doc'], count=1)
-                # count=1 means we only handle the first occurrence of the command. Delete any further commands:
-                member['doc'] = relates_cmd_match.sub('', member['doc'])
-                # TODO: produce error if there are more of these commands?
+            # We only look for the command in documentation to functions, variables, macros, aliases, enums
+            if member['member_type'] in ['function', 'variable', 'macro', 'aliase', 'enum']:
+                parent = member['parent']
+                # We only look for the command in documentation to namespace members (not class, struct, union or enum members)
+                if not parent or members[parent]['member_type'] == 'namespace':
+                    member['doc'] = relates_cmd_match.sub(relates_cmd_replace, member['doc'], count=1)
+                    # count=1 means we only handle the first occurrence of the command. Delete any further commands:
+                    member['doc'] = relates_cmd_match.sub('', member['doc'])
+                    # TODO: produce error if there are more of these commands?
 
 subpage_cmd_match = re.compile(r'[\\@]subpage +((?:\w|-)+(?: *\(.*?\))?)(?: +"(.*?)")?')
 
@@ -743,8 +750,9 @@ def process_generic_command(cmd: DocumentationCommand, status: Status):
     else:
         member['group'] = group
     brief, doc = separate_brief(doc)
-    doc = find_anchor_cmds(doc, status)
+    doc, anchors = find_anchor_cmds(doc, status)
     add_doc(member, brief, doc)
+    member['anchors'].extend(anchors)
 
 def process_macro_command(cmd: DocumentationCommand, status: Status):
     # \macro <name>
@@ -780,17 +788,19 @@ def process_macro_command(cmd: DocumentationCommand, status: Status):
             log.warning("Documenting a previously documented macro, this time the parameters are different.\n" +
                         "   in file %s", id, cmd.file)
         brief, doc = separate_brief(doc)
-        doc = find_anchor_cmds(doc, status)
+        doc, anchors = find_anchor_cmds(doc, status)
         add_doc(member, brief, doc)
+        member['anchors'].extend(anchors)
         if not member['group']:
             member['group'] = group
     else:
         # Create a new member
         member = members.new_member(id, name, 'macro', '', cmd.header_id)
         brief, doc = separate_brief(doc)
-        doc = find_anchor_cmds(doc, status)
+        doc, anchors = find_anchor_cmds(doc, status)
         member['brief'] = brief
         member['doc'] = doc
+        member['anchors'] = anchors
         member['group'] = group
         member['macro_params'] = macro_params
         status.members[id] = member
@@ -808,25 +818,29 @@ def process_file_command(cmd: DocumentationCommand, status: Status):
         return
     header = status.headers[id]
     brief, doc = separate_brief(cmd.doc)
-    doc = find_anchor_cmds(doc, status)
+    doc, anchors = find_anchor_cmds(doc, status)
     add_doc(header, brief, doc)
+    header['anchors'].extend(anchors)
 
 def create_page(name, title, doc, file, status: Status):
     if name in status.pages:
         # Page already exists, append documentation
-        doc = find_anchor_cmds(doc, status)
-        cur_doc = status.pages[name]['doc']
+        page = status.pages[name]
+        doc, anchors = find_anchor_cmds(doc, status)
+        cur_doc = page['doc']
         if cur_doc:
             doc = cur_doc + '\n\n' + doc
-        status.pages[name]['doc'] = doc
+        page['doc'] = doc
+        page['anchors'].extend(anchors)
     else:
         # Validate `name` to have only {\w|-} characters
         if not unique_id.is_valid(name):
             log.error("\\page has invalid name '%s', documentation ignored.\n   in file %s", name, file)
             return
         # Create new page
-        doc = find_anchor_cmds(doc, status)
+        doc, anchors = find_anchor_cmds(doc, status)
         page = members.new_page(name, title, doc)
+        page['anchors'] = anchors
         status.data['pages'].append(page)
         status.pages[name] = page
 
@@ -894,10 +908,12 @@ def process_grouping_command(cmd, args, doc, loc, status: Status):
             open_group = True
             doc = doc[:-len('\\addtogroup')].strip()
         brief, doc = separate_brief(doc)
-        doc = find_anchor_cmds(doc, status)
+        doc, anchors = find_anchor_cmds(doc, status)
         if id not in status.groups:
-            status.groups[id] = members.new_group(id, name, brief, doc, parent_group)
-            status.data['groups'].append(status.groups[id])
+            group = members.new_group(id, name, brief, doc, parent_group)
+            group['anchors'] = anchors
+            status.groups[id] = group
+            status.data['groups'].append(group)
         else:
             group = status.groups[id]
             if not group['name']:
@@ -909,6 +925,7 @@ def process_grouping_command(cmd, args, doc, loc, status: Status):
             else:
                 group['parent'] = parent_group
             add_doc(group, brief, doc)
+            group['anchors'] = anchors
         if parent_group:
             if parent_group in status.groups:
                 group = status.groups[parent_group]
@@ -994,8 +1011,9 @@ def process_comment_command(lines, loc, status: Status):
     # Documenting the current file
     if cmd == 'file' and not args:
         brief, doc = separate_brief(doc)
-        doc = find_anchor_cmds(doc, status)
+        doc, anchors = find_anchor_cmds(doc, status)
         add_doc(status.current_header, brief, doc)
+        status.current_header['anchors'].extend(anchors)
         return
 
     # Documenting things we don't declare right here, this we'll do after processing all header files
@@ -1386,7 +1404,7 @@ def extract_declarations(citer, parent, status: Status):
                 if not(len(cmd) > 1 and cmd[0] in ['\\', '@'] and cmd[1:] in documentation_commands):
                     group, comment = find_ingroup_cmd(comment)
                     member['brief'], member['doc'] = separate_brief(comment)
-                    member['doc'] = find_anchor_cmds(member['doc'], status)
+                    member['doc'], member['anchors'] = find_anchor_cmds(member['doc'], status)
 
             # Fix constructor and destructor names for templated classes
             if member_type in ['constructor', 'destructor']:

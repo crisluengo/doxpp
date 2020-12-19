@@ -33,7 +33,7 @@ doxpp.log.setLevel(doxpp.config.get(config, 'log', 'level'))
 options = {
     'PROJECT_NAME': doxpp.config.get(config, 'project', 'name'),
     'PROJECT_BRIEF': doxpp.config.get(config, 'project', 'brief'),
-    'MAIN_PROJECT_URL': doxpp.config.get(config, 'project', 'brief'),
+    'MAIN_PROJECT_URL': doxpp.config.get(config, 'project', 'url'),
     'PROJECT_LOGO': doxpp.config.get(config, 'project', 'logo'),
     'THEME_COLOR': doxpp.config.get(config, 'html', 'theme color'),
     'FAVICON': doxpp.config.get(config, 'html', 'favicon'),

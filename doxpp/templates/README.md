@@ -290,3 +290,6 @@ variable.brief
 variable.include
 variable.has_template_details
 variable.doc
+
+TODO: `<member>.base_url` and `<member>.url` should be replaced everywhere with `<member>.page_id`
+      We then need the template to add ".html" to the end of `<member>.page_id` to form the actual URL.

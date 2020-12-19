@@ -21,6 +21,7 @@ in which they were found in the header file. Each `members[i]` is a dictionary a
    "name": "",         // name of the member
    "brief": "",        // brief description, in Markdown
    "doc": "",          // full documentation, in Markdown
+   "anchors": [],      // IDs of anchors in "doc"
    "member_type": "",  // class/function/enum/variable/define/namespace/etc.
    "parent": "",       // ID of parent member
    "header": "",       // ID of the header file it is in (or the first one it is encountered in)
@@ -52,8 +53,9 @@ This is a list of files. Each `headers[i]` is a dictionary as follows:
 {
    "id": "",           // unique identifier
    "name": "",         // file name, with path from project root
-   "brief": "",
-   "doc": "",
+   "brief": "",        // brief description, in Markdown
+   "doc": "",          // full documentation, in Markdown
+   "anchors": [],      // IDs of anchors in "doc"
    "includes": []      // list of files included by the header
 }
 ```
@@ -71,8 +73,9 @@ A list of defined groups. Each `groups[i]` is a dictionary as follows:
 {
    "id": "",           // unique identifier
    "name": "",         // file name, with path from project root
-   "brief": "",
-   "doc": "",
+   "brief": "",        // brief description, in Markdown
+   "doc": "",          // full documentation, in Markdown
+   "anchors": [],      // IDs of anchors in "doc"
    "parent": "",       // ID of the parent group, if any
    "subgroups": []     // list of IDs of child groups
 }
@@ -87,7 +90,8 @@ A list of pages. Each `pages[i]` is a dictionary as follows:
 {
    "id": "",           // unique identifier
    "title": "",        // file name, with path from project root
-   "doc": "",
+   "doc": "",          // full documentation, in Markdown
+   "anchors": [],      // IDs of anchors in "doc"
    "parent": "",       // ID of the parent page, if any
    "subpages": []      // list of IDs of child pages
 }
@@ -110,3 +114,14 @@ will know what page the documentation for a given member is put in).
 
 Other recognized commands will be similarly replaced with Markdown or removed, as appropriate.
 Any command not listed in in the `commands.md` page will be left as-is.
+
+## The "anchor" field
+
+Documentation can contain headers and anchors that can be referenced in the same way that
+members or pages can be referenced. These are created with the commands `\anchor`, `\section`,
+`\subsection` and `\subsubsection`. These commands are replaced with appropriate Markdown
+syntax to create an anchor, and the anchor ID (the string that can be used with `\ref` to
+link to the anchor) is listed in the "anchor" field. Where these anchors are referenced,
+a Markdown link is generated as described in the section above. The generator will need
+to modify this link to point to the right page. The "anchor" field gives the required
+information to the generator for this.

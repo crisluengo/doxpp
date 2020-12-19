@@ -20,22 +20,6 @@ import markdown
 from . import log
 from . import walktree
 
-extensions = ['attr_list',      # https://python-markdown.github.io/extensions/attr_list/
-              'md_in_html',     # https://python-markdown.github.io/extensions/md_in_html/
-              'tables',         # https://python-markdown.github.io/extensions/tables/
-              'fenced_code',    # https://python-markdown.github.io/extensions/fenced_code_blocks/
-              'admonition',     # https://python-markdown.github.io/extensions/admonition/
-              'codehilite',     # https://python-markdown.github.io/extensions/code_hilite/
-              'sane_lists',     # https://python-markdown.github.io/extensions/sane_lists/
-              'smarty'          # https://python-markdown.github.io/extensions/smarty/
-              ]
-extension_configs = {
-    'codehilite': {
-        'css_class': 'codehilite'
-    }
-}
-md = markdown.Markdown(extensions=extensions, extension_configs=extension_configs, output_format="html5")
-
 
 class Status:
     # This defines the status of our generator
@@ -56,27 +40,42 @@ class Status:
         # Items not in here are not documented.
         self.id_map = {}
 
-        # This dictionary links each page to the things that will be listed there (with or without
-        # detailed documentation). Things can be listed on multiple pages.
+        # This dictionary links each page to the members that will be listed there (with or without
+        # detailed documentation). Members can be listed on multiple pages.
         self.html_pages_index = {}
 
-        # This dictionary links each page to the things that will be documented there (with or without
-        # detailed documentation). Things are documented in only one page. This is the inverse of `id_map`.
+        # This dictionary links each page to the members that will be documented there (with or without
+        # detailed documentation). Members are documented in only one page. This is the inverse of `id_map`,
+        # except that it contains only members.
         self.html_pages_detailed = {}
 
 
-def list_item_on_page(item, page, status: Status):
-    if page not in status.html_pages_index:
-        status.html_pages_index[page] = set()
-    status.html_pages_index[page].add(item)
+def register_anchors_to_page(compound, page_id, status: Status):
+    for anchor in compound['anchors']:
+        status.id_map[anchor] = page_id
 
+def list_member_on_page(member_id, page_id, status: Status):
+    if page_id not in status.html_pages_index:
+        status.html_pages_index[page_id] = set()
+    status.html_pages_index[page_id].add(member_id)
 
-def document_item_on_page(item, page, status: Status):
-    status.id_map[item] = page
-    if page not in status.html_pages_detailed:
-        status.html_pages_detailed[page] = set()
-    status.html_pages_detailed[page].add(item)
-    list_item_on_page(item, page, status)
+def document_member_on_page(member, page_id, status: Status):
+    member['page_id'] = page_id
+    member_id = member['id']
+    status.id_map[member_id] = page_id
+    if page_id not in status.html_pages_detailed:
+        status.html_pages_detailed[page_id] = set()
+    status.html_pages_detailed[page_id].add(member_id)
+    list_member_on_page(member_id, page_id, status)
+    register_anchors_to_page(member, page_id, status)
+
+def create_page(compound, status: Status):
+    page_id = compound['id']
+    compound['page_id'] = page_id
+    status.id_map[page_id] = page_id
+    if page_id not in status.html_pages_index:
+        status.html_pages_index[page_id] = set()
+    register_anchors_to_page(compound, page_id, status)
 
 def show_member(member, show_private, show_undocumented):
     if not (show_undocumented or member['brief']):
@@ -88,16 +87,9 @@ def show_member(member, show_private, show_undocumented):
 def assign_page(status: Status, show_private, show_undocumented):
     # All header files and groups will have a page, whether they're documented or not
     for header in status.headers.values():
-        html_page = header['id']
-        status.id_map[html_page] = html_page
-        status.html_pages_index[html_page] = set()
+        create_page(header, status)
     for group in status.groups.values():
-        html_page = group['id']
-        status.id_map[html_page] = html_page
-        status.html_pages_index[html_page] = set()
-        for child in group['subgroups']:
-            # Subgroups listed in parent group's page
-            list_item_on_page(child, html_page, status)
+        create_page(group, status)
     # Assign members to a specific page
     for member in status.members.values():
         id = member['id']
@@ -109,53 +101,105 @@ def assign_page(status: Status, show_private, show_undocumented):
             # the parent has already been processed. This is shown in the documentation even if not documented,
             # as long as the parent is.
             if show_member(status.members[member['parent']], show_private, show_undocumented):
-                document_item_on_page(id, status.id_map[member['parent']], status)
+                document_member_on_page(member, status.id_map[member['parent']], status)
             continue
         if not show_member(member, show_private, show_undocumented):
             # Undocumented or private, ignore
             continue
         if member['member_type'] in ['class', 'struct', 'union', 'namespace']:
             # Class, struct, union and namespace go in their own page
-            document_item_on_page(id, id, status)
+            document_member_on_page(member, id, status)
         elif member['parent'] and status.members[member['parent']]['member_type'] in ['class', 'struct', 'union']:
             # Class or struct members go in the class/struct/union page
-            document_item_on_page(id, member['parent'], status)
+            document_member_on_page(member, member['parent'], status)
             # Don't list anywhere else
             continue
+        elif member['relates']:
+            document_member_on_page(member, member['relates'], status)
         elif member['group']:
             # Otherwise, if group member, go in the group page
-            document_item_on_page(id, member['group'], status)
+            document_member_on_page(member, member['group'], status)
         elif member['parent']:
             # Otherwise, if namespace member, go in the namespace page
-            document_item_on_page(id, member['parent'], status)
+            document_member_on_page(member, member['parent'], status)
         else:
             # Otherwise, go in the header page
-            document_item_on_page(id, member['header'], status)
+            document_member_on_page(member, member['header'], status)
         # Additionally, they're listed in the group page, the namespace page and the header page
-        list_item_on_page(id, member['header'], status)
+        list_member_on_page(id, member['header'], status)
         if member['group']:
-            list_item_on_page(id, member['group'], status)
+            list_member_on_page(id, member['group'], status)
         if member['parent'] and status.members[member['parent']]['member_type'] == 'namespace':
-            list_item_on_page(id, member['parent'], status)
+            list_member_on_page(id, member['parent'], status)
+    # All pages have a page, obviously
+    for page in status.pages.values():
+        create_page(page, status)
+
+
+def parse_markdown(status: Status):
+    extensions = ['attr_list',      # https://python-markdown.github.io/extensions/attr_list/
+                  'md_in_html',     # https://python-markdown.github.io/extensions/md_in_html/
+                  'tables',         # https://python-markdown.github.io/extensions/tables/
+                  'fenced_code',    # https://python-markdown.github.io/extensions/fenced_code_blocks/
+                  'admonition',     # https://python-markdown.github.io/extensions/admonition/
+                  'codehilite',     # https://python-markdown.github.io/extensions/code_hilite/
+                  'sane_lists',     # https://python-markdown.github.io/extensions/sane_lists/
+                  'smarty'          # https://python-markdown.github.io/extensions/smarty/
+                  ]
+    extension_configs = {
+        'codehilite': {
+            'css_class': 'codehilite'
+        }
+    }
+    md = markdown.Markdown(extensions=extensions, extension_configs=extension_configs, output_format="html5")
+
+    # TODO: Add these extensions:
+    #       https://github.com/SaschaCowley/Markdown-Headdown
+    #       https://github.com/jambonrose/markdown_superscript_extension
+    #       https://github.com/jambonrose/markdown_subscript_extension
+
+    # TODO: Create a LaTeX math extension based on some stuff in m.css as well as the following:
+    #       https://github.com/justinvh/Markdown-LaTeX
+    #       https://github.com/ShadowKyogre/python-asciimathml
+
+    # TODO: Create an extension that fixes links of the form `#<member_id>` to `<page_id>.html#<member_id>`,
+    #       where `page_id` is given by `status.id_map[member_id]`.
+
+    for header in status.headers.values():
+        if header['brief']:
+            header['brief'] = md.reset().convert(header['brief'])
+        if header['doc']:
+            header['doc'] = md.reset().convert(header['doc'])
+    for group in status.groups.values():
+        if group['brief']:
+            group['brief'] = md.reset().convert(group['brief'])
+        if group['doc']:
+            group['doc'] = md.reset().convert(group['doc'])
+    for member in status.members.values():
+        if member['id'] not in status.id_map:
+            continue
+        if member['brief']:
+            member['brief'] = md.reset().convert(member['brief'])
+        if member['doc']:
+            member['doc'] = md.reset().convert(member['doc'])
+    for page in status.pages.values():
+        if page['doc']:
+            page['doc'] = md.reset().convert(page['doc'])
 
 
 def generate_member_page(page, status: Status):
-    # Generate the index with brief documentation (parsed by Markdown)
-    # Add the corresponding detailed documentation (parsed by Markdown)
-    # TODO
+    # TODO Jinja stuff here
     return ''
 
 
 def generate_page_page(page, status: Status):
-    # Add documentation (parsed by Markdown)
-    # TODO
+    # TODO Jinja stuff here
     return ''
 
 
-def fix_links(html, status: Status):
-    # Fix links in HTML document to point to the right page
-    # TODO
-    return html
+def generate_default_index_page(status: Status):
+    # TODO Jinja stuff here
+    return ''
 
 
 def createhtml(input_file, output_dir, options):
@@ -182,19 +226,22 @@ def createhtml(input_file, output_dir, options):
     #print('\n\nhtml_pages_detailed', status.html_pages_detailed)
     #print('\n\nid_map', status.id_map)
 
+    # Parse all Markdown
+    parse_markdown(status)
+
     # Generate the pages
     for page in status.html_pages_index.keys():
         html = generate_member_page(page, status)
-        html = fix_links(html, status)
         with open(os.path.join(output_dir, page + '.html'), 'w') as file:
             file.write(html)
     for page in status.pages.values():
         html = generate_page_page(page, status)
-        html = fix_links(html, status)
         with open(os.path.join(output_dir, page['id'] + '.html'), 'w') as file:
             file.write(html)
     if 'index' not in status.pages:
-        # TODO: create an index
+        html = generate_default_index_page(status)
+        with open(os.path.join(output_dir, 'index.html'), 'w') as file:
+            file.write(html)
         pass
 
     # Generate indexes for pages, groups (==modules), namespaces/classes/structs (==classes), and headers (==files)
