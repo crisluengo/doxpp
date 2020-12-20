@@ -5,8 +5,11 @@
       "name": "A",
       "brief": "The union A.",
       "doc": "A longer description of A.",
+      "sections": [],
+      "anchors": [],
       "member_type": "union",
       "parent": "",
+      "relates": "",
       "header": "file--union-h",
       "group": "",
       "deprecated": false,
@@ -19,6 +22,8 @@
       "name": "union.h",
       "brief": "",
       "doc": "",
+      "sections": [],
+      "anchors": [],
       "includes": []
     }
   ],

@@ -6,6 +6,8 @@
       "name": "page.h",
       "brief": "",
       "doc": "",
+      "sections": [],
+      "anchors": [],
       "includes": []
     }
   ],
@@ -16,7 +18,9 @@
       "title": "A page",
       "doc": "This is the text for a page",
       "parent": "",
-      "subpages": []
+      "subpages": [],
+      "sections": [],
+      "anchors": []
     }
   ]
 }

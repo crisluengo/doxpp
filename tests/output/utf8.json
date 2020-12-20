@@ -5,8 +5,11 @@
       "name": "A",
       "brief": "Copyright \u00a9",
       "doc": "",
+      "sections": [],
+      "anchors": [],
       "member_type": "class",
       "parent": "",
+      "relates": "",
       "header": "file--utf8-h",
       "group": "",
       "deprecated": false,
@@ -23,6 +26,8 @@
       "name": "utf8.h",
       "brief": "",
       "doc": "",
+      "sections": [],
+      "anchors": [],
       "includes": []
     }
   ],

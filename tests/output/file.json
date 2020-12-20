@@ -6,6 +6,8 @@
       "name": "file.h",
       "brief": "This is a header file",
       "doc": "Here comes the long documentation about this mostly empty file.",
+      "sections": [],
+      "anchors": [],
       "includes": []
     }
   ],

@@ -5,8 +5,11 @@
       "name": "sort_ints",
       "brief": "",
       "doc": "",
+      "sections": [],
+      "anchors": [],
       "member_type": "function",
       "parent": "",
+      "relates": "",
       "header": "file--functionpointer-h",
       "group": "",
       "deprecated": false,
@@ -34,6 +37,8 @@
       "name": "functionpointer.h",
       "brief": "",
       "doc": "",
+      "sections": [],
+      "anchors": [],
       "includes": []
     }
   ],

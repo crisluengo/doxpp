@@ -11,21 +11,27 @@
       "subpages": [
         "page1",
         "page2"
-      ]
+      ],
+      "sections": [],
+      "anchors": []
     },
     {
       "id": "page1",
       "title": "Page number 1",
       "doc": "This is the text for page number 1\nSee also [Page number 2](#page2).\n\nBack to [The index](#index).",
       "parent": "index",
-      "subpages": []
+      "subpages": [],
+      "sections": [],
+      "anchors": []
     },
     {
       "id": "page2",
       "title": "Page number 2",
       "doc": "This is the text for page number 2\nSee also [Page number 1](#page1).\n\nBack to [The index](#index).",
       "parent": "index",
-      "subpages": []
+      "subpages": [],
+      "sections": [],
+      "anchors": []
     }
   ]
 }

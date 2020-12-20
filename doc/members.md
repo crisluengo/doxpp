@@ -43,6 +43,10 @@ This description can be shown in a list of members.
 The full documentation, excluding the first line, which is in `"brief"`.['derived-class-member-id', 'derived-class-member-id', ...]
 Should be rendered through a Markdown processor.
 
+### "sections" (list)
+
+List of tuples: (ID, level) for all sections present in the "doc" string.
+
 ### "anchors" (list)
 
 List of strings with anchor IDs present in the "doc" string.

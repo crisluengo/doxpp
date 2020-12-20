@@ -20,6 +20,7 @@ def basic(id, name='', brief='', doc=''):
         'name': name,
         'brief': brief,
         'doc': doc,
+        'sections': [],
         'anchors': []
     }
 

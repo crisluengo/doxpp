@@ -8,7 +8,34 @@
       "title": "A page",
       "doc": "Some text. See [A section](#sec1) and [Another section](#sec2).\n\nAlso talk about [this particular subsection](#sec2-1).\n\n# A section {#sec1}\n\n## A subsection {#sec1-1}\n\n## Another subsection {#sec1-2}\n\n# Another section {#sec2}\n\n## Some more subsection {#sec2-1}\n\n## This is the last one {#sec2-2}",
       "parent": "",
-      "subpages": []
+      "subpages": [],
+      "sections": [
+        [
+          "sec1",
+          1
+        ],
+        [
+          "sec1-1",
+          2
+        ],
+        [
+          "sec1-2",
+          2
+        ],
+        [
+          "sec2",
+          1
+        ],
+        [
+          "sec2-1",
+          2
+        ],
+        [
+          "sec2-2",
+          2
+        ]
+      ],
+      "anchors": []
     }
   ]
 }
