@@ -14,11 +14,41 @@
 # this program; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+# Some bits of code are taken from m.css:
+#   Copyright 2017-2020 Vladimír Vondruš <mosra@centrum.cz>
+#   Copyright 2020 Yuri Edward <nicolas1.fraysse@epitech.eu>
+#
+#   Permission is hereby granted, free of charge, to any person obtaining a
+#   copy of this software and associated documentation files (the "Software"),
+#   to deal in the Software without restriction, including without limitation
+#   the rights to use, copy, modify, merge, publish, distribute, sublicense,
+#   and/or sell copies of the Software, and to permit persons to whom the
+#   Software is furnished to do so, subject to the following conditions:
+#
+#   The above copyright notice and this permission notice shall be included
+#   in all copies or substantial portions of the Software.
+#
+#   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+#   THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+#   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+#   DEALINGS IN THE SOFTWARE.
+
 import os
+import urllib.parse
 import markdown
+import jinja2
 
 from . import log
 from . import walktree
+from . import members
+
+from search import CssClass, ResultFlag, ResultMap, Trie, serialize_search_data, base85encode_search_data, search_filename, searchdata_filename, searchdata_filename_b85, searchdata_format_version
+
+
+default_templates = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'html_templates')
 
 
 class Status:
@@ -26,6 +56,8 @@ class Status:
     def __init__(self, data):
         # Data read in from JSON file
         self.data = data
+
+        walktree.populate_member_lists(data)
 
         # These dictionaries contain the same dictionaries as in 'data', but indexed by their ID so they're
         # easy to find. It is the *same* dictionaries, modifying these will modify 'data'.
@@ -51,6 +83,8 @@ class Status:
 
 
 def register_anchors_to_page(compound, page_id, status: Status):
+    for section in compound['sections']:
+        status.id_map[section[0]] = page_id
     for anchor in compound['anchors']:
         status.id_map[anchor] = page_id
 
@@ -197,23 +231,20 @@ def generate_page_page(page, status: Status):
     return ''
 
 
-def generate_default_index_page(status: Status):
-    # TODO Jinja stuff here
-    return ''
-
-
-def createhtml(input_file, output_dir, options):
+def createhtml(input_file, output_dir, options, template_params):
     """
     Generates HTML pages for the documentation in the JSON file `input_file`.
 
     :param input_file: the name of the JSON file that contains the documentation to format (string)
     :param output_dir: directory where the HTML files will be written (string)
     :param options: dictionary with options for how to process things
+    :param template_params: dictionary with template parameters
 
     Options must contain the keys:
     - 'show_private': include private members in the documentation
     - 'show_undocumented': include undocumented members in the documentation
-    Options should also contain keys used in the HTML templates.
+    - 'extra_files': list of extra files to copy to the output directory
+    - 'templates': path to templates to use instead of default ones
     """
 
     # Load data
@@ -229,23 +260,51 @@ def createhtml(input_file, output_dir, options):
     # Parse all Markdown
     parse_markdown(status)
 
+    # If custom template dir was supplied, use the default template directory
+    # as a fallback
+    template_paths = [options['templates']]
+    if options['templates'] != default_templates:
+        template_paths.append(default_templates)
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_paths),
+                             trim_blocks=True, lstrip_blocks=True, enable_async=True)
+
+    # Filter to return file basename or the full URL, if absolute
+    def basename_or_url(path):
+        if urllib.parse.urlparse(path).netloc:
+            return path
+        return os.path.basename(path)
+    def rtrim(value):
+        return value.rstrip()
+    env.filters['rtrim'] = rtrim
+    env.filters['basename_or_url'] = basename_or_url
+    env.filters['urljoin'] = urllib.parse.urljoin
+
     # Generate the pages
     for page in status.html_pages_index.keys():
         html = generate_member_page(page, status)
         with open(os.path.join(output_dir, page + '.html'), 'w') as file:
             file.write(html)
+    if 'index' not in status.pages:
+        page = members.new_page('index', options['PROJECT_NAME'], '')
+        status.pages['index'] = page
     for page in status.pages.values():
         html = generate_page_page(page, status)
         with open(os.path.join(output_dir, page['id'] + '.html'), 'w') as file:
             file.write(html)
-    if 'index' not in status.pages:
-        html = generate_default_index_page(status)
-        with open(os.path.join(output_dir, 'index.html'), 'w') as file:
-            file.write(html)
-        pass
 
-    # Generate indexes for pages, groups (==modules), namespaces/classes/structs (==classes), and headers (==files)
-    # TODO
+    # Generate indexes for pages, groups (==modules), namespaces, classes/structs (==classes), and headers (==files)
+    for index in ['pages', 'modules', 'namespaces', 'classes', 'files']:
+        file = '{}.html'.format(index)
+        template = env.get_template(file)
+        rendered = template.render(index=parsed.index,
+                                   FILENAME=file,
+                                   SEARCHDATA_FORMAT_VERSION=searchdata_format_version,
+                                   **template_params)
+        with open(os.path.join(output_dir, file), 'w') as file:
+            file.write(rendered)
 
     # Generate search data
+    # TODO
+
+    # Copy over all referenced files
     # TODO

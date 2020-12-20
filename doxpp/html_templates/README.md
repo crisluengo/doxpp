@@ -167,7 +167,7 @@ Note:
 For Entries:
 
 alias.has_details
-alias.base_url
+alias.page_id
 alias.id
 alias.templates
 alias.name
@@ -184,7 +184,7 @@ alias.doc
 
 class.templates
 class.kind
-class.url
+class.page_id
 class.name
 class.is_protected
 class.is_final
@@ -194,7 +194,7 @@ class.since
 class.brief
 
 enum.has_details
-enum.base_url
+enum.page_id
 enum.id
 enum.is_strong
 enum.name
@@ -209,14 +209,14 @@ enum is inside
 enum.doc
 enum.has_value_details
 
-file.url
+file.page_id
 file.name
 file.deprecated
 file.since
 file.brief
 
 function.has_details
-function.base_url
+function.page_id
 function.id
 function.templates
 function.prefix
@@ -250,7 +250,7 @@ function.exceptions
 function.doc
 
 macro.has_details
-macro.base_url
+macro.page_id
 macro.id
 macro.name
 macro.params
@@ -262,13 +262,13 @@ macro.has_param_details
 macro.return_value
 macro.doc
 
-module.url
+module.page_id
 module.name
 module.deprecated
 module.since
 module.brief
 
-namespace.url
+namespace.page_id
 namespace.name
 namespace.is_inline
 namespace.deprecated
@@ -276,7 +276,7 @@ namespace.since
 namespace.brief
 
 variable.has_details
-variable.base_url
+variable.page_id
 variable.id
 variable.templates
 variable.is_static
@@ -290,6 +290,3 @@ variable.brief
 variable.include
 variable.has_template_details
 variable.doc
-
-TODO: `<member>.base_url` and `<member>.url` should be replaced everywhere with `<member>.page_id`
-      We then need the template to add ".html" to the end of `<member>.page_id` to form the actual URL.

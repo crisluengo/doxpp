@@ -1,5 +1,0 @@
-            <dt{% if not macro.has_details and macro.base_url == compound.url %} id="{{ macro.id }}"{% endif %}>
-              {% set j = joiner(', ') %}
-              <span class="m-doc-wrap-bumper">#define <a href="{% if macro.base_url != compound.url %}{{ macro.base_url }}{% endif %}#{{ macro.id }}" class="m-doc{% if not macro.has_details and macro.base_url == compound.url %}-self{% endif %}">{{ macro.name }}</a>{% if macro.params != None %}(</span><span class="m-doc-wrap">{% for param in macro.params %}{{ j() }}{{ param[0] }}{% endfor %}){% endif %}{% if macro.deprecated %} <span class="m-label m-danger">{{ macro.deprecated }}</span>{% endif %}{% if macro.since %} {{ macro.since }}{% endif %}</span>
-            </dt>
-            <dd>{{ macro.brief }}</dd>

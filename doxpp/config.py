@@ -48,8 +48,9 @@ default_config_values = {
         'document undocumented members': 'no',
         'theme color': '#22272e',
         'favicon': '',
-        'stylesheets': '',
-        'extra files': '',
+        'stylesheets': '',            # style sheets to use in addition to the default ones (separate multiple files with spaces)
+        'templates': '',              # relative path to templates to use instead of the default ones
+        'extra files': '',            # additional files to copy to output directory (separate multiple files with spaces)
         'html header': '',            # HTML code to add to the <head> section of each HTML page
         'page header': '',            # HTML code to add to the top of each page
         'fine print': '[default]'     # text to use at the bottom of each page, leave empty for no footer
