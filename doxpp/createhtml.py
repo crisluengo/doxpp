@@ -149,11 +149,12 @@ def create_page(compound, status: Status):
 def show_member(member, show_private, show_undocumented):
     if not (show_undocumented or member['brief']):
         return False
-    if not (show_private or ('access' in member and member['access'] == 'private')):
+    if 'access' in member and not (show_private or (member['access'] == 'private')):
         return False
     return True
 
 def assign_page(status: Status, show_private, show_undocumented):
+    # TODO: Add option `show_if_documented_children`
     # All header files and groups will have a page, whether they're documented or not
     for header in status.headers.values():
         create_page(header, status)
@@ -217,14 +218,18 @@ def create_indices(status: Status):
         # TODO: for namespaces, we need to add a flag to indicate if there's child namespaces
         if not member['id']:
             continue
-        if member['member_type'] not in ['namespace','class','struct','union']:
+        if member['member_type'] not in ['namespace', 'class', 'struct', 'union']:
             continue
-        if not member['parent']:
-            index['symbols'].append(member)
         member['children'] = []
-        for s in member['members']:
-            if s['member_type'] in ['namespace','class','struct','union']:
-                member['children'].append(s)
+        if 'page_id' not in member or not member['page_id']:
+            continue
+        if member['parent']:
+            parent = status.members[member['parent']]
+            parent['children'].append(member) # Parent has been processed earlier, has a 'children' key
+            if member['member_type'] == 'namespace':
+                parent['has_child_namespace'] = True
+        else:
+            index['symbols'].append(member)
     # Files (headers)
     index['files'] = walktree.build_file_hierarchy(status.data['headers'])
     # Modules (groups)

@@ -76,7 +76,7 @@ def assign_file_part_recursive(parts, file, out):
         out.append(file.copy())
         out[-1]['name'] = parts[0]
     else:
-        if parts[0]!= out[-1]['name']: # Because we're processing files in alphabetical order, it it's there it's always the last element of out
+        if not out or parts[0] != out[-1]['name']:  # Because we're processing files in alphabetical order, it it's there it's always the last element of out
             out.append({'name': parts[0], 'children': []})
         assign_file_part_recursive(parts[1:], file, out[-1]['children'])
 

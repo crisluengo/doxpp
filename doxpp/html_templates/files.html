@@ -7,7 +7,7 @@
           {% for i in index.files recursive %}
           {% if i.children %}
           <li class="m-doc-collapsible{% if loop.depth > FILE_INDEX_EXPAND_LEVELS %} collapsed{% endif %}">
-            <a href="#" onclick="return toggle(this)">{{ i.name }}</a>
+            <a href="#" onclick="return toggle(this)">{{ i.name }}/</a>
             <ul class="m-doc">
 {{ loop(i.children)|rtrim|indent(4, true) }}
             </ul>

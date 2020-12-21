@@ -90,4 +90,7 @@ def read(filename: str):
 
 
 def get(config: configparser.ConfigParser, section: str, value: str):
-    return config[section].get(value, default_config_values[section][value])
+    return config[section].get(value, fallback=default_config_values[section][value])
+
+def get_boolean(config: configparser.ConfigParser, section: str, value: str):
+    return config[section].getboolean(value, fallback=default_config_values[section][value])
