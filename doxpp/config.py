@@ -48,7 +48,7 @@ default_config_values = {
         'document undocumented members': 'no',
         'theme color': '#22272e',
         'favicon': '',
-        'stylesheets': '',            # style sheets to use in addition to the default ones (separate multiple files with spaces)
+        'stylesheets': '',            # style sheets to use instead of the default ones (separate multiple files with spaces)
         'templates': '',              # relative path to templates to use instead of the default ones
         'extra files': '',            # additional files to copy to output directory (separate multiple files with spaces)
         'html header': '',            # HTML code to add to the <head> section of each HTML page

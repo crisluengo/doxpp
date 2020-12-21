@@ -14,7 +14,7 @@
 # this program; if not, write to the Free Software Foundation, Inc., 51
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import re
+import os
 import json
 
 from . import log
@@ -59,6 +59,41 @@ def populate_member_lists(data):
     data['headers']['members'] = []
     data['groups']['members'] = []
     populate_member_lists_recursive(data['members'], data)
+
+
+# ---  ---
+
+def split_path(head):
+    out = []
+    while head:
+        head, tail = os.path.split(head)
+        out.append(tail)
+    out.reverse()
+    return out
+
+def assign_file_part_recursive(parts, file, out):
+    if len(parts) == 1:
+        out.append(file.copy())
+        out[-1]['name'] = parts[0]
+    else:
+        if parts[0]!= out[-1]['name']: # Because we're processing files in alphabetical order, it it's there it's always the last element of out
+            out.append({'name': parts[0], 'children': []})
+        assign_file_part_recursive(parts[1:], file, out[-1]['children'])
+
+def build_file_hierarchy(headers):
+    """
+    Builds a file hierarchy.
+    :param headers: data['headers'] list
+    :return: hierarchical list of dictionaries with directories and files
+    out[ii]['name'] = file/directory name
+    out[ii]['children'] = list of dictionaries with directories and files, if this is a directory
+    out[ii][key] = value for key in corresponding data['headers'] element, if this is a file (i.e. copies over everything)
+    """
+    out = []
+    for file in sorted(headers, key=lambda x: x['name']):
+        parts = split_path(file['name'])
+        assign_file_part_recursive(parts, file, out)
+    return out
 
 
 # --- create_member_dict ---

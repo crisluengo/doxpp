@@ -45,10 +45,11 @@ from . import log
 from . import walktree
 from . import members
 
-from search import CssClass, ResultFlag, ResultMap, Trie, serialize_search_data, base85encode_search_data, search_filename, searchdata_filename, searchdata_filename_b85, searchdata_format_version
+from .search import CssClass, ResultFlag, ResultMap, Trie, serialize_search_data, base85encode_search_data, search_filename, searchdata_filename, searchdata_filename_b85, searchdata_format_version
 
 
-default_templates = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'html_templates')
+doxpp_path = os.path.dirname(os.path.realpath(__file__))
+default_templates = os.path.join(doxpp_path, 'html_templates')
 
 
 class Status:
@@ -56,8 +57,6 @@ class Status:
     def __init__(self, data):
         # Data read in from JSON file
         self.data = data
-
-        walktree.populate_member_lists(data)
 
         # These dictionaries contain the same dictionaries as in 'data', but indexed by their ID so they're
         # easy to find. It is the *same* dictionaries, modifying these will modify 'data'.
@@ -70,7 +69,14 @@ class Status:
         # To link to an ID, link to "<page>.html#<ID>", unless page==ID, in which case
         # it suffices to link to "<page>.html".
         # Items not in here are not documented.
-        self.id_map = {}
+        self.id_map = {
+            'classes': 'classes',
+            'files': 'files',
+            'index': 'index',
+            'modules': 'modules',
+            'namespaces': 'namespaces',
+            'pages': 'pages'
+        }
 
         # This dictionary links each page to the members that will be listed there (with or without
         # detailed documentation). Members can be listed on multiple pages.
@@ -81,6 +87,35 @@ class Status:
         # except that it contains only members.
         self.html_pages_detailed = {}
 
+    def get_link(self, id):
+        # Convert an ID into a URL to link to
+        page = self.id_map[id]
+        if page == id:
+            return page + '.html'
+        else:
+            return page + '.html#' + id
+
+    def find_title(self, id):
+        standard = {
+            'classes': 'Classes',
+            'files': 'Files',
+            'index': 'Home',
+            'modules': 'Modules',
+            'namespaces': 'Namespaces',
+            'pages': 'Pages'
+        }
+        if id in standard:
+            return standard[id]
+        if id in self.members:
+            return self.members[id]['name']
+        if id in self.headers:
+            return self.headers[id]['name']
+        if id in self.groups:
+            return self.groups[id]['name']
+        if id in self.pages:
+            return self.pages[id]['title']
+        # TODO: how about links to (sub-)sections and anchors?
+        return '(unknown)'
 
 def register_anchors_to_page(compound, page_id, status: Status):
     for section in compound['sections']:
@@ -170,6 +205,58 @@ def assign_page(status: Status, show_private, show_undocumented):
         create_page(page, status)
 
 
+
+def create_indices(status: Status):
+    index = {}
+    index['symbols'] = []   # Used in classes and namespaces index
+    index['files'] = []     # Used in files index
+    index['modules'] = []   # Used in modules index
+    index['pages'] = []     # used in pages index
+    # Symbols (class, struct, union and namespace)
+    for member in status.members.values():
+        # TODO: for namespaces, we need to add a flag to indicate if there's child namespaces
+        if not member['id']:
+            continue
+        if member['member_type'] not in ['namespace','class','struct','union']:
+            continue
+        if not member['parent']:
+            index['symbols'].append(member)
+        member['children'] = []
+        for s in member['members']:
+            if s['member_type'] in ['namespace','class','struct','union']:
+                member['children'].append(s)
+    # Files (headers)
+    index['files'] = walktree.build_file_hierarchy(status.data['headers'])
+    # Modules (groups)
+    for group in status.data['groups']:
+        if not group['parent']:
+            index['modules'].append(group)
+        group['children'] = []
+        for s in group['subgroups']:
+            group['children'].append(status.groups[s])
+    # Pages
+    for page in status.data['pages']:
+        if not page['parent']:
+            index['pages'].append(page)
+        page['children'] = []
+        for s in page['subpages']:
+            page['children'].append(status.pages[s])
+    return index
+
+
+def process_navbar_links(navbar, status: Status):
+    # Convert (title, id, sub) into (title, link, id, sub)
+    out = []
+    for title, id, sub in navbar:
+        if sub:
+            sub = process_navbar_links(sub, status)
+        link = status.get_link(id)
+        if not title:
+            title = status.find_title(id)
+        out.append((title, link, id, sub))
+    return out
+
+
 def parse_markdown(status: Status):
     extensions = ['attr_list',      # https://python-markdown.github.io/extensions/attr_list/
                   'md_in_html',     # https://python-markdown.github.io/extensions/md_in_html/
@@ -257,8 +344,21 @@ def createhtml(input_file, output_dir, options, template_params):
     #print('\n\nhtml_pages_detailed', status.html_pages_detailed)
     #print('\n\nid_map', status.id_map)
 
+    # Create tree structure for index pages
+    index = create_indices(status)
+
+    # Navbar links
+    if 'LINKS_NAVBAR1' in template_params:
+        template_params['LINKS_NAVBAR1'] = process_navbar_links(template_params['LINKS_NAVBAR1'], status)
+    if 'LINKS_NAVBAR2' in template_params:
+        template_params['LINKS_NAVBAR2'] = process_navbar_links(template_params['LINKS_NAVBAR2'], status)
+
     # Parse all Markdown
     parse_markdown(status)
+
+    # If no stylesheets were given, use the default one
+    if not 'STYLESHEETS' in template_params or not template_params['STYLESHEETS']:
+        template_params['STYLESHEETS'] = ['m-light-documentation.compiled.css']
 
     # If custom template dir was supplied, use the default template directory
     # as a fallback
@@ -293,10 +393,9 @@ def createhtml(input_file, output_dir, options, template_params):
             file.write(html)
 
     # Generate indexes for pages, groups (==modules), namespaces, classes/structs (==classes), and headers (==files)
-    for index in ['pages', 'modules', 'namespaces', 'classes', 'files']:
-        file = '{}.html'.format(index)
+    for file in ['pages.html', 'modules.html', 'namespaces.html', 'classes.html', 'files.html']:
         template = env.get_template(file)
-        rendered = template.render(index=parsed.index,
+        rendered = template.render(index=index,
                                    FILENAME=file,
                                    SEARCHDATA_FORMAT_VERSION=searchdata_format_version,
                                    **template_params)

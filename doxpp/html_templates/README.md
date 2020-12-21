@@ -161,6 +161,34 @@ Modules index pages, `index` contains:
 Pages index pages, `index` contains:
 - `pages`
 
+index.symbols.member_type
+index.symbols.page_id
+index.symbols.name
+index.symbols.is_inline # TODO
+index.symbols.deprecated
+index.symbols.since # TODO
+index.symbols.brief
+index.symbols.children
+index.symbols.is_final # TODO
+index.files.name
+index.files.children # iff directory
+index.files.page_id
+index.files.deprecated # TODO
+index.files.since # TODO
+index.files.brief
+index.modules.page_id
+index.modules.name
+index.modules.deprecated # TODO
+index.modules.since # TODO
+index.modules.brief
+index.modules.children
+index.pages.children
+index.pages.page_id
+index.pages.title
+index.pages.deprecated # TODO
+index.pages.since # TODO
+index.pages.brief
+
 Note:
 - `sections` contains the section headers, used only to generate the table of contents for classes/structs, files, namespaces and modules.
 
