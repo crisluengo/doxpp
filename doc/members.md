@@ -107,6 +107,10 @@ See below under "The type dictionary".
 
 `true` if this is a class template.
 
+### "abstract" (boolean)
+
+`true` if this is an abstract class (has a pure virtual member function).
+
 ### "bases" (list)
 
 A list of dictionaries listing the base classes. It contains the following fields:
@@ -159,6 +163,10 @@ The value of the enumerator constant.
 ### "constexpr" (boolean)
 
 `true` if this is a `constexpr` function.
+
+### "noexcept" (boolean)
+
+`true` if the function is marked `noexcept`.
 
 ### "return_type"  (dictionary)
 

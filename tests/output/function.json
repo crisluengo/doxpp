@@ -15,6 +15,7 @@
       "deprecated": false,
       "templated": false,
       "constexpr": true,
+      "noexcept": false,
       "return_type": {
         "typename": "double",
         "qualifiers": "",
@@ -37,6 +38,7 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
+      "noexcept": false,
       "return_type": {
         "typename": "double",
         "qualifiers": "",
@@ -51,6 +53,29 @@
           "id": ""
         }
       ]
+    },
+    {
+      "id": "function_noexcept",
+      "name": "function_noexcept",
+      "brief": "",
+      "doc": "",
+      "sections": [],
+      "anchors": [],
+      "member_type": "function",
+      "parent": "",
+      "relates": "",
+      "header": "file--function-h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "constexpr": false,
+      "noexcept": true,
+      "return_type": {
+        "typename": "double",
+        "qualifiers": "",
+        "id": ""
+      },
+      "arguments": []
     }
   ],
   "headers": [

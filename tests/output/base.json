@@ -14,6 +14,8 @@
       "group": "",
       "deprecated": false,
       "templated": false,
+      "abstract": true,
+      "final": false,
       "bases": [],
       "derived": [
         "A"
@@ -36,10 +38,13 @@
           "static": false,
           "virtual": true,
           "pure_virtual": true,
+          "final": false,
+          "override": false,
           "const": false,
           "access": "public",
-          "constexpr": false,
           "method_type": "method",
+          "constexpr": false,
+          "noexcept": false,
           "return_type": {
             "typename": "void",
             "qualifiers": "",
@@ -64,6 +69,8 @@
       "group": "",
       "deprecated": false,
       "templated": false,
+      "abstract": false,
+      "final": false,
       "bases": [
         {
           "typename": "Base",
@@ -90,10 +97,13 @@
           "static": false,
           "virtual": true,
           "pure_virtual": false,
+          "final": false,
+          "override": false,
           "const": false,
           "access": "public",
-          "constexpr": false,
           "method_type": "method",
+          "constexpr": false,
+          "noexcept": false,
           "return_type": {
             "typename": "void",
             "qualifiers": "",

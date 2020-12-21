@@ -28,6 +28,8 @@
           "group": "",
           "deprecated": false,
           "templated": false,
+          "abstract": false,
+          "final": false,
           "bases": [],
           "derived": [],
           "members": [],
@@ -48,6 +50,7 @@
           "deprecated": false,
           "templated": false,
           "constexpr": false,
+          "noexcept": false,
           "return_type": {
             "typename": "void",
             "qualifiers": "",

@@ -1,0 +1,223 @@
+{
+  "members": [
+    {
+      "id": "Base",
+      "name": "Base",
+      "brief": "",
+      "doc": "",
+      "sections": [],
+      "anchors": [],
+      "member_type": "struct",
+      "parent": "",
+      "relates": "",
+      "header": "file--final-h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "abstract": false,
+      "final": false,
+      "bases": [],
+      "derived": [
+        "A"
+      ],
+      "members": [
+        {
+          "id": "Base-foo",
+          "name": "foo",
+          "brief": "",
+          "doc": "",
+          "sections": [],
+          "anchors": [],
+          "member_type": "function",
+          "parent": "Base",
+          "relates": "",
+          "header": "file--final-h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": true,
+          "pure_virtual": false,
+          "final": false,
+          "override": false,
+          "const": false,
+          "access": "public",
+          "method_type": "method",
+          "constexpr": false,
+          "noexcept": false,
+          "return_type": {
+            "typename": "void",
+            "qualifiers": "",
+            "id": ""
+          },
+          "arguments": []
+        }
+      ],
+      "related": []
+    },
+    {
+      "id": "A",
+      "name": "A",
+      "brief": "",
+      "doc": "",
+      "sections": [],
+      "anchors": [],
+      "member_type": "struct",
+      "parent": "",
+      "relates": "",
+      "header": "file--final-h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "abstract": false,
+      "final": false,
+      "bases": [
+        {
+          "typename": "Base",
+          "access": "public",
+          "id": "Base"
+        }
+      ],
+      "derived": [
+        "B"
+      ],
+      "members": [
+        {
+          "id": "A-foo",
+          "name": "foo",
+          "brief": "",
+          "doc": "",
+          "sections": [],
+          "anchors": [],
+          "member_type": "function",
+          "parent": "A",
+          "relates": "",
+          "header": "file--final-h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": true,
+          "pure_virtual": false,
+          "final": true,
+          "override": false,
+          "const": false,
+          "access": "public",
+          "method_type": "method",
+          "constexpr": false,
+          "noexcept": false,
+          "return_type": {
+            "typename": "void",
+            "qualifiers": "",
+            "id": ""
+          },
+          "arguments": []
+        },
+        {
+          "id": "A-bar",
+          "name": "bar",
+          "brief": "",
+          "doc": "",
+          "sections": [],
+          "anchors": [],
+          "member_type": "function",
+          "parent": "A",
+          "relates": "",
+          "header": "file--final-h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": true,
+          "pure_virtual": false,
+          "final": false,
+          "override": false,
+          "const": false,
+          "access": "public",
+          "method_type": "method",
+          "constexpr": false,
+          "noexcept": false,
+          "return_type": {
+            "typename": "void",
+            "qualifiers": "",
+            "id": ""
+          },
+          "arguments": []
+        }
+      ],
+      "related": []
+    },
+    {
+      "id": "B",
+      "name": "B",
+      "brief": "",
+      "doc": "",
+      "sections": [],
+      "anchors": [],
+      "member_type": "struct",
+      "parent": "",
+      "relates": "",
+      "header": "file--final-h",
+      "group": "",
+      "deprecated": false,
+      "templated": false,
+      "abstract": false,
+      "final": true,
+      "bases": [
+        {
+          "typename": "A",
+          "access": "public",
+          "id": "A"
+        }
+      ],
+      "derived": [],
+      "members": [
+        {
+          "id": "B-bar",
+          "name": "bar",
+          "brief": "",
+          "doc": "",
+          "sections": [],
+          "anchors": [],
+          "member_type": "function",
+          "parent": "B",
+          "relates": "",
+          "header": "file--final-h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "static": false,
+          "virtual": true,
+          "pure_virtual": false,
+          "final": false,
+          "override": true,
+          "const": false,
+          "access": "public",
+          "method_type": "method",
+          "constexpr": false,
+          "noexcept": false,
+          "return_type": {
+            "typename": "void",
+            "qualifiers": "",
+            "id": ""
+          },
+          "arguments": []
+        }
+      ],
+      "related": []
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--final-h",
+      "name": "final.h",
+      "brief": "",
+      "doc": "",
+      "sections": [],
+      "anchors": [],
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

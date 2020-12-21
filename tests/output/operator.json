@@ -28,6 +28,8 @@
           "group": "",
           "deprecated": false,
           "templated": false,
+          "abstract": false,
+          "final": false,
           "bases": [],
           "derived": [],
           "members": [
@@ -48,10 +50,13 @@
               "static": false,
               "virtual": false,
               "pure_virtual": false,
+              "final": false,
+              "override": false,
               "const": false,
               "access": "public",
-              "constexpr": false,
               "method_type": "method",
+              "constexpr": false,
+              "noexcept": false,
               "return_type": {
                 "typename": "bool",
                 "qualifiers": "",
@@ -84,10 +89,13 @@
               "static": false,
               "virtual": false,
               "pure_virtual": false,
+              "final": false,
+              "override": false,
               "const": true,
               "access": "public",
-              "constexpr": false,
               "method_type": "conversionfunction",
+              "constexpr": false,
+              "noexcept": false,
               "return_type": {
                 "typename": "int",
                 "qualifiers": "*",
@@ -113,6 +121,7 @@
           "deprecated": false,
           "templated": false,
           "constexpr": false,
+          "noexcept": false,
           "return_type": {
             "typename": "bool",
             "qualifiers": "",
@@ -150,6 +159,7 @@
           "deprecated": false,
           "templated": false,
           "constexpr": false,
+          "noexcept": false,
           "return_type": {
             "typename": "N::A",
             "qualifiers": "",
@@ -182,6 +192,7 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
+      "noexcept": false,
       "return_type": {
         "typename": "void",
         "qualifiers": "*",
@@ -212,6 +223,7 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
+      "noexcept": false,
       "return_type": {
         "typename": "void",
         "qualifiers": "*",
@@ -242,6 +254,7 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
+      "noexcept": true,
       "return_type": {
         "typename": "void",
         "qualifiers": "",
@@ -272,6 +285,7 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
+      "noexcept": true,
       "return_type": {
         "typename": "void",
         "qualifiers": "",

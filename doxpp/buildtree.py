@@ -1217,6 +1217,8 @@ def is_constexpr(item):
     return False
 
 def process_function_declaration(item, member):
+    member['constexpr'] = is_constexpr(item)
+    member['noexcept'] = item.exception_specification_kind in [cindex.ExceptionSpecificationKind.BASIC_NOEXCEPT, cindex.ExceptionSpecificationKind.COMPUTED_NOEXCEPT]
     member['return_type'] = process_type(item.type.get_result())
     arguments = []
     for child in item.get_children():
@@ -1235,6 +1237,10 @@ def process_function_declaration(item, member):
             param['name'] = name
             param['default'] = default
             arguments.append(param)
+        elif child.kind == cindex.CursorKind.CXX_FINAL_ATTR:
+            member['final'] = True
+        elif child.kind == cindex.CursorKind.CXX_OVERRIDE_ATTR:
+            member['override'] = True
     member['arguments'] = arguments
 
 def merge_member(member, new_member):
@@ -1273,6 +1279,10 @@ def extract_declarations(citer, parent, status: Status):
         if item.kind == cindex.CursorKind.UNEXPOSED_DECL:
             extract_declarations(item.get_children(), parent, status)
             continue
+
+        if item.kind == cindex.CursorKind.CXX_FINAL_ATTR:
+            # This should only happen for classes
+            status.members[parent]['final'] = True
 
         if item.kind in cursor_kind_to_type_map:
             # What are we dealing with?
@@ -1447,6 +1457,8 @@ def extract_declarations(citer, parent, status: Status):
                     # This is a forward declaration, let's skip it
                     continue
                 member['templated'] = is_template
+                member['abstract'] = item.is_abstract_record()
+                member['final'] = False
                 member['bases'] = []
                 member['derived'] = []
                 member['members'] = []
@@ -1457,11 +1469,11 @@ def extract_declarations(citer, parent, status: Status):
                 member['static'] = item.is_static_method()
                 member['virtual'] = item.is_virtual_method()
                 member['pure_virtual'] = item.is_pure_virtual_method()
+                member['final'] = False
+                member['override'] = False
                 member['const'] = item.is_const_method()
                 member['access'] = access_specifier_map[item.access_specifier]
-                member['constexpr'] = is_constexpr(item)
                 member['method_type'] = member_type
-                # TODO: a child member could be cindex.CursorKind.CXX_FINAL_ATTR?
                 process_function_declaration(item, member)
                 member_type = 'function'  # write out as function
             elif member_type == 'enumvalue':
@@ -1486,7 +1498,6 @@ def extract_declarations(citer, parent, status: Status):
                 member_type = 'variable'
             elif member_type == 'function':
                 member['templated'] = is_template
-                member['constexpr'] = is_constexpr(item)
                 process_function_declaration(item, member)
             elif member_type == 'namespace':
                 member['members'] = []
@@ -1528,8 +1539,6 @@ def extract_declarations(citer, parent, status: Status):
             #     else:
             #         log.error("Template parameter kind not recognized")
             #         continue
-            #
-            # TODO: Friend functions and classes should automatically be added to the 'related' field.
 
             # Deal with IDs -- we do this at the end of the above so we can use all that data to generate our ID.
             usr = item.get_usr()

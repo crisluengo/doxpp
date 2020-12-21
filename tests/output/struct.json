@@ -14,6 +14,8 @@
       "group": "",
       "deprecated": false,
       "templated": false,
+      "abstract": false,
+      "final": false,
       "bases": [],
       "derived": [],
       "members": [
@@ -86,6 +88,7 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
+      "noexcept": false,
       "return_type": {
         "typename": "A",
         "qualifiers": "*",
@@ -108,6 +111,7 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
+      "noexcept": false,
       "return_type": {
         "typename": "void",
         "qualifiers": "",
@@ -138,6 +142,7 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
+      "noexcept": false,
       "return_type": {
         "typename": "int",
         "qualifiers": "",
@@ -168,6 +173,7 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
+      "noexcept": false,
       "return_type": {
         "typename": "float",
         "qualifiers": "",

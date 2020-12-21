@@ -15,6 +15,7 @@
       "deprecated": false,
       "templated": false,
       "constexpr": false,
+      "noexcept": false,
       "return_type": {
         "typename": "int",
         "qualifiers": "",
