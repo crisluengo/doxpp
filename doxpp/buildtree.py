@@ -535,7 +535,7 @@ def post_process_types(members):
 
 def cleanup_qualifiers(member):
     # Replace 'qualifiers' member in 'type' dicts with a string
-    if 'type' in member and isinstance(member['type'], dict):
+    if 'type' in member and isinstance(member['type'], dict) and member['type']:
         member['type']['qualifiers'] = ''.join(member['type']['qualifiers'])
     if 'return_type' in member and isinstance(member['return_type'], dict):
         member['return_type']['qualifiers'] = ''.join(member['return_type']['qualifiers'])
@@ -1301,10 +1301,12 @@ def extract_declarations(citer, parent, status: Status):
                     else:
                         log.warning("USR of semantic parent for %s was unknown, ignoring member.\n   in file %s",
                                     item.displayname, status.current_header_name)
+                        log.info("   USR of semantic parent is %s", semantic_parent)
                         # This seems to happen in template specializations.
                         # It also also when a class member definition is in a header file that is not the
                         # header file where the class is defined, and that header file is processed first, such
                         # that the class is yet unknown.
+                        # TODO: how do we fix this when it's a problem of parsing headers in correct order?
                         continue
                 else:
                     log.debug("Semantic parent for %s not given, assuming lexical parent is semantic parent.\n" +
