@@ -231,6 +231,11 @@ The list of dictionaries for the child members.
 
 The list of dictionaries for the child members.
 
+### "related" (list)
+
+A list of strings, the IDs of related members. These are not child members, but are related
+to the union and their documentation could be shown together with that of the union's members.
+
 
 ## variable-specific fields
 

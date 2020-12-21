@@ -21,9 +21,11 @@ for file in glob.glob(os.path.join(currentdir, 'input', '*')):
     if ext == '.md':
         h_file = ''
         md_file = file
-    else:
+    elif ext == '.h':
         h_file = file
         md_file = ''
+    else:
+        continue
     data = doxpp.buildtree.buildtree(os.path.join(currentdir, 'input'), h_file, md_file, '-std=c++11', '', options)
     with open(json_file, 'w') as output_file:
         output_file.write(json.dumps(data, indent=2))

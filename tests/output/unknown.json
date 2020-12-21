@@ -1,0 +1,74 @@
+{
+  "members": [
+    {
+      "id": "A",
+      "name": "A",
+      "brief": "",
+      "doc": "",
+      "sections": [],
+      "anchors": [],
+      "member_type": "namespace",
+      "parent": "",
+      "relates": "",
+      "header": "",
+      "group": "",
+      "deprecated": false,
+      "members": [
+        {
+          "id": "A-B",
+          "name": "B",
+          "brief": "",
+          "doc": "",
+          "sections": [],
+          "anchors": [],
+          "member_type": "namespace",
+          "parent": "A",
+          "relates": "",
+          "header": "",
+          "group": "",
+          "deprecated": false,
+          "members": [
+            {
+              "id": "A-B-foo",
+              "name": "foo",
+              "brief": "Documenting a member of a namespace not declared in the documented headers.",
+              "doc": "",
+              "sections": [],
+              "anchors": [],
+              "member_type": "function",
+              "parent": "A-B",
+              "relates": "",
+              "header": "file--unknown-h",
+              "group": "",
+              "deprecated": false,
+              "templated": false,
+              "constexpr": false,
+              "noexcept": false,
+              "return_type": {
+                "typename": "int",
+                "qualifiers": "",
+                "id": ""
+              },
+              "arguments": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--unknown-h",
+      "name": "unknown.h",
+      "brief": "",
+      "doc": "",
+      "sections": [],
+      "anchors": [],
+      "includes": [
+        "\"unknown/_unknown.h\""
+      ]
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

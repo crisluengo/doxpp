@@ -13,7 +13,8 @@
       "header": "file--union-h",
       "group": "",
       "deprecated": false,
-      "members": []
+      "members": [],
+      "related": []
     }
   ],
   "headers": [

@@ -553,9 +553,9 @@ def post_process_inheritance(members):
     # - add links to base and derived classes
     #    member['bases'][ii] = '[name](#name)'
     #    member['derived'] = ['derived-class-id', 'derived-class-id', ...]
-    # - add links to derived class members that override virtual base class members
+    # - TODO: add links to derived class members that override virtual base class members
     #    member['override'] = 'base-class-member-id'
-    # - add links to the overridden virtual base class members
+    # - TODO: add links to the overridden virtual base class members
     #    member['overridden'] = ['derived-class-member-id', 'derived-class-member-id', ...]
     for member in members.values():
         if 'bases' in member:
@@ -566,7 +566,6 @@ def post_process_inheritance(members):
                     base['id'] = id
                     base_member = members[id]
                     base_member['derived'].append(member['id'])
-                    # TODO: find virtual functions in base class that are overridden in derived class
 
 ref_cmd_match = re.compile(r'[\\@]ref +((?:\w|::|%|-)+(?: *\(.*?\))?)(?: +"(.*?)")?')
 ref_cmd_quotes_match = re.compile(r'[\\@]ref +"((?:[^"]|"")+)"(?: +"(.*?)")?')
@@ -670,7 +669,7 @@ def post_process_relates(members):
 
         def relates_cmd_replace(match):
             id = find_member(match[1], member['id'], members)
-            if id and members[id]['member_type'] in ['class', 'struct']:
+            if id and members[id]['member_type'] in ['class', 'struct', 'union']:
                 members[id]['related'].append(member['id'])
                 member['relates'] = id
             else:
@@ -679,7 +678,7 @@ def post_process_relates(members):
 
         if 'doc' in member:  # this one is missing if member is status.members['']
             # We only look for the command in documentation to functions, variables, macros, aliases, enums
-            if member['member_type'] in ['function', 'variable', 'macro', 'aliase', 'enum']:
+            if member['member_type'] in ['function', 'variable', 'macro', 'alias', 'enum']:
                 parent = member['parent']
                 # We only look for the command in documentation to namespace members (not class, struct, union or enum members)
                 if not parent or members[parent]['member_type'] == 'namespace':
@@ -867,8 +866,7 @@ def process_page_command(cmd: DocumentationCommand, status: Status):
 def process_documentation_command(cmd: DocumentationCommand, status: Status):
     # This function processes commands that add documentation to members
     if cmd.cmd == 'dir':
-        # TODO: How do we record these? Is this even useful?
-        log.error("\\dir currently not implemented, documentation ignored.\n   in file %s", cmd.file)
+        log.error("\\dir not implemented, documentation ignored.\n   in file %s", cmd.file)
         return
     if cmd.cmd == 'file':
         process_file_command(cmd, status)
@@ -1253,8 +1251,45 @@ def merge_member(member, new_member):
                 if m not in member['members']:
                     member['members'].append(m)
             continue
-        if key in member and not member[key]:
+        if key not in member or not member[key]:
             member[key] = new_member[key]
+
+def add_undocumented_member(item: cindex.Cursor, status: Status):
+    # Adds members to status.data (and status.members) without much information, to be filled in
+    # at a later time, for the purpose of documenting its members now. This is called when documenting
+    # the child of a member that has been declared in an #included header file, and that header file
+    # is either not part of the documentation input, or it will be parsed later.
+    if item.kind in cursor_kind_to_type_map:
+        # What are we dealing with?
+        member_type = cursor_kind_to_type_map[item.kind]
+        if member_type not in ['namespace', 'class', 'struct', 'union']:
+            log.error("This is unexpected!")
+            return
+        semantic_parent = ''
+        semantic_parent_item = item.semantic_parent
+        if semantic_parent_item:
+            semantic_parent = semantic_parent_item.get_usr()
+        if semantic_parent:
+            if semantic_parent not in status.member_ids:
+                add_undocumented_member(semantic_parent_item, status)
+            semantic_parent = status.member_ids[semantic_parent]
+        member = members.new_member('', item.spelling, member_type, semantic_parent, '')
+        member['members'] = []
+        id = unique_id.member(member, status)  # TODO: This goes wrong with templated types, we haven't figured out the template params, and the ID will be wrong here
+        member['id'] = id
+        status.member_ids[item.get_usr()] = id
+        if id in status.members:
+            log.error("USR for member %s was unknown, but ID %s was already there! This means that " +
+                      "there is a name clash, unique_id.member is not good enough.\n   in file %s",
+                      member['name'], id, status.current_header_name)
+            return
+        status.members[id] = member
+        if semantic_parent:
+            status.members[semantic_parent]['members'].append(member)
+        else:
+            status.data['members'].append(member)
+    else:
+        log.error("This is unexpected!")
 
 def extract_declarations(citer, parent, status: Status):
     # Recursive AST exploration, adds data to `status`.
@@ -1302,22 +1337,21 @@ def extract_declarations(citer, parent, status: Status):
             if member_type == 'templatenontypeparameter' or member_type == 'templatetypeparameter':
                 semantic_parent = parent
             else:
-                semantic_parent = item.semantic_parent
+                semantic_parent = ''
+                semantic_parent_item = item.semantic_parent
+                if semantic_parent_item:
+                    semantic_parent = semantic_parent_item.get_usr()
                 if semantic_parent:
-                    semantic_parent = item.semantic_parent.get_usr()
-                if semantic_parent:
-                    if semantic_parent in status.member_ids:
-                        semantic_parent = status.member_ids[semantic_parent]
-                    else:
-                        log.warning("USR of semantic parent for %s was unknown, ignoring member.\n   in file %s",
-                                    item.displayname, status.current_header_name)
-                        log.info("   USR of semantic parent is %s", semantic_parent)
+                    if semantic_parent not in status.member_ids:
                         # This seems to happen in template specializations.
                         # It also also when a class member definition is in a header file that is not the
                         # header file where the class is defined, and that header file is processed first, such
                         # that the class is yet unknown.
-                        # TODO: how do we fix this when it's a problem of parsing headers in correct order?
-                        continue
+                        log.warning("USR of semantic parent for %s was unknown, adding undocumented member.\n   in file %s",
+                                    item.displayname, status.current_header_name)
+                        add_undocumented_member(semantic_parent_item, status)
+                        log.info("   ID of undocumented semantic parent is %s", status.member_ids[semantic_parent])
+                    semantic_parent = status.member_ids[semantic_parent]
                 else:
                     log.debug("Semantic parent for %s not given, assuming lexical parent is semantic parent.\n" +
                               "   in file %s", item.displayname, status.current_header_name)
@@ -1514,6 +1548,7 @@ def extract_declarations(citer, parent, status: Status):
                     process_children = True
             elif member_type == 'union':
                 member['members'] = []
+                member['related'] = []
                 process_children = True
             elif member_type == 'variable':
                 member['type'] = process_type(item.type, item)
@@ -1580,7 +1615,7 @@ def is_under_directory(file, path):
         return os.path.relpath(file, path), True
     return file, False
 
-def extract_includes(tu, status: Status, include_dirs):
+def extract_includes(tu, status: Status, input_files, include_dirs):
     # Gets the list of files directly included by this one (not the ones included
     # by files included here).
     # include_dirs[0] is always the project's root dir
@@ -1589,9 +1624,12 @@ def extract_includes(tu, status: Status, include_dirs):
     for f in it:
         if f.depth == 1:
             include = os.path.realpath(f.include.name)
-            include, in_project = is_under_directory(include, include_dirs[0])
-            if in_project:
-                this_file_includes.append('"[{}](#{})"'.format(include, unique_id.header(include)))
+            include_name, is_under_project = is_under_directory(include, include_dirs[0])
+            if is_under_project:
+                if include in input_files:
+                    this_file_includes.append('"[{}](#{})"'.format(include_name, unique_id.header(include_name)))
+                else:
+                    this_file_includes.append('"{}"'.format(include_name))
             else:
                 full_include = include
                 for dir in include_dirs[1:]:
@@ -1636,8 +1674,8 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
 
     # Process the input parameters
     root_dir = os.path.realpath(root_dir)
-    input_files = expand_sources(shlex.split(input_files))
-    additional_files = expand_sources(shlex.split(additional_files))
+    input_files = [os.path.realpath(x) for x in expand_sources(shlex.split(input_files))]
+    additional_files = [os.path.realpath(x) for x in expand_sources(shlex.split(additional_files))]
     compiler_flags = compiler_flags.split()
     include_dirs = [os.path.realpath(x) for x in shlex.split(include_dirs, posix=False)]
 
@@ -1665,7 +1703,6 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
     processed = {}
     for f in input_files:
         # Skip file if already processed
-        f = os.path.realpath(f)  # realpath makes for better comparisons
         if f in processed:
             continue
 
@@ -1713,7 +1750,7 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
                 exit(1)
 
         # Extract list of headers included by this file
-        extract_includes(tu, status, include_dirs)
+        extract_includes(tu, status, input_files, include_dirs)
 
         # Extract and process documentation comments with commands
         process_comments(tu, status)
@@ -1734,14 +1771,13 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
     status.current_file_name = ''
     processed = {}
     for f in additional_files:
-        # Record file name in `current_include_name` for use in error messages
-        status.current_header_name = f
-
         # Skip file if already processed
-        f = os.path.realpath(f)  # realpath makes for better comparisons
         if f in processed:
             continue
         log.info('Processing %s', f)
+
+        # Record file name in `current_include_name` for use in error messages
+        status.current_header_name = f
 
         # Reset the parts of status that we use
         status.current_group = ['']

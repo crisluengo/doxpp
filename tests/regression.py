@@ -38,9 +38,11 @@ def generate_tests():
         if ext == '.md':
             h_file = ''
             md_file = file
-        else:
+        elif ext == '.h':
             h_file = file
             md_file = ''
+        else:
+            continue
         t = create_test(name, os.path.join(currentdir, 'input'), h_file, md_file, json_file)
         setattr(Regression, t.__name__, t)
 
