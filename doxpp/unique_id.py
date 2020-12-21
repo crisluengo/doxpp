@@ -16,9 +16,11 @@
 
 import urllib.parse
 import re
+import os
 
 
 def header(name):
+    name = name.replace(os.path.sep, '--')
     id = 'file--' + urllib.parse.quote(name, safe='')
     return id.replace('.','-')
 

@@ -338,7 +338,7 @@ def find_anchor_cmds(doc, status: Status):
             log.error("Anchor %s already exists, ignored.", name)
             return '{} {}'.format('#' * level, title)
         status.anchors[name] = title
-        sections.append((name, level))
+        sections.append([name, level])
         return '{} {} {{#{}}}'.format('#' * level, title, name)
 
     def anchor_cmd_replace(match):
@@ -550,13 +550,7 @@ def cleanup_qualifiers(member):
                 arg['type']['qualifiers'] = ''.join(arg['type']['qualifiers'])
 
 def post_process_inheritance(members):
-    # - add links to base and derived classes
-    #    member['bases'][ii] = '[name](#name)'
-    #    member['derived'] = ['derived-class-id', 'derived-class-id', ...]
-    # - TODO: add links to derived class members that override virtual base class members
-    #    member['override'] = 'base-class-member-id'
-    # - TODO: add links to the overridden virtual base class members
-    #    member['overridden'] = ['derived-class-member-id', 'derived-class-member-id', ...]
+    # Add links to derived classes in the base classes
     for member in members.values():
         if 'bases' in member:
             for base in member['bases']:
@@ -1264,7 +1258,7 @@ def add_undocumented_member(item: cindex.Cursor, status: Status):
         member_type = cursor_kind_to_type_map[item.kind]
         if member_type not in ['namespace', 'class', 'struct', 'union']:
             log.error("This is unexpected!")
-            return
+            return ''
         semantic_parent = ''
         semantic_parent_item = item.semantic_parent
         if semantic_parent_item:
@@ -1282,14 +1276,16 @@ def add_undocumented_member(item: cindex.Cursor, status: Status):
             log.error("USR for member %s was unknown, but ID %s was already there! This means that " +
                       "there is a name clash, unique_id.member is not good enough.\n   in file %s",
                       member['name'], id, status.current_header_name)
-            return
+            return ''
         status.members[id] = member
         if semantic_parent:
             status.members[semantic_parent]['members'].append(member)
         else:
             status.data['members'].append(member)
+        return id
     else:
         log.error("This is unexpected!")
+        return ''
 
 def extract_declarations(citer, parent, status: Status):
     # Recursive AST exploration, adds data to `status`.
@@ -1342,16 +1338,18 @@ def extract_declarations(citer, parent, status: Status):
                 if semantic_parent_item:
                     semantic_parent = semantic_parent_item.get_usr()
                 if semantic_parent:
-                    if semantic_parent not in status.member_ids:
+                    if semantic_parent in status.member_ids:
+                        semantic_parent = status.member_ids[semantic_parent]
+                    else:
                         # This seems to happen in template specializations.
                         # It also also when a class member definition is in a header file that is not the
                         # header file where the class is defined, and that header file is processed first, such
                         # that the class is yet unknown.
-                        log.warning("USR of semantic parent for %s was unknown, adding undocumented member.\n   in file %s",
-                                    item.displayname, status.current_header_name)
-                        add_undocumented_member(semantic_parent_item, status)
-                        log.info("   ID of undocumented semantic parent is %s", status.member_ids[semantic_parent])
-                    semantic_parent = status.member_ids[semantic_parent]
+                        semantic_parent = add_undocumented_member(semantic_parent_item, status)
+                        if not semantic_parent:
+                            continue
+                        log.warning("USR of semantic parent for %s was unknown, added undocumented member %s.\n   in file %s",
+                                    item.displayname, semantic_parent, status.current_header_name)
                 else:
                     log.debug("Semantic parent for %s not given, assuming lexical parent is semantic parent.\n" +
                               "   in file %s", item.displayname, status.current_header_name)

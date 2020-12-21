@@ -51,6 +51,7 @@ template_params = {
     'FINE_PRINT': doxpp.config.get(config, 'html', 'fine print'),
     'LINKS_NAVBAR1': [
         ('', 'pages', []),
+        ('', 'modules', []),
         ('', 'namespaces', [])
     ],
     'LINKS_NAVBAR2': [

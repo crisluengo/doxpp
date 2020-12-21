@@ -349,6 +349,9 @@ def createhtml(input_file, output_dir, options, template_params):
     #print('\n\nhtml_pages_detailed', status.html_pages_detailed)
     #print('\n\nid_map', status.id_map)
 
+    # Parse all Markdown
+    parse_markdown(status)
+
     # Create tree structure for index pages
     index = create_indices(status)
 
@@ -357,9 +360,6 @@ def createhtml(input_file, output_dir, options, template_params):
         template_params['LINKS_NAVBAR1'] = process_navbar_links(template_params['LINKS_NAVBAR1'], status)
     if 'LINKS_NAVBAR2' in template_params:
         template_params['LINKS_NAVBAR2'] = process_navbar_links(template_params['LINKS_NAVBAR2'], status)
-
-    # Parse all Markdown
-    parse_markdown(status)
 
     # If no stylesheets were given, use the default one
     if not 'STYLESHEETS' in template_params or not template_params['STYLESHEETS']:
