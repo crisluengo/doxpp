@@ -59,6 +59,8 @@ recognized.
 9. Unique identifiers for members are fairly readable, and don't look like the hashes that
 Doxygen generates. This should allow the generator to create more meaningful URLs.
 10. There is no "autolink", all links must be explicitly made with `\ref`.
+11. You can use Markdown formatting in page and section titles.
+12. There is no empty page generated for Markdown files that contain member documentation.
 
 ## What is missing
 
@@ -78,7 +80,6 @@ Things we'd like to add/fix/improve:
 6. There's no way to have the literal text "`\ref`" (and similar commands) in the documentation,
    we need to avoid matching commands inside backticks or in code blocks.
 
-
 Things that Clang doesn't tell us:
 
 1. Clang doesn't easily report on pre-processor macros. Instead of making things complicated,
@@ -97,14 +98,16 @@ Some code and ideas are derived from [cldoc](https://github.com/jessevdk/cldoc):
 Copyright 2013-2018, Jesse van den Kieboom  
 cldoc uses the GPL-2.0 license.
 
-Some code and ideas are derived from [m.css](https://mcss.mosra.cz/):  
+Some code and ideas are derived from [m.css](https://mcss.mosra.cz/);  
+CSS and HTML templates are taken (templates modified) from m.css:  
 Copyright 2017-2020 Vladimír Vondruš  
 m.css uses the MIT license.
 
 
 # Requirements
 
-dox++ requires Python 3, and has been tested (so far) with Python 3.9.
+dox++ requires Python 3, and has been tested (so far) with Python 3.9. Packages required:
+`markdown`, `jinja2`.
 
 dox++ requires Clang to be installed on the system. I don't know which is the minimal
 version, but there's no reason to use a very old one.

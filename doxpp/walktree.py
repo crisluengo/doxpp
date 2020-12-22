@@ -80,10 +80,20 @@ def assign_file_part_recursive(parts, file, out):
             out.append({'name': parts[0], 'children': []})
         assign_file_part_recursive(parts[1:], file, out[-1]['children'])
 
-def build_file_hierarchy(headers):
+def move_directories_to_top(out):
+    order = [i for i, x in enumerate(out) if 'children' in x] + [i for i, x in enumerate(out) if 'children' not in x]
+    out[:] = [out[i] for i in order]
+    for dir in out:
+        if 'children' in dir:
+            move_directories_to_top(dir['children'])
+        else:
+            break
+
+def build_file_hierarchy(headers, directories_first=True):
     """
     Builds a file hierarchy.
     :param headers: data['headers'] list
+    :param directories_first: Set to False to keep directories in alphabetical order among files
     :return: hierarchical list of dictionaries with directories and files
     out[ii]['name'] = file/directory name
     out[ii]['children'] = list of dictionaries with directories and files, if this is a directory
@@ -93,6 +103,8 @@ def build_file_hierarchy(headers):
     for file in sorted(headers, key=lambda x: x['name']):
         parts = split_path(file['name'])
         assign_file_part_recursive(parts, file, out)
+    if directories_first:
+        move_directories_to_top(out)
     return out
 
 

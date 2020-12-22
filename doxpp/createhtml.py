@@ -215,7 +215,6 @@ def create_indices(status: Status):
     index['pages'] = []     # used in pages index
     # Symbols (class, struct, union and namespace)
     for member in status.members.values():
-        # TODO: for namespaces, we need to add a flag to indicate if there's child namespaces
         if not member['id']:
             continue
         if member['member_type'] not in ['namespace', 'class', 'struct', 'union']:
@@ -270,22 +269,23 @@ def process_navbar_links(navbar, status: Status):
     return out
 
 
-def process_sections_recursive(sections, level):
+def process_sections_recursive(sections, level, md):
     if sections[0][2] < level:
         return []
     section = sections.pop(0)
     subsections = []
     while sections and sections[0][2] > section[2]:
-        subsections.append(process_sections_recursive(sections, level + 1))
-    return (section[0], section[1], subsections)
+        subsections.append(process_sections_recursive(sections, level + 1, md))
+    return (section[0], md.reset().convert(section[1]), subsections)
 
-def process_sections(compound):
+def process_sections(compound, md):
     # compound['sections'] is a flat list of tuples [(name, title, level), ...]
-    # we turn it into a hierarchical list according to level: [(name, title, [...]), ...]
+    # We turn it into a hierarchical list according to level: [(name, title, [...]), ...]
+    # We also apply Markdown processing to `title`
     sections = compound['sections']
     compound['sections'] = []
     while sections:
-        compound['sections'].append(process_sections_recursive(sections, 1))
+        compound['sections'].append(process_sections_recursive(sections, 1, md))
 
 def parse_markdown(status: Status):
     extensions = ['attr_list',      # https://python-markdown.github.io/extensions/attr_list/
@@ -321,13 +321,13 @@ def parse_markdown(status: Status):
             header['brief'] = md.reset().convert(header['brief'])
         if header['doc']:
             header['doc'] = md.reset().convert(header['doc'])
-        process_sections(header)
+        process_sections(header, md)
     for group in status.groups.values():
         if group['brief']:
             group['brief'] = md.reset().convert(group['brief'])
         if group['doc']:
             group['doc'] = md.reset().convert(group['doc'])
-        process_sections(group)
+        process_sections(group, md)
     for member in status.members.values():
         if member['id'] not in status.id_map:
             continue
@@ -335,11 +335,13 @@ def parse_markdown(status: Status):
             member['brief'] = md.reset().convert(member['brief'])
         if member['doc']:
             member['doc'] = md.reset().convert(member['doc'])
-        process_sections(member)
+        process_sections(member, md)
     for page in status.pages.values():
         if page['doc']:
             page['doc'] = md.reset().convert(page['doc'])
-        process_sections(page)
+        if page['title']:
+            page['title'] = md.reset().convert(page['title'])
+        process_sections(page, md)
 
 
 def generate_member_page(page, status: Status):
