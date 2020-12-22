@@ -21,7 +21,7 @@ in which they were found in the header file. Each `members[i]` is a dictionary a
    "name": "",         // name of the member
    "brief": "",        // brief description, in Markdown
    "doc": "",          // full documentation, in Markdown
-   "sections": [],     // (ID, level) for sections in "doc"
+   "sections": [],     // (ID, title, level) for sections in "doc"
    "anchors": [],      // IDs of anchors in "doc"
    "member_type": "",  // class/function/enum/variable/define/namespace/etc.
    "parent": "",       // ID of parent member
@@ -56,7 +56,7 @@ This is a list of files. Each `headers[i]` is a dictionary as follows:
    "name": "",         // file name, with path from project root
    "brief": "",        // brief description, in Markdown
    "doc": "",          // full documentation, in Markdown
-   "sections": [],     // (ID, level) for sections in "doc"
+   "sections": [],     // (ID, title, level) for sections in "doc"
    "anchors": [],      // IDs of anchors in "doc"
    "includes": []      // list of files included by the header
 }
@@ -77,7 +77,7 @@ A list of defined groups. Each `groups[i]` is a dictionary as follows:
    "name": "",         // file name, with path from project root
    "brief": "",        // brief description, in Markdown
    "doc": "",          // full documentation, in Markdown
-   "sections": [],     // (ID, level) for sections in "doc"
+   "sections": [],     // (ID, title, level) for sections in "doc"
    "anchors": [],      // IDs of anchors in "doc"
    "parent": "",       // ID of the parent group, if any
    "subgroups": []     // list of IDs of child groups
@@ -94,7 +94,7 @@ A list of pages. Each `pages[i]` is a dictionary as follows:
    "id": "",           // unique identifier
    "title": "",        // file name, with path from project root
    "doc": "",          // full documentation, in Markdown
-   "sections": [],     // (ID, level) for sections in "doc"
+   "sections": [],     // (ID, title, level) for sections in "doc"
    "anchors": [],      // IDs of anchors in "doc"
    "parent": "",       // ID of the parent page, if any
    "subpages": []      // list of IDs of child pages
@@ -133,5 +133,5 @@ information to the generator for this.
 
 In a similar fashion to anchors, documentation can also contain headers that can be referenced.
 These are created with the commands `\section`, `\subsection` and `\subsubsection`. These commands
-are replaced with the appropriate Markdown syntax, and the section ID and level (1 for section,
+are replaced with the appropriate Markdown syntax, and the section ID, title and level (1 for section,
 2 for subsection, etc.) is stored as tuples in the "sections" field.

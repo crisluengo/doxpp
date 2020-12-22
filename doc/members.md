@@ -45,7 +45,7 @@ Should be rendered through a Markdown processor.
 
 ### "sections" (list)
 
-List of tuples: (ID, level) for all sections present in the "doc" string.
+List of tuples: (ID, title, level) for all sections present in the "doc" string.
 
 ### "anchors" (list)
 

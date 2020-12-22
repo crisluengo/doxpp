@@ -112,7 +112,7 @@ Class/struct/union reference pages, `compound` contains:
 - `kind`
 - `templates`
 - `include`
-- `is_final`
+- `final`
 - `since`
 - `brief`
 - `has_template_details`
@@ -145,8 +145,8 @@ Class/struct/union reference pages, `compound` contains:
 - `has_macro_details`
 Page reference pages, `compound` contains:
 - `breadcrumb`
-- `footer_navigation`
-- `since`
+- `footer_navigation` # TODO
+- `since` # TODO
 - `brief`
 - `sections`
 - `doc`
@@ -169,7 +169,7 @@ index.symbols.deprecated
 index.symbols.since # TODO
 index.symbols.brief
 index.symbols.children
-index.symbols.is_final # TODO
+index.symbols.final
 index.files.name
 index.files.children # iff directory
 index.files.page_id
@@ -206,7 +206,7 @@ alias.is_protected
 alias.since
 alias.brief
 alias.include
-alias.is_using
+alias.is_using # TODO
 alias.has_template_details
 alias.doc
 
@@ -215,7 +215,7 @@ class.kind
 class.page_id
 class.name
 class.is_protected
-class.is_final
+class.final
 class.is_virtual
 class.deprecated
 class.since
@@ -260,7 +260,7 @@ function.is_signal
 function.is_defaulted
 function.is_deleted
 function.is_explicit
-function.is_final
+function.final
 function.is_override
 function.is_pure_virtual
 function.is_virtual

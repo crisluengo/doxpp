@@ -230,9 +230,14 @@ def create_indices(status: Status):
                 parent['has_child_namespace'] = True
         else:
             index['symbols'].append(member)
+    index['symbols'].sort(key=lambda x: x['name'])
+    for member in status.members.values():
+        if 'children' in member:
+            member['children'].sort(key=lambda x: x['name'])
     # Files (headers)
     index['files'] = walktree.build_file_hierarchy(status.data['headers'])
     # Modules (groups)
+    status.data['groups'].sort(key=lambda x: x['name'])
     for group in status.data['groups']:
         if not group['parent']:
             index['modules'].append(group)
@@ -240,7 +245,10 @@ def create_indices(status: Status):
         for s in group['subgroups']:
             group['children'].append(status.groups[s])
     # Pages
+    status.data['pages'].sort(key=lambda x: x['title'])
     for page in status.data['pages']:
+        if page['id'] == 'index':
+            continue  # the index is not on the list of pages
         if not page['parent']:
             index['pages'].append(page)
         page['children'] = []
@@ -261,6 +269,23 @@ def process_navbar_links(navbar, status: Status):
         out.append((title, link, id, sub))
     return out
 
+
+def process_sections_recursive(sections, level):
+    if sections[0][2] < level:
+        return []
+    section = sections.pop(0)
+    subsections = []
+    while sections and sections[0][2] > section[2]:
+        subsections.append(process_sections_recursive(sections, level + 1))
+    return (section[0], section[1], subsections)
+
+def process_sections(compound):
+    # compound['sections'] is a flat list of tuples [(name, title, level), ...]
+    # we turn it into a hierarchical list according to level: [(name, title, [...]), ...]
+    sections = compound['sections']
+    compound['sections'] = []
+    while sections:
+        compound['sections'].append(process_sections_recursive(sections, 1))
 
 def parse_markdown(status: Status):
     extensions = ['attr_list',      # https://python-markdown.github.io/extensions/attr_list/
@@ -296,11 +321,13 @@ def parse_markdown(status: Status):
             header['brief'] = md.reset().convert(header['brief'])
         if header['doc']:
             header['doc'] = md.reset().convert(header['doc'])
+        process_sections(header)
     for group in status.groups.values():
         if group['brief']:
             group['brief'] = md.reset().convert(group['brief'])
         if group['doc']:
             group['doc'] = md.reset().convert(group['doc'])
+        process_sections(group)
     for member in status.members.values():
         if member['id'] not in status.id_map:
             continue
@@ -308,9 +335,11 @@ def parse_markdown(status: Status):
             member['brief'] = md.reset().convert(member['brief'])
         if member['doc']:
             member['doc'] = md.reset().convert(member['doc'])
+        process_sections(member)
     for page in status.pages.values():
         if page['doc']:
             page['doc'] = md.reset().convert(page['doc'])
+        process_sections(page)
 
 
 def generate_member_page(page, status: Status):
@@ -384,18 +413,33 @@ def createhtml(input_file, output_dir, options, template_params):
     env.filters['basename_or_url'] = basename_or_url
     env.filters['urljoin'] = urllib.parse.urljoin
 
-    # Generate the pages
+    # Generate the html for the members
     for page in status.html_pages_index.keys():
         html = generate_member_page(page, status)
-        with open(os.path.join(output_dir, page + '.html'), 'w') as file:
-            file.write(html)
+        with open(os.path.join(output_dir, page + '.html'), 'w') as f:
+            f.write(html)
+
+    # Generate the html for the pages
     if 'index' not in status.pages:
         page = members.new_page('index', options['PROJECT_NAME'], '')
         status.pages['index'] = page
     for page in status.pages.values():
-        html = generate_page_page(page, status)
-        with open(os.path.join(output_dir, page['id'] + '.html'), 'w') as file:
-            file.write(html)
+        file = page['id'] + '.html'
+        path_reverse = [page['id']]
+        parent = page['parent']
+        while parent:
+            path_reverse.append(parent)
+            parent = status.pages[parent]['parent']
+        page['breadcrumb'] = []
+        for elem in reversed(path_reverse):
+            page['breadcrumb'].append((status.pages[elem]['title'], elem + '.html'))
+        template = env.get_template('page.html')
+        rendered = template.render(compound=page,
+                               FILENAME=file,
+                               SEARCHDATA_FORMAT_VERSION=searchdata_format_version,
+                               **template_params)
+        with open(os.path.join(output_dir, file), 'w') as f:
+            f.write(rendered)
 
     # Generate indexes for pages, groups (==modules), namespaces, classes/structs (==classes), and headers (==files)
     for file in ['pages.html', 'modules.html', 'namespaces.html', 'classes.html', 'files.html']:
@@ -404,8 +448,8 @@ def createhtml(input_file, output_dir, options, template_params):
                                    FILENAME=file,
                                    SEARCHDATA_FORMAT_VERSION=searchdata_format_version,
                                    **template_params)
-        with open(os.path.join(output_dir, file), 'w') as file:
-            file.write(rendered)
+        with open(os.path.join(output_dir, file), 'w') as f:
+            f.write(rendered)
 
     # Generate search data
     # TODO

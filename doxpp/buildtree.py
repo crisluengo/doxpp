@@ -338,7 +338,7 @@ def find_anchor_cmds(doc, status: Status):
             log.error("Anchor %s already exists, ignored.", name)
             return '{} {}'.format('#' * level, title)
         status.anchors[name] = title
-        sections.append([name, level])
+        sections.append([name, title, level])
         return '{} {} {{#{}}}'.format('#' * level, title, name)
 
     def anchor_cmd_replace(match):
