@@ -12,26 +12,32 @@
       "sections": [
         [
           "sec1",
+          "A section",
           1
         ],
         [
           "sec1-1",
+          "A subsection",
           2
         ],
         [
           "sec1-2",
+          "Another subsection",
           2
         ],
         [
           "sec2",
+          "Another section",
           1
         ],
         [
           "sec2-1",
+          "Some more subsection",
           2
         ],
         [
           "sec2-2",
+          "This is the last one",
           2
         ]
       ],

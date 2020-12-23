@@ -37,6 +37,7 @@
 #   DEALINGS IN THE SOFTWARE.
 
 import os
+import html
 import urllib.parse
 import markdown
 import jinja2
@@ -47,6 +48,9 @@ from . import members
 
 from .search import CssClass, ResultFlag, ResultMap, Trie, serialize_search_data, base85encode_search_data, search_filename, searchdata_filename, searchdata_filename_b85, searchdata_format_version
 
+from .markdown.admonition import AdmonitionExtension
+from .markdown.mdx_subscript import SubscriptExtension
+from .markdown.mdx_superscript import SuperscriptExtension
 
 doxpp_path = os.path.dirname(os.path.realpath(__file__))
 default_templates = os.path.join(doxpp_path, 'html_templates')
@@ -206,7 +210,6 @@ def assign_page(status: Status, show_private, show_undocumented):
         create_page(page, status)
 
 
-
 def create_indices(status: Status):
     index = {}
     index['symbols'] = []   # Used in classes and namespaces index
@@ -256,6 +259,77 @@ def create_indices(status: Status):
     return index
 
 
+def add_wbr(text: str):
+    if '<' in text:  # Stuff contains HTML code, do not touch!
+        return text
+    if '::' in text:  # C++ names
+        return
+    if '_' in text:  # VERY_LONG_UPPER_CASE macro names
+        return text.replace('_', '_<wbr />')
+    # These characters are quite common, so at least check that there is no
+    # space (which may hint that the text is actually some human language):
+    if '/' in text and not ' ' in text:  # URLs
+        return text.replace('/', '/<wbr />')
+    return text
+
+def generate_compound(id, status: Status):
+    if id in status.members:
+        compound = status.members[id].copy()
+    elif id in status.headers:
+        compound = status.headers[id].copy()
+        compound['member_type'] = 'file'
+    elif id in status.groups:
+        compound = status.groups[id].copy()
+        compound['member_type'] = 'module'
+    elif id in status.pages:
+        compound = status.pages[id]
+        compound['member_type'] = 'page'
+        return compound  # Nothing else to do for pages
+    else:
+        log.error("Generating 'compound' data structure for unknown id = %s", id)
+        return {}
+    compound['has_enum_details'] = False
+    compound['has_alias_details'] = False
+    compound['has_function_details'] = False
+    compound['has_variable_details'] = False
+    compound['has_macro_details'] = False
+    if compound['member_type'] in ['class', 'struct', 'union']:
+        # fix up compound['base_classes']
+        # fix up compound['derived_classes']
+        compound['typeless_functions'] = []
+        compound['groups'] = []
+        compound['public_types'] = []
+        compound['public_functions'] = []
+        compound['public_vars'] = []
+        compound['public_static_functions'] = []
+        compound['public_static_vars'] = []
+        compound['protected_types'] = []
+        compound['protected_functions'] = []
+        compound['protected_vars'] = []
+        compound['protected_static_functions'] = []
+        compound['protected_static_vars'] = []
+        compound['private_types'] = []
+        compound['private_functions'] = []
+        compound['private_vars'] = []
+        compound['private_static_functions'] = []
+        compound['private_static_vars'] = []
+        compound['related'] = []
+    else:  # ['files', 'modules', 'namespaces']
+        compound['modules'] = []
+        compound['files'] = []
+        compound['namespaces'] = []
+        compound['classes'] = []
+        compound['enums'] = []
+        compound['aliases'] = []
+        compound['functions'] = []
+        compound['variables'] = []
+        compound['macros'] = []
+    if compound['member_type'] in ['class', 'struct', 'union', 'namespace']:
+        compound['prefix_wbr'] = (html.escape(walktree.get_fully_qualified_name(id, status.members))).replace('::', '::<wbr />') + '::<wbr />'
+    # TODO: What is `prefix_wbr` for modules or files?
+    return compound
+
+
 def process_navbar_links(navbar, status: Status):
     # Convert (title, id, sub) into (title, link, id, sub)
     out = []
@@ -269,6 +343,14 @@ def process_navbar_links(navbar, status: Status):
     return out
 
 
+def remove_p_tag(title):
+    # Markdown always encloses its output in paragraph tags, but we don't want these when it's a page or section title
+    if title[:3] == '<p>' and title[-4:] == '</p>':
+        title = title[3:-4]
+    if '<p>' in title:
+        log.warning("Title contains a HTML paragraph tag: %s", title)
+    return title
+
 def process_sections_recursive(sections, level, md):
     if sections[0][2] < level:
         return []
@@ -276,7 +358,7 @@ def process_sections_recursive(sections, level, md):
     subsections = []
     while sections and sections[0][2] > section[2]:
         subsections.append(process_sections_recursive(sections, level + 1, md))
-    return (section[0], md.reset().convert(section[1]), subsections)
+    return (section[0], remove_p_tag(md.reset().convert(section[1])), subsections)
 
 def process_sections(compound, md):
     # compound['sections'] is a flat list of tuples [(name, title, level), ...]
@@ -288,26 +370,34 @@ def process_sections(compound, md):
         compound['sections'].append(process_sections_recursive(sections, 1, md))
 
 def parse_markdown(status: Status):
-    extensions = ['attr_list',      # https://python-markdown.github.io/extensions/attr_list/
-                  'md_in_html',     # https://python-markdown.github.io/extensions/md_in_html/
-                  'tables',         # https://python-markdown.github.io/extensions/tables/
-                  'fenced_code',    # https://python-markdown.github.io/extensions/fenced_code_blocks/
-                  'admonition',     # https://python-markdown.github.io/extensions/admonition/
-                  'codehilite',     # https://python-markdown.github.io/extensions/code_hilite/
-                  'sane_lists',     # https://python-markdown.github.io/extensions/sane_lists/
-                  'smarty'          # https://python-markdown.github.io/extensions/smarty/
-                  ]
+    extensions = [
+        # Extensions packaged with `markdown`:
+        'attr_list',        # https://python-markdown.github.io/extensions/attr_list/
+        'md_in_html',       # https://python-markdown.github.io/extensions/md_in_html/
+        'tables',           # https://python-markdown.github.io/extensions/tables/
+        'fenced_code',      # https://python-markdown.github.io/extensions/fenced_code_blocks/
+        'codehilite',       # https://python-markdown.github.io/extensions/code_hilite/
+        'sane_lists',       # https://python-markdown.github.io/extensions/sane_lists/
+        'smarty',           # https://python-markdown.github.io/extensions/smarty/
+        # Installed with package `markdown-headdown`
+        'mdx_headdown',     # https://github.com/SaschaCowley/Markdown-Headdown
+        # Installed with package `MarkdownSuperscript`
+        # Installed with package `MarkdownSubscript`
+        # Our own concoctions
+        AdmonitionExtension(),  # Modification of the standard 'admonition' extension
+        # Two extensions not installed through PyPI because they cause a downgrade of the Markdown package
+        SubscriptExtension(),   # https://github.com/jambonrose/markdown_subscript_extension
+        SuperscriptExtension()  # https://github.com/jambonrose/markdown_superscript_extension
+    ]
     extension_configs = {
         'codehilite': {
-            'css_class': 'codehilite'
+            'css_class': 'm-code'
+        },
+        'mdx_headdown': {
+            'offset': 1,
         }
     }
     md = markdown.Markdown(extensions=extensions, extension_configs=extension_configs, output_format="html5")
-
-    # TODO: Add these extensions:
-    #       https://github.com/SaschaCowley/Markdown-Headdown
-    #       https://github.com/jambonrose/markdown_superscript_extension
-    #       https://github.com/jambonrose/markdown_subscript_extension
 
     # TODO: Create a LaTeX math extension based on some stuff in m.css as well as the following:
     #       https://github.com/justinvh/Markdown-LaTeX
@@ -340,18 +430,19 @@ def parse_markdown(status: Status):
         if page['doc']:
             page['doc'] = md.reset().convert(page['doc'])
         if page['title']:
-            page['title'] = md.reset().convert(page['title'])
+            page['title'] = remove_p_tag(md.reset().convert(page['title']))
         process_sections(page, md)
 
 
-def generate_member_page(page, status: Status):
-    # TODO Jinja stuff here
-    return ''
-
-
-def generate_page_page(page, status: Status):
-    # TODO Jinja stuff here
-    return ''
+def add_breadcrumb(compound, name, pages):
+    path_reverse = [compound['id']]
+    parent = compound['parent']
+    while parent:
+        path_reverse.append(parent)
+        parent = pages[parent]['parent']
+    compound['breadcrumb'] = []
+    for elem in reversed(path_reverse):
+        compound['breadcrumb'].append((pages[elem][name], elem + '.html'))
 
 
 def createhtml(input_file, output_dir, options, template_params):
@@ -386,6 +477,11 @@ def createhtml(input_file, output_dir, options, template_params):
     # Create tree structure for index pages
     index = create_indices(status)
 
+    # We need to have an index.html page
+    if 'index' not in status.pages:
+        page = members.new_page('index', options['PROJECT_NAME'], '')
+        status.pages['index'] = page
+
     # Navbar links
     if 'LINKS_NAVBAR1' in template_params:
         template_params['LINKS_NAVBAR1'] = process_navbar_links(template_params['LINKS_NAVBAR1'], status)
@@ -416,30 +512,25 @@ def createhtml(input_file, output_dir, options, template_params):
     env.filters['urljoin'] = urllib.parse.urljoin
 
     # Generate the html for the members
-    for page in status.html_pages_index.keys():
-        html = generate_member_page(page, status)
-        with open(os.path.join(output_dir, page + '.html'), 'w') as f:
-            f.write(html)
-
-    # Generate the html for the pages
-    if 'index' not in status.pages:
-        page = members.new_page('index', options['PROJECT_NAME'], '')
-        status.pages['index'] = page
-    for page in status.pages.values():
-        file = page['id'] + '.html'
-        path_reverse = [page['id']]
-        parent = page['parent']
-        while parent:
-            path_reverse.append(parent)
-            parent = status.pages[parent]['parent']
-        page['breadcrumb'] = []
-        for elem in reversed(path_reverse):
-            page['breadcrumb'].append((status.pages[elem]['title'], elem + '.html'))
-        template = env.get_template('page.html')
-        rendered = template.render(compound=page,
-                               FILENAME=file,
-                               SEARCHDATA_FORMAT_VERSION=searchdata_format_version,
-                               **template_params)
+    for id in status.html_pages_index.keys():
+        file = id + '.html'
+        compound = generate_compound(id, status)
+        if not compound:
+            continue
+        type = compound['member_type']
+        if type == 'file':
+            compound['breadcrumb'] = [(compound['name'], file)]
+        elif type == 'module':
+            add_breadcrumb(compound, 'name', status.groups)
+        elif type == 'page':
+            add_breadcrumb(compound, 'title', status.pages)
+        else:
+            add_breadcrumb(compound, 'name', status.members)
+        template = env.get_template(type + '.html')
+        rendered = template.render(compound=compound,
+                                   FILENAME=file,
+                                   SEARCHDATA_FORMAT_VERSION=searchdata_format_version,
+                                   **template_params)
         with open(os.path.join(output_dir, file), 'w') as f:
             f.write(rendered)
 

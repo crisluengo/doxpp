@@ -14,12 +14,12 @@ Here's some more stuff to read: \subpage page1
 
 \section main-test-refs Testing references
 
-The main header file is \ref file--transport%2Ftransport-h. There's also \ref "transport/racingbike.h" as well
+The main header file is \ref file--transport--transport-h. There's also \ref "transport/racingbike.h" as well
 as \ref "mountainbike.h"!
 
 \subsection main-test-refs-sa ... in  a "See also" block
 
-\see file--transport%2Ftransport-h, "transport/racingbike.h", "mountainbike.h"
+\see file--transport--transport-h, "transport/racingbike.h", "mountainbike.h"
 
 
 \comment ----------------------

@@ -630,7 +630,7 @@ def post_process_links(elements, status: Status):
 
         def see_cmd_replace(match):
             # For matches of a `\see` or `\sa` command.
-            output = '!!! see_also "See also"\n    '
+            output = '!!! see\n    '
             first = True
             for element in see_arg_match.findall(match[1]):
                 # TODO: the regexp above doesn't work for `operator,`

@@ -107,7 +107,7 @@ m.css uses the MIT license.
 # Requirements
 
 dox++ requires Python 3, and has been tested (so far) with Python 3.9. Packages required:
-`markdown`, `jinja2`.
+`jinja2`, `markdown`, `markdown-headdown`
 
 dox++ requires Clang to be installed on the system. I don't know which is the minimal
 version, but there's no reason to use a very old one.
