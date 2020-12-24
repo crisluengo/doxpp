@@ -250,8 +250,11 @@ Alternatively, provide the ID for the variable.
 ### `\anchor <name>`
 
 Anywhere in a documentation block, adds an anchor that can be referenced elsewhere with `\ref`.
-
 Is replaced by `{#<name>}` in the Markdown output.
+
+The `\anchor` command must happen at the end of a paragraph or in a paragraph of its own,
+in either case it references the preceding paragraph. The paragraph is assigned the `#<name>`
+attribute.
 
 ### `\brief`
 

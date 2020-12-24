@@ -318,7 +318,7 @@ def find_ingroup_cmd(doc):
     return '', doc
 
 section_cmd_match = re.compile(r'^ *[\\@]((?:sub){,2})section +((?:\w|-)+) +(.*?) *$', re.MULTILINE)
-anchor_cmd_match = re.compile(r'[\\@]anchor +((?:\w|-)+)')
+anchor_cmd_match = re.compile(r'\n* *[\\@]anchor +((?:\w|-)+) *\n')
 
 def find_anchor_cmds(doc, status: Status):
     # Finds section headings and explicit anchors, and adds them to a list.
@@ -348,7 +348,7 @@ def find_anchor_cmds(doc, status: Status):
             return ''
         status.anchors[name] = ''
         anchors.append(name)
-        return '{{#{}}}'.format(name)
+        return '\n{{: #{} }}\n\n'.format(name)
 
     doc = section_cmd_match.sub(section_cmd_replace, doc)
     doc = anchor_cmd_match.sub(anchor_cmd_replace, doc)

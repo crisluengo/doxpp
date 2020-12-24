@@ -6,7 +6,7 @@
 This project is called 'transport', and defines some classes named after types
 of bicycles.
 
-A good place to start looking is examining the \ref transport namespace. \anchor anchor-in-main
+A good place to start looking is examining the \ref transport namespace.\anchor anchor-in-main
 
 \ref transport "This whole sentence is a reference to the transport namespace!" 
 

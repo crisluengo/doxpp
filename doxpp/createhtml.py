@@ -49,6 +49,7 @@ from . import members
 from .search import CssClass, ResultFlag, ResultMap, Trie, serialize_search_data, base85encode_search_data, search_filename, searchdata_filename, searchdata_filename_b85, searchdata_format_version
 
 from .markdown.admonition import AdmonitionExtension
+from .markdown.fix_links import FixLinksExtension
 from .markdown.mdx_subscript import SubscriptExtension
 from .markdown.mdx_superscript import SuperscriptExtension
 
@@ -384,27 +385,24 @@ def parse_markdown(status: Status):
         # Installed with package `MarkdownSuperscript`
         # Installed with package `MarkdownSubscript`
         # Our own concoctions
-        AdmonitionExtension(),  # Modification of the standard 'admonition' extension
+        AdmonitionExtension(),              # Modification of the standard 'admonition' extension
+        FixLinksExtension(status.id_map),   # Fixes links from '#id' to 'page_id.html#id'
         # Two extensions not installed through PyPI because they cause a downgrade of the Markdown package
-        SubscriptExtension(),   # https://github.com/jambonrose/markdown_subscript_extension
-        SuperscriptExtension()  # https://github.com/jambonrose/markdown_superscript_extension
+        SubscriptExtension(),       # https://github.com/jambonrose/markdown_subscript_extension
+        SuperscriptExtension()      # https://github.com/jambonrose/markdown_superscript_extension
     ]
     extension_configs = {
         'codehilite': {
             'css_class': 'm-code'
         },
         'mdx_headdown': {
-            'offset': 1,
+            'offset': 1
         }
     }
-    md = markdown.Markdown(extensions=extensions, extension_configs=extension_configs, output_format="html5")
-
     # TODO: Create a LaTeX math extension based on some stuff in m.css as well as the following:
     #       https://github.com/justinvh/Markdown-LaTeX
     #       https://github.com/ShadowKyogre/python-asciimathml
-
-    # TODO: Create an extension that fixes links of the form `#<member_id>` to `<page_id>.html#<member_id>`,
-    #       where `page_id` is given by `status.id_map[member_id]`.
+    md = markdown.Markdown(extensions=extensions, extension_configs=extension_configs, output_format="html5")
 
     for header in status.headers.values():
         if header['brief']:
