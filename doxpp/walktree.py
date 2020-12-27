@@ -40,28 +40,7 @@ def get_fully_qualified_name(id, members):
     return output
 
 
-# --- populate_member_lists ---
-
-def populate_member_lists_recursive(members, data):
-    for member in members:
-        data['headers']['members'].append(member['id'])
-        data['groups']['members'].append(member['id'])
-        if 'members' in member:
-            populate_member_lists_recursive(member['members'], data)
-
-def populate_member_lists(data):
-    """
-    Updates data['headers'] and data['groups'], such that each element in those lists
-    contains a new key 'members'. These will list the member IDs (from data['members'])
-    that belong in the element.
-    :param data: data returned by load_data_from_json_file()
-    """
-    data['headers']['members'] = []
-    data['groups']['members'] = []
-    populate_member_lists_recursive(data['members'], data)
-
-
-# ---  ---
+# --- build_file_hierarchy ---
 
 def split_path(head):
     out = []

@@ -6,7 +6,7 @@
                 template&lt;{% for t in compound.templates %}{{ j() }}{{ t.type }} {% if t.name %}{{ t.name }}{% else %}_{{ loop.index }}{% endif %}{% endfor %}&gt;
               </div>
               {% endif %}
-              enum {% if enum.is_strong %}class {% endif %}{{ prefix }}<a href="#{{ enum.id }}" class="m-doc-self">{{ enum.name }}</a>{% if enum.type %}: {{ enum.type }}{% endif %}{% if enum.is_protected %} <span class="m-label m-warning">protected</span>{% endif %}{% if enum.since %} {{ enum.since }}{% endif %}
+              enum {% if enum.scoped %}class {% endif %}{{ prefix }}<a href="#{{ enum.id }}" class="m-doc-self">{{ enum.fully_qualified_name if show_full_name else enum.name }}</a>{% if enum.type %}: {{ enum.type }}{% endif %}{% if enum.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif enum.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}{% if enum.since %} {{ enum.since }}{% endif %}
               {# not sure why there needs to be this space #}
 
               {% if enum.include %}

@@ -17,10 +17,11 @@
               </div>
               {% endif %}
               {% if alias.is_using %}
-              using {{ prefix }}<a href="#{{ alias.id }}" class="m-doc-self">{{ alias.name }}</a> = {{ alias.type }}{{ alias.args }}{% if alias.is_protected %} <span class="m-label m-warning">protected</span>{% endif %}{% if alias.since %} {{ alias.since }}{% endif %}
+              using {{ prefix }}<a href="#{{ alias.id }}" class="m-doc-self">{{ alias.fully_qualified_name if show_full_name else alias.name }}</a> = {{ alias.type }}{{ alias.args }}
               {% else %}
-              typedef {{ alias.type }}{% if not alias.args %} {% endif %}{{ prefix }}<a href="#{{ alias.id }}" class="m-doc-self">{{ alias.name }}</a>{{ alias.args }}{% if alias.is_protected %} <span class="m-label m-warning">protected</span>{% endif %}{% if alias.since %} {{ alias.since }}{% endif %}
+              typedef {{ alias.type }}{% if not alias.args %} {% endif %}{{ prefix }}<a href="#{{ alias.id }}" class="m-doc-self">{{ alias.fully_qualified_name if show_full_name else alias.name }}</a>{{ alias.args }}
               {% endif %}
+              {% if alias.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif alias.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}{% if alias.since %} {{ alias.since }}{% endif %}
               {# the empty line has to be here to prevent the lines from merging #}
 
               {% if alias.include and compound.templates == None and alias.templates == None %}

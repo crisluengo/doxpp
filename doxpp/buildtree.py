@@ -318,7 +318,7 @@ def find_ingroup_cmd(doc):
     return '', doc
 
 section_cmd_match = re.compile(r'^ *[\\@]((?:sub){,2})section +((?:\w|-)+) +(.*?) *$', re.MULTILINE)
-anchor_cmd_match = re.compile(r'\n* *[\\@]anchor +((?:\w|-)+) *\n')
+anchor_cmd_match = re.compile(r'\n* *[\\@]anchor +((?:\w|-)+) *(?:$|\n)')
 
 def find_anchor_cmds(doc, status: Status):
     # Finds section headings and explicit anchors, and adds them to a list.
@@ -1491,6 +1491,8 @@ def extract_declarations(citer, parent, status: Status):
                 member['templated'] = is_template
                 member['abstract'] = item.is_abstract_record()
                 member['final'] = False
+                if not parent_is_namespace:
+                    member['access'] = access_specifier_map[item.access_specifier]
                 member['bases'] = []
                 member['derived'] = []
                 member['members'] = []
@@ -1513,9 +1515,9 @@ def extract_declarations(citer, parent, status: Status):
                 member['group'] = ''  # these should not be part of a group
             elif member_type == 'enum':
                 member['scoped'] = item.is_scoped_enum()
+                if not parent_is_namespace:
+                    member['access'] = access_specifier_map[item.access_specifier]
                 type = process_type(item.enum_type)['typename']
-                if code_formatting:
-                    type = '`{}`'.format(type)
                 member['type'] = type
                 member['members'] = []
                 process_children = True
@@ -1536,6 +1538,8 @@ def extract_declarations(citer, parent, status: Status):
                 process_children = True
             elif member_type in ['typedef', 'using']:
                 member_type = 'alias'
+                if not parent_is_namespace:
+                    member['access'] = access_specifier_map[item.access_specifier]
                 type = process_type(item.underlying_typedef_type, item)
                 if type['typename']:
                     member['type'] = type
@@ -1545,6 +1549,8 @@ def extract_declarations(citer, parent, status: Status):
                 if is_template:
                     process_children = True
             elif member_type == 'union':
+                if not parent_is_namespace:
+                    member['access'] = access_specifier_map[item.access_specifier]
                 member['members'] = []
                 member['related'] = []
                 process_children = True

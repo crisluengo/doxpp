@@ -1,19 +1,19 @@
 {% extends 'base.html' %}
 
-{% macro entry_class(class) %}{% include 'entry-class.html' %}{% endmacro %}
-{% macro entry_alias(alias, mark_nonpublic=False) %}{% include 'entry-alias.html' %}{% endmacro %}
-{% macro entry_enum(enum, mark_nonpublic=False) %}{% include 'entry-enum.html' %}{% endmacro %}
-{% macro entry_function(function, mark_nonpublic=False) %}{% include 'entry-function.html' %}{% endmacro %}
-{% macro entry_variable(variable, mark_nonpublic=False) %}{% include 'entry-variable.html' %}{% endmacro %}
+{% macro entry_class(class, show_full_name=False) %}{% include 'entry-class.html' %}{% endmacro %}
+{% macro entry_alias(alias, show_full_name=False) %}{% include 'entry-alias.html' %}{% endmacro %}
+{% macro entry_enum(enum, show_full_name=False) %}{% include 'entry-enum.html' %}{% endmacro %}
+{% macro entry_function(function, show_full_name=False) %}{% include 'entry-function.html' %}{% endmacro %}
+{% macro entry_variable(variable, show_full_name=False) %}{% include 'entry-variable.html' %}{% endmacro %}
 {% macro entry_macro(macro) %}{% include 'entry-macro.html' %}{% endmacro %}
 
-{% macro details_alias(alias, prefix) %}{% include 'details-alias.html' %}{% endmacro %}
-{% macro details_enum(enum, prefix) %}{% include 'details-enum.html' %}{% endmacro %}
-{% macro details_function(function, prefix) %}{% include 'details-function.html' %}{% endmacro %}
-{% macro details_variable(variable, prefix) %}{% include 'details-variable.html' %}{% endmacro %}
+{% macro details_alias(alias, show_full_name=False) %}{% include 'details-alias.html' %}{% endmacro %}
+{% macro details_enum(enum, show_full_name=False) %}{% include 'details-enum.html' %}{% endmacro %}
+{% macro details_function(function, show_full_name=False) %}{% include 'details-function.html' %}{% endmacro %}
+{% macro details_variable(variable, show_full_name=False) %}{% include 'details-variable.html' %}{% endmacro %}
 {% macro details_macro(macro) %}{% include 'details-macro.html' %}{% endmacro %}
 
-{% block title %}{% set j = joiner('::') %}{% for name, _ in compound.breadcrumb %}{{ j() }}{{ name }}{% endfor %} {{ compound.kind }} | {{ super() }}{% endblock %}
+{% block title %}{% set j = joiner('::') %}{% for name, _ in compound.breadcrumb %}{{ j() }}{{ name }}{% endfor %} {{ compound.member_type }} | {{ super() }}{% endblock %}
 
 {% block main %}
         <h1>
@@ -24,7 +24,7 @@
           {% set j = joiner(',\n    ') %}
            <div class="m-doc-template"><span class="m-doc-wrap-bumper">template&lt;</span><span class="m-doc-wrap">{% for t in compound.templates %}{{ j() }}{{ t.type }}{% if t.name %} {{ t.name }}{% endif %}{% if t.default %} = {{ t.default }}{% endif%}{% endfor %}&gt;</span></div>
           {% endif %}
-          {%+ for name, target in compound.breadcrumb[:-1] %}<span class="m-breadcrumb"><a href="{{ target }}">{{ name }}</a>::<wbr/></span>{% endfor %}{{ compound.breadcrumb[-1][0] }} <span class="m-thin">{{ compound.kind }}</span>{% if compound.final %} <span class="m-label m-flat m-warning">final</span>{% endif %}{% if compound.since %} {{ compound.since }}{% endif %}
+          {%+ for name, target in compound.breadcrumb[:-1] %}<span class="m-breadcrumb"><a href="{{ target }}">{{ name }}</a>::<wbr/></span>{% endfor %}{{ compound.breadcrumb[-1][0] }} <span class="m-thin">{{ compound.member_type }}</span>{% if compound.final %} <span class="m-label m-flat m-warning">final</span>{% endif %}{% if compound.since %} {{ compound.since }}{% endif %}
           {# need an explicit space here otherwise the newline gets removed #}
 
           {% if compound.include and compound.templates == None %}
@@ -49,7 +49,7 @@
           </tbody>
         </table>
         {% endif %}
-        {% if compound.sections or compound.base_classes or compound.derived_classes or compound.public_types or compound.public_static_functions or compound.typeless_functions or compound.public_functions or compound.public_static_vars or compound.public_vars or compound.protected_types or compound.protected_static_functions or compound.protected_functions or compound.protected_static_vars or compound.protected_vars or compound.private_types or compound.private_static_functions or compound.private_functions or compound.private_static_vars or compound.private_vars or compound.groups or compound.related %}
+        {% if compound.sections or compound.base_classes or compound.derived_classes or compound.typeless_functions or compound.groups or compound.classes or compound.enums or compound.aliases or compound.functions or compound.variables or compound.related %}
         <div class="m-block m-default">
           <h3>Contents</h3>
           <ul>
@@ -80,50 +80,20 @@
                 {% for group in compound.groups %}
                 <li><a href="#{{ group.id }}">{{ group.name }}</a></li>
                 {% endfor %}
-                {% if compound.public_types %}
-                <li><a href="#pub-types">Public types</a></li>
+                {% if compound.classes %}
+                <li><a href="#nested-classes">Classes</a></li>
                 {% endif %}
-                {% if compound.public_functions %}
-                <li><a href="#pub-methods">Public functions</a></li>
+                {% if compound.enums %}
+                <li><a href="#enum-members">Enums</a></li>
                 {% endif %}
-                {% if compound.public_vars %}
-                <li><a href="#pub-attribs">Public variables</a></li>
+                {% if compound.aliases %}
+                <li><a href="#alias-members">Aliases</a></li>
                 {% endif %}
-                {% if compound.public_static_functions %}
-                <li><a href="#pub-static-methods">Public static functions</a></li>
+                {% if compound.functions %}
+                <li><a href="#function-members">Functions</a></li>
                 {% endif %}
-                {% if compound.public_static_vars %}
-                <li><a href="#pub-static-attribs">Public static variables</a></li>
-                {% endif %}
-                {% if compound.protected_types %}
-                <li><a href="#pro-types">Protected types</a></li>
-                {% endif %}
-                {% if compound.protected_functions %}
-                <li><a href="#pro-methods">Protected functions</a></li>
-                {% endif %}
-                {% if compound.protected_vars %}
-                <li><a href="#pro-attribs">Protected variables</a></li>
-                {% endif %}
-                {% if compound.protected_static_functions %}
-                <li><a href="#pro-static-methods">Protected static functions</a></li>
-                {% endif %}
-                {% if compound.protected_static_vars %}
-                <li><a href="#pro-static-attribs">Protected static variables</a></li>
-                {% endif %}
-                {% if compound.private_types %}
-                <li><a href="#pri-types">Private types</a></li>
-                {% endif %}
-                {% if compound.private_functions %}
-                <li><a href="#pri-methods">Private functions</a></li>
-                {% endif %}
-                {% if compound.private_vars %}
-                <li><a href="#pri-attribs">Private variables</a></li>
-                {% endif %}
-                {% if compound.private_static_functions %}
-                <li><a href="#pri-static-methods">Private static functions</a></li>
-                {% endif %}
-                {% if compound.private_static_vars %}
-                <li><a href="#pri-static-attribs">Private static variables</a></li>
+                {% if compound.variables %}
+                <li><a href="#variable-members">Variables</a></li>
                 {% endif %}
                 {% if compound.related %}
                 <li><a href="#related">Related</a></li>
@@ -141,7 +111,7 @@
           <h2><a href="#base-classes">Base classes</a></h2>
           <dl class="m-doc">
             {% for class in compound.base_classes %}
-{{ entry_class(class) }}
+{{ entry_class(class, show_full_name=True) }}
             {% endfor %}
           </dl>
         </section>
@@ -151,7 +121,7 @@
           <h2><a href="#derived-classes">Derived classes</a></h2>
           <dl class="m-doc">
             {% for class in compound.derived_classes %}
-{{ entry_class(class) }}
+{{ entry_class(class, show_full_name=True) }}
             {% endfor %}
           </dl>
         </section>
@@ -161,7 +131,7 @@
             <h2><a href="#typeless-methods">Constructors, destructors, conversion operators</a></h2>
             <dl class="m-doc">
                 {% for function in compound.typeless_functions %}
-                {{ entry_function(function) }}
+{{ entry_function(function) }}
                 {% endfor %}
             </dl>
         </section>
@@ -169,207 +139,88 @@
         {% for group in compound.groups %}
         <section id="{{ group.id }}">
             <h2><a href="#{{ group.id }}">{{ group.name }}</a></h2>
-            {% if group.doc %}
-            {{ group.doc }}
-            {% endif %}
             <dl class="m-doc">
-                {% for kind, member in group.members %}
-                {% if kind == 'alias' %}
-                {{ entry_alias(member, mark_nonpublic=True) }}
-                {% elif kind == 'enum' %}
-                {{ entry_enum(member, mark_nonpublic=True) }}
-                {% elif kind == 'function' %}
-                {{ entry_function(member, mark_nonpublic=True) }}
-                {% elif kind == 'variable' %}
-                {{ entry_variable(member, mark_nonpublic=True) }}
+                {% for member in group.members %}
+                {% if member.member_type in ['class', 'struct', 'union'] %}
+                {{ entry_class(member) }}
+                {% elif member.member_type == 'enum' %}
+                {{ entry_enum(member) }}
+                {% elif member.member_type == 'alias' %}
+                {{ entry_alias(member) }}
+                {% elif member.member_type == 'function' %}
+                {{ entry_function(member) }}
+                {% elif member.member_type == 'variable' %}
+                {{ entry_variable(member) }}
                 {% endif %}
                 {% endfor %}
             </dl>
         </section>
         {% endfor %}
-        {% if compound.public_types %}
-        <section id="pub-types">
-          <h2><a href="#pub-types">Public types</a></h2>
+        {% if compound.classes %}
+        <section id="nested-classes">
+          <h2><a href="#nested-classes">Classes</a></h2>
           <dl class="m-doc">
-            {% for kind, type in compound.public_types %}
-            {% if kind == 'class' %}
+            {% for type in compound.classes %}
 {{ entry_class(type) }}
-            {% elif kind == 'enum' %}
+            {% endfor %}
+          </dl>
+        </section>
+        {% endif %}
+        {% if compound.enums %}
+        <section id="enum-members">
+          <h2><a href="#enum-members">Enums</a></h2>
+          <dl class="m-doc">
+            {% for type in compound.enums %}
 {{ entry_enum(type) }}
-            {% elif kind == 'alias' %}
-{{ entry_alias(type) }}
-            {% endif %}
             {% endfor %}
           </dl>
         </section>
         {% endif %}
-        {% if compound.public_functions %}
-        <section id="pub-methods">
-          <h2><a href="#pub-methods">Public functions</a></h2>
+        {% if compound.aliases %}
+        <section id="alias-members">
+          <h2><a href="#alias-members">Aliases</a></h2>
           <dl class="m-doc">
-            {% for function in compound.public_functions %}
-{{ entry_function(function) }}
+            {% for function in compound.aliases %}
+{{ entry_alias(function) }}
             {% endfor %}
           </dl>
         </section>
         {% endif %}
-        {% if compound.public_vars %}
-        <section id="pub-attribs">
-          <h2><a href="#pub-attribs">Public variables</a></h2>
+        {% if compound.functions %}
+        <section id="function-members">
+          <h2><a href="#function-members">Functions</a></h2>
           <dl class="m-doc">
-            {% for variable in compound.public_vars %}
-{{ entry_variable(variable) }}
+            {% for variable in compound.functions %}
+{{ entry_function(variable) }}
             {% endfor %}
           </dl>
         </section>
         {% endif %}
-        {% if compound.public_static_functions %}
-        <section id="pub-static-methods">
-           <h2><a href="#pub-static-methods">Public static functions</a></h2>
+        {% if compound.variables %}
+        <section id="variable-members">
+           <h2><a href="#variable-members">Variables</a></h2>
            <dl class="m-doc">
-              {% for function in compound.public_static_functions %}
-{{ entry_function(function) }}
+              {% for function in compound.variables %}
+{{ entry_variable(function) }}
               {% endfor %}
            </dl>
-        </section>
-        {% endif %}
-        {% if compound.public_static_vars %}
-        <section id="pub-static-attribs">
-           <h2><a href="#pub-static-attribs">Public static variables</a></h2>
-           <dl class="m-doc">
-              {% for variable in compound.public_static_vars %}
-{{ entry_variable(variable) }}
-              {% endfor %}
-           </dl>
-        </section>
-        {% endif %}
-        {% if compound.protected_types %}
-        <section id="pro-types">
-          <h2><a href="#pro-types">Protected types</a></h2>
-          <dl class="m-doc">
-            {% for kind, type in compound.protected_types %}
-            {% if kind == 'class' %}
-{{ entry_class(type) }}
-            {% elif kind == 'enum' %}
-{{ entry_enum(type) }}
-            {% elif kind == 'alias' %}
-{{ entry_alias(type) }}
-            {% endif %}
-            {% endfor %}
-          </dl>
-        </section>
-        {% endif %}
-        {% if compound.protected_functions %}
-        <section id="pro-methods">
-          <h2><a href="#pro-methods">Protected functions</a></h2>
-          <dl class="m-doc">
-            {% for function in compound.protected_functions %}
-{{ entry_function(function) }}
-            {% endfor %}
-          </dl>
-        </section>
-        {% endif %}
-        {% if compound.protected_vars %}
-        <section id="pro-attribs">
-          <h2><a href="#pro-attribs">Protected variables</a></h2>
-          <dl class="m-doc">
-            {% for variable in compound.protected_vars %}
-{{ entry_variable(variable) }}
-            {% endfor %}
-          </dl>
-        </section>
-        {% endif %}
-        {% if compound.protected_static_functions %}
-        <section id="pro-static-methods">
-           <h2><a href="#pro-static-methods">Protected static functions</a></h2>
-           <dl class="m-doc">
-              {% for function in compound.protected_static_functions %}
-{{ entry_function(function) }}
-              {% endfor %}
-           </dl>
-        </section>
-        {% endif %}
-        {% if compound.protected_static_vars %}
-        <section id="pro-static-attribs">
-           <h2><a href="#pro-static-attribs">Protected static variables</a></h2>
-           <dl class="m-doc">
-              {% for variable in compound.protected_static_vars %}
-{{ entry_variable(variable) }}
-              {% endfor %}
-           </dl>
-        </section>
-        {% endif %}
-        {% if compound.private_types %}
-        <section id="pri-types">
-            <h2><a href="#pro-types">Private types</a></h2>
-            <dl class="m-doc">
-                {% for kind, type in compound.private_types %}
-                {% if kind == 'class' %}
-                {{ entry_class(type) }}
-                {% elif kind == 'enum' %}
-                {{ entry_enum(type) }}
-                {% elif kind == 'alias' %}
-                {{ entry_alias(type) }}
-                {% endif %}
-                {% endfor %}
-            </dl>
-        </section>
-        {% endif %}
-        {% if compound.private_functions %}
-        <section id="pri-methods">
-            <h2><a href="#pro-methods">Private functions</a></h2>
-            <dl class="m-doc">
-                {% for function in compound.private_functions %}
-                {{ entry_function(function) }}
-                {% endfor %}
-            </dl>
-        </section>
-        {% endif %}
-        {% if compound.private_vars %}
-        <section id="pri-attribs">
-            <h2><a href="#pro-attribs">Private variables</a></h2>
-            <dl class="m-doc">
-                {% for variable in compound.private_vars %}
-                {{ entry_variable(variable) }}
-                {% endfor %}
-            </dl>
-        </section>
-        {% endif %}
-        {% if compound.private_static_functions %}
-        <section id="pri-static-methods">
-            <h2><a href="#pro-static-methods">Private static functions</a></h2>
-            <dl class="m-doc">
-                {% for function in compound.private_static_functions %}
-                {{ entry_function(function) }}
-                {% endfor %}
-            </dl>
-        </section>
-        {% endif %}
-        {% if compound.private_static_vars %}
-        <section id="pri-static-attribs">
-            <h2><a href="#pro-static-attribs">Private static variables</a></h2>
-            <dl class="m-doc">
-                {% for variable in compound.private_static_vars %}
-                {{ entry_variable(variable) }}
-                {% endfor %}
-            </dl>
         </section>
         {% endif %}
         {% if compound.related %}
         <section id="related">
           <h2><a href="#related">Related</a></h2>
           <dl class="m-doc">
-            {% for kind, member in compound.related %}
-            {% if kind == 'alias' %}
-{{ entry_alias(member) }}
-            {% elif kind == 'enum' %}
-{{ entry_enum(member) }}
-            {% elif kind == 'function' %}
-{{ entry_function(member) }}
-            {% elif kind == 'variable' %}
-{{ entry_variable(member) }}
-            {% elif kind == 'macro' %}
-{{ entry_macro(member) }}
+            {% for member in compound.related %}
+            {% if member.member_type == 'alias' %}
+{{ entry_alias(member, show_full_name=True) }}
+            {% elif member.member_type == 'enum' %}
+{{ entry_enum(member, show_full_name=True) }}
+            {% elif member.member_type == 'function' %}
+{{ entry_function(member, show_full_name=True) }}
+            {% elif member.member_type == 'variable' %}
+{{ entry_variable(member, show_full_name=True) }}
+            {% elif member.member_type == 'macro' %}
+{{ entry_macro(member, show_full_name=True) }}
             {% endif %}
             {% endfor %}
           </dl>
@@ -379,30 +230,30 @@
         <section>
           <h2>Enum documentation</h2>
           {% for group in compound.groups %}
-          {% for kind, member in group.members %}
-          {% if kind == 'enum' and member.has_details %}
-          {{ details_enum(member, compound.prefix_wbr) }}
+          {% for member in group.members %}
+          {% if member.member_type == 'enum' and member.has_details %}
+{{ details_enum(member) }}
           {% endif %}
           {% endfor %}
           {% endfor %}
-          {% for kind, member in compound.public_types %}
-          {% if kind == 'enum' and member.has_details %}
-{{ details_enum(member, compound.prefix_wbr) }}
+          {% for member in compound.public_types %}
+          {% if member.member_type == 'enum' and member.has_details %}
+{{ details_enum(member) }}
           {% endif %}
           {% endfor %}
-          {% for kind, member in compound.protected_types %}
-          {% if kind == 'enum' and member.has_details %}
-{{ details_enum(member, compound.prefix_wbr) }}
+          {% for member in compound.protected_types %}
+          {% if member.member_type == 'enum' and member.has_details %}
+{{ details_enum(member) }}
           {% endif %}
           {% endfor %}
-          {% for kind, member in compound.private_types %}
-          {% if kind == 'enum' and member.has_details %}
-{{ details_enum(member, compound.prefix_wbr) }}
+          {% for member in compound.private_types %}
+          {% if member.member_type == 'enum' and member.has_details %}
+{{ details_enum(member) }}
           {% endif %}
           {% endfor %}
-          {% for kind, member in compound.related %}
-          {% if kind == 'enum' and member.has_details %}
-{{ details_enum(member, '') }}
+          {% for member in compound.related %}
+          {% if member.member_type == 'enum' and member.has_details %}
+{{ details_enum(member, show_full_name=True) }}
           {% endif %}
           {% endfor %}
         </section>
@@ -411,30 +262,20 @@
         <section>
           <h2>Alias documentation</h2>
           {% for group in compound.groups %}
-          {% for kind, member in group.members %}
-          {% if kind == 'alias' and member.has_details %}
-          {{ details_alias(member, compound.prefix_wbr) }}
+          {% for member in group.members %}
+          {% if member.member_type == 'alias' and member.has_details %}
+{{ details_alias(member) }}
           {% endif %}
           {% endfor %}
           {% endfor %}
-          {% for kind, member in compound.public_types %}
-          {% if kind == 'alias' and member.has_details %}
-{{ details_alias(member, compound.prefix_wbr) }}
+          {% for member in compound.aliases %}
+          {% if member.has_details %}
+{{ details_alias(member) }}
           {% endif %}
           {% endfor %}
-          {% for kind, member in compound.protected_types %}
-          {% if kind == 'alias' and member.has_details %}
-{{ details_alias(member, compound.prefix_wbr) }}
-          {% endif %}
-          {% endfor %}
-          {% for kind, member in compound.private_types %}
-          {% if kind == 'alias' and member.has_details %}
-{{ details_alias(member, compound.prefix_wbr) }}
-          {% endif %}
-          {% endfor %}
-          {% for kind, member in compound.related %}
-          {% if kind == 'alias' and member.has_details %}
-{{ details_alias(member, '') }}
+          {% for member in compound.related %}
+          {% if member.member_type == 'alias' and member.has_details %}
+{{ details_alias(member, show_full_name=True) }}
           {% endif %}
           {% endfor %}
         </section>
@@ -444,49 +285,24 @@
           <h2>Function documentation</h2>
           {% for function in compound.typeless_functions %}
           {% if function.has_details %}
-{{ details_function(function, compound.prefix_wbr) }}
+{{ details_function(function) }}
           {% endif %}
           {% endfor %}
           {% for group in compound.groups %}
-          {% for kind, member in group.members %}
-          {% if kind == 'function' and member.has_details %}
-          {{ details_function(member, compound.prefix_wbr) }}
+          {% for member in group.members %}
+          {% if member.member_type == 'function' and member.has_details %}
+{{ details_function(member) }}
           {% endif %}
           {% endfor %}
           {% endfor %}
-          {% for function in compound.public_functions %}
+          {% for function in compound.functions %}
           {% if function.has_details %}
-{{ details_function(function, compound.prefix_wbr) }}
+{{ details_function(function) }}
           {% endif %}
           {% endfor %}
-          {% for function in compound.public_static_functions %}
-          {% if function.has_details %}
-{{ details_function(function, compound.prefix_wbr) }}
-          {% endif %}
-          {% endfor %}
-          {% for function in compound.protected_functions %}
-          {% if function.has_details %}
-{{ details_function(function, compound.prefix_wbr) }}
-          {% endif %}
-          {% endfor %}
-          {% for function in compound.protected_static_functions %}
-          {% if function.has_details %}
-{{ details_function(function, compound.prefix_wbr) }}
-          {% endif %}
-          {% endfor %}
-          {% for function in compound.private_functions %}
-          {% if function.has_details %}
-{{ details_function(function, compound.prefix_wbr) }}
-          {% endif %}
-          {% endfor %}
-          {% for function in compound.private_static_functions %}
-          {% if function.has_details %}
-{{ details_function(function, compound.prefix_wbr) }}
-          {% endif %}
-          {% endfor %}
-          {% for kind, member in compound.related %}
-          {% if kind == 'function' and member.has_details %}
-{{ details_function(member, '') }}
+          {% for member in compound.related %}
+          {% if member.member_type == 'function' and member.has_details %}
+{{ details_function(member, show_full_name=True) }}
           {% endif %}
           {% endfor %}
         </section>
@@ -495,45 +311,20 @@
         <section>
           <h2>Variable documentation</h2>
           {% for group in compound.groups %}
-          {% for kind, member in group.members %}
-          {% if kind == 'variable' and member.has_details %}
-          {{ details_variable(member, compound.prefix_wbr) }}
+          {% for member in group.members %}
+          {% if member.member_type == 'variable' and member.has_details %}
+{{ details_variable(member) }}
           {% endif %}
           {% endfor %}
           {% endfor %}
-          {% for variable in compound.public_vars %}
+          {% for variable in compound.variables %}
           {% if variable.has_details %}
-{{ details_variable(variable, compound.prefix_wbr) }}
+{{ details_variable(variable) }}
           {% endif %}
           {% endfor %}
-          {% for variable in compound.public_static_vars %}
-          {% if variable.has_details %}
-{{ details_variable(variable, compound.prefix_wbr) }}
-          {% endif %}
-          {% endfor %}
-          {% for variable in compound.protected_vars %}
-          {% if variable.has_details %}
-{{ details_variable(variable, compound.prefix_wbr) }}
-          {% endif %}
-          {% endfor %}
-          {% for variable in compound.protected_static_vars %}
-          {% if variable.has_details %}
-{{ details_variable(variable, compound.prefix_wbr) }}
-          {% endif %}
-          {% endfor %}
-          {% for variable in compound.private_vars %}
-          {% if variable.has_details %}
-{{ details_variable(variable, compound.prefix_wbr) }}
-          {% endif %}
-          {% endfor %}
-          {% for variable in compound.private_static_vars %}
-          {% if variable.has_details %}
-{{ details_variable(variable, compound.prefix_wbr) }}
-          {% endif %}
-          {% endfor %}
-          {% for kind, member in compound.related %}
-          {% if kind == 'variable' and member.has_details %}
-{{ details_variable(member, '') }}
+          {% for member in compound.related %}
+          {% if member.member_type == 'variable' and member.has_details %}
+{{ details_variable(member, show_full_name=True) }}
           {% endif %}
           {% endfor %}
         </section>
@@ -541,8 +332,8 @@
         {% if compound.has_macro_details %}
         <section>
           <h2>Macro documentation</h2>
-          {% for kind, member in compound.related %}
-          {% if kind == 'macro' and member.has_details %}
+          {% for member in compound.related %}
+          {% if member.member_type == 'macro' and member.has_details %}
 {{ details_macro(member) }}
           {% endif %}
           {% endfor %}

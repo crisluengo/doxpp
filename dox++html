@@ -33,6 +33,7 @@ doxpp.log.setLevel(doxpp.config.get(config, 'log', 'level'))
 
 options = {
     'show_private': doxpp.config.get_boolean(config, 'html', 'document private members'),
+    'show_protected': doxpp.config.get_boolean(config, 'html', 'document protected members'),
     'show_undocumented': doxpp.config.get_boolean(config, 'html', 'document undocumented members'),
     'extra_files': shlex.split(doxpp.config.get(config, 'html', 'extra files'), posix=False),
     'templates': doxpp.config.get(config, 'html', 'templates')

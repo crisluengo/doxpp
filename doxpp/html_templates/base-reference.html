@@ -2,6 +2,8 @@
 
 {% set prefix = compound.prefix_wbr %}
 
+{% set show_full_name = compound.member_type != 'namespace' %}
+
 {% macro entry_module(module) %}{% include 'entry-module.html' %}{% endmacro %}
 {% macro entry_file(file) %}{% include 'entry-file.html' %}{% endmacro %}
 {% macro entry_namespace(namespace) %}{% include 'entry-namespace.html' %}{% endmacro %}
@@ -24,7 +26,7 @@
         {% if compound.brief %}
         <p>{{ compound.brief }}</p>
         {% endif %}
-        {% if compound.sections or compound.modules or compound.files or compound.namespaces or compound.classes or compound.enums or compound.aliases or compound.functions or compound.variables or compound.macros %}
+        {% if compound.sections or compound.modules or compound.namespaces or compound.classes or compound.enums or compound.aliases or compound.functions or compound.variables or compound.macros %}
         <div class="m-block m-default">
           <h3>Contents</h3>
           <ul>
@@ -40,15 +42,12 @@
             <li><a href="#{{ id }}">{{ name }}</a></li>
             {% endif %}
             {% endfor %}
-            {% if compound.modules or compound.files or compound.namespaces or compound.classes or compound.enums or compound.aliases or compound.functions or compound.variables or compound.macros %}
+            {% if compound.modules or compound.namespaces or compound.classes or compound.enums or compound.aliases or compound.functions or compound.variables or compound.macros %}
             <li>
               Reference
               <ul>
                 {% if compound.modules %}
                 <li><a href="#modules">Modules</a></li>
-                {% endif %}
-                {% if compound.files %}
-                <li><a href="#files">Files</a></li>
                 {% endif %}
                 {% if compound.namespaces %}
                 <li><a href="#namespaces">Namespaces</a></li>
@@ -77,25 +76,15 @@
           </ul>
         </div>
         {% endif %}
-{% if compound.doc %}
+        {% if compound.doc %}
 {{ compound.doc }}
-{% endif %}
+        {% endif %}
         {% if compound.modules %}
         <section id="modules">
           <h2><a href="#modules">Modules</a></h2>
           <dl class="m-doc">
             {% for module in compound.modules %}
 {{ entry_module(module) }}
-            {% endfor %}
-          </dl>
-        </section>
-        {% endif %}
-        {% if compound.files %}
-        <section id="files">
-          <h2><a href="#files">Files</a></h2>
-          <dl class="m-doc">
-            {% for file in compound.files %}
-{{ entry_file(file) }}
             {% endfor %}
           </dl>
         </section>

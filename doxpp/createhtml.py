@@ -59,7 +59,7 @@ default_templates = os.path.join(doxpp_path, 'html_templates')
 
 class Status:
     # This defines the status of our generator
-    def __init__(self, data):
+    def __init__(self, data, options):
         # Data read in from JSON file
         self.data = data
 
@@ -83,14 +83,13 @@ class Status:
             'pages': 'pages'
         }
 
-        # This dictionary links each page to the members that will be listed there (with or without
-        # detailed documentation). Members can be listed on multiple pages.
-        self.html_pages_index = {}
+        # This dictionary links page_id to the compound with the relevant information for that page.
+        self.html_pages = {}
 
-        # This dictionary links each page to the members that will be documented there (with or without
-        # detailed documentation). Members are documented in only one page. This is the inverse of `id_map`,
-        # except that it contains only members.
-        self.html_pages_detailed = {}
+        # Options
+        self.show_private = options['show_private']
+        self.show_protected = options['show_protected']
+        self.show_undocumented = options['show_undocumented']
 
     def get_link(self, id):
         # Convert an ID into a URL to link to
@@ -122,92 +121,254 @@ class Status:
         # TODO: how about links to (sub-)sections and anchors?
         return '(unknown)'
 
+    def get_compound(self, id):
+        if id in self.members:
+            return self.members[id]
+        elif id in self.headers:
+            return self.headers[id]
+        elif id in self.groups:
+            return self.groups[id]
+        elif id in self.pages:
+            return self.pages[id]
+        else:
+            #log.error("Looking for 'compound' data structure for unknown id = %s", id)
+            return {}
+
+
+def generate_fully_qualified_names(members, status: Status):
+    for member in members:
+        name = member['name']
+        if member['parent']:
+            name = status.members[member['parent']]['fully_qualified_name'] + '::<wbr />' + name
+        member['fully_qualified_name'] = name
+        if 'members' in member:
+            generate_fully_qualified_names(member['members'], status)
+
+
 def register_anchors_to_page(compound, page_id, status: Status):
     for section in compound['sections']:
         status.id_map[section[0]] = page_id
     for anchor in compound['anchors']:
         status.id_map[anchor] = page_id
 
-def list_member_on_page(member_id, page_id, status: Status):
-    if page_id not in status.html_pages_index:
-        status.html_pages_index[page_id] = set()
-    status.html_pages_index[page_id].add(member_id)
-
 def document_member_on_page(member, page_id, status: Status):
     member['page_id'] = page_id
-    member_id = member['id']
-    status.id_map[member_id] = page_id
-    if page_id not in status.html_pages_detailed:
-        status.html_pages_detailed[page_id] = set()
-    status.html_pages_detailed[page_id].add(member_id)
-    list_member_on_page(member_id, page_id, status)
+    status.id_map[member['id']] = page_id
     register_anchors_to_page(member, page_id, status)
 
 def create_page(compound, status: Status):
     page_id = compound['id']
     compound['page_id'] = page_id
     status.id_map[page_id] = page_id
-    if page_id not in status.html_pages_index:
-        status.html_pages_index[page_id] = set()
     register_anchors_to_page(compound, page_id, status)
+    status.html_pages[page_id] = compound
 
-def show_member(member, show_private, show_undocumented):
-    if not (show_undocumented or member['brief']):
+def show_member(member, status: Status):
+    if not (status.show_undocumented or member['brief']):
+        # TODO: if this is an enum, and any of its children is documented, then this guy is documented too
         return False
-    if 'access' in member and not (show_private or (member['access'] == 'private')):
+    if not status.show_private and 'access' in member and member['access'] == 'private':
+        return False
+    if not status.show_protected and 'access' in member and member['access'] == 'protected':
         return False
     return True
 
-def assign_page(status: Status, show_private, show_undocumented):
-    # TODO: Add option `show_if_documented_children`
-    # All header files and groups will have a page, whether they're documented or not
-    for header in status.headers.values():
-        create_page(header, status)
-    for group in status.groups.values():
-        create_page(group, status)
-    # Assign members to a specific page
-    for member in status.members.values():
-        id = member['id']
-        if not id:
-            # This is the "root" member
-            continue
-        if member['member_type'] == 'enumvalue':
-            # These are added to the page that their parent is in. Because of the way we generate the members list,
-            # the parent has already been processed. This is shown in the documentation even if not documented,
-            # as long as the parent is.
-            if show_member(status.members[member['parent']], show_private, show_undocumented):
-                document_member_on_page(member, status.id_map[member['parent']], status)
-            continue
-        if not show_member(member, show_private, show_undocumented):
-            # Undocumented or private, ignore
-            continue
-        if member['member_type'] in ['class', 'struct', 'union', 'namespace']:
-            # Class, struct, union and namespace go in their own page
-            document_member_on_page(member, id, status)
-        elif member['parent'] and status.members[member['parent']]['member_type'] in ['class', 'struct', 'union']:
-            # Class or struct members go in the class/struct/union page
-            document_member_on_page(member, member['parent'], status)
-            # Don't list anywhere else
-            continue
-        elif member['relates']:
-            document_member_on_page(member, member['relates'], status)
-        elif member['group']:
-            # Otherwise, if group member, go in the group page
-            document_member_on_page(member, member['group'], status)
-        elif member['parent']:
-            # Otherwise, if namespace member, go in the namespace page
-            document_member_on_page(member, member['parent'], status)
-        else:
-            # Otherwise, go in the header page
-            document_member_on_page(member, member['header'], status)
-        # Additionally, they're listed in the group page, the namespace page and the header page
-        list_member_on_page(id, member['header'], status)
+def has_documented_members(compound):
+    return compound['has_enum_details'] or compound['has_alias_details'] or compound['has_function_details'] \
+           or compound['has_variable_details'] or compound['has_macro_details']
+
+def add_compound_member_booleans(compound):
+    compound['has_enum_details'] = False
+    compound['has_alias_details'] = False
+    compound['has_function_details'] = False
+    compound['has_variable_details'] = False
+    compound['has_macro_details'] = False
+
+def add_class_member_lists(compound):
+    compound['typeless_functions'] = []
+    compound['groups'] = []
+    compound['groups_names'] = {}
+    compound['classes'] = []
+    compound['enums'] = []
+    compound['aliases'] = []
+    compound['functions'] = []
+    compound['variables'] = []
+    compound['related'] = []
+    add_compound_member_booleans(compound)
+
+def add_compound_member_lists(compound):
+    compound['modules'] = []
+    compound['namespaces'] = []
+    compound['classes'] = []
+    compound['enums'] = []
+    compound['aliases'] = []
+    compound['functions'] = []
+    compound['variables'] = []
+    compound['macros'] = []
+    add_compound_member_booleans(compound)
+
+def process_enum_values(member, status: Status):
+    # member must be an enum
+    # We only get here if member is being shown
+    for value in member['members']:
+        document_member_on_page(value, member['page_id'], status)
+
+def process_class_member(compound, member, status: Status):
+    # compound must be a class/struct/union
+    if member['member_type'] in ['class', 'struct', 'union']:
+        process_class(member, status)
+        if 'page_id' in member:
+            compound['classes'].append(member)
+    elif show_member(member, status):
+        document_member_on_page(member, compound['id'], status)
+        member_type = member['member_type']
         if member['group']:
-            list_member_on_page(id, member['group'], status)
-        if member['parent'] and status.members[member['parent']]['member_type'] == 'namespace':
-            list_member_on_page(id, member['parent'], status)
+            if member['group'] not in compound['groups_names']:
+                compound['groups_names'][member['group']] = len(compound['groups'])
+                compound['groups'].append({
+                    'name': member['group'],
+                    'id': 'group--' + urllib.parse.quote(member['group']),
+                    'members': []
+                })
+            compound['groups'][compound['groups_names'][member['group']]]['members'].append(member)
+        elif 'method_type' in member and member['method_type'] != 'method':
+            compound['typeless_functions'].append(member)
+        elif member_type == 'enum':
+            compound['enums'].append(member)
+            process_enum_values(member, status)
+        elif member_type == 'alias':
+            compound['aliases'].append(member)
+        elif member_type == 'function':
+            compound['functions'].append(member)
+        elif member_type == 'variable':
+            compound['variables'].append(member)
+        else:
+            log.error("Member of type %s cannot be listed on %s page", member_type, compound['member_type'])
+            return
+        if member['doc']:
+            compound['has_' + member_type + '_details'] = True
+
+def process_namespace_member(compound, member, status: Status):
+    # compound must be a namespace
+    if not member['header']:
+        # TODO: This only happens because of an issue with parent template class defined in other header file
+        log.error("Member %s doesn't have a header file, this is a bug in dox++parse that needs to be fixed", member['id'])
+        return
+    header_compound = status.headers[member['header']]
+    group_compound = status.groups[member['group']] if member['group'] else {}
+    if member['member_type'] in ['class', 'struct', 'union']:
+        process_class(member, status)
+        if 'page_id' in member:
+            compound['classes'].append(member)
+            header_compound['classes'].append(member)
+            if group_compound:
+                group_compound['classes'].append(member)
+    elif member['member_type'] == 'namespace':
+        process_namespace(member, status)
+        if 'page_id' in member:
+            compound['namespaces'].append(member)
+            header_compound['namespaces'].append(member)
+            if group_compound:
+                group_compound['namespaces'].append(member)
+    elif show_member(member, status):
+        if member['relates']:
+            page_id = member['relates']
+            status.get_compound(page_id)['related'].append(member)
+        elif member['group']:
+            page_id = member['group']
+        elif compound['id']:
+            page_id = compound['id']
+        else:
+            page_id = member['header']
+        document_member_on_page(member, page_id, status)
+        member_type = member['member_type']
+        if member_type == 'enum':
+            compound['enums'].append(member)
+            header_compound['enums'].append(member)
+            if group_compound:
+                group_compound['enums'].append(member)
+            process_enum_values(member, status)
+        elif member_type == 'alias':
+            compound['aliases'].append(member)
+            header_compound['aliases'].append(member)
+            if group_compound:
+                group_compound['aliases'].append(member)
+        elif member_type == 'function':
+            compound['functions'].append(member)
+            header_compound['functions'].append(member)
+            if group_compound:
+                group_compound['functions'].append(member)
+        elif member_type == 'variable':
+            compound['variables'].append(member)
+            header_compound['variables'].append(member)
+            if group_compound:
+                group_compound['variables'].append(member)
+        elif member_type == 'macro':
+            compound['macros'].append(member)
+            header_compound['macros'].append(member)
+            if group_compound:
+                group_compound['macros'].append(member)
+        else:
+            log.error("Member of type %s cannot be listed on %s page", member_type, compound['member_type'])
+            return
+        if member['doc']:
+            (compound if page_id == compound['id'] else status.get_compound(page_id))['has_' + member_type + '_details'] = True
+
+def process_class(compound, status: Status):
+    # compound must be a class/struct/union
+    add_class_member_lists(compound)
+    # Process namespace members
+    for member in compound['members']:
+        process_class_member(compound, member, status)
+    # Create a page for this one?
+    if compound['id'] and (show_member(compound, status) or has_documented_members(compound)):
+        create_page(compound, status)
+
+def process_namespace(compound, status: Status):
+    # compound must be a namespace
+    add_compound_member_lists(compound)
+    # Process namespace members
+    for member in compound['members']:
+        process_namespace_member(compound, member, status)
+    # Create a page for this one?
+    if compound['id'] and (show_member(compound, status) or has_documented_members(compound)):
+        create_page(compound, status)
+
+def assign_page(status: Status):
+    # TODO: Add option `show_if_documented_children`
+    # All header files will have a page, whether they're documented or not
+    for header in status.headers.values():
+        add_compound_member_lists(header)
+        header['member_type'] = 'file'
+        create_page(header, status)
+    # All groups (modules) will have a page, whether they're documented or not
+    for group in status.groups.values():
+        add_compound_member_lists(group)
+        group['member_type'] = 'module'
+        create_page(group, status)
+    # Assign sub-groups to be shown in parent group's page; they're always sorted
+    for group in status.groups.values():
+        group['modules'] = [status.groups[id] for id in group['subgroups']]
+        group['modules'].sort(key=lambda x: x['name'])
+    for member in status.members.values():
+        if not member['id']:
+            continue
+        if member['member_type'] == 'namespace':
+            add_compound_member_lists(member)
+        elif member['member_type'] in ['class', 'struct', 'union']:
+            add_class_member_lists(member)
+    # Assign members to a specific page
+    base = {  # bogus namespace to get things rolling
+        'id': '',
+        'member_type': 'namespace',
+        'members': status.data['members'],
+        'header': '',
+        'group': ''
+    }
+    process_namespace(base, status)
     # All pages have a page, obviously
     for page in status.pages.values():
+        page['member_type'] = 'page'
         create_page(page, status)
 
 
@@ -244,9 +405,7 @@ def create_indices(status: Status):
     for group in status.data['groups']:
         if not group['parent']:
             index['modules'].append(group)
-        group['children'] = []
-        for s in group['subgroups']:
-            group['children'].append(status.groups[s])
+        group['children'] = group['modules']
     # Pages
     status.data['pages'].sort(key=lambda x: x['title'])
     for page in status.data['pages']:
@@ -256,79 +415,8 @@ def create_indices(status: Status):
             index['pages'].append(page)
         page['children'] = []
         for s in page['subpages']:
-            page['children'].append(status.pages[s])
+            page['children'].append(status.pages[s])  # We don't sort these, but use them in the order they're referenced in the parent page
     return index
-
-
-def add_wbr(text: str):
-    if '<' in text:  # Stuff contains HTML code, do not touch!
-        return text
-    if '::' in text:  # C++ names
-        return
-    if '_' in text:  # VERY_LONG_UPPER_CASE macro names
-        return text.replace('_', '_<wbr />')
-    # These characters are quite common, so at least check that there is no
-    # space (which may hint that the text is actually some human language):
-    if '/' in text and not ' ' in text:  # URLs
-        return text.replace('/', '/<wbr />')
-    return text
-
-def generate_compound(id, status: Status):
-    if id in status.members:
-        compound = status.members[id].copy()
-    elif id in status.headers:
-        compound = status.headers[id].copy()
-        compound['member_type'] = 'file'
-    elif id in status.groups:
-        compound = status.groups[id].copy()
-        compound['member_type'] = 'module'
-    elif id in status.pages:
-        compound = status.pages[id]
-        compound['member_type'] = 'page'
-        return compound  # Nothing else to do for pages
-    else:
-        log.error("Generating 'compound' data structure for unknown id = %s", id)
-        return {}
-    compound['has_enum_details'] = False
-    compound['has_alias_details'] = False
-    compound['has_function_details'] = False
-    compound['has_variable_details'] = False
-    compound['has_macro_details'] = False
-    if compound['member_type'] in ['class', 'struct', 'union']:
-        # fix up compound['base_classes']
-        # fix up compound['derived_classes']
-        compound['typeless_functions'] = []
-        compound['groups'] = []
-        compound['public_types'] = []
-        compound['public_functions'] = []
-        compound['public_vars'] = []
-        compound['public_static_functions'] = []
-        compound['public_static_vars'] = []
-        compound['protected_types'] = []
-        compound['protected_functions'] = []
-        compound['protected_vars'] = []
-        compound['protected_static_functions'] = []
-        compound['protected_static_vars'] = []
-        compound['private_types'] = []
-        compound['private_functions'] = []
-        compound['private_vars'] = []
-        compound['private_static_functions'] = []
-        compound['private_static_vars'] = []
-        compound['related'] = []
-    else:  # ['files', 'modules', 'namespaces']
-        compound['modules'] = []
-        compound['files'] = []
-        compound['namespaces'] = []
-        compound['classes'] = []
-        compound['enums'] = []
-        compound['aliases'] = []
-        compound['functions'] = []
-        compound['variables'] = []
-        compound['macros'] = []
-    if compound['member_type'] in ['class', 'struct', 'union', 'namespace']:
-        compound['prefix_wbr'] = (html.escape(walktree.get_fully_qualified_name(id, status.members))).replace('::', '::<wbr />') + '::<wbr />'
-    # TODO: What is `prefix_wbr` for modules or files?
-    return compound
 
 
 def process_navbar_links(navbar, status: Status):
@@ -432,15 +520,29 @@ def parse_markdown(status: Status):
         process_sections(page, md)
 
 
-def add_breadcrumb(compound, name, pages):
+def add_wbr(text: str):
+    if '<' in text:  # Stuff contains HTML code, do not touch!
+        return text
+    if '::' in text:  # C++ names
+        return text.replace('::', '::<wbr />')
+    if '_' in text:  # VERY_LONG_UPPER_CASE macro names
+        return text.replace('_', '_<wbr />')
+    # These characters are quite common, so at least check that there is no
+    # space (which may hint that the text is actually some human language):
+    if '/' in text and not ' ' in text:  # URLs
+        return text.replace('/', '/<wbr />')
+    return text
+
+
+def add_breadcrumb(compound, name, compounds):
     path_reverse = [compound['id']]
     parent = compound['parent']
     while parent:
         path_reverse.append(parent)
-        parent = pages[parent]['parent']
+        parent = compounds[parent]['parent']
     compound['breadcrumb'] = []
     for elem in reversed(path_reverse):
-        compound['breadcrumb'].append((pages[elem][name], elem + '.html'))
+        compound['breadcrumb'].append((compounds[elem][name], elem + '.html'))
 
 
 def createhtml(input_file, output_dir, options, template_params):
@@ -454,19 +556,22 @@ def createhtml(input_file, output_dir, options, template_params):
 
     Options must contain the keys:
     - 'show_private': include private members in the documentation
+    - 'show_protected': include protected members in the documentation
     - 'show_undocumented': include undocumented members in the documentation
     - 'extra_files': list of extra files to copy to the output directory
     - 'templates': path to templates to use instead of default ones
     """
 
     # Load data
-    status = Status(walktree.load_data_from_json_file(input_file))
+    status = Status(walktree.load_data_from_json_file(input_file), options)
+
+    # Generate fully qualified names
+    generate_fully_qualified_names(status.data['members'], status)
 
     # Find out which pages to create, what is listed in each, and in which page
     # the detailed documentation for each member has to go
-    assign_page(status, options['show_private'], options['show_undocumented'])
-    #print('\n\nhtml_pages_index', status.html_pages_index)
-    #print('\n\nhtml_pages_detailed', status.html_pages_detailed)
+    assign_page(status)
+    #print('\n\nhtml_pages', status.html_pages)
     #print('\n\nid_map', status.id_map)
 
     # Parse all Markdown
@@ -477,7 +582,7 @@ def createhtml(input_file, output_dir, options, template_params):
 
     # We need to have an index.html page
     if 'index' not in status.pages:
-        page = members.new_page('index', options['PROJECT_NAME'], '')
+        page = members.new_page('index', template_params['PROJECT_NAME'], '')
         status.pages['index'] = page
 
     # Navbar links
@@ -510,14 +615,15 @@ def createhtml(input_file, output_dir, options, template_params):
     env.filters['urljoin'] = urllib.parse.urljoin
 
     # Generate the html for the members
-    for id in status.html_pages_index.keys():
+    for id in status.html_pages:
         file = id + '.html'
-        compound = generate_compound(id, status)
-        if not compound:
-            continue
+        compound = status.html_pages[id]
+        #if not compound:
+        #    log.error("Generating 'compound' data structure for unknown id = %s", id)
+        #    continue
         type = compound['member_type']
         if type == 'file':
-            compound['breadcrumb'] = [(compound['name'], file)]
+            compound['breadcrumb'] = [(compound['name'].replace('/', '/<wbr />'), file)]
         elif type == 'module':
             add_breadcrumb(compound, 'name', status.groups)
         elif type == 'page':
@@ -532,7 +638,7 @@ def createhtml(input_file, output_dir, options, template_params):
         with open(os.path.join(output_dir, file), 'w') as f:
             f.write(rendered)
 
-    # Generate indexes for pages, groups (==modules), namespaces, classes/structs (==classes), and headers (==files)
+    # Generate indexes for pages, groups (==modules), namespaces, classes/structs/unions (==classes), and headers (==files)
     for file in ['pages.html', 'modules.html', 'namespaces.html', 'classes.html', 'files.html']:
         template = env.get_template(file)
         rendered = template.render(index=index,
