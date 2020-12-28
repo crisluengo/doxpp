@@ -1208,11 +1208,41 @@ def is_constexpr(item):
             return False
     return False
 
+def process_template_type_parameter(item):
+    default = ''
+    for child in item.get_children():
+        if child.kind == cindex.CursorKind.TYPE_REF:
+            default = process_type(child.type, child)
+        break
+    return {
+        'name': item.spelling,
+        'type': 'type',
+        'default': default
+    }
+
+def process_template_nontype_parameter(item):
+    name = item.spelling
+    if not name:
+        # This happens for SFINAE template parameters
+        # TODO: This would happen for any parameter that is not named. What to do?
+        type = '<SFINAE>'
+        # TODO: To get a proper representation of this template parameter we'd need to
+        #       process the tokens manually.
+    else:
+        type = process_type(item.type, item)
+    default = find_default_value([x.spelling for x in item.get_tokens()])
+    return {
+        'name': item.spelling,
+        'type': type,
+        'default': default
+    }
+
 def process_function_declaration(item, member):
     member['constexpr'] = is_constexpr(item)
     member['noexcept'] = item.exception_specification_kind in [cindex.ExceptionSpecificationKind.BASIC_NOEXCEPT, cindex.ExceptionSpecificationKind.COMPUTED_NOEXCEPT]
     member['return_type'] = process_type(item.type.get_result())
     arguments = []
+    template_parameters = []
     for child in item.get_children():
         if child.kind == cindex.CursorKind.PARM_DECL:
             name = child.spelling
@@ -1233,7 +1263,15 @@ def process_function_declaration(item, member):
             member['final'] = True
         elif child.kind == cindex.CursorKind.CXX_OVERRIDE_ATTR:
             member['override'] = True
+        elif child.kind ==cindex.CursorKind.TEMPLATE_NON_TYPE_PARAMETER:
+            template_parameters.append(process_template_nontype_parameter(child))
+        elif child.kind == cindex.CursorKind.TEMPLATE_TYPE_PARAMETER:
+            template_parameters.append(process_template_type_parameter(child))
     member['arguments'] = arguments
+    if member['templated']:
+        member['template_parameters'] = template_parameters
+    elif template_parameters:
+        log.warning('Unexpected thing happened here: a non-templated function has template parameters!')
 
 def merge_member(member, new_member):
     # Merges the two member structures, filling in empty elements in `member` with new data.
@@ -1390,26 +1428,10 @@ def extract_declarations(citer, parent, status: Status):
                     return
                 default = None
                 if member_type == 'templatetypeparameter':
-                    type = 'type'
-                    for child in item.get_children():
-                        if child.kind == cindex.CursorKind.TYPE_REF:
-                            default = process_type(child.type, child)
-                        break
+                    param = process_template_type_parameter(item)
                 else:
-                    if not name:
-                        # This happens for SFINAE template parameters
-                        # TODO: This would happen for any parameter that is not named. What to do?
-                        type = '<SFINAE>'
-                        # TODO: To get a proper representation of this template parameter we'd need to
-                        #       process the tokens manually.
-                    else:
-                        type = process_type(item.type, item)
-                    default = find_default_value([x.spelling for x in item.get_tokens()])
-                status.members[semantic_parent]['template_parameters'].append({
-                    'name': name,
-                    'type': type,
-                    'default': default
-                })
+                    param = process_template_nontype_parameter(item)
+                status.members[semantic_parent]['template_parameters'].append(param)
                 continue
 
             # Disambiguate templated types:
@@ -1424,7 +1446,7 @@ def extract_declarations(citer, parent, status: Status):
             elif member_type == 'classtemplate':
                 is_template = True
                 member_type = 'class'
-                # Could be 'structtemplate' also
+                # Could be 'struct' or 'union' also
                 tokens = list(item.get_tokens())
                 n = 0
                 for i in range(len(tokens)):
@@ -1435,8 +1457,11 @@ def extract_declarations(citer, parent, status: Status):
                         if n == 0:
                             i += 1
                             if i < len(tokens):
-                                if tokens[i].kind == cindex.TokenKind.KEYWORD and tokens[i].spelling == 'struct':
-                                    member_type = 'struct'
+                                if tokens[i].kind == cindex.TokenKind.KEYWORD:
+                                    if tokens[i].spelling == 'struct':
+                                        member_type = 'struct'
+                                    elif tokens[i].spelling == 'union':
+                                        member_type = 'union'
                             break
             elif member_type == 'usingtemplate':
                 is_template = True
@@ -1489,6 +1514,8 @@ def extract_declarations(citer, parent, status: Status):
                     # This is a forward declaration, let's skip it
                     continue
                 member['templated'] = is_template
+                if is_template:
+                    member['template_parameters'] = []
                 member['abstract'] = item.is_abstract_record()
                 member['final'] = False
                 if not parent_is_namespace:
@@ -1500,6 +1527,8 @@ def extract_declarations(citer, parent, status: Status):
                 process_children = True
             elif member_type in ['method', 'conversionfunction', 'constructor', 'destructor']:
                 member['templated'] = is_template
+                if is_template:
+                    member['template_parameters'] = []
                 member['static'] = item.is_static_method()
                 member['virtual'] = item.is_virtual_method()
                 member['pure_virtual'] = item.is_pure_virtual_method()
@@ -1509,6 +1538,8 @@ def extract_declarations(citer, parent, status: Status):
                 member['access'] = access_specifier_map[item.access_specifier]
                 member['method_type'] = member_type
                 process_function_declaration(item, member)
+                if member_type != 'method':
+                    member['return_type']['typename'] = ''
                 member_type = 'function'  # write out as function
             elif member_type == 'enumvalue':
                 member['value'] = item.enum_value
@@ -1532,12 +1563,17 @@ def extract_declarations(citer, parent, status: Status):
                 member_type = 'variable'
             elif member_type == 'function':
                 member['templated'] = is_template
+                if is_template:
+                    member['template_parameters'] = []
                 process_function_declaration(item, member)
             elif member_type == 'namespace':
                 member['members'] = []
                 process_children = True
             elif member_type in ['typedef', 'using']:
                 member_type = 'alias'
+                member['templated'] = is_template
+                if is_template:
+                    member['template_parameters'] = []
                 if not parent_is_namespace:
                     member['access'] = access_specifier_map[item.access_specifier]
                 type = process_type(item.underlying_typedef_type, item)
@@ -1546,9 +1582,14 @@ def extract_declarations(citer, parent, status: Status):
                 else:
                     member['type'] = {}  # This happens if we're processing a 'usingtemplate'. Leave the type
                     #                      empty so that it can be replaced later
-                if is_template:
-                    process_children = True
+                process_children = is_template
             elif member_type == 'union':
+                if not item.is_definition():
+                    # This is a forward declaration, let's skip it
+                    continue
+                member['templated'] = is_template
+                if is_template:
+                    member['template_parameters'] = []
                 if not parent_is_namespace:
                     member['access'] = access_specifier_map[item.access_specifier]
                 member['members'] = []
@@ -1558,8 +1599,6 @@ def extract_declarations(citer, parent, status: Status):
                 member['type'] = process_type(item.type, item)
                 member['static'] = item.storage_class == cindex.StorageClass.STATIC
                 member['constexpr'] = is_constexpr(item)
-            if is_template:  # 'classtemplate', 'structtemplate', 'functiontemplate', 'methodtemplate', 'usingtemplate'
-                member['template_parameters'] = []
             member['member_type'] = member_type
             # TODO: For template specializations, the following should be useful:
             # for ii in range(item.get_num_template_arguments()):

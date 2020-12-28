@@ -96,6 +96,10 @@ For members of type `"enumvalue"` (enum members), the group is always the empty 
 
 ## alias-specific fields
 
+### "templated" (boolean)
+
+`true` if this is an alias template.
+
 ### "type" (dictionary)
 
 See below under "The type dictionary".
@@ -196,6 +200,14 @@ If the function is a class or struct member, it additionally has the following f
 
 `true` or `false` depending on if the function is pure virtual or not.
 
+### "final" (boolean)
+
+`true` or `false` depending on if the function is marked `final`.
+
+### "override" (boolean)
+
+`true` or `false` depending on if the function is marked `override`.
+
 ### "const" (boolean)
 
 `true` or `false` depending on if the function is declared const or not.
@@ -226,6 +238,10 @@ The list of dictionaries for the child members.
 
 
 ## union-specific fields
+
+### "templated" (boolean)
+
+`true` if this is a union template.
 
 ### "members" (list)
 
@@ -276,8 +292,8 @@ The bitfield width.
 
 ## template-specific fields
 
-For members that are a class template, struct template, or function template, the following
-field is additionally present:
+For members that are a class template, struct template, union template, function template or alias template,
+the following field is additionally present:
 
 ### "template_parameters" (list)
 
