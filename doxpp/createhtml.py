@@ -37,8 +37,8 @@
 #   DEALINGS IN THE SOFTWARE.
 
 import os
-import html
 import urllib.parse
+
 import markdown
 import jinja2
 
@@ -349,7 +349,7 @@ def assign_page(status: Status):
     # Assign sub-groups to be shown in parent group's page; they're always sorted
     for group in status.groups.values():
         group['modules'] = [status.groups[id] for id in group['subgroups']]
-        group['modules'].sort(key=lambda x: x['name'])
+        group['modules'].sort(key=lambda x: x['name'].casefold())
     for member in status.members.values():
         if not member['id']:
             continue
@@ -366,6 +366,8 @@ def assign_page(status: Status):
         'group': ''
     }
     process_namespace(base, status)
+    # For headers and groups, do we have any detailed docs?
+
     # All pages have a page, obviously
     for page in status.pages.values():
         page['member_type'] = 'page'
@@ -394,20 +396,20 @@ def create_indices(status: Status):
                 parent['has_child_namespace'] = True
         else:
             index['symbols'].append(member)
-    index['symbols'].sort(key=lambda x: x['name'])
+    index['symbols'].sort(key=lambda x: x['name'].casefold())
     for member in status.members.values():
         if 'children' in member:
-            member['children'].sort(key=lambda x: x['name'])
+            member['children'].sort(key=lambda x: x['name'].casefold())
     # Files (headers)
     index['files'] = walktree.build_file_hierarchy(status.data['headers'])
     # Modules (groups)
-    status.data['groups'].sort(key=lambda x: x['name'])
+    status.data['groups'].sort(key=lambda x: x['name'].casefold())
     for group in status.data['groups']:
         if not group['parent']:
             index['modules'].append(group)
         group['children'] = group['modules']
     # Pages
-    status.data['pages'].sort(key=lambda x: x['title'])
+    status.data['pages'].sort(key=lambda x: x['title'].casefold())
     for page in status.data['pages']:
         if page['id'] == 'index':
             continue  # the index is not on the list of pages
@@ -545,6 +547,22 @@ def add_breadcrumb(compound, name, compounds):
         compound['breadcrumb'].append((compounds[elem][name], elem + '.html'))
 
 
+def fixup_namespace_member_has_details(compound):
+    for members in (compound['enums'], compound['aliases'], compound['functions'],
+                  compound['variables'], compound['macros']):
+        for member in members:
+            member['has_details'] = (member['page_id'] == compound['page_id']) and (len(member['doc']) > 0)
+
+def fixup_class_member_has_details(compound):
+    for members in (compound['typeless_functions'], compound['enums'], compound['aliases'],
+                  compound['functions'], compound['variables'], compound['related']):
+        for member in members:
+            member['has_details'] = len(member['doc']) > 0
+    for group in compound['groups']:
+        for member in group['members']:
+            member['has_details'] = len(member['doc']) > 0
+
+
 def createhtml(input_file, output_dir, options, template_params):
     """
     Generates HTML pages for the documentation in the JSON file `input_file`.
@@ -624,12 +642,18 @@ def createhtml(input_file, output_dir, options, template_params):
         type = compound['member_type']
         if type == 'file':
             compound['breadcrumb'] = [(compound['name'].replace('/', '/<wbr />'), file)]
+            fixup_namespace_member_has_details(compound)
         elif type == 'module':
             add_breadcrumb(compound, 'name', status.groups)
+            fixup_namespace_member_has_details(compound)
         elif type == 'page':
             add_breadcrumb(compound, 'title', status.pages)
         else:
             add_breadcrumb(compound, 'name', status.members)
+            if type == 'namespace':
+                fixup_namespace_member_has_details(compound)
+            else:
+                fixup_class_member_has_details(compound)
         template = env.get_template(type + '.html')
         rendered = template.render(compound=compound,
                                    FILENAME=file,

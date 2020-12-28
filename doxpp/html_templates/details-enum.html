@@ -1,19 +1,19 @@
           <section class="m-doc-details" id="{{ enum.id }}"><div>
             <h3>
-              {% if compound.templates != None %}
+              {% if compound.templated %}
               <div class="m-doc-template">
                 {% set j = joiner(', ') %}
-                template&lt;{% for t in compound.templates %}{{ j() }}{{ t.type }} {% if t.name %}{{ t.name }}{% else %}_{{ loop.index }}{% endif %}{% endfor %}&gt;
+                template&lt;{% for t in compound.template_parameters %}{{ j() }}{{ t.type }} {% if t.name %}{{ t.name }}{% else %}_{{ loop.index }}{% endif %}{% endfor %}&gt;
               </div>
               {% endif %}
-              enum {% if enum.scoped %}class {% endif %}{{ prefix }}<a href="#{{ enum.id }}" class="m-doc-self">{{ enum.fully_qualified_name if show_full_name else enum.name }}</a>{% if enum.type %}: {{ enum.type }}{% endif %}{% if enum.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif enum.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}{% if enum.since %} {{ enum.since }}{% endif %}
+              enum {% if enum.scoped %}class {% endif %}<a href="#{{ enum.id }}" class="m-doc-self">{{ enum.fully_qualified_name if show_full_name else enum.name }}</a>{% if enum.type %}: {{ enum.type }}{% endif %}{% if enum.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif enum.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}{% if enum.since %} {{ enum.since }}{% endif %}
               {# not sure why there needs to be this space #}
 
               {% if enum.include %}
               {# Template info can be only present if the enum is inside a
                  templated class, but in that case we have global include
                  information, so no need to handle case where
-                 `enum.include and compound.templates != None` #}
+                 `enum.include and not compound.templated` #}
               <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ enum.include[1] }}">{{ enum.include[0] }}</a></div>
               {% endif %}
             </h3>

@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
 
-{% set prefix = compound.prefix_wbr %}
-
 {% set show_full_name = compound.member_type != 'namespace' %}
 
 {% macro entry_module(module) %}{% include 'entry-module.html' %}{% endmacro %}
@@ -182,7 +180,7 @@
         {% if compound.has_function_details %}
         <section>
           <h2>Function documentation</h2>
-          {% for function in compound.variables %}
+          {% for function in compound.functions %}
           {% if function.has_details %}
 {{ details_function(function) }}
           {% endif %}

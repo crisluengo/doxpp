@@ -109,7 +109,8 @@ Class/struct/union reference pages, `compound` contains:
 - `compound.breadcrumb`
 - `compound.prefix_wbr`
 - `compound.member_type`
-- `compound.templates`
+- `compound.templated`
+- `compound.template_parameters` (if `compound.templated`)
 - `compound.include`
 - `compound.final`
 - `compound.since`
@@ -178,7 +179,8 @@ For Entries:
 - `alias.has_details`
 - `alias.page_id`
 - `alias.id`
-- `alias.templates`
+- `alias.templated`
+- `alias.template_parameters` (if `alias.templated`)
 - `alias.name` & `alias.fully_qualified_name`
 - `alias.type`
 - `alias.args`
@@ -187,17 +189,18 @@ For Entries:
 - `alias.since`
 - `alias.brief`
 - `alias.include`
-- `alias.is_using` # TODO
+- `alias.oldfashioned` # TODO
 - `alias.has_template_details`
 - `alias.doc`
 
-- `class.templates`
+- `class.templated`
+- `class.template_parameters` (if `class.templated`)
 - `class.member_type`
 - `class.page_id`
 - `class.name` & `class.fully_qualified_name`
 - `class.access`
 - `class.final`
-- `class.is_virtual`
+- `class.abstract`
 - `class.deprecated`
 - `class.since` # TODO
 - `class.brief`
@@ -221,24 +224,22 @@ we have: `class.templated`, `class.abstract`, `class.bases`
 - `function.has_details`
 - `function.page_id`
 - `function.id`
-- `function.templates`
-- `function.prefix`
+- `function.templated`
+- `function.template_parameters` (if `function.templated`)
 - `function.type`
 - `function.name` & `function.fully_qualified_name`
 - `function.params`
-- `function.suffix`
 - `function.deprecated`
 - `function.access`
-- `function.is_defaulted`
-- `function.is_deleted`
-- `function.is_explicit`
+- `function.is_defaulted` # TODO
+- `function.is_deleted` # TODO
+- `function.is_explicit` # TODO
 - `function.final`
-- `function.is_override`
-- `function.is_pure_virtual`
-- `function.is_virtual`
-- `function.is_constexpr`
-- `function.is_conditional_noexcept`
-- `function.is_noexcept`
+- `function.override`
+- `function.pure_virtual`
+- `function.virtual`
+- `function.constexpr`
+- `function.noexcept`
 - `function.since` # TODO
 - `function.brief`
 - `function.include`
@@ -265,7 +266,8 @@ we have: `class.templated`, `class.abstract`, `class.bases`
 - `variable.has_details`
 - `variable.page_id`
 - `variable.id`
-- `variable.templates`
+- `variable.templated`
+- `variable.template_parameters` (if `variable.templated`)
 - `variable.is_static`
 - `variable.type`
 - `variable.name` & `variable.fully_qualified_name`
