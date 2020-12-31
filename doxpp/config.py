@@ -48,7 +48,7 @@ default_config_values = {
         'document protected members': 'yes',
         'document undocumented members': 'no',
         'theme color': '#22272e',
-        'favicon': '',
+        'favicon': '',                # favicon to use instead of the default one
         'stylesheets': '',            # style sheets to use instead of the default ones (separate multiple files with spaces)
         'templates': '',              # relative path to templates to use instead of the default ones
         'extra files': '',            # additional files to copy to output directory (separate multiple files with spaces)

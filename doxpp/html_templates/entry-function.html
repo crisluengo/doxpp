@@ -5,9 +5,7 @@
               {% endif %}
               {% set j = joiner(',\n              ') %}
               <span class="m-doc-wrap-bumper">{% if function.static %}static {% endif %}{% if function.return_type.typename == 'void' %}void{% elif function.return_type.typename %}auto{% endif %}
-                <a href="{% if function.page_id != compound.page_id %}{{ function.page_id }}.html{% endif %}#{{ function.id }}" class="m-doc{% if not function.has_details and function.page_id == compound.page_id %}-self{% endif %}">{{ function.fully_qualified_name if show_full_name else function.name }}</a>(
-                </span><span class="m-doc-wrap">{% for param in function.arguments %}{{ j() }}{{ param.typename }} {{ param.name }}{% if param.default %} = {{ param.default }}{% endif %}{% endfor %} )
-                {% if function.const %} const{% endif %}{% if function.return_type.typename and function.return_type.typename != 'void' %} -&gt; {{ function.return_type.typename }}{% endif %}
+                <a href="{% if function.page_id != compound.page_id %}{{ function.page_id }}.html{% endif %}#{{ function.id }}" class="m-doc{% if not function.has_details and function.page_id == compound.page_id %}-self{% endif %}">{{ function.fully_qualified_name if show_full_name else function.name }}</a>(</span><span class="m-doc-wrap">{% for param in function.arguments %}{{ j() }}{{ param.typename }} {{ param.name }}{% if param.default %} = {{ param.default }}{% endif %}{% endfor %}){% if function.const %} const{% endif %}{% if function.return_type.typename and function.return_type.typename != 'void' %} -&gt; {{ function.return_type.typename }}{% endif %}
                 {% if function.deprecated %} <span class="m-label m-danger">{{ function.deprecated }}</span>{% endif %}
                 {% if function.access == 'protected' %} <span class="m-label m-flat m-warning">protected</span>{% elif function.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}
                 {% if function.is_defaulted %} <span class="m-label m-flat m-info">defaulted</span>{% endif %}

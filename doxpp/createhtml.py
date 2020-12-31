@@ -38,6 +38,8 @@
 
 import os
 import urllib.parse
+import mimetypes
+import shutil
 
 import markdown
 import jinja2
@@ -86,6 +88,10 @@ class Status:
         # This dictionary links page_id to the compound with the relevant information for that page.
         self.html_pages = {}
 
+        # This is the set of images referenced in the documentation
+        # TODO: This needs to be filled by Markdown parser
+        self.images = set()
+
         # Options
         self.show_private = options['show_private']
         self.show_protected = options['show_protected']
@@ -93,7 +99,11 @@ class Status:
 
     def get_link(self, id):
         # Convert an ID into a URL to link to
-        page = self.id_map[id]
+        try:
+            page = self.id_map[id]
+        except KeyError:
+            log.error('Referencing type %s, which was excluded from documentation', id)
+            return '#id'
         if page == id:
             return page + '.html'
         else:
@@ -489,6 +499,7 @@ def parse_markdown(status: Status):
             'offset': 1
         }
     }
+    # TODO: Create an extension that adds image file names to status.images
     # TODO: Create a LaTeX math extension based on some stuff in m.css as well as the following:
     #       https://github.com/justinvh/Markdown-LaTeX
     #       https://github.com/ShadowKyogre/python-asciimathml
@@ -520,6 +531,33 @@ def parse_markdown(status: Status):
         if page['title']:
             page['title'] = remove_p_tag(md.reset().convert(page['title']))
         process_sections(page, md)
+
+
+def render_type(type, status: Status, doc_link_class):
+    typename = type['typename']
+    if type['id']:
+        typename = '<a href="' + status.get_link(type['id']) + '" class="' + doc_link_class + '">' + typename + '</a>'
+    if type['qualifiers']:
+        if type['qualifiers'][0] == 'c':
+            typename += ' '
+        typename += type['qualifiers']
+    type['typename'] = typename
+
+def parse_types(status: Status, doc_link_class):
+    for member in status.members.values():
+        if 'type' in member and isinstance(member['type'], dict):
+            render_type(member['type'], status, doc_link_class)
+        if 'return_type' in member and isinstance(member['return_type'], dict):
+            render_type(member['return_type'], status, doc_link_class)
+        if 'arguments' in member:
+            for arg in member['arguments']:
+                render_type(arg, status, doc_link_class)
+        if 'template_parameters' in member:
+            for arg in member['template_parameters']:
+                if isinstance(arg['default'], dict):
+                    render_type(arg['default'], status, doc_link_class)
+                elif isinstance(arg['type'], dict):
+                    render_type(arg['type'], status, doc_link_class)
 
 
 def add_wbr(text: str):
@@ -595,6 +633,9 @@ def createhtml(input_file, output_dir, options, template_params):
     # Parse all Markdown
     parse_markdown(status)
 
+    # Convert type name strings into HTML links if appropriate
+    parse_types(status, template_params['DOC_LINK_CLASS'])
+
     # Create tree structure for index pages
     index = create_indices(status)
 
@@ -613,8 +654,12 @@ def createhtml(input_file, output_dir, options, template_params):
     if not 'STYLESHEETS' in template_params or not template_params['STYLESHEETS']:
         template_params['STYLESHEETS'] = ['m-light-documentation.compiled.css']
 
-    # If custom template dir was supplied, use the default template directory
-    # as a fallback
+    # Fill in default favicon if not given, and get type
+    if not template_params['FAVICON']:
+        template_params['FAVICON'] = 'html_templates/favicon-light.png'
+    template_params['FAVICON'] = (template_params['FAVICON'], mimetypes.guess_type(template_params['FAVICON'])[0])
+
+    # If custom template dir was supplied, use the default template directory as a fallback
     template_paths = [options['templates']]
     if options['templates'] != default_templates:
         template_paths.append(default_templates)
@@ -676,4 +721,13 @@ def createhtml(input_file, output_dir, options, template_params):
     # TODO
 
     # Copy over all referenced files
-    # TODO
+    for i in list(status.images) + template_params['STYLESHEETS'] + options['extra_files'] + ([template_params['PROJECT_LOGO']] if template_params['PROJECT_LOGO'] else []) + ([template_params['FAVICON'][0]] if template_params['FAVICON'][0] else []) + ([] if template_params['SEARCH_DISABLED'] else ['html_templates/search.js']):
+        if urllib.parse.urlparse(i).netloc:
+            continue
+        # The search.js is special, we encode the version information into its filename
+        file_out = search_filename if i == 'html_templates/search.js' else i
+        # File is either found relative to the current directory or relative to script directory
+        if not os.path.exists(i):
+            i = os.path.join(doxpp_path, i)
+        log.info("Copying %s to output", i)
+        shutil.copy(i, os.path.join(output_dir, os.path.basename(file_out)))

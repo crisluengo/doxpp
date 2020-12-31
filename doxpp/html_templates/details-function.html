@@ -18,8 +18,7 @@
               {% endif %}
               {% set j = joiner(',\n              ') %}
               <span class="m-doc-wrap-bumper">{% if function.static %}static {% endif %}{{ function.return_type.typename }}
-                </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#{{ function.id }}" class="m-doc-self">{{ function.fully_qualified_name if show_full_name else function.name }}</a>(
-                </span><span class="m-doc-wrap">{% for param in function.arguments %}{{ j() }}{{ param.typename }} {{ param.name }}{% if param.default %} = {{ param.default }}{% endif %}{% endfor %} )
+                </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#{{ function.id }}" class="m-doc-self">{{ function.fully_qualified_name if show_full_name else function.name }}</a>(</span><span class="m-doc-wrap">{% for param in function.arguments %}{{ j() }}{{ param.typename }} {{ param.name }}{% if param.default %} = {{ param.default }}{% endif %}{% endfor %})
                 {% if function.const %} const{% endif %}
                 {% if function.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif function.access == 'private' %} <span class="m-label m-danger">private</span>{% endif %}
                 {% if function.is_defaulted %} <span class="m-label m-info">defaulted</span>{% endif %}
