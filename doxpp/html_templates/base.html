@@ -26,13 +26,9 @@
 <header><nav id="navigation">
   <div class="m-container">
     <div class="m-row">
-      {% if MAIN_PROJECT_URL and PROJECT_BRIEF %}
       <span id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">
-        <a href="{{ MAIN_PROJECT_URL }}">{% if PROJECT_LOGO %}<img src="{{ PROJECT_LOGO|basename_or_url|e }}" alt="" />{% endif %}{{ PROJECT_NAME }}</a> <span class="m-breadcrumb">|</span> <a href="index.html" class="m-thin">{{ PROJECT_BRIEF }}</a>
+        <a href="{% if MAIN_PROJECT_URL %}{{ MAIN_PROJECT_URL }}{% else %}index.html{% endif %}">{% if PROJECT_LOGO %}<img src="{{ PROJECT_LOGO|basename_or_url|e }}" alt="" />{% endif %}{{ PROJECT_NAME }}</a>{% if PROJECT_BRIEF %}<span class="m-breadcrumb">┃</span><a href="index.html" class="m-thin">{{ PROJECT_BRIEF }}</a>{% endif %}
       </span>
-      {% else %}
-      <a href="index.html" id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">{% if PROJECT_LOGO %}<img src="{{ PROJECT_LOGO|basename_or_url|e }}" alt="" />{% endif %}{{ PROJECT_NAME }}{% if PROJECT_BRIEF %} <span class="m-thin">{{ PROJECT_BRIEF }}</span>{% endif %}</a>
-      {% endif %}
       {% if LINKS_NAVBAR1 or LINKS_NAVBAR2 or not SEARCH_DISABLED %}
       <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
         {% if not SEARCH_DISABLED %}

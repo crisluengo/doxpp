@@ -678,6 +678,10 @@ table.m-table th, table.m-table td {
   border-bottom-width: 0;
   border-color: #f7e3db;
 }
+table.m-first-tight td:first-child {
+  width: 1%;
+  white-space: nowrap;
+}
 table.m-table caption {
   padding-bottom: 0.5rem;
 }

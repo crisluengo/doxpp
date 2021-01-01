@@ -59,10 +59,8 @@ namespace transport
        * bikes have bells. */
       virtual void RingBell();
 
-      /// Default destructor.
-      ///
-      /// Some might want to override this
-      virtual ~Bicycle();
+      /// Pure virtual destructor
+      virtual ~Bicycle() = 0;
 
    private:
       int id; ///< Something to identify a bike by

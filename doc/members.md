@@ -232,6 +232,10 @@ List of strings containing macro parameters, if given.
 
 ## namespace-specific fields
 
+### "inline" (boolean)
+
+`true` for inline namespaces.
+
 ### "members" (list)
 
 The list of dictionaries for the child members.

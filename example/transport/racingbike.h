@@ -20,7 +20,7 @@ namespace transport
     * on the road, with much less effort (even uphill!). It doesn't make
     * sense to call \ref RingBell on a racing bike for they don't have bells.
     */
-   class RacingBike : public Bicycle
+   class RacingBike final : public Bicycle
    {
    public:
       /// \name Behavior

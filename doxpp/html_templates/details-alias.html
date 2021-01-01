@@ -17,9 +17,9 @@
               </div>
               {% endif %}
               {% if alias.oldfashioned %}
-              typedef {{ alias.type }}{% if not alias.args %} {% endif %}<a href="#{{ alias.id }}" class="m-doc-self">{{ alias.fully_qualified_name if show_full_name else alias.name }}</a>{{ alias.args }}
+              typedef {{ alias.type.typename }} <a href="#{{ alias.id }}" class="m-doc-self">{{ alias.fully_qualified_name if show_full_name else alias.name }}</a>
               {% else %}
-              using <a href="#{{ alias.id }}" class="m-doc-self">{{ alias.fully_qualified_name if show_full_name else alias.name }}</a> = {{ alias.type }}{{ alias.args }}
+              using <a href="#{{ alias.id }}" class="m-doc-self">{{ alias.fully_qualified_name if show_full_name else alias.name }}</a> = {{ alias.type.typename }}
               {% endif %}
               {% if alias.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif alias.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}{% if alias.since %} {{ alias.since }}{% endif %}
               {# the empty line has to be here to prevent the lines from merging #}
@@ -32,14 +32,14 @@
             <p>{{ alias.brief }}</p>
             {% endif %}
             {% if alias.has_template_details %}
-            <table class="m-table m-fullwidth m-flat">
+            <table class="m-table m-fullwidth m-first-tight m-flat">
               <thead>
                 <tr><th colspan="2">Template parameters</th></tr>
               </thead>
               <tbody>
                 {% for template in alias.template_parameters|selectattr('name') %}
                 <tr>
-                  <td{% if loop.index == 1 %} style="width: 1%"{% endif %}>{{ template.name }}</td>
+                  <td>{{ template.name }}</td>
                   <td>{{ template.doc }}</td>
                 </tr>
                 {% endfor %}

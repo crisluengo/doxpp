@@ -115,10 +115,10 @@ Class/struct/union reference pages, `compound` contains:
 - `compound.final`
 - `compound.since`
 - `compound.brief`
-- `compound.has_template_details`
+- `compound.has_template_details` # TODO
 - `compound.sections`
-- `compound.base_classes`
-- `compound.derived_classes`
+- `compound.base_classes` # TODO
+- `compound.derived_classes` # TODO
 - `compound.typeless_functions`
 - `compound.groups`
 - `compound.classes`
@@ -146,7 +146,7 @@ Classes/Namespaces index pages, `index` contains:
 - `index.symbols[i].member_type`
 - `index.symbols[i].page_id`
 - `index.symbols[i].name`
-- `index.symbols[i].is_inline` # TODO
+- `index.symbols[i].inline`
 - `index.symbols[i].deprecated`
 - `index.symbols[i].since` # TODO
 - `index.symbols[i].brief`
@@ -183,14 +183,13 @@ For Entries:
 - `alias.template_parameters` (if `alias.templated`)
 - `alias.name` & `alias.fully_qualified_name`
 - `alias.type`
-- `alias.args`
 - `alias.deprecated`
 - `alias.access`
-- `alias.since`
+- `alias.since` # TODO
 - `alias.brief`
 - `alias.include`
 - `alias.oldfashioned` # TODO
-- `alias.has_template_details`
+- `alias.has_template_details` # TODO
 - `alias.doc`
 
 - `class.templated`
@@ -243,8 +242,8 @@ we have: `class.templated`, `class.abstract`, `class.bases`
 - `function.since` # TODO
 - `function.brief`
 - `function.include`
-- `function.has_template_details`
-- `function.has_param_details`
+- `function.has_template_details` # TODO
+- `function.has_param_details` # TODO
 - `function.return_value`
 - `function.return_values`
 - `function.exceptions`
@@ -259,8 +258,8 @@ we have: `class.templated`, `class.abstract`, `class.bases`
 - `macro.since` # TODO
 - `macro.brief`
 - `macro.include`
-- `macro.has_param_details`
-- `macro.return_value`
+- `macro.has_param_details` # TODO
+- `macro.return_value` # TODO
 - `macro.doc`
 
 - `variable.has_details`
@@ -268,16 +267,17 @@ we have: `class.templated`, `class.abstract`, `class.bases`
 - `variable.id`
 - `variable.templated`
 - `variable.template_parameters` (if `variable.templated`)
-- `variable.is_static`
+- `variable.static`
+- `variable.mutable`
 - `variable.type`
 - `variable.name` & `variable.fully_qualified_name`
 - `variable.deprecated`
 - `variable.access`
-- `variable.is_constexpr`
+- `variable.constexpr`
 - `variable.since` # TODO
 - `variable.brief`
 - `variable.include`
-- `variable.has_template_details`
+- `variable.has_template_details` # TODO
 - `variable.doc`
 
 - `file.page_id`
@@ -294,7 +294,7 @@ we have: `class.templated`, `class.abstract`, `class.bases`
 
 - `namespace.page_id`
 - `namespace.name`
-- `namespace.is_inline`
+- `namespace.inline`
 - `namespace.deprecated`
 - `namespace.since` # TODO
 - `namespace.brief`

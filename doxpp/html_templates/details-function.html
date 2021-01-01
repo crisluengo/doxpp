@@ -18,16 +18,7 @@
               {% endif %}
               {% set j = joiner(',\n              ') %}
               <span class="m-doc-wrap-bumper">{% if function.static %}static {% endif %}{{ function.return_type.typename }}
-                </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#{{ function.id }}" class="m-doc-self">{{ function.fully_qualified_name if show_full_name else function.name }}</a>(</span><span class="m-doc-wrap">{% for param in function.arguments %}{{ j() }}{{ param.typename }} {{ param.name }}{% if param.default %} = {{ param.default }}{% endif %}{% endfor %})
-                {% if function.const %} const{% endif %}
-                {% if function.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif function.access == 'private' %} <span class="m-label m-danger">private</span>{% endif %}
-                {% if function.is_defaulted %} <span class="m-label m-info">defaulted</span>{% endif %}
-                {% if function.is_deleted %} <span class="m-label m-danger">deleted</span>{% endif %}
-                {% if function.is_explicit %} <span class="m-label m-info">explicit</span>{% endif %}
-                {% if function.final %} <span class="m-label m-warning">final</span>{% elif function.override %} <span class="m-label m-warning">override</span>{% elif function.pure_virtual %} <span class="m-label m-warning">pure virtual</span>{% elif function.virtual %} <span class="m-label m-warning">virtual</span>{% endif %}
-                {% if function.constexpr %} <span class="m-label m-primary">constexpr</span>{% endif %}
-                {% if function.noexcept %} <span class="m-label m-flat m-success">noexcept</span>{% endif %}
-                {% if function.since %} {{ function.since }}{% endif %}</span></span>
+                </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#{{ function.id }}" class="m-doc-self">{{ function.fully_qualified_name if show_full_name else function.name }}</a>(</span><span class="m-doc-wrap">{% for param in function.arguments %}{{ j() }}{{ param.typename }} {{ param.name }}{% if param.default %} = {{ param.default }}{% endif %}{% endfor %}){% if function.const %} const{% endif %}{% if function.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif function.access == 'private' %} <span class="m-label m-danger">private</span>{% endif %}{% if function.is_defaulted %} <span class="m-label m-info">defaulted</span>{% endif %}{% if function.is_deleted %} <span class="m-label m-danger">deleted</span>{% endif %}{% if function.is_explicit %} <span class="m-label m-info">explicit</span>{% endif %}{% if function.final %} <span class="m-label m-warning">final</span>{% elif function.override %} <span class="m-label m-warning">override</span>{% elif function.pure_virtual %} <span class="m-label m-warning">pure virtual</span>{% elif function.virtual %} <span class="m-label m-warning">virtual</span>{% endif %}{% if function.constexpr %} <span class="m-label m-primary">constexpr</span>{% endif %}{% if function.noexcept %} <span class="m-label m-flat m-success">noexcept</span>{% endif %}{% if function.since %} {{ function.since }}{% endif %}</span></span>
               {% if function.include and not compound.templated and not function.templated %}
               <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ function.include[1] }}">{{ function.include[0] }}</a></div>
               {% endif %}
@@ -36,7 +27,7 @@
             <p>{{ function.brief }}</p>
             {% endif %}
             {% if function.has_template_details or function.has_param_details or function.return_value or function.return_values or function.exceptions %}
-            <table class="m-table m-fullwidth m-flat">
+            <table class="m-table m-fullwidth m-first-tight m-flat">
               {% if function.has_template_details %}
               <thead>
                 <tr><th colspan="2">Template parameters</th></tr>
@@ -44,7 +35,7 @@
               <tbody>
                 {% for template in function.template_parameters|selectattr('name') %}
                 <tr>
-                  <td{% if loop.index == 1 %} style="width: 1%"{% endif %}>{{ template.name }}</td>
+                  <td>{{ template.name }}</td>
                   <td>{{ template.doc }}</td>
                 </tr>
                 {% endfor %}
@@ -57,7 +48,7 @@
               <tbody>
                 {% for param in function.arguments|selectattr('name') %}
                 <tr>
-                  <td{% if loop.index == 1 and not function.has_template_details %} style="width: 1%"{% endif %}>{{ param.name }}{% if param.direction == 'in' %}&nbsp;<span class="m-label m-flat m-info">in</span>{% elif param.direction == 'out' %}&nbsp;<span class="m-label m-flat m-warning">out</span>{% elif param.direction == 'inout' %}&nbsp;<span class="m-label m-flat m-danger">in/out</span>{% endif %}</td>
+                  <td>{{ param.name }}{% if param.direction == 'in' %}&nbsp;<span class="m-label m-flat m-info">in</span>{% elif param.direction == 'out' %}&nbsp;<span class="m-label m-flat m-warning">out</span>{% elif param.direction == 'inout' %}&nbsp;<span class="m-label m-flat m-danger">in/out</span>{% endif %}</td>
                   <td>{{ param.doc }}</td>
                 </tr>
                 {% endfor %}
@@ -66,7 +57,7 @@
               {% if function.return_value %}
               {{ '<thead>' if function.return_values or function.exceptions else '<tfoot>' }}
                 <tr>
-                  <th{% if not function.has_template_details and not function.has_param_details %} style="width: 1%"{% endif %}>Returns</th>
+                  <th>Returns</th>
                   <td>{{ function.return_value }}</td>
                 </tr>
               {{ '</thead>' if function.return_values or function.exceptions else '</tfoot>' }}
@@ -79,7 +70,7 @@
               <tbody>
                 {% for value, doc in function.return_values %}
                 <tr>
-                  <td{% if loop.index == 1 and not function.has_template_details and not function.has_param_details and not function.return_value %} style="width: 1%"{% endif %}>{{ value }}</td>
+                  <td>{{ value }}</td>
                   <td>{{ doc }}</td>
                 </tr>
                 {% endfor %}
@@ -92,7 +83,7 @@
               <tbody>
                 {% for exception, doc in function.exceptions %}
                 <tr>
-                  <td{% if loop.index == 1 and not function.has_template_details and not function.has_param_details and not function.return_value and not function.return_values %} style="width: 1%"{% endif %}>{{ exception }}</td>
+                  <td>{{ exception }}</td>
                   <td>{{ doc }}</td>
                 </tr>
                 {% endfor %}

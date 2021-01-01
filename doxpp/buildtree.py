@@ -578,8 +578,8 @@ def post_process_links(elements, status: Status):
             if id:
                 if not text:
                     text = name
-                if code_formatting:
-                    text = '`{}`'.format(text)
+                    if code_formatting:
+                        text = '`{}`'.format(text)
             return id, text
 
         def find_and_format_name(name, text):
@@ -1208,14 +1208,30 @@ def is_constexpr(item):
             return False
     return False
 
+def is_inline(item):
+    name = item.spelling
+    for t in item.get_tokens():
+        if t.spelling == 'inline':
+            return True
+        if t.spelling == name:
+            return False
+    return False
+
 def process_template_type_parameter(item):
-    default = ''
+    name = item.spelling
+    if not name:
+        # This happens for SFINAE template parameters
+        # TODO: This would happen for any parameter that is not named. What to do?
+        name = '<SFINAE>'
+        # TODO: To get a proper representation of this template parameter we'd need to
+        #       process the tokens manually.
+    default = None
     for child in item.get_children():
         if child.kind == cindex.CursorKind.TYPE_REF:
             default = process_type(child.type, child)
         break
     return {
-        'name': item.spelling,
+        'name': name,
         'type': 'type',
         'default': default
     }
@@ -1225,14 +1241,15 @@ def process_template_nontype_parameter(item):
     if not name:
         # This happens for SFINAE template parameters
         # TODO: This would happen for any parameter that is not named. What to do?
-        type = '<SFINAE>'
+        name = '<SFINAE>'
+        type = {'typename': '', 'qualifiers': []}
         # TODO: To get a proper representation of this template parameter we'd need to
         #       process the tokens manually.
     else:
         type = process_type(item.type, item)
     default = find_default_value([x.spelling for x in item.get_tokens()])
     return {
-        'name': item.spelling,
+        'name': name,
         'type': type,
         'default': default
     }
@@ -1263,7 +1280,7 @@ def process_function_declaration(item, member):
             member['final'] = True
         elif child.kind == cindex.CursorKind.CXX_OVERRIDE_ATTR:
             member['override'] = True
-        elif child.kind ==cindex.CursorKind.TEMPLATE_NON_TYPE_PARAMETER:
+        elif child.kind == cindex.CursorKind.TEMPLATE_NON_TYPE_PARAMETER:
             template_parameters.append(process_template_nontype_parameter(child))
         elif child.kind == cindex.CursorKind.TEMPLATE_TYPE_PARAMETER:
             template_parameters.append(process_template_type_parameter(child))
@@ -1393,8 +1410,8 @@ def extract_declarations(citer, parent, status: Status):
                               "   in file %s", item.displayname, status.current_header_name)
                     semantic_parent = parent
 
-            log.debug("member: kind = %s, displayname = %s, spelling = %s, parent = %s, semantic_parent = %s",
-                      item.kind, item.displayname, item.spelling, parent, semantic_parent)
+            log.debug("member: kind = %s, member_type = %s, displayname = %s, spelling = %s, parent = %s, semantic_parent = %s",
+                      item.kind, member_type, item.displayname, item.spelling, parent, semantic_parent)
             # log.debug("        tokens = %s", [x.spelling for x in item.get_tokens()])
 
             # Is the parent a namespace, or something else?
@@ -1426,7 +1443,6 @@ def extract_declarations(citer, parent, status: Status):
                     log.error("Template parameter %s has a parent that is not a template.\n   in file %s",
                               name, status.current_header_name)
                     return
-                default = None
                 if member_type == 'templatetypeparameter':
                     param = process_template_type_parameter(item)
                 else:
@@ -1567,6 +1583,7 @@ def extract_declarations(citer, parent, status: Status):
                     member['template_parameters'] = []
                 process_function_declaration(item, member)
             elif member_type == 'namespace':
+                member['inline'] = is_inline(item)
                 member['members'] = []
                 process_children = True
             elif member_type in ['typedef', 'using']:

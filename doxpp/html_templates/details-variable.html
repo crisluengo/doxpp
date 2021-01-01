@@ -16,7 +16,7 @@
                 {% endif %}
               </div>
               {% endif %}
-              {%+ if variable.is_static %}static {% endif %}{{ variable.type }} <a href="#{{ variable.id }}" class="m-doc-self">{{ variable.fully_qualified_name if show_full_name else variable.name }}</a>{% if variable.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif variable.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}{% if variable.is_constexpr %} <span class="m-label m-primary">constexpr</span>{% endif %}{% if variable.since %} {{ variable.since }}{% endif %}
+              {%+ if variable.static %}static {% elif variable.mutable %}mutable {% endif %}{{ variable.type.typename }} <a href="#{{ variable.id }}" class="m-doc-self">{{ variable.fully_qualified_name if show_full_name else variable.name }}</a>{% if variable.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif variable.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}{% if variable.constexpr %} <span class="m-label m-primary">constexpr</span>{% endif %}{% if variable.since %} {{ variable.since }}{% endif %}
               {# the empty line needs to be here to prevent the lines from merging #}
 
               {% if variable.include and not compound.templated and not variable.templated %}
@@ -27,14 +27,14 @@
             <p>{{ variable.brief }}</p>
             {% endif %}
             {% if variable.has_template_details %}
-            <table class="m-table m-fullwidth m-flat">
+            <table class="m-table m-fullwidth m-first-tight m-flat">
               <thead>
                 <tr><th colspan="2">Template parameters</th></tr>
               </thead>
               <tbody>
                 {% for template in variable.template_parameters|selectattr('name') %}
                 <tr>
-                  <td{% if loop.index == 1 %} style="width: 1%"{% endif %}>{{ template.name }}</td>
+                  <td>{{ template.name }}</td>
                   <td>{{ template.doc }}</td>
                 </tr>
                 {% endfor %}

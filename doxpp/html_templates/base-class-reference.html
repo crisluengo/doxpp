@@ -35,14 +35,14 @@
         <p>{{ compound.brief }}</p>
         {% endif %}
         {% if compound.has_template_details %}
-        <table class="m-table m-fullwidth m-flat">
+        <table class="m-table m-fullwidth m-first-tight m-flat">
           <thead>
             <tr><th colspan="2">Template parameters</th></tr>
           </thead>
           <tbody>
             {% for template in compound.template_parameters|selectattr('name') %}
             <tr>
-              <td{% if loop.index == 1 %} style="width: 1%"{% endif %}>{{ template.name }}</td>
+              <td>{{ template.name }}</td>
               <td>{{ template.doc }}</td>
             </tr>
             {% endfor %}

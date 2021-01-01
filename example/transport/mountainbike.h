@@ -62,13 +62,17 @@ namespace transport
 
    /// \endgroup
 
-/// For some reason, this definition takes the documentation for the declaration, ignoring this.
-bool MountainBike::SetSuspension(const double stiffness) {}
+   /// For some reason, this definition takes the documentation for the declaration, ignoring this.
+   bool MountainBike::SetSuspension(const double stiffness) {}
 
-/// A constexpr declaration
-/// \relates MountainBike
-static constexpr int CONST = 5;
+   /// An inline namespace called `vars`.
+   inline namespace vars {
 
+      /// A constexpr declaration
+      /// \relates MountainBike
+      static constexpr int CONST = 5;
+
+   }
 }
 
 /// \endgroup

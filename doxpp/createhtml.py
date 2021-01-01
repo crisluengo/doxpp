@@ -38,6 +38,7 @@
 
 import os
 import urllib.parse
+import html
 import mimetypes
 import shutil
 
@@ -174,8 +175,7 @@ def create_page(compound, status: Status):
     status.html_pages[page_id] = compound
 
 def show_member(member, status: Status):
-    if not (status.show_undocumented or member['brief']):
-        # TODO: if this is an enum, and any of its children is documented, then this guy is documented too
+    if not (status.show_undocumented or member['brief'] or (member['member_type'] == 'enum' and member['has_value_details'])):
         return False
     if not status.show_private and 'access' in member and member['access'] == 'private':
         return False
@@ -255,7 +255,7 @@ def process_class_member(compound, member, status: Status):
         else:
             log.error("Member of type %s cannot be listed on %s page", member_type, compound['member_type'])
             return
-        if member['doc']:
+        if member['doc'] or (member_type == 'enum' and member['has_value_details']):
             compound['has_' + member_type + '_details'] = True
 
 def process_namespace_member(compound, member, status: Status):
@@ -321,7 +321,7 @@ def process_namespace_member(compound, member, status: Status):
         else:
             log.error("Member of type %s cannot be listed on %s page", member_type, compound['member_type'])
             return
-        if member['doc']:
+        if member['doc'] or (member_type == 'enum' and member['has_value_details']):
             (compound if page_id == compound['id'] else status.get_compound(page_id))['has_' + member_type + '_details'] = True
 
 def process_class(compound, status: Status):
@@ -344,6 +344,12 @@ def process_namespace(compound, status: Status):
     if compound['id'] and (show_member(compound, status) or has_documented_members(compound)):
         create_page(compound, status)
 
+def has_value_details(member):
+    for child in member['members']:
+        if child['brief']:
+            return True
+    return False
+
 def assign_page(status: Status):
     # TODO: Add option `show_if_documented_children`
     # All header files will have a page, whether they're documented or not
@@ -360,6 +366,7 @@ def assign_page(status: Status):
     for group in status.groups.values():
         group['modules'] = [status.groups[id] for id in group['subgroups']]
         group['modules'].sort(key=lambda x: x['name'].casefold())
+    # Prepare class and namespace members with needed field. Also: find out if enum members have documented values
     for member in status.members.values():
         if not member['id']:
             continue
@@ -367,6 +374,8 @@ def assign_page(status: Status):
             add_compound_member_lists(member)
         elif member['member_type'] in ['class', 'struct', 'union']:
             add_class_member_lists(member)
+        elif member['member_type'] == 'enum':
+            member['has_value_details'] = has_value_details(member)
     # Assign members to a specific page
     base = {  # bogus namespace to get things rolling
         'id': '',
@@ -445,7 +454,8 @@ def process_navbar_links(navbar, status: Status):
 
 
 def remove_p_tag(title):
-    # Markdown always encloses its output in paragraph tags, but we don't want these when it's a page or section title
+    # Markdown always encloses its output in paragraph tags, but we don't want these when it's
+    # a page or section title, nor for the brief docs.
     if title[:3] == '<p>' and title[-4:] == '</p>':
         title = title[3:-4]
     if '<p>' in title:
@@ -507,13 +517,13 @@ def parse_markdown(status: Status):
 
     for header in status.headers.values():
         if header['brief']:
-            header['brief'] = md.reset().convert(header['brief'])
+            header['brief'] = remove_p_tag(md.reset().convert(header['brief']))
         if header['doc']:
             header['doc'] = md.reset().convert(header['doc'])
         process_sections(header, md)
     for group in status.groups.values():
         if group['brief']:
-            group['brief'] = md.reset().convert(group['brief'])
+            group['brief'] = remove_p_tag(md.reset().convert(group['brief']))
         if group['doc']:
             group['doc'] = md.reset().convert(group['doc'])
         process_sections(group, md)
@@ -521,7 +531,7 @@ def parse_markdown(status: Status):
         if member['id'] not in status.id_map:
             continue
         if member['brief']:
-            member['brief'] = md.reset().convert(member['brief'])
+            member['brief'] = remove_p_tag(md.reset().convert(member['brief']))
         if member['doc']:
             member['doc'] = md.reset().convert(member['doc'])
         process_sections(member, md)
@@ -534,13 +544,15 @@ def parse_markdown(status: Status):
 
 
 def render_type(type, status: Status, doc_link_class):
-    typename = type['typename']
+    typename = html.escape(type['typename'])
+    if not typename:
+        return
     if type['id']:
         typename = '<a href="' + status.get_link(type['id']) + '" class="' + doc_link_class + '">' + typename + '</a>'
     if type['qualifiers']:
         if type['qualifiers'][0] == 'c':
             typename += ' '
-        typename += type['qualifiers']
+        typename += html.escape(type['qualifiers'])
     type['typename'] = typename
 
 def parse_types(status: Status, doc_link_class):
@@ -554,10 +566,20 @@ def parse_types(status: Status, doc_link_class):
                 render_type(arg, status, doc_link_class)
         if 'template_parameters' in member:
             for arg in member['template_parameters']:
-                if isinstance(arg['default'], dict):
-                    render_type(arg['default'], status, doc_link_class)
-                elif isinstance(arg['type'], dict):
+                if arg['type'] == 'type':
+                    arg['type'] = 'typename'
+                    if arg['default']:
+                        render_type(arg['default'], status, doc_link_class)
+                else:  # isinstance(arg['type'], 'dict'):
                     render_type(arg['type'], status, doc_link_class)
+                arg['name'] = html.escape(arg['name'])  # just in case this is "<SFINAE>".
+
+
+def find_header_file_name(status: Status):
+    for member in status.members.values():
+        if 'header' in member and member['header']:  # The "root member" doesn't have this key
+            member['include'] = ('"' + status.headers[member['header']]['name'] + '"', member['header'] + '.html')
+            # TODO: We want to adjust this for each page the member is shown in, and adjust the page's include also.
 
 
 def add_wbr(text: str):
@@ -586,19 +608,24 @@ def add_breadcrumb(compound, name, compounds):
 
 
 def fixup_namespace_member_has_details(compound):
+    def has_details(member):
+        return member['page_id'] == compound['page_id'] and\
+               (len(member['doc']) > 0 or (member['member_type'] == 'enum' and member['has_value_details']))
     for members in (compound['enums'], compound['aliases'], compound['functions'],
-                  compound['variables'], compound['macros']):
+                    compound['variables'], compound['macros']):
         for member in members:
-            member['has_details'] = (member['page_id'] == compound['page_id']) and (len(member['doc']) > 0)
+            member['has_details'] = has_details(member)
 
 def fixup_class_member_has_details(compound):
-    for members in (compound['typeless_functions'], compound['enums'], compound['aliases'],
-                  compound['functions'], compound['variables'], compound['related']):
+    def has_details(member):
+        return len(member['doc']) > 0 or (member['member_type'] == 'enum' and member['has_value_details'])
+    for members in (compound['typeless_functions'], compound['enums'], compound['aliases'], compound['functions'],
+                    compound['variables'], compound['related']):
         for member in members:
-            member['has_details'] = len(member['doc']) > 0
+            member['has_details'] = has_details(member)
     for group in compound['groups']:
         for member in group['members']:
-            member['has_details'] = len(member['doc']) > 0
+            member['has_details'] = has_details(member)
 
 
 def createhtml(input_file, output_dir, options, template_params):
@@ -636,6 +663,9 @@ def createhtml(input_file, output_dir, options, template_params):
     # Convert type name strings into HTML links if appropriate
     parse_types(status, template_params['DOC_LINK_CLASS'])
 
+    # Find header file name for each member
+    find_header_file_name(status)
+
     # Create tree structure for index pages
     index = create_indices(status)
 
@@ -652,7 +682,7 @@ def createhtml(input_file, output_dir, options, template_params):
 
     # If no stylesheets were given, use the default one
     if not 'STYLESHEETS' in template_params or not template_params['STYLESHEETS']:
-        template_params['STYLESHEETS'] = ['m-light-documentation.compiled.css']
+        template_params['STYLESHEETS'] = ['css/m-light-documentation.compiled.css']
 
     # Fill in default favicon if not given, and get type
     if not template_params['FAVICON']:
