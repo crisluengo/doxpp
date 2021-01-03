@@ -1677,7 +1677,7 @@ def is_under_directory(file, path):
         return os.path.relpath(file, path), True
     return file, False
 
-def extract_includes(tu, status: Status, input_files, include_dirs):
+def extract_includes(tu, status: Status, header_files, include_dirs):
     # Gets the list of files directly included by this one (not the ones included
     # by files included here).
     # include_dirs[0] is always the project's root dir
@@ -1688,7 +1688,7 @@ def extract_includes(tu, status: Status, input_files, include_dirs):
             include = os.path.realpath(f.include.name)
             include_name, is_under_project = is_under_directory(include, include_dirs[0])
             if is_under_project:
-                if include in input_files:
+                if include in header_files:
                     this_file_includes.append('"[{}](#{})"'.format(include_name, unique_id.header(include_name)))
                 else:
                     this_file_includes.append('"{}"'.format(include_name))
@@ -1706,7 +1706,7 @@ def extract_includes(tu, status: Status, input_files, include_dirs):
 
 # --- Main function for this file ---
 
-def buildtree(root_dir, input_files, additional_files, compiler_flags, include_dirs, options):
+def buildtree(root_dir, header_files, markdown_files, compiler_flags, include_dirs, options):
     """
     Builds the member tree as well as the headers, groups and pages lists, which together represent all
     the information about the code in the C++ project that is needed to produce useful documentation for
@@ -1714,8 +1714,8 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
 
     :param root_dir: The root directory for the header files, that you would pass to the compiler with `-I`
            when using the library (string)
-    :param input_files: header files (with wildcards and path relative to working directory), space separated (string)
-    :param additional_files: Markdown files (with wildcards and path relative to working directory), space
+    :param header_files: header files (with wildcards and path relative to working directory), space separated (string)
+    :param markdown_files: Markdown files (with wildcards and path relative to working directory), space
            separated (string)
     :param compiler_flags: flags to pass to the compiler (string)
     :param include_dirs: include directories to pass to the compiler (string)
@@ -1736,8 +1736,8 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
 
     # Process the input parameters
     root_dir = os.path.realpath(root_dir)
-    input_files = [os.path.realpath(x) for x in expand_sources(shlex.split(input_files))]
-    additional_files = [os.path.realpath(x) for x in expand_sources(shlex.split(additional_files))]
+    header_files = [os.path.realpath(x) for x in expand_sources(shlex.split(header_files))]
+    markdown_files = [os.path.realpath(x) for x in expand_sources(shlex.split(markdown_files))]
     compiler_flags = compiler_flags.split()
     include_dirs = [os.path.realpath(x) for x in shlex.split(include_dirs, posix=False)]
 
@@ -1763,7 +1763,7 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
     # Process all header files
     index = cindex.Index.create()
     processed = {}
-    for f in input_files:
+    for f in header_files:
         # Skip file if already processed
         if f in processed:
             continue
@@ -1812,7 +1812,7 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
                 exit(1)
 
         # Extract list of headers included by this file
-        extract_includes(tu, status, input_files, include_dirs)
+        extract_includes(tu, status, header_files, include_dirs)
 
         # Extract and process documentation comments with commands
         process_comments(tu, status)
@@ -1832,7 +1832,7 @@ def buildtree(root_dir, input_files, additional_files, compiler_flags, include_d
     status.current_header = {}
     status.current_file_name = ''
     processed = {}
-    for f in additional_files:
+    for f in markdown_files:
         # Skip file if already processed
         if f in processed:
             continue

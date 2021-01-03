@@ -23,7 +23,7 @@ import markdown
 
 class FixLinksTreeprocessor(markdown.treeprocessors.Treeprocessor):
 
-    id_map = {}
+    id_map = None
 
     def run(self, doc):
         for elem in doc.iter(tag='a'):

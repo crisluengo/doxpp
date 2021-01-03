@@ -1,5 +1,5 @@
 # dox++
-# Copyright 2020, Cris Luengo
+# Copyright 2020-2021, Cris Luengo
 #
 # This file is part of dox++.  dox++ is free software: you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -53,6 +53,7 @@ from .search import CssClass, ResultFlag, ResultMap, Trie, serialize_search_data
 
 from .markdown.admonition import AdmonitionExtension
 from .markdown.fix_links import FixLinksExtension
+from .markdown.record_images import RecordLinkedImagesExtension
 from .markdown.mdx_subscript import SubscriptExtension
 from .markdown.mdx_superscript import SuperscriptExtension
 
@@ -90,7 +91,6 @@ class Status:
         self.html_pages = {}
 
         # This is the set of images referenced in the documentation
-        # TODO: This needs to be filled by Markdown parser
         self.images = set()
 
         # Options
@@ -369,11 +369,10 @@ def find_header_file(compound):
     for members in (compound['classes'], compound['enums'], compound['aliases'],
                     compound['functions'], compound['variables'], compound['macros']):
         for member in members:
-            if 'header' in member and member['header']:  # TODO: This should always be true
-                if member['header'] in headers:
-                    headers[member['header']] += 1
-                else:
-                    headers[member['header']] = 1
+            if member['header'] in headers:
+                headers[member['header']] += 1
+            else:
+                headers[member['header']] = 1
     # Any header file that is shown in 80% of the members we take as the header for the compound
     threshold = 0.8 * sum(headers.values())
     compound_header = max(headers, key=lambda m: headers[m], default='')
@@ -530,12 +529,12 @@ def parse_markdown(status: Status):
         'smarty',           # https://python-markdown.github.io/extensions/smarty/
         # Installed with package `markdown-headdown`
         'mdx_headdown',     # https://github.com/SaschaCowley/Markdown-Headdown
-        # Installed with package `MarkdownSuperscript`
-        # Installed with package `MarkdownSubscript`
         # Our own concoctions
         AdmonitionExtension(),              # Modification of the standard 'admonition' extension
         FixLinksExtension(status.id_map),   # Fixes links from '#id' to 'page_id.html#id'
+        RecordLinkedImagesExtension(status.images),  # Stores names of images linked in the documentation
         # Two extensions not installed through PyPI because they cause a downgrade of the Markdown package
+        # (would be installed with packages `MarkdownSuperscript` and `MarkdownSubscript`)
         SubscriptExtension(),       # https://github.com/jambonrose/markdown_subscript_extension
         SuperscriptExtension()      # https://github.com/jambonrose/markdown_superscript_extension
     ]
@@ -706,6 +705,8 @@ def createhtml(input_file, output_dir, options, template_params):
     - 'show_undocumented': include undocumented members in the documentation
     - 'extra_files': list of extra files to copy to the output directory
     - 'templates': path to templates to use instead of default ones
+    - 'source_files': list of source files (header files + markdown files), used to locate
+                      image files referenced in documentation.
     """
 
     # Load data
@@ -811,13 +812,31 @@ def createhtml(input_file, output_dir, options, template_params):
     # TODO
 
     # Copy over all referenced files
-    for i in list(status.images) + template_params['STYLESHEETS'] + options['extra_files'] + ([template_params['PROJECT_LOGO']] if template_params['PROJECT_LOGO'] else []) + ([template_params['FAVICON'][0]] if template_params['FAVICON'][0] else []) + ([] if template_params['SEARCH_DISABLED'] else ['html_templates/search.js']):
+    for i in template_params['STYLESHEETS'] + options['extra_files'] + ([template_params['PROJECT_LOGO']] if template_params['PROJECT_LOGO'] else []) + ([template_params['FAVICON'][0]] if template_params['FAVICON'][0] else []):
         if urllib.parse.urlparse(i).netloc:
             continue
-        # The search.js is special, we encode the version information into its filename
-        file_out = search_filename if i == 'html_templates/search.js' else i
+        file_out = i
         # File is either found relative to the current directory or relative to script directory
         if not os.path.exists(i):
             i = os.path.join(doxpp_path, i)
+        if not os.path.exists(i):
+            log.error("File %s not found", file_out)
         log.info("Copying %s to output", i)
         shutil.copy(i, os.path.join(output_dir, os.path.basename(file_out)))
+    # The images we need to search for in the input directories
+    source_dirs = set()
+    for s in options['source_files']:
+        source_dirs.add(os.path.dirname(s))
+    for i in status.images:
+        found = False
+        for s in source_dirs:
+            p = os.path.join(s,i)
+            if os.path.exists(p):
+                shutil.copy(p, os.path.join(output_dir, os.path.basename(i)))
+                found = True
+                break
+        if not found:
+            log.error("File %s not found", i)
+    # The search.js is special, we encode the version information into its filename
+    if not template_params['SEARCH_DISABLED']:
+        shutil.copy(os.path.join(doxpp_path, 'html_templates/search.js'), os.path.join(output_dir, os.path.basename(search_filename)))

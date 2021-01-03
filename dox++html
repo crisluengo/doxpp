@@ -36,7 +36,10 @@ options = {
     'show_protected': doxpp.config.get_boolean(config, 'html', 'document protected members'),
     'show_undocumented': doxpp.config.get_boolean(config, 'html', 'document undocumented members'),
     'extra_files': shlex.split(doxpp.config.get(config, 'html', 'extra files'), posix=False),
-    'templates': doxpp.config.get(config, 'html', 'templates')
+    'templates': doxpp.config.get(config, 'html', 'templates'),
+    'source_files': shlex.split(doxpp.config.get(config, 'input', 'header files'), posix=False) +
+                    shlex.split(doxpp.config.get(config, 'input', 'markdown files'), posix=False)
+
 }
 
 template_params = {
