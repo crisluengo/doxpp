@@ -260,24 +260,25 @@ def process_class_member(compound, member, status: Status):
 
 def process_namespace_member(compound, member, status: Status):
     # compound must be a namespace
-    if not member['header']:
+    if member['member_type'] != 'namespace' and not member['header']:
         # TODO: This only happens because of an issue with parent template class defined in other header file
         log.error("Member %s doesn't have a header file, this is a bug in dox++parse that needs to be fixed", member['id'])
-        return
-    header_compound = status.headers[member['header']]
+    header_compound = status.headers[member['header']] if member['header'] else {}
     group_compound = status.groups[member['group']] if member['group'] else {}
     if member['member_type'] in ['class', 'struct', 'union']:
         process_class(member, status)
         if 'page_id' in member:
             compound['classes'].append(member)
-            header_compound['classes'].append(member)
+            if header_compound:
+                header_compound['classes'].append(member)
             if group_compound:
                 group_compound['classes'].append(member)
     elif member['member_type'] == 'namespace':
         process_namespace(member, status)
         if 'page_id' in member:
             compound['namespaces'].append(member)
-            header_compound['namespaces'].append(member)
+            if header_compound:
+                header_compound['namespaces'].append(member)
             if group_compound:
                 group_compound['namespaces'].append(member)
     elif show_member(member, status):
@@ -294,28 +295,33 @@ def process_namespace_member(compound, member, status: Status):
         member_type = member['member_type']
         if member_type == 'enum':
             compound['enums'].append(member)
-            header_compound['enums'].append(member)
+            if header_compound:
+                header_compound['enums'].append(member)
             if group_compound:
                 group_compound['enums'].append(member)
             process_enum_values(member, status)
         elif member_type == 'alias':
             compound['aliases'].append(member)
-            header_compound['aliases'].append(member)
+            if header_compound:
+                header_compound['aliases'].append(member)
             if group_compound:
                 group_compound['aliases'].append(member)
         elif member_type == 'function':
             compound['functions'].append(member)
-            header_compound['functions'].append(member)
+            if header_compound:
+                header_compound['functions'].append(member)
             if group_compound:
                 group_compound['functions'].append(member)
         elif member_type == 'variable':
             compound['variables'].append(member)
-            header_compound['variables'].append(member)
+            if header_compound:
+                header_compound['variables'].append(member)
             if group_compound:
                 group_compound['variables'].append(member)
         elif member_type == 'macro':
             compound['macros'].append(member)
-            header_compound['macros'].append(member)
+            if header_compound:
+                header_compound['macros'].append(member)
             if group_compound:
                 group_compound['macros'].append(member)
         else:
@@ -350,6 +356,31 @@ def has_value_details(member):
             return True
     return False
 
+def verify_namespace_header(member):
+    for child in member['members']:
+        if child['header'] and child['header'] != member['header']:
+            member['header'] = ''
+            return
+
+def find_header_file(compound):
+    # TODO: Modules without members, that only have submodules, should be assigned a header file.
+    # We first count how many members have the same header file
+    headers = {}
+    for members in (compound['classes'], compound['enums'], compound['aliases'],
+                    compound['functions'], compound['variables'], compound['macros']):
+        for member in members:
+            if 'header' in member and member['header']:  # TODO: This should always be true
+                if member['header'] in headers:
+                    headers[member['header']] += 1
+                else:
+                    headers[member['header']] = 1
+    # Any header file that is shown in 80% of the members we take as the header for the compound
+    threshold = 0.8 * sum(headers.values())
+    compound_header = max(headers, key=lambda m: headers[m], default='')
+    if compound_header in headers and headers[compound_header] < threshold:
+        compound_header = ''
+    compound['header'] = compound_header
+
 def assign_page(status: Status):
     # TODO: Add option `show_if_documented_children`
     # All header files will have a page, whether they're documented or not
@@ -366,12 +397,15 @@ def assign_page(status: Status):
     for group in status.groups.values():
         group['modules'] = [status.groups[id] for id in group['subgroups']]
         group['modules'].sort(key=lambda x: x['name'].casefold())
-    # Prepare class and namespace members with needed field. Also: find out if enum members have documented values
+    # Prepare class and namespace members with needed field. Also:
+    #  - find out if enum members have documented values
+    #  - find out if namespace members all have the same header file, and reset namespace header if not
     for member in status.members.values():
         if not member['id']:
             continue
         if member['member_type'] == 'namespace':
             add_compound_member_lists(member)
+            verify_namespace_header(member)
         elif member['member_type'] in ['class', 'struct', 'union']:
             add_class_member_lists(member)
         elif member['member_type'] == 'enum':
@@ -385,8 +419,12 @@ def assign_page(status: Status):
         'group': ''
     }
     process_namespace(base, status)
-    # For headers and groups, do we have any detailed docs?
-
+    # Assign a header file to groups and namespaces
+    for group in status.groups.values():
+        find_header_file(group)
+    for member in status.members.values():
+        if member['id'] and member['member_type'] == 'namespace':
+            find_header_file(member)
     # All pages have a page, obviously
     for page in status.pages.values():
         page['member_type'] = 'page'
@@ -575,13 +613,6 @@ def parse_types(status: Status, doc_link_class):
                 arg['name'] = html.escape(arg['name'])  # just in case this is "<SFINAE>".
 
 
-def find_header_file_name(status: Status):
-    for member in status.members.values():
-        if 'header' in member and member['header']:  # The "root member" doesn't have this key
-            member['include'] = ('"' + status.headers[member['header']]['name'] + '"', member['header'] + '.html')
-            # TODO: We want to adjust this for each page the member is shown in, and adjust the page's include also.
-
-
 def add_wbr(text: str):
     if '<' in text:  # Stuff contains HTML code, do not touch!
         return text
@@ -607,25 +638,57 @@ def add_breadcrumb(compound, name, compounds):
         compound['breadcrumb'].append((compounds[elem][name], elem + '.html'))
 
 
-def fixup_namespace_member_has_details(compound):
+def fixup_namespace_compound_members(compound, status: Status):
+    # Adjusts data in the members referenced in compound for display in the context of compound.
+    # Some details about a member appear differently depending on which page we're looking at.
+    # This function only changes member fields that are not primary, (i.e. original data is not lost):
+    # - has_details: if a section with member details needs to be shown for this member
+    # - include: either () to not show include file information, or ("name", link) to show it
+    # - TODO: fixup referenced types in each member to be relative to compound if compound is a namespace
     def has_details(member):
-        return member['page_id'] == compound['page_id'] and\
+        return member['page_id'] == compound['page_id'] and \
                (len(member['doc']) > 0 or (member['member_type'] == 'enum' and member['has_value_details']))
+    if compound['member_type'] == 'file':
+        # None of the members will show an include file
+        compound_header = compound['id']
+    else:
+        compound_header = compound['header']
+        if compound_header:
+            compound['include'] = ('"' + status.headers[compound_header]['name'] + '"', compound_header + '.html')
+        else:
+            compound['include'] = ()
     for members in (compound['enums'], compound['aliases'], compound['functions'],
                     compound['variables'], compound['macros']):
         for member in members:
             member['has_details'] = has_details(member)
+            if member['header'] == compound_header:
+                member['include'] = ()
+            else:
+                member['include'] = ('"' + status.headers[member['header']]['name'] + '"', member['header'] + '.html')
+                member['has_details'] = True
+                if member['page_id'] == compound['id']:
+                    compound['has_' + member['member_type'] + '_details'] = True
 
-def fixup_class_member_has_details(compound):
+def fixup_class_compound_members(compound, status: Status):
+    # This function works like `fixup_namespace_compound_members`, but is for when the compound is a class/struct/union.
     def has_details(member):
         return len(member['doc']) > 0 or (member['member_type'] == 'enum' and member['has_value_details'])
+    compound['include'] = ('"' + status.headers[compound['header']]['name'] + '"', compound['header'] + '.html')
     for members in (compound['typeless_functions'], compound['enums'], compound['aliases'], compound['functions'],
-                    compound['variables'], compound['related']):
+                    compound['variables']):
         for member in members:
             member['has_details'] = has_details(member)
     for group in compound['groups']:
         for member in group['members']:
             member['has_details'] = has_details(member)
+    for member in compound['related']:
+        member['has_details'] = has_details(member)
+        if member['header'] == compound['header']:
+            member['include'] = ()
+        else:
+            member['include'] = ('"' + status.headers[member['header']]['name'] + '"', member['header'] + '.html')
+            member['has_details'] = True
+            compound['has_' + member['member_type'] + '_details'] = True
 
 
 def createhtml(input_file, output_dir, options, template_params):
@@ -662,9 +725,6 @@ def createhtml(input_file, output_dir, options, template_params):
 
     # Convert type name strings into HTML links if appropriate
     parse_types(status, template_params['DOC_LINK_CLASS'])
-
-    # Find header file name for each member
-    find_header_file_name(status)
 
     # Create tree structure for index pages
     index = create_indices(status)
@@ -717,18 +777,18 @@ def createhtml(input_file, output_dir, options, template_params):
         type = compound['member_type']
         if type == 'file':
             compound['breadcrumb'] = [(compound['name'].replace('/', '/<wbr />'), file)]
-            fixup_namespace_member_has_details(compound)
+            fixup_namespace_compound_members(compound, status)
         elif type == 'module':
             add_breadcrumb(compound, 'name', status.groups)
-            fixup_namespace_member_has_details(compound)
+            fixup_namespace_compound_members(compound, status)
         elif type == 'page':
             add_breadcrumb(compound, 'title', status.pages)
         else:
             add_breadcrumb(compound, 'name', status.members)
             if type == 'namespace':
-                fixup_namespace_member_has_details(compound)
+                fixup_namespace_compound_members(compound, status)
             else:
-                fixup_class_member_has_details(compound)
+                fixup_class_compound_members(compound, status)
         template = env.get_template(type + '.html')
         rendered = template.render(compound=compound,
                                    FILENAME=file,

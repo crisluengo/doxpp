@@ -414,6 +414,8 @@ def find_member(name, start_id, members):
     Returns the `id` of the first match found. If `name` has parenthesis, these are assumed to contain
     function arguments, and will be used to disambiguate in the case of overloaded functions.
     """
+    # TODO: This doesn't work correctly for members injected into a different namespace, for example
+    #       members of inline namespaces, anonymous namespaces, or through a `using` statement.
     name = name.strip()
     if not name:
         return ''
