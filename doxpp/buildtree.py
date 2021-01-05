@@ -180,7 +180,10 @@ def expand_sources(sources):
     ret = []
     for source in sources:
         if ('*' in source) or ('?' in source):
-            ret.extend(glob.glob(source))
+            source = glob.glob(source)
+            if source:
+                source.sort()
+                ret.extend(source)
         else:
             ret.append(source)
     return ret
@@ -492,7 +495,7 @@ def find_file(name, headers):
         hdr = header['name']
         if hdr == name:
             return header['id']
-        n = hdr.count(os.sep)
+        n = hdr.count(os.sep)  # TODO: we should normalize paths to always use '/'
         if n < match_length and hdr.endswith(os.sep + name):
             match_length = n
             best_match = header['id']
@@ -678,8 +681,11 @@ def post_process_relates(members):
                 parent = member['parent']
                 # We only look for the command in documentation to namespace members (not class, struct, union or enum members)
                 if not parent or members[parent]['member_type'] == 'namespace':
-                    member['doc'] = relates_cmd_match.sub(relates_cmd_replace, member['doc'], count=1)
+                    member['brief'] = relates_cmd_match.sub(relates_cmd_replace, member['brief'], count=1)
+                    if not member['relates']:
+                        member['doc'] = relates_cmd_match.sub(relates_cmd_replace, member['doc'], count=1)
                     # count=1 means we only handle the first occurrence of the command. Delete any further commands:
+                    member['brief'] = relates_cmd_match.sub('', member['brief'])
                     member['doc'] = relates_cmd_match.sub('', member['doc'])
                     # TODO: produce error if there are more of these commands?
 

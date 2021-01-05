@@ -1,6 +1,8 @@
 {% set navbar_current = 'files' %}
 {% extends 'base-index.html' %}
 
+{% block title %}Files | {{ super() }}{% endblock %}
+
 {% block main %}
         <h1>Files</h1>
         <ul class="m-doc">

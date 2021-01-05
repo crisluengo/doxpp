@@ -97,6 +97,7 @@ class Status:
         self.show_private = options['show_private']
         self.show_protected = options['show_protected']
         self.show_undocumented = options['show_undocumented']
+        self.modify_include_statement = options['modify_include_statement']
 
     def get_link(self, id):
         # Convert an ID into a URL to link to
@@ -111,6 +112,7 @@ class Status:
             return page + '.html#' + id
 
     def find_title(self, id):
+        # This is used only in process_navbar_links()
         standard = {
             'classes': 'Classes',
             'files': 'Files',
@@ -332,7 +334,6 @@ def process_namespace_member(compound, member, status: Status):
 
 def process_class(compound, status: Status):
     # compound must be a class/struct/union
-    add_class_member_lists(compound)
     # Process namespace members
     for member in compound['members']:
         process_class_member(compound, member, status)
@@ -342,7 +343,6 @@ def process_class(compound, status: Status):
 
 def process_namespace(compound, status: Status):
     # compound must be a namespace
-    add_compound_member_lists(compound)
     # Process namespace members
     for member in compound['members']:
         process_namespace_member(compound, member, status)
@@ -396,7 +396,7 @@ def assign_page(status: Status):
     for group in status.groups.values():
         group['modules'] = [status.groups[id] for id in group['subgroups']]
         group['modules'].sort(key=lambda x: x['name'].casefold())
-    # Prepare class and namespace members with needed field. Also:
+    # Prepare class and namespace members with needed fields. Also:
     #  - find out if enum members have documented values
     #  - find out if namespace members all have the same header file, and reset namespace header if not
     for member in status.members.values():
@@ -417,8 +417,12 @@ def assign_page(status: Status):
         'header': '',
         'group': ''
     }
+    add_compound_member_lists(base)
     process_namespace(base, status)
     # Assign a header file to groups and namespaces
+    for member in status.members.values():
+        if member['id'] and member['header']:
+            member['header'] = status.modify_include_statement(member['header'])
     for group in status.groups.values():
         find_header_file(group)
     for member in status.members.values():
@@ -703,6 +707,7 @@ def createhtml(input_file, output_dir, options, template_params):
     - 'show_private': include private members in the documentation
     - 'show_protected': include protected members in the documentation
     - 'show_undocumented': include undocumented members in the documentation
+    - 'modify_include_statement': a Python function to rewrite the header ID of members
     - 'extra_files': list of extra files to copy to the output directory
     - 'templates': path to templates to use instead of default ones
     - 'source_files': list of source files (header files + markdown files), used to locate
@@ -777,7 +782,7 @@ def createhtml(input_file, output_dir, options, template_params):
         #    continue
         type = compound['member_type']
         if type == 'file':
-            compound['breadcrumb'] = [(compound['name'].replace('/', '/<wbr />'), file)]
+            compound['breadcrumb'] = [(p, '') for p in compound['name'].split('/')]  # TODO: Make sure this works on Windows
             fixup_namespace_compound_members(compound, status)
         elif type == 'module':
             add_breadcrumb(compound, 'name', status.groups)
@@ -815,14 +820,14 @@ def createhtml(input_file, output_dir, options, template_params):
     for i in template_params['STYLESHEETS'] + options['extra_files'] + ([template_params['PROJECT_LOGO']] if template_params['PROJECT_LOGO'] else []) + ([template_params['FAVICON'][0]] if template_params['FAVICON'][0] else []):
         if urllib.parse.urlparse(i).netloc:
             continue
-        file_out = i
         # File is either found relative to the current directory or relative to script directory
-        if not os.path.exists(i):
-            i = os.path.join(doxpp_path, i)
-        if not os.path.exists(i):
-            log.error("File %s not found", file_out)
-        log.info("Copying %s to output", i)
-        shutil.copy(i, os.path.join(output_dir, os.path.basename(file_out)))
+        p = i
+        if not os.path.exists(p):
+            p = os.path.join(doxpp_path, p)
+        if not os.path.exists(p):
+            log.error("File %s not found", i)
+        log.info("Copying %s to output", p)
+        shutil.copy(p, os.path.join(output_dir, os.path.basename(p)))
     # The images we need to search for in the input directories
     source_dirs = set()
     for s in options['source_files']:
@@ -832,6 +837,7 @@ def createhtml(input_file, output_dir, options, template_params):
         for s in source_dirs:
             p = os.path.join(s,i)
             if os.path.exists(p):
+                log.info("Copying %s to output", p)
                 shutil.copy(p, os.path.join(output_dir, os.path.basename(i)))
                 found = True
                 break
@@ -839,4 +845,6 @@ def createhtml(input_file, output_dir, options, template_params):
             log.error("File %s not found", i)
     # The search.js is special, we encode the version information into its filename
     if not template_params['SEARCH_DISABLED']:
-        shutil.copy(os.path.join(doxpp_path, 'html_templates/search.js'), os.path.join(output_dir, os.path.basename(search_filename)))
+        p = os.path.join(doxpp_path, 'html_templates/search.js')
+        log.info("Copying %s to output as %s", p, search_filename)
+        shutil.copy(p, os.path.join(output_dir, search_filename))

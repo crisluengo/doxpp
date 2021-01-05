@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>{% block title %}{{ PROJECT_NAME }}{% if PROJECT_BRIEF %} {{ PROJECT_BRIEF }}{% endif %}{% endblock %}</title>
+  <title>{% block title %}{{ PROJECT_NAME }}{% if PROJECT_BRIEF %} | {{ PROJECT_BRIEF }}{% endif %}{% endblock %}</title>
   {% for css in STYLESHEETS %}
   <link rel="stylesheet" href="{{ css|basename_or_url|e }}" />
   {% endfor %}

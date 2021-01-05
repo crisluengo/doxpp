@@ -47,6 +47,7 @@ default_config_values = {
         'document private members': 'yes',
         'document protected members': 'yes',
         'document undocumented members': 'no',
+        'modify include statement': 'def modify_include_statement(id): return id',
         'theme color': '#22272e',
         'favicon': '',                # favicon to use instead of the default one
         'stylesheets': '',            # style sheets to use instead of the default ones (separate multiple files with spaces)
