@@ -44,8 +44,12 @@ options = {
     'extra_files': shlex.split(doxpp.config.get(config, 'html', 'extra files'), posix=False),
     'templates': doxpp.config.get(config, 'html', 'templates'),
     'source_files': shlex.split(doxpp.config.get(config, 'input', 'header files'), posix=False) +
-                    shlex.split(doxpp.config.get(config, 'input', 'markdown files'), posix=False)
-
+                    shlex.split(doxpp.config.get(config, 'input', 'markdown files'), posix=False),
+    'search_add_lookahead_barriers': True,
+    'add_snake_case_suffixes': True,
+    'add_camel_case_suffixes': True,
+    'search_merge_subtrees': True,
+    'search_merge_prefixes': True,
 }
 
 template_params = {
@@ -72,7 +76,7 @@ template_params = {
     'CLASS_INDEX_EXPAND_LEVELS': 1,
     'CLASS_INDEX_EXPAND_INNER': False,
     'SEARCH_DISABLED': False,
-    'SEARCH_DOWNLOAD_BINARY': False,
+    'SEARCH_DOWNLOAD_BINARY': False,  # Set to false for Chromium-based browsers when browsing HTML from the local file system. Keep True for deployment to server.
     'SEARCH_HELP':
         """<p class="m-noindent">Search for symbols, directories, files, pages or
         modules. You can omit any prefix from the symbol or file path; adding a

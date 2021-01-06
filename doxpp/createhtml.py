@@ -37,10 +37,13 @@
 #   DEALINGS IN THE SOFTWARE.
 
 import os
+import re
 import urllib.parse
 import html
 import mimetypes
 import shutil
+import enum
+from types import SimpleNamespace as Empty
 
 import markdown
 import jinja2
@@ -56,6 +59,7 @@ from .markdown.fix_links import FixLinksExtension
 from .markdown.record_images import RecordLinkedImagesExtension
 from .markdown.mdx_subscript import SubscriptExtension
 from .markdown.mdx_superscript import SuperscriptExtension
+
 
 doxpp_path = os.path.dirname(os.path.realpath(__file__))
 default_templates = os.path.join(doxpp_path, 'html_templates')
@@ -594,7 +598,7 @@ def render_type(type, status: Status, doc_link_class):
         if type['qualifiers'][0] == 'c':
             typename += ' '
         typename += html.escape(type['qualifiers'])
-    type['typename'] = typename
+    type['type'] = typename
 
 def parse_types(status: Status, doc_link_class):
     for member in status.members.values():
@@ -617,6 +621,7 @@ def parse_types(status: Status, doc_link_class):
 
 
 def add_wbr(text: str):
+    # TODO: This function not yet used
     if '<' in text:  # Stuff contains HTML code, do not touch!
         return text
     if '::' in text:  # C++ names
@@ -694,6 +699,215 @@ def fixup_class_compound_members(compound, status: Status):
             compound['has_' + member['member_type'] + '_details'] = True
 
 
+class EntryType(enum.Enum):
+    # Order must match the search_type_map below; first value is reserved for
+    # ResultFlag.ALIAS
+    PAGE = 1
+    NAMESPACE = 2
+    MODULE = 3
+    CLASS = 4
+    STRUCT = 5
+    UNION = 6
+    ALIAS = 7
+    FILE = 8
+    FUNCTION = 9
+    MACRO = 10
+    ENUM = 11
+    ENUM_VALUE = 12
+    VARIABLE = 13
+
+entry_type_map = {
+    'page': EntryType.PAGE,
+    'namespace': EntryType.NAMESPACE,
+    'module': EntryType.MODULE,
+    'class': EntryType.CLASS,
+    'struct': EntryType.STRUCT,
+    'union': EntryType.UNION,
+    'alias': EntryType.ALIAS,
+    'file': EntryType.FILE,
+    'function': EntryType.FUNCTION,
+    'macro': EntryType.MACRO,
+    'enum': EntryType.ENUM,
+    'enumvalue': EntryType.ENUM_VALUE,
+    'variable': EntryType.VARIABLE
+}
+
+search_type_map = [
+    # Order must match the EntryType above
+    (CssClass.SUCCESS, 'page'),
+    (CssClass.PRIMARY, 'namespace'),
+    (CssClass.SUCCESS, 'module'),
+    (CssClass.PRIMARY, 'class'),
+    (CssClass.PRIMARY, 'struct'),
+    (CssClass.PRIMARY, 'union'),
+    (CssClass.PRIMARY, 'alias'),
+    (CssClass.WARNING, 'file'),
+    (CssClass.INFO, 'function'),
+    (CssClass.INFO, 'macro'),
+    (CssClass.PRIMARY, 'enum'),
+    (CssClass.DEFAULT, 'enum value'),
+    (CssClass.DEFAULT, 'variable')
+]
+
+snake_case_point ='_[^_]'
+camel_case_point = '[^A-Z][A-Z].'
+snake_case_point_re = re.compile(snake_case_point)
+camel_case_point_re = re.compile(camel_case_point)
+camel_or_snake_case_point_re = re.compile('({})|({})'.format(snake_case_point, camel_case_point))
+
+def add_entry_to_search_data(result, joiner: str, trie: Trie, map: ResultMap, add_lookahead_barriers,
+                             add_snake_case_suffixes, add_camel_case_suffixes):
+    has_params = hasattr(result, 'params') and result.params is not None
+
+    # Add entry as-is
+    index = map.add(joiner.join(result.prefix + [result.name_with_args]),
+                    result.url, suffix_length=result.suffix_length, flags=result.flags)
+
+    # Add functions and function macros the second time with () appended, everything is the same
+    # except for suffix length which is 2 chars shorter
+    index_args = None
+    if has_params:
+        index_args = map.add(joiner.join(result.prefix + [result.name_with_args]), result.url,
+                             suffix_length=result.suffix_length - 2, flags=result.flags)
+
+    # Add the result multiple times with all possible prefixes
+    prefixed_name = result.prefix + [result.name]
+    for i in range(len(prefixed_name)):
+        lookahead_barriers = []
+        name = ''
+        for j in prefixed_name[i:]:
+            if name:
+                lookahead_barriers += [len(name)]
+                name += joiner
+            name += j
+        trie.insert(name.lower(), index, lookahead_barriers=lookahead_barriers if add_lookahead_barriers else [])
+
+        # Add functions and function macros the second time with () appended, referencing the other
+        # result that expects () appended. The lookahead barrier is at the ( character to avoid the
+        # result being shown twice.
+        if has_params:
+            trie.insert(name.lower() + '()', index_args, lookahead_barriers=lookahead_barriers + [len(name)]
+            if add_lookahead_barriers else [])
+
+    # Add the result multiple times again for all parts of the name
+    if add_camel_case_suffixes and add_snake_case_suffixes:
+        prefix_end_re = camel_or_snake_case_point_re
+    elif add_camel_case_suffixes:
+        prefix_end_re = camel_case_point_re
+    elif add_snake_case_suffixes:
+        prefix_end_re = snake_case_point_re
+    else:
+        prefix_end_re = None
+    if prefix_end_re:
+        for m in prefix_end_re.finditer(result.name.lstrip('__')):
+            name = result.name[m.start(0)+1:]
+            trie.insert(name.lower(), index)
+            if has_params:
+                trie.insert(name.lower() + '()', index_args, lookahead_barriers=[len(name)])
+
+    # Add keyword aliases for this symbol
+    for search, title, suffix_length in result.keywords:
+        if not title:
+            title = search
+        keyword_index = map.add(title, '', alias=index, suffix_length=result.suffix_length)
+        trie.insert(search.lower(), keyword_index)
+
+    return len(result.keywords) + 1
+
+def build_search_data(status: Status, merge_subtrees=True, add_lookahead_barriers=True, add_snake_case_suffixes=True,
+                      add_camel_case_suffixes=True, merge_prefixes=True) -> bytearray:
+    symbol_count = 0
+    trie = Trie()
+    map = ResultMap()
+    for member in status.members.values():
+        if not 'page_id' in member:  # Not documented, skip
+            continue
+        result = Empty()
+        result.prefix = walktree.get_prefix(member['id'], status.members)
+        result.name = member['name']
+        result.flags = ResultFlag.from_type(ResultFlag.DEPRECATED if member['deprecated'] else ResultFlag(0),
+                                            entry_type_map[member['member_type']])
+        result.url = member['page_id'] + '.html'
+        if member['page_id'] != member['id']:
+            result.url += '#' + member['id']
+        result.keywords = []  # TODO: dox++parse should output a keywords field for all members.
+
+        # Handle function arguments
+        result.name_with_args = result.name
+        result.suffix_length = 0
+        if 'arguments' in member and member['arguments']:
+            # Some very heavily templated function parameters might cause the suffix_length to exceed 256,
+            # which won't fit into the serialized search data. However that *also* won't fit in the search
+            # result list so there's no point in storing so much. Truncate it to 48 chars which should fit
+            # the full function name in the list in most cases, yet be still long enough to be able to
+            # distinguish particular overloads.
+            result.params = ', '.join([arg['typename'] +
+                                       (' ' if arg['qualifiers'] and arg['qualifiers'][0] == 'c' else '') +
+                                       arg['qualifiers'] for arg in member['arguments']])
+            if len(result.params) > 49:
+                result.params = result.params[:48] + '…'
+            result.name_with_args += '(' + result.params + ')'
+            result.suffix_length += len(result.params.encode('utf-8')) + 2
+        if 'const' in member and member['const']:
+            result.name_with_args += ' const'
+            result.suffix_length += len(' const')
+
+        # Add the symbol with all its different prefixes and suffixes and so on
+        symbol_count += add_entry_to_search_data(result, '::', trie, map, add_lookahead_barriers,
+                                                 add_snake_case_suffixes, add_camel_case_suffixes)
+
+    for file in status.headers.values():
+        result = Empty()
+        result.prefix = file['name'].split('/')
+        result.name = result.prefix[-1]
+        result.prefix = result.prefix[:-1]
+        result.flags = ResultFlag.from_type(ResultFlag(0), entry_type_map['file'])
+                        # ResultFlag.DEPRECATED if file['deprecated'] else ResultFlag(0)
+        result.url = file['id'] + '.html'
+        result.keywords = []  # TODO: dox++parse should output a keywords field for all members.
+        result.name_with_args = result.name
+        result.suffix_length = 0
+
+        # Add the symbol with all its different prefixes and suffixes and so on
+        symbol_count += add_entry_to_search_data(result, '/', trie, map, add_lookahead_barriers,
+                                                 add_snake_case_suffixes, add_camel_case_suffixes)
+
+    for group in status.groups.values():
+        result = Empty()
+        result.prefix = walktree.get_prefix(group['id'], status.groups)
+        result.name = group['name']
+        result.flags = ResultFlag.from_type(ResultFlag(0), entry_type_map['module'])
+                        # ResultFlag.DEPRECATED if group['deprecated'] else ResultFlag(0)
+        result.url = group['id'] + '.html'
+        result.keywords = []  # TODO: dox++parse should output a keywords field for all members.
+        result.name_with_args = result.name
+        result.suffix_length = 0
+
+        # Add the symbol with all its different prefixes and suffixes and so on
+        symbol_count += add_entry_to_search_data(result, ' » ', trie, map, add_lookahead_barriers,
+                                                 add_snake_case_suffixes, add_camel_case_suffixes)
+
+    for page in status.pages.values():
+        result = Empty()
+        result.prefix = walktree.get_prefix(page['id'], status.pages, key='title')
+        result.name = page['title']
+        result.flags = ResultFlag.from_type(ResultFlag(0), entry_type_map['page'])
+                        # ResultFlag.DEPRECATED if page['deprecated'] else ResultFlag(0)
+        result.url = page['id'] + '.html'
+        result.keywords = []  # TODO: dox++parse should output a keywords field for all members.
+        result.name_with_args = result.name
+        result.suffix_length = 0
+
+        # Add the symbol with all its different prefixes and suffixes and so on
+        symbol_count += add_entry_to_search_data(result, ' » ', trie, map, add_lookahead_barriers,
+                                                 add_snake_case_suffixes, add_camel_case_suffixes)
+
+    # For each node in the trie sort the results so the found items have sane order by default
+    log.info("Indexed %d symbols for search data", symbol_count)
+    trie.sort(map)
+    return serialize_search_data(trie, map, search_type_map, symbol_count, merge_subtrees=merge_subtrees, merge_prefixes=merge_prefixes)
+
+
 def createhtml(input_file, output_dir, options, template_params):
     """
     Generates HTML pages for the documentation in the JSON file `input_file`.
@@ -712,6 +926,11 @@ def createhtml(input_file, output_dir, options, template_params):
     - 'templates': path to templates to use instead of default ones
     - 'source_files': list of source files (header files + markdown files), used to locate
                       image files referenced in documentation.
+    - 'search_add_lookahead_barriers': TODO: document
+    - 'add_snake_case_suffixes': TODO: document
+    - 'add_camel_case_suffixes': TODO: document
+    - 'search_merge_subtrees': TODO: document
+    - 'search_merge_prefixes': TODO: document
     """
 
     # Load data
@@ -814,7 +1033,28 @@ def createhtml(input_file, output_dir, options, template_params):
             f.write(rendered)
 
     # Generate search data
-    # TODO
+    if not template_params['SEARCH_DISABLED']:
+        data = build_search_data(status, add_lookahead_barriers=options['search_add_lookahead_barriers'],
+                                 add_snake_case_suffixes=options['add_snake_case_suffixes'], add_camel_case_suffixes=options['add_camel_case_suffixes'],
+                                 merge_subtrees=options['search_merge_subtrees'], merge_prefixes=options['search_merge_prefixes'])
+
+        if template_params['SEARCH_DOWNLOAD_BINARY']:
+            log.info("Writing search data to %s", searchdata_filename)
+            with open(os.path.join(output_dir, searchdata_filename), 'wb') as f:
+                f.write(data)
+        else:
+            log.info("Writing search data to %s", searchdata_filename_b85)
+            with open(os.path.join(output_dir, searchdata_filename_b85), 'wb') as f:
+                f.write(base85encode_search_data(data))
+
+        # OpenSearch metadata, if we have the base URL
+        if template_params['SEARCH_BASE_URL']:
+            log.info("writing OpenSearch metadata file")
+            template = env.get_template('opensearch.xml')
+            rendered = template.render(**template_params)
+            output = os.path.join(output_dir, 'opensearch.xml')
+            with open(output, 'w') as f:
+                f.write(rendered)
 
     # Copy over all referenced files
     for i in template_params['STYLESHEETS'] + options['extra_files'] + ([template_params['PROJECT_LOGO']] if template_params['PROJECT_LOGO'] else []) + ([template_params['FAVICON'][0]] if template_params['FAVICON'][0] else []):

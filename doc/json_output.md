@@ -74,7 +74,7 @@ A list of defined groups. Each `groups[i]` is a dictionary as follows:
 ```json
 {
    "id": "",           // unique identifier
-   "name": "",         // file name, with path from project root
+   "name": "",         // group name
    "brief": "",        // brief description, in Markdown
    "doc": "",          // full documentation, in Markdown
    "sections": [],     // (ID, title, level) for sections in "doc"
@@ -92,7 +92,7 @@ A list of pages. Each `pages[i]` is a dictionary as follows:
 ```json
 {
    "id": "",           // unique identifier
-   "title": "",        // file name, with path from project root
+   "title": "",        // page title
    "doc": "",          // full documentation, in Markdown
    "sections": [],     // (ID, title, level) for sections in "doc"
    "anchors": [],      // IDs of anchors in "doc"

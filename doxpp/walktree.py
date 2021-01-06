@@ -20,6 +20,24 @@ import json
 from . import log
 
 
+# --- get_prefix ---
+
+def get_prefix(id, members, key='name'):
+    """
+    Creates a list with the names of parents of member `id`. List excludes the name of `id` itself.
+    :param id: string.
+    :param members: dictionary created by `create_member_dict` or `create_element_dict`.
+    :param key: dictionary key to record, typically 'name' for members or groups, 'title' for pages.
+    :return: list of strings.
+    """
+    path_reverse = []
+    id = members[id]['parent']
+    while id:
+        member = members[id]
+        path_reverse.append(member[key])
+        id = member['parent']
+    return path_reverse[::-1]
+
 # --- get_fully_qualified_name ---
 
 def get_fully_qualified_name(id, members):
@@ -29,15 +47,9 @@ def get_fully_qualified_name(id, members):
     :param members: dictionary created by `create_member_dict`.
     :return: string.
     """
-    output = ''
-    while id:
-        part = members[id]['name']
-        if output:
-            output = part + '::' + output
-        else:
-            output = part
-        id = members[id]['parent']
-    return output
+    names = get_prefix(id, members)
+    names.append(members[id]['name'])
+    return '::'.join(names)
 
 
 # --- build_file_hierarchy ---
