@@ -218,8 +218,12 @@ Set to a string `"public"`, `"protected"` or `"private"`.
 
 ### "method_type" (string)
 
-Set to a string `"method"`, `"conversionfunction"`, `"constructor"` or `"destructor"`.
+Set to a string `"method"`, `"conversionfunction"`, `"assignmentoperator"`, `"constructor"` or `"destructor"`.
 
+### "explicit" (boolean)
+
+`true` or `false` depending on if the function is marked `explicit`.
+Exists only if `"method_type"` is either `"conversionfunction"` or `"constructor"`.
 
 ## macro-specific fields
 

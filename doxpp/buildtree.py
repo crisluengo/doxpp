@@ -357,6 +357,15 @@ def find_anchor_cmds(doc, status: Status):
     doc = anchor_cmd_match.sub(anchor_cmd_replace, doc)
     return doc, sections, anchors
 
+def is_token_char(char):
+    return char.isalnum() or char=='_'
+
+def ends_with_token_char(str):
+    return str and is_token_char(str[-1])
+
+def starts_with_token_char(str):
+    return str and is_token_char(str[0])
+
 
 # --- find_member ---
 
@@ -1225,6 +1234,42 @@ def is_inline(item):
             return False
     return False
 
+def is_explicit(item):
+    name = item.spelling
+    for t in item.get_tokens():
+        if t.spelling == 'explicit':
+            return True
+        if t.spelling == name:
+            return False
+    return False
+
+def get_defaulted_or_deleted(item):
+    # `item` is a declaration for a constructor, destructor or assignment operator.
+    # We look for the first '(' character, then for the matching ')' character. If the next
+    # character is '=', it will be followed by either 'default' or 'delete' (or '0').
+    # TODO: Is this logic always correct?
+    # TODO: In C++20, comparison operators can be default as well.
+    i = item.get_tokens()
+    try:
+        t = next(i)
+        while t.spelling != '(':
+            t = next(i)
+        count = 1
+        t = next(i)
+        while True:
+            if t.spelling == '(':
+                count += 1
+            elif t.spelling == ')':
+                count -= 1
+            t = next(i)
+            if count == 0:
+                break
+        if t.spelling == '=':
+            return next(i).spelling
+    except StopIteration:
+        pass
+    return ''
+
 def process_template_type_parameter(item):
     name = item.spelling
     if not name:
@@ -1381,6 +1426,7 @@ def extract_declarations(citer, parent, status: Status):
         if item.kind in cursor_kind_to_type_map:
             # What are we dealing with?
             member_type = cursor_kind_to_type_map[item.kind]
+            name = item.spelling
 
             # Find out what the actual parent is.
             # The `parent` passed in is the member where this declaration lives (lexical parent),
@@ -1442,7 +1488,6 @@ def extract_declarations(citer, parent, status: Status):
 
             # Process template parameters differently
             if member_type in ['templatenontypeparameter', 'templatetypeparameter']:
-                name = item.spelling
                 if not semantic_parent:
                     log.error("Template parameter %s doesn't have a parent.\n   in file %s",
                               name, status.current_header_name)
@@ -1492,7 +1537,7 @@ def extract_declarations(citer, parent, status: Status):
                 member_type = 'using'
 
             # Create a member data structure for this member
-            member = members.new_member('', item.spelling, member_type, semantic_parent, status.current_header['id'])
+            member = members.new_member('', name, member_type, semantic_parent, status.current_header['id'])
 
             # Find the associated documentation comment and parse it
             group = ''
@@ -1513,7 +1558,29 @@ def extract_declarations(citer, parent, status: Status):
             if member_type in ['constructor', 'destructor']:
                 if item.semantic_parent.kind == cindex.CursorKind.CLASS_TEMPLATE:
                     # Remove the "<...>" at the end of the name
-                    member['name'] = item.spelling.split('<', maxsplit=1)[0]
+                    member['name'] = name.split('<', maxsplit=1)[0]
+
+            # Fix conversion operator names
+            # Clang gives the name to the base type, not to the name of an alias as it might appear in the source code
+            if name.startswith('operator '):
+                i = item.get_tokens()
+                try:
+                    t = next(i)
+                    while t.spelling != 'operator':
+                        t = next(i)
+                    t = next(i)
+                    type = ''
+                    while t.spelling != '(':
+                        p = t.spelling
+                        if ends_with_token_char(type) and starts_with_token_char(p):
+                            p = ' ' + p
+                        type += p
+                        t = next(i)
+                    member['name'] = 'operator ' + type
+                except StopIteration:
+                    log.error("Couldn't find conversion operator type for %s\n   in file %s",
+                              name, status.current_header_name)
+                    pass
 
             # Find the group this member belongs to
             if parent_is_namespace:
@@ -1560,9 +1627,30 @@ def extract_declarations(citer, parent, status: Status):
                 member['override'] = False
                 member['const'] = item.is_const_method()
                 member['access'] = access_specifier_map[item.access_specifier]
+                if is_template and member['name'] == status.members[semantic_parent]['name']:
+                    # Templated member functions are of type 'functiontemplate',
+                    # so Clang doesn't tell us if it's a constructor or not.
+                    member_type = 'constructor'
+                    # is_converting_constructor
+                    # is_copy_constructor
+                    # is_default_constructor
+                    # is_move_constructor
+                if member_type in ['conversionfunction', 'constructor']:
+                    member['explicit'] = is_explicit(item)
+                if member['name'] == 'operator=':
+                    member_type = 'assignmentoperator'
+                if member_type in ['assignmentoperator', 'constructor', 'destructor']:
+                    v = get_defaulted_or_deleted(item)
+                    member['defaulted'] = v == 'default'
+                    member['deleted'] = v == 'delete'
+                    if member['defaulted'] != item.is_default_method():
+                        log.debug("I and Clang don't agree on the %s::%s method being defaulted" +
+                                  " (I think it is %sdefaulted)\n   in file %s",
+                                  status.members[semantic_parent]['name'], member['name'],
+                                  '' if member['defaulted'] else 'not ', status.current_header_name)
                 member['method_type'] = member_type
                 process_function_declaration(item, member)
-                if member_type != 'method':
+                if member_type in ['conversionfunction', 'constructor', 'destructor']:
                     member['return_type']['typename'] = ''
                 member_type = 'function'  # write out as function
             elif member_type == 'enumvalue':

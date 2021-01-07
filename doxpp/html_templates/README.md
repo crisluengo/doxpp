@@ -230,9 +230,9 @@ we have: `class.templated`, `class.abstract`, `class.bases`
 - `function.params`
 - `function.deprecated`
 - `function.access`
-- `function.is_defaulted` # TODO
-- `function.is_deleted` # TODO
-- `function.is_explicit` # TODO
+- `function.defaulted` # TODO
+- `function.deleted` # TODO
+- `function.explicit`
 - `function.final`
 - `function.override`
 - `function.pure_virtual`

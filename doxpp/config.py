@@ -74,7 +74,7 @@ def generate(filename: str):
 
 
 def read(filename: str):
-    config = configparser.ConfigParser()
+    config = configparser.ConfigParser(interpolation=None)
     config.read(filename)
     if not 'clang' in config:
         config['clang'] = {}
