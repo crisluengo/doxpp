@@ -155,8 +155,13 @@ class Status:
 def generate_fully_qualified_names(members, status: Status):
     for member in members:
         name = member['name']
-        if member['parent']:
-            name = status.members[member['parent']]['fully_qualified_name'] + '::<wbr />' + name
+        parent = member['parent']
+        if parent:
+            if parent in status.members:
+                name = status.members[parent]['fully_qualified_name'] + '::<wbr />' + name
+            else:
+                log.error('Member %s has as parent an unknown id %s', name, parent)
+                name = '&lt;unknown&gt;::<wbr />' + name
         member['fully_qualified_name'] = name
         if 'members' in member:
             generate_fully_qualified_names(member['members'], status)

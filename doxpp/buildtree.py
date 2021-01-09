@@ -1758,6 +1758,7 @@ def extract_declarations(citer, parent, status: Status, level = 0):
             if usr in status.member_ids:
                 id = status.member_ids[usr]
                 log.debug("Member %s (%s) already exists, merging.", id, usr)
+                member['id'] = id
                 cleanup_qualifiers(member)
                 merge_member(status.members[id], member)
             else:
