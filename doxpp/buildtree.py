@@ -1347,13 +1347,17 @@ def merge_member(member, new_member):
     # Merges the two member structures, filling in empty elements in `member` with new data.
     # We don't append documentation, only replace, because Clang passes the same document block
     # every time we encounter a re-declaration of a member.
+    # Because a class can have a forward declaration in a different file, and that file could
+    # have been processed earlier, if the existing structure has no 'brief', we replace everything.
+    # This assumes that it is the actual declaration that is documented, not the forward declaration.
+    replace = new_member['brief'] and not member['brief']
     for key in new_member:
         if key == 'members':
             for m in new_member['members']:
                 if m not in member['members']:
                     member['members'].append(m)
             continue
-        if key not in member or not member[key]:
+        if replace or (key not in member or not member[key]):
             member[key] = new_member[key]
 
 def add_undocumented_member(item: cindex.Cursor, status: Status):
@@ -1395,7 +1399,7 @@ def add_undocumented_member(item: cindex.Cursor, status: Status):
         log.error("This is unexpected!")
         return ''
 
-def extract_declarations(citer, parent, status: Status):
+def extract_declarations(citer, parent, status: Status, level = 0):
     # Recursive AST exploration, adds data to `status`.
     if not citer:
         return
@@ -1407,12 +1411,24 @@ def extract_declarations(citer, parent, status: Status):
 
         # Check the source of item
         if not item.location.file:
-            extract_declarations(item.get_children(), '', status)
+            extract_declarations(item.get_children(), '', status, level)
             continue
 
         # Ignore files other than the ones we are scanning for
         if str(item.location.file) != status.current_file_name:
             continue
+
+        # This section can be uncommented to display the full AST, useful for learning about it.
+        # semantic_parent = item.semantic_parent
+        # if semantic_parent:
+        #     semantic_parent = semantic_parent.displayname
+        # else:
+        #     semantic_parent = 'None'
+        # print('  ' * level, "- member: kind = %s, displayname = %s, spelling = %s, parent = %s, semantic_parent = %s" % (
+        #       item.kind, item.displayname, item.spelling, parent, semantic_parent))
+        # print('  ' * level, "          tokens =", [x.spelling for x in item.get_tokens()])
+        # extract_declarations(item.get_children(), '', status, level + 1)
+        # continue
 
         # Ignore unexposed things
         if item.kind == cindex.CursorKind.UNEXPOSED_DECL:
@@ -1454,6 +1470,12 @@ def extract_declarations(citer, parent, status: Status):
                         # It also also when a class member definition is in a header file that is not the
                         # header file where the class is defined, and that header file is processed first, such
                         # that the class is yet unknown.
+                        if str(item.semantic_parent.location.file) == status.current_file_name:
+                            # The semantic parent is defined in this file, this must be a template specialization
+                            log.debug("Semantic parent for %s had unknown USR, but is defined in this file: skipping.\n   in file %s",
+                                      item.semantic_parent.displayname + '::' + item.displayname, status.current_header_name)
+                            continue
+                        # The semantic parent is defined elsewhere, let's assume we'll be seeing the definition later
                         semantic_parent = add_undocumented_member(semantic_parent_item, status)
                         if not semantic_parent:
                             continue
