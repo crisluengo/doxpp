@@ -7,6 +7,7 @@
 {% macro entry_variable(variable, show_full_name=False) %}{% include 'entry-variable.html' %}{% endmacro %}
 {% macro entry_macro(macro) %}{% include 'entry-macro.html' %}{% endmacro %}
 
+{% macro details_class(class, show_full_name=False) %}{% include 'details-class.html' %}{% endmacro %}
 {% macro details_alias(alias, show_full_name=False) %}{% include 'details-alias.html' %}{% endmacro %}
 {% macro details_enum(enum, show_full_name=False) %}{% include 'details-enum.html' %}{% endmacro %}
 {% macro details_function(function, show_full_name=False) %}{% include 'details-function.html' %}{% endmacro %}
@@ -83,11 +84,11 @@
                 {% if compound.classes %}
                 <li><a href="#nested-classes">Classes</a></li>
                 {% endif %}
-                {% if compound.enums %}
-                <li><a href="#enum-members">Enums</a></li>
-                {% endif %}
                 {% if compound.aliases %}
                 <li><a href="#alias-members">Aliases</a></li>
+                {% endif %}
+                {% if compound.enums %}
+                <li><a href="#enum-members">Enums</a></li>
                 {% endif %}
                 {% if compound.functions %}
                 <li><a href="#function-members">Functions</a></li>
@@ -166,22 +167,22 @@
           </dl>
         </section>
         {% endif %}
+        {% if compound.aliases %}
+        <section id="alias-members">
+            <h2><a href="#alias-members">Aliases</a></h2>
+            <dl class="m-doc">
+                {% for function in compound.aliases %}
+                {{ entry_alias(function) }}
+                {% endfor %}
+            </dl>
+        </section>
+        {% endif %}
         {% if compound.enums %}
         <section id="enum-members">
           <h2><a href="#enum-members">Enums</a></h2>
           <dl class="m-doc">
             {% for type in compound.enums %}
 {{ entry_enum(type) }}
-            {% endfor %}
-          </dl>
-        </section>
-        {% endif %}
-        {% if compound.aliases %}
-        <section id="alias-members">
-          <h2><a href="#alias-members">Aliases</a></h2>
-          <dl class="m-doc">
-            {% for function in compound.aliases %}
-{{ entry_alias(function) }}
             {% endfor %}
           </dl>
         </section>
@@ -226,34 +227,19 @@
           </dl>
         </section>
         {% endif %}
-        {% if compound.has_enum_details %}
+        {% if compound.has_class_details %}
         <section>
-          <h2>Enum documentation</h2>
+          <h2>Class documentation</h2>
           {% for group in compound.groups %}
           {% for member in group.members %}
-          {% if member.member_type == 'enum' and member.has_details %}
-{{ details_enum(member) }}
+          {% if member.member_type in ['class', 'struct', 'union'] and member.has_details %}
+{{ details_class(member) }}
           {% endif %}
           {% endfor %}
           {% endfor %}
-          {% for member in compound.public_types %}
-          {% if member.member_type == 'enum' and member.has_details %}
-{{ details_enum(member) }}
-          {% endif %}
-          {% endfor %}
-          {% for member in compound.protected_types %}
-          {% if member.member_type == 'enum' and member.has_details %}
-{{ details_enum(member) }}
-          {% endif %}
-          {% endfor %}
-          {% for member in compound.private_types %}
-          {% if member.member_type == 'enum' and member.has_details %}
-{{ details_enum(member) }}
-          {% endif %}
-          {% endfor %}
-          {% for member in compound.related %}
-          {% if member.member_type == 'enum' and member.has_details %}
-{{ details_enum(member, show_full_name=True) }}
+          {% for member in compound.classes %}
+          {% if member.has_details %}
+{{ details_class(member) }}
           {% endif %}
           {% endfor %}
         </section>
@@ -278,6 +264,28 @@
 {{ details_alias(member, show_full_name=True) }}
           {% endif %}
           {% endfor %}
+        </section>
+        {% endif %}
+        {% if compound.has_enum_details %}
+        <section>
+            <h2>Enum documentation</h2>
+            {% for group in compound.groups %}
+            {% for member in group.members %}
+            {% if member.member_type == 'enum' and member.has_details %}
+{{ details_enum(member) }}
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+            {% for member in compound.enums %}
+            {% if member.has_details %}
+{{ details_enum(member) }}
+            {% endif %}
+            {% endfor %}
+            {% for member in compound.related %}
+            {% if member.member_type == 'enum' and member.has_details %}
+{{ details_enum(member, show_full_name=True) }}
+            {% endif %}
+            {% endfor %}
         </section>
         {% endif %}
         {% if compound.has_function_details %}

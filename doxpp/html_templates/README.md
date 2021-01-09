@@ -100,6 +100,7 @@ File/module/namespace reference pages, `compound` contains:
 - `compound.variables`
 - `compound.macros`
 - `compound.doc`
+- `compound.has_class_details`
 - `compound.has_enum_details`
 - `compound.has_alias_details`
 - `compound.has_function_details`
@@ -128,6 +129,7 @@ Class/struct/union reference pages, `compound` contains:
 - `compound.variables`
 - `compound.related`
 - `compound.doc`
+- `compound.has_class_details`
 - `compound.has_enum_details`
 - `compound.has_alias_details`
 - `compound.has_function_details`
@@ -145,6 +147,7 @@ All index pages define:
 Classes/Namespaces index pages, `index` contains:
 - `index.symbols[i].member_type`
 - `index.symbols[i].page_id`
+- `index.symbols[i].id`
 - `index.symbols[i].name`
 - `index.symbols[i].inline`
 - `index.symbols[i].deprecated`
@@ -192,6 +195,8 @@ For Entries:
 - `alias.has_template_details` # TODO
 - `alias.doc`
 
+- `class.simple` (true if it only has documented variables)
+- `class.has_details` (can only be true if `class.simple`)
 - `class.templated`
 - `class.template_parameters` (if `class.templated`)
 - `class.member_type`
@@ -203,7 +208,8 @@ For Entries:
 - `class.deprecated`
 - `class.since` # TODO
 - `class.brief`
-we have: `class.templated`, `class.abstract`, `class.bases`
+- `class.variables`
+- `class.doc`
 
 - `enum.has_details`
 - `enum.page_id`

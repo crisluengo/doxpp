@@ -6,14 +6,15 @@
 {% macro entry_file(file) %}{% include 'entry-file.html' %}{% endmacro %}
 {% macro entry_namespace(namespace) %}{% include 'entry-namespace.html' %}{% endmacro %}
 {% macro entry_class(class) %}{% include 'entry-class.html' %}{% endmacro %}
-{% macro entry_enum(enum) %}{% include 'entry-enum.html' %}{% endmacro %}
 {% macro entry_alias(alias) %}{% include 'entry-alias.html' %}{% endmacro %}
+{% macro entry_enum(enum) %}{% include 'entry-enum.html' %}{% endmacro %}
 {% macro entry_function(function) %}{% include 'entry-function.html' %}{% endmacro %}
 {% macro entry_variable(variable) %}{% include 'entry-variable.html' %}{% endmacro %}
 {% macro entry_macro(macro) %}{% include 'entry-macro.html' %}{% endmacro %}
 
-{% macro details_enum(enum) %}{% include 'details-enum.html' %}{% endmacro %}
+{% macro details_class(class) %}{% include 'details-class.html' %}{% endmacro %}
 {% macro details_alias(alias) %}{% include 'details-alias.html' %}{% endmacro %}
+{% macro details_enum(enum) %}{% include 'details-enum.html' %}{% endmacro %}
 {% macro details_function(function) %}{% include 'details-function.html' %}{% endmacro %}
 {% macro details_variable(variable) %}{% include 'details-variable.html' %}{% endmacro %}
 {% macro details_macro(macro) %}{% include 'details-macro.html' %}{% endmacro %}
@@ -53,11 +54,11 @@
                 {% if compound.classes %}
                 <li><a href="#nested-classes">Classes</a></li>
                 {% endif %}
-                {% if compound.enums %}
-                <li><a href="#enum-members">Enums</a></li>
-                {% endif %}
                 {% if compound.aliases %}
                 <li><a href="#alias-members">Aliases</a></li>
+                {% endif %}
+                {% if compound.enums %}
+                <li><a href="#enum-members">Enums</a></li>
                 {% endif %}
                 {% if compound.functions %}
                 <li><a href="#function-members">Functions</a></li>
@@ -107,22 +108,22 @@
           </dl>
         </section>
         {% endif %}
+        {% if compound.aliases %}
+        <section id="alias-members">
+            <h2><a href="#alias-members">Aliases</a></h2>
+            <dl class="m-doc">
+                {% for alias in compound.aliases %}
+                {{ entry_alias(alias) }}
+                {% endfor %}
+            </dl>
+        </section>
+        {% endif %}
         {% if compound.enums %}
         <section id="enum-members">
           <h2><a href="#enum-members">Enums</a></h2>
           <dl class="m-doc">
             {% for enum in compound.enums %}
 {{ entry_enum(enum) }}
-            {% endfor %}
-          </dl>
-        </section>
-        {% endif %}
-        {% if compound.aliases %}
-        <section id="alias-members">
-          <h2><a href="#alias-members">Aliases</a></h2>
-          <dl class="m-doc">
-            {% for alias in compound.aliases %}
-{{ entry_alias(alias) }}
             {% endfor %}
           </dl>
         </section>
@@ -157,22 +158,32 @@
           </dl>
         </section>
         {% endif %}
+        {% if compound.has_class_details %}
+        <section>
+            <h2>Class documentation</h2>
+            {% for class in compound.classes %}
+            {% if class.has_details %}
+            {{ details_class(class) }}
+            {% endif %}
+            {% endfor %}
+        </section>
+        {% endif %}
+        {% if compound.has_alias_details %}
+        <section>
+            <h2>Alias documentation</h2>
+            {% for alias in compound.aliases %}
+            {% if alias.has_details %}
+            {{ details_alias(alias) }}
+            {% endif %}
+            {% endfor %}
+        </section>
+        {% endif %}
         {% if compound.has_enum_details %}
         <section>
           <h2>Enum documentation</h2>
           {% for enum in compound.enums %}
           {% if enum.has_details %}
 {{ details_enum(enum) }}
-          {% endif %}
-          {% endfor %}
-        </section>
-        {% endif %}
-        {% if compound.has_alias_details %}
-        <section>
-          <h2>Alias documentation</h2>
-          {% for alias in compound.aliases %}
-          {% if alias.has_details %}
-{{ details_alias(alias) }}
           {% endif %}
           {% endfor %}
         </section>
