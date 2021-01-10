@@ -40,14 +40,13 @@
           "override": false,
           "const": false,
           "access": "public",
+          "explicit": false,
+          "defaulted": false,
+          "deleted": false,
           "method_type": "constructor",
           "constexpr": false,
           "noexcept": false,
-          "return_type": {
-            "typename": "void",
-            "qualifiers": "",
-            "id": ""
-          },
+          "return_type": {},
           "arguments": []
         },
         {
@@ -71,14 +70,12 @@
           "override": false,
           "const": false,
           "access": "public",
+          "defaulted": false,
+          "deleted": false,
           "method_type": "destructor",
           "constexpr": false,
           "noexcept": false,
-          "return_type": {
-            "typename": "void",
-            "qualifiers": "",
-            "id": ""
-          },
+          "return_type": {},
           "arguments": []
         }
       ],

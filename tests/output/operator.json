@@ -13,12 +13,13 @@
       "header": "file--operator-h",
       "group": "",
       "deprecated": false,
+      "inline": false,
       "members": [
         {
           "id": "N-A",
           "name": "A",
           "brief": "Struct N::A",
-          "doc": "Contains [`operator<`](#N-A-operator%3C-N-A-CL), and [`operator int *`](#N-A-operator%20int%20%2A-C).",
+          "doc": "Contains [`operator<`](#N-A-operator%3C-N-A-CL), and [`operator int*`](#N-A-operator%20int%2A-C).",
           "sections": [],
           "anchors": [],
           "member_type": "struct",
@@ -73,8 +74,8 @@
               ]
             },
             {
-              "id": "N-A-operator%20int%20%2A-C",
-              "name": "operator int *",
+              "id": "N-A-operator%20int%2A-C",
+              "name": "operator int*",
               "brief": "",
               "doc": "",
               "sections": [],
@@ -93,14 +94,11 @@
               "override": false,
               "const": true,
               "access": "public",
+              "explicit": false,
               "method_type": "conversionfunction",
               "constexpr": false,
               "noexcept": false,
-              "return_type": {
-                "typename": "int",
-                "qualifiers": "*",
-                "id": ""
-              },
+              "return_type": {},
               "arguments": []
             }
           ],

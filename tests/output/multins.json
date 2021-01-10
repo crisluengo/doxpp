@@ -13,6 +13,7 @@
       "header": "file--multins-h",
       "group": "",
       "deprecated": false,
+      "inline": false,
       "members": [
         {
           "id": "foo-A",

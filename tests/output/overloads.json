@@ -86,14 +86,13 @@
           "override": false,
           "const": false,
           "access": "public",
+          "explicit": false,
+          "defaulted": false,
+          "deleted": false,
           "method_type": "constructor",
           "constexpr": false,
           "noexcept": false,
-          "return_type": {
-            "typename": "void",
-            "qualifiers": "",
-            "id": ""
-          },
+          "return_type": {},
           "arguments": [
             {
               "typename": "double",
@@ -132,14 +131,13 @@
           "override": false,
           "const": false,
           "access": "public",
+          "explicit": false,
+          "defaulted": false,
+          "deleted": false,
           "method_type": "constructor",
           "constexpr": false,
           "noexcept": false,
-          "return_type": {
-            "typename": "void",
-            "qualifiers": "",
-            "id": ""
-          },
+          "return_type": {},
           "arguments": [
             {
               "typename": "double",
@@ -178,14 +176,13 @@
           "override": false,
           "const": false,
           "access": "public",
+          "explicit": false,
+          "defaulted": true,
+          "deleted": false,
           "method_type": "constructor",
           "constexpr": false,
           "noexcept": false,
-          "return_type": {
-            "typename": "void",
-            "qualifiers": "",
-            "id": ""
-          },
+          "return_type": {},
           "arguments": [
             {
               "typename": "AClass",
@@ -217,14 +214,13 @@
           "override": false,
           "const": false,
           "access": "public",
+          "explicit": false,
+          "defaulted": true,
+          "deleted": false,
           "method_type": "constructor",
           "constexpr": false,
           "noexcept": false,
-          "return_type": {
-            "typename": "void",
-            "qualifiers": "",
-            "id": ""
-          },
+          "return_type": {},
           "arguments": [
             {
               "typename": "AClass",
@@ -256,14 +252,12 @@
           "override": false,
           "const": false,
           "access": "public",
+          "defaulted": false,
+          "deleted": false,
           "method_type": "destructor",
           "constexpr": false,
           "noexcept": false,
-          "return_type": {
-            "typename": "void",
-            "qualifiers": "",
-            "id": ""
-          },
+          "return_type": {},
           "arguments": []
         },
         {
@@ -287,7 +281,9 @@
           "override": false,
           "const": false,
           "access": "public",
-          "method_type": "method",
+          "defaulted": true,
+          "deleted": false,
+          "method_type": "assignmentoperator",
           "constexpr": false,
           "noexcept": false,
           "return_type": {
@@ -326,7 +322,9 @@
           "override": false,
           "const": false,
           "access": "public",
-          "method_type": "method",
+          "defaulted": true,
+          "deleted": false,
+          "method_type": "assignmentoperator",
           "constexpr": false,
           "noexcept": false,
           "return_type": {

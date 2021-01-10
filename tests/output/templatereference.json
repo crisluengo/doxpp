@@ -37,6 +37,13 @@
       "group": "",
       "deprecated": false,
       "templated": true,
+      "template_parameters": [
+        {
+          "name": "T",
+          "type": "type",
+          "default": null
+        }
+      ],
       "abstract": false,
       "final": false,
       "bases": [],
@@ -55,6 +62,8 @@
           "header": "file--templatereference-h",
           "group": "",
           "deprecated": false,
+          "templated": false,
+          "access": "public",
           "type": {
             "typename": "T",
             "qualifiers": "",
@@ -62,14 +71,7 @@
           }
         }
       ],
-      "related": [],
-      "template_parameters": [
-        {
-          "name": "T",
-          "type": "type",
-          "default": null
-        }
-      ]
+      "related": []
     },
     {
       "id": "WithInnerIntType",
@@ -84,6 +86,7 @@
       "header": "file--templatereference-h",
       "group": "",
       "deprecated": false,
+      "templated": false,
       "type": {
         "typename": "std::allocator<int> >",
         "qualifiers": "",

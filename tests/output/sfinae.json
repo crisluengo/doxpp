@@ -14,6 +14,22 @@
       "group": "",
       "deprecated": false,
       "templated": true,
+      "template_parameters": [
+        {
+          "name": "A",
+          "type": "type",
+          "default": null
+        },
+        {
+          "name": "<SFINAE>",
+          "type": {
+            "typename": "",
+            "qualifiers": [],
+            "id": ""
+          },
+          "default": "0"
+        }
+      ],
       "abstract": false,
       "final": false,
       "bases": [],
@@ -43,19 +59,7 @@
           "constexpr": false
         }
       ],
-      "related": [],
-      "template_parameters": [
-        {
-          "name": "A",
-          "type": "type",
-          "default": null
-        },
-        {
-          "name": "",
-          "type": "<SFINAE>",
-          "default": "0"
-        }
-      ]
+      "related": []
     }
   ],
   "headers": [

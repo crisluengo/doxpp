@@ -13,6 +13,7 @@
       "header": "file--namespace-h",
       "group": "",
       "deprecated": false,
+      "inline": false,
       "members": [
         {
           "id": "A-B",
@@ -72,7 +73,7 @@
           "group": "",
           "deprecated": false,
           "scoped": false,
-          "type": "`unsigned int`",
+          "type": "unsigned int",
           "members": [
             {
               "id": "A-E-E_1",

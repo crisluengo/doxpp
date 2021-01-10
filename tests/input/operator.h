@@ -8,7 +8,7 @@
 namespace N
 {
    /** Struct N::A
-    * Contains \ref "operator<", and \ref "operator int *".
+    * Contains \ref "operator<", and \ref "operator int*".
     */
    struct A
    {

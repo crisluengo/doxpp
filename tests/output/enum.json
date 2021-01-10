@@ -14,7 +14,7 @@
       "group": "",
       "deprecated": false,
       "scoped": false,
-      "type": "`unsigned int`",
+      "type": "unsigned int",
       "members": [
         {
           "id": "A-A_1",
