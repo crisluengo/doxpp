@@ -21,7 +21,7 @@
               {% else %}
               using <a href="#{{ alias.id }}" class="m-doc-self">{{ alias.fully_qualified_name if show_full_name else alias.name }}</a> = {{ alias.type.type }}
               {% endif %}
-              {% if alias.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif alias.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}{% if alias.since %} {{ alias.since }}{% endif %}
+              {%- if alias.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif alias.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}{% if alias.since %} {{ alias.since }}{% endif %}
               {# the empty line has to be here to prevent the lines from merging #}
 
               {% if alias.include and not compound.templated and not alias.templated %}

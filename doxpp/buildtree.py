@@ -1717,6 +1717,7 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                 member['members'] = []
                 process_children = True
             elif member_type in ['typedef', 'using']:
+                member['oldfashioned'] = member_type == 'typedef'
                 member_type = 'alias'
                 member['templated'] = is_template
                 if is_template:

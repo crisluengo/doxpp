@@ -104,6 +104,10 @@ For members of type `"enumvalue"` (enum members), the group is always the empty 
 
 See below under "The type dictionary".
 
+### "oldfashioned" (boolean)
+
+`true` if this is a `typedef` declaration, `false` if it is a `using` declaration.
+
 
 ## class- or struct-specific fields
 

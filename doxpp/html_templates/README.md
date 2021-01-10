@@ -55,10 +55,7 @@ Reference pages:
 - `namespace.html`
 - `page.html`
 - `struct.html`
-- `union.html` -> do we want to keep these inline?
-
-TODO: If we keep unions inline, then we should also put structs and classes that only have public
-member variables inline.
+- `union.html`
 
 ---
 
@@ -191,7 +188,7 @@ For Entries:
 - `alias.since` # TODO
 - `alias.brief`
 - `alias.include`
-- `alias.oldfashioned` # TODO
+- `alias.oldfashioned`
 - `alias.has_template_details` # TODO
 - `alias.doc`
 
@@ -236,8 +233,8 @@ For Entries:
 - `function.params`
 - `function.deprecated`
 - `function.access`
-- `function.defaulted` # TODO
-- `function.deleted` # TODO
+- `function.defaulted`
+- `function.deleted`
 - `function.explicit`
 - `function.final`
 - `function.override`

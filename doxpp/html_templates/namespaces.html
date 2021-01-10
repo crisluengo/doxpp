@@ -9,13 +9,13 @@
           {% for i in index.symbols|selectattr('member_type', 'equalto', 'namespace') recursive %}
           {% if i.has_child_namespace %}
           <li class="m-doc-collapsible">
-            <a href="#" onclick="return toggle(this)">{{ i.member_type }}</a> <a href="{{ i.page_id }}.html" class="m-doc">{{ i.name }}</a>{% if i.inline %} <span class="m-label m-flat m-info">inline</span>{% endif %}{% if i.deprecated %} <span class="m-label m-danger">{{ i.deprecated }}</span>{% endif %}{% if i.since %} {{ i.since }}{% endif %}<br><span class="m-doc">{{ i.brief }}</span>
+            <a href="#" onclick="return toggle(this)">{{ i.member_type }}</a> <a href="{{ i.page_id }}.html" class="m-doc">{{ i.name }}</a>{% if i.inline %} <span class="m-label m-flat m-info">inline</span>{% endif %}{% if i.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}{% if i.since %} {{ i.since }}{% endif %}<br><span class="m-doc">{{ i.brief }}</span>
             <ul class="m-doc">
 {{ loop(i.children|selectattr('member_type', 'equalto', 'namespace'))|rtrim|indent(4, true) }}
             </ul>
           </li>
           {% else %}
-          <li>{{ i.member_type }} <a href="{{ i.page_id }}.html" class="m-doc">{{ i.name }}</a>{% if i.inline %} <span class="m-label m-flat m-info">inline</span>{% endif %}{% if i.deprecated %} <span class="m-label m-danger">{{ i.deprecated }}</span>{% endif %}{% if i.since %} {{ i.since }}{% endif %}<br><span class="m-doc">{{ i.brief }}</span></li>
+          <li>{{ i.member_type }} <a href="{{ i.page_id }}.html" class="m-doc">{{ i.name }}</a>{% if i.inline %} <span class="m-label m-flat m-info">inline</span>{% endif %}{% if i.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}{% if i.since %} {{ i.since }}{% endif %}<br><span class="m-doc">{{ i.brief }}</span></li>
           {% endif %}
           {% endfor %}
         </ul>

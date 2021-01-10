@@ -34,7 +34,7 @@
                   {% set j = joiner(', ') %}
                   template&lt;{% for t in variable.template_parameters %}{{ j() }}{{ t.type }}{% if t.name %} {{ t.name }}{% endif %}{% if t.default %} = {{ t.default }}{% endif%}{% endfor %}&gt;
                   {% endif %}
-                  {%+ if variable.static %}static {% elif variable.mutable %}mutable {% endif %}{{ variable.type.type }} <a href="#{{ variable.id }}" class="m-doc-self" id="{{ variable.id }}">{{ variable.name }}</a>{% if variable.deprecated %} <span class="m-label m-danger">{{ variable.deprecated }}</span>{% endif %}{% if variable.access == 'protected' %} <span class="m-label m-flat m-warning">protected</span>{% elif variable.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}{% if variable.constexpr %} <span class="m-label m-flat m-primary">constexpr</span>{% endif %}{% if variable.since %} {{ variable.since }}{% endif %}
+                  {%+ if variable.static %}static {% elif variable.mutable %}mutable {% endif %}{{ variable.type.type }} <a href="#{{ variable.id }}" class="m-doc-self" id="{{ variable.id }}">{{ variable.name }}</a>{% if variable.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}{% if variable.access == 'protected' %} <span class="m-label m-flat m-warning">protected</span>{% elif variable.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}{% if variable.constexpr %} <span class="m-label m-flat m-primary">constexpr</span>{% endif %}{% if variable.since %} {{ variable.since }}{% endif %}
                   </td>
                   <td>
                   {% if variable.brief %}
