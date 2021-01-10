@@ -175,6 +175,7 @@ The value of the enumerator constant.
 ### "return_type"  (dictionary)
 
 The function's return type. See below under "The type dictionary".
+For constructors, destructors and conversion functions (see `"method_type"`) this key is empty.
 
 ### "arguments" (list)
 

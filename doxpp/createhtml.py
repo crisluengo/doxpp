@@ -669,7 +669,7 @@ def parse_types(status: Status, doc_link_class):
     for member in status.members.values():
         if 'type' in member and isinstance(member['type'], dict):
             render_type(member['type'], status, doc_link_class)
-        if 'return_type' in member and isinstance(member['return_type'], dict):
+        if 'return_type' in member and member['return_type']:
             render_type(member['return_type'], status, doc_link_class)
         if 'arguments' in member:
             for arg in member['arguments']:

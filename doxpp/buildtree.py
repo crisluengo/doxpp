@@ -535,7 +535,7 @@ def post_process_types(members):
         collect_template_params(member, template_params, members)
         if 'type' in member and isinstance(member['type'], dict):
             member['type']['id'] = get_type_id_or_empty_string(member['type'], template_params, members)
-        if 'return_type' in member and isinstance(member['return_type'], dict):
+        if 'return_type' in member and member['return_type']:
             member['return_type']['id'] = get_type_id_or_empty_string(member['return_type'], template_params, members)
         if 'arguments' in member:
             for arg in member['arguments']:
@@ -551,7 +551,7 @@ def cleanup_qualifiers(member):
     # Replace 'qualifiers' member in 'type' dicts with a string
     if 'type' in member and isinstance(member['type'], dict) and member['type']:
         member['type']['qualifiers'] = ''.join(member['type']['qualifiers'])
-    if 'return_type' in member and isinstance(member['return_type'], dict):
+    if 'return_type' in member and member['return_type']:
         member['return_type']['qualifiers'] = ''.join(member['return_type']['qualifiers'])
     if 'arguments' in member:
         for arg in member['arguments']:
@@ -1673,7 +1673,7 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                 member['method_type'] = member_type
                 process_function_declaration(item, member)
                 if member_type in ['conversionfunction', 'constructor', 'destructor']:
-                    member['return_type']['typename'] = ''
+                    member['return_type'] = {}
                 member_type = 'function'  # write out as function
             elif member_type == 'enumvalue':
                 member['value'] = item.enum_value
