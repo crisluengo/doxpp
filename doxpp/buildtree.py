@@ -1427,7 +1427,8 @@ def extract_declarations(citer, parent, status: Status, level = 0):
         # print('  ' * level, "- member: kind = %s, displayname = %s, spelling = %s, parent = %s, semantic_parent = %s" % (
         #       item.kind, item.displayname, item.spelling, parent, semantic_parent))
         # print('  ' * level, "          tokens =", [x.spelling for x in item.get_tokens()])
-        # extract_declarations(item.get_children(), '', status, level + 1)
+        # print('  ' * level, "          comment =", item.raw_comment)
+        # extract_declarations(item.get_children(), item.displayname, status, level + 1)
         # continue
 
         # Ignore unexposed things
@@ -1438,6 +1439,7 @@ def extract_declarations(citer, parent, status: Status, level = 0):
         if item.kind == cindex.CursorKind.CXX_FINAL_ATTR:
             # This should only happen for classes
             status.members[parent]['final'] = True
+            continue
 
         if item.kind in cursor_kind_to_type_map:
             # What are we dealing with?
@@ -1445,10 +1447,12 @@ def extract_declarations(citer, parent, status: Status, level = 0):
             name = item.spelling
 
             # Find out what the actual parent is.
+            #
             # The `parent` passed in is the member where this declaration lives (lexical parent),
             # but it not necessarily the actual (semantic) parent.
             # For example a class method defined outside the class body will have as the `parent` whatever
             # namespace this definition is written inside, rather than the class.
+            #
             # But for a using template, for some reason, the semantic parent of the template parameters is
             # set to the enclosing namespace rather than the using statement:
             # - namespace
@@ -1523,6 +1527,14 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                 else:
                     param = process_template_nontype_parameter(item)
                 status.members[semantic_parent]['template_parameters'].append(param)
+                continue
+
+            # Process actual using element of templated using directive differently
+            # We've already created the alias member, we are just missing the type
+            if member_type == 'using' and parent and status.members[parent]['member_type'] == 'alias':
+                type = process_type(item.underlying_typedef_type, item)
+                type['qualifiers'] = ''.join(type['qualifiers'])
+                status.members[parent]['type'] = type
                 continue
 
             # Disambiguate templated types:
@@ -1711,12 +1723,7 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                     member['template_parameters'] = []
                 if not parent_is_namespace:
                     member['access'] = access_specifier_map[item.access_specifier]
-                type = process_type(item.underlying_typedef_type, item)
-                if type['typename']:
-                    member['type'] = type
-                else:
-                    member['type'] = {}  # This happens if we're processing a 'usingtemplate'. Leave the type
-                    #                      empty so that it can be replaced later
+                member['type'] = process_type(item.underlying_typedef_type, item)
                 process_children = is_template
             elif member_type == 'union':
                 if not item.is_definition():
