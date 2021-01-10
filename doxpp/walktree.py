@@ -92,6 +92,8 @@ def build_file_hierarchy(headers, directories_first=True):
     """
     out = []
     for file in sorted(headers, key=lambda x: x['name']):
+        if not file['page_id']:
+            continue
         parts = split_path(file['name'])
         assign_file_part_recursive(parts, file, out)
     if directories_first:

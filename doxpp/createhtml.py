@@ -187,6 +187,13 @@ def create_page(compound, status: Status):
     document_member_on_page(compound, page_id, status)
     status.html_pages[page_id] = compound
 
+def delete_page(compound, status: Status):
+    del status.id_map[compound['id']]
+    del status.html_pages[compound['page_id']]
+    compound['page_id'] = ''
+    # This function is only evert called for undocumented compounds, which necessarily will not have any
+    # sections or anchors, so we don't have to worry about undoing any actions by `register_anchors_to_page()`.
+
 def show_member(member, status: Status):
     if not (status.show_undocumented or member['brief'] or (member['member_type'] == 'enum' and member['has_value_details'])):
         return False
@@ -441,10 +448,6 @@ def assign_page(status: Status):
         add_compound_member_lists(group)
         group['member_type'] = 'module'
         create_page(group, status)
-    # Assign sub-groups to be shown in parent group's page; they're always sorted
-    for group in status.groups.values():
-        group['modules'] = [status.groups[id] for id in group['subgroups']]
-        group['modules'].sort(key=lambda x: x['name'].casefold())
     # Prepare class and namespace members with needed fields. Also:
     #  - find out if enum members have documented values
     #  - find out if namespace members all have the same header file, and reset namespace header if not
@@ -477,6 +480,21 @@ def assign_page(status: Status):
     for member in status.members.values():
         if member['id'] and member['member_type'] == 'namespace':
             find_header_file(member)
+    # Don't show undocumented header files that don't list any members
+    for header in status.headers.values():
+        if not compound_has_documented_members(header) and not header['brief']:
+            delete_page(header, status)
+    # Don't show undocumented groups (modules) that don't list any members (these are unlikely to exist...)
+    for group in status.groups.values():
+        if not compound_has_documented_members(group) and not group['brief']:
+            delete_page(group, status)
+    # Assign sub-groups to be shown in parent group's page; they're always sorted
+    for group in status.groups.values():
+        group['modules'] = []
+        for id in group['subgroups']:
+            if status.groups[id]['page_id']:
+                group['modules'].append(status.groups[id])
+        group['modules'].sort(key=lambda x: x['name'].casefold())
     # All pages have a page, obviously
     for page in status.pages.values():
         page['member_type'] = 'page'
@@ -514,6 +532,8 @@ def create_indices(status: Status):
     # Modules (groups)
     status.data['groups'].sort(key=lambda x: x['name'].casefold())
     for group in status.data['groups']:
+        if not group['page_id']:
+            continue
         if not group['parent']:
             index['modules'].append(group)
         group['children'] = group['modules']
@@ -886,7 +906,7 @@ def build_search_data(status: Status, merge_subtrees=True, add_lookahead_barrier
     trie = Trie()
     map = ResultMap()
     for member in status.members.values():
-        if not 'page_id' in member:  # Not documented, skip
+        if not 'page_id' in member or not member['page_id']:  # Not documented, skip
             continue
         result = Empty()
         result.prefix = walktree.get_prefix(member['id'], status.members)
@@ -923,6 +943,8 @@ def build_search_data(status: Status, merge_subtrees=True, add_lookahead_barrier
                                                  add_snake_case_suffixes, add_camel_case_suffixes)
 
     for file in status.headers.values():
+        if not 'page_id' in file or not file['page_id']:  # Not documented, skip
+            continue
         result = Empty()
         result.prefix = file['name'].split('/')
         result.name = result.prefix[-1]
@@ -939,6 +961,8 @@ def build_search_data(status: Status, merge_subtrees=True, add_lookahead_barrier
                                                  add_snake_case_suffixes, add_camel_case_suffixes)
 
     for group in status.groups.values():
+        if not 'page_id' in group or not group['page_id']:  # Not documented, skip
+            continue
         result = Empty()
         result.prefix = walktree.get_prefix(group['id'], status.groups)
         result.name = group['name']
