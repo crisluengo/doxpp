@@ -6,7 +6,9 @@
                 template&lt;{% for t in compound.template_parameters %}{{ j() }}{{ t.type }} {% if t.name %}{{ t.name }}{% else %}_{{ loop.index }}{% endif %}{% endfor %}&gt;
               </div>
               {% endif %}
-              {{ class.member_type }} <a href="#{{ class.id }}" class="m-doc-self">{{ class.fully_qualified_name if show_full_name else class.name }}</a>{% if class.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif class.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}{% if class.since %} {{ class.since }}{% endif %}
+              {{ class.member_type }} <a href="#{{ class.id }}" class="m-doc-self">{{ class.fully_qualified_name if show_full_name else class.name }}</a>
+              {%- if class.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif class.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}
+              {% if class.since %} {{ class.since }}{% endif %}
               {# not sure why there needs to be this space #}
 
               {% if class.include %}
@@ -34,7 +36,11 @@
                   {% set j = joiner(', ') %}
                   template&lt;{% for t in variable.template_parameters %}{{ j() }}{{ t.type }}{% if t.name %} {{ t.name }}{% endif %}{% if t.default %} = {{ t.default }}{% endif%}{% endfor %}&gt;
                   {% endif %}
-                  {%+ if variable.static %}static {% elif variable.mutable %}mutable {% endif %}{{ variable.type.type }} <a href="#{{ variable.id }}" class="m-doc-self" id="{{ variable.id }}">{{ variable.name }}</a>{% if variable.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}{% if variable.access == 'protected' %} <span class="m-label m-flat m-warning">protected</span>{% elif variable.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}{% if variable.constexpr %} <span class="m-label m-flat m-primary">constexpr</span>{% endif %}{% if variable.since %} {{ variable.since }}{% endif %}
+                  {%+ if variable.static %}static {% elif variable.mutable %}mutable {% endif %}{{ variable.type.type }} <a href="#{{ variable.id }}" class="m-doc-self" id="{{ variable.id }}">{{ variable.name }}</a>
+                  {%- if variable.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}
+                  {% if variable.access == 'protected' %} <span class="m-label m-flat m-warning">protected</span>{% elif variable.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}
+                  {% if variable.constexpr %} <span class="m-label m-flat m-primary">constexpr</span>{% endif %}
+                  {% if variable.since %} {{ variable.since }}{% endif %}
                   </td>
                   <td>
                   {% if variable.brief %}

@@ -1,2 +1,4 @@
-            <dt>file <a href="{{ file.page_id }}.html" class="m-doc">{{ file.name }}</a>{% if file.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}{% if file.since %} {{ file.since }}{% endif %}</dt>
+            <dt>file <a href="{{ file.page_id }}.html" class="m-doc">{{ file.name }}</a>
+              {%- if file.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}
+              {% if file.since %} {{ file.since }}{% endif %}</dt>
             <dd>{{ file.brief }}</dd>
