@@ -214,7 +214,7 @@ def class_has_documented_members(compound):
 def class_is_simple(compound):  # This is true if it has no documented members other than variables
     return not (compound['typeless_functions'] or compound['groups'] or compound['groups_names'] or
                 compound['classes'] or compound['enums'] or compound['aliases'] or compound['functions'] or
-                compound['related'])
+                compound['related'] or compound['bases'] or compound['derived'])
 
 def compound_has_documented_members(compound):  # not for classes
     return compound['modules'] or compound['namespaces'] or compound['classes'] or compound['enums'] or \
@@ -432,6 +432,30 @@ def find_header_file(compound):
         compound_header = ''
     compound['header'] = compound_header
 
+def process_base_and_derived_lists(status: Status):
+    for member in status.members.values():
+        if 'bases' in member and member['bases']:
+            member['base_classes'] = []
+            for base in member['bases']:
+                if 'id' in base:
+                    tmp = status.members[base['id']].copy()  # we make a copy so we can change the 'access' value.
+                    tmp['access'] = base['access']
+                    member['base_classes'].append(tmp)
+                else:
+                    tmp = {
+                        'member_type': 'class',  # TODO: we don't know, could be struct.
+                        'id': '',
+                        'page_id': '',
+                        'name': base['typename'],
+                        'fully_qualified_name': base['typename'],
+                        'access': base['access']
+                    }
+                    member['base_classes'].append(tmp)
+        if 'derived' in member and member['derived']:
+            member['derived_classes'] = []
+            for id in member['derived']:
+                member['derived_classes'].append(status.members[id])
+
 def assign_page(status: Status):
     # TODO: Add option `show_if_documented_children`
     # All header files will have a page, whether they're documented or not
@@ -471,6 +495,8 @@ def assign_page(status: Status):
     }
     add_compound_member_lists(base)
     process_namespace(base, status)
+    # Fix base and derived class lists
+    process_base_and_derived_lists(status)
     # Assign a header file to groups and namespaces
     for member in status.members.values():
         if member['id'] and member['header']:

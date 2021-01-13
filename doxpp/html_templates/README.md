@@ -115,8 +115,8 @@ Class/struct/union reference pages, `compound` contains:
 - `compound.brief`
 - `compound.has_template_details` # TODO
 - `compound.sections`
-- `compound.base_classes` # TODO
-- `compound.derived_classes` # TODO
+- `compound.base_classes`
+- `compound.derived_classes`
 - `compound.typeless_functions`
 - `compound.groups`
 - `compound.classes`
