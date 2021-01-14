@@ -237,7 +237,6 @@ def add_class_member_lists(compound):
     compound['aliases'] = []
     compound['functions'] = []
     compound['variables'] = []
-    compound['related'] = []
     add_compound_member_booleans(compound)
 
 def add_compound_member_lists(compound):  # not for classes
@@ -335,7 +334,14 @@ def process_namespace_member(compound, member, status: Status):
     elif show_member(member, status):
         if member['relates']:
             page_id = member['relates']
-            status.get_compound(page_id)['related'].append(member)
+            # Replace the ID in the list of related members by the member itself
+            related_list = status.get_compound(page_id)['related']
+            try:
+                index = related_list.index(member['id'])
+                related_list[index] = member
+            except ValueError:
+                # This should not occur, but let's make sure
+                related_list.append(member)
         elif member['group']:
             page_id = member['group']
         elif compound['id']:
@@ -432,7 +438,7 @@ def find_header_file(compound):
         compound_header = ''
     compound['header'] = compound_header
 
-def process_base_and_derived_lists(status: Status):
+def process_base_derived_related_lists(status: Status):
     for member in status.members.values():
         if 'bases' in member and member['bases']:
             member['base_classes'] = []
@@ -455,6 +461,12 @@ def process_base_and_derived_lists(status: Status):
             member['derived_classes'] = []
             for id in member['derived']:
                 member['derived_classes'].append(status.members[id])
+        if 'related' in member and member['related']:
+            related_list = member['related']
+            member['related'] = []
+            for related in related_list:
+                if isinstance(related, dict):
+                    member['related'].append(related)
 
 def assign_page(status: Status):
     # TODO: Add option `show_if_documented_children`
@@ -495,8 +507,8 @@ def assign_page(status: Status):
     }
     add_compound_member_lists(base)
     process_namespace(base, status)
-    # Fix base and derived class lists
-    process_base_and_derived_lists(status)
+    # Fix base and derived class lists, and related member lists
+    process_base_derived_related_lists(status)
     # Assign a header file to groups and namespaces
     for member in status.members.values():
         if member['id'] and member['header']:
@@ -681,33 +693,32 @@ def parse_markdown(status: Status):
 
 def render_type(type, status: Status, doc_link_class):
     typename = html.escape(type['typename'])
-    if not typename:
-        return
-    if type['id']:
-        typename = '<a href="' + status.get_link(type['id']) + '" class="' + doc_link_class + '">' + typename + '</a>'
-    if type['qualifiers']:
-        if type['qualifiers'][0] == 'c':
-            typename += ' '
-        typename += html.escape(type['qualifiers'])
-    type['type'] = typename
+    if typename:
+        if type['id']:
+            typename = '<a href="' + status.get_link(type['id']) + '" class="' + doc_link_class + '">' + typename + '</a>'
+        if type['qualifiers']:
+            if type['qualifiers'][0] == 'c':
+                typename += ' '
+            typename += html.escape(type['qualifiers'])
+    return typename
 
 def parse_types(status: Status, doc_link_class):
     for member in status.members.values():
         if 'type' in member and isinstance(member['type'], dict):
-            render_type(member['type'], status, doc_link_class)
+            member['type']['type'] = render_type(member['type'], status, doc_link_class)
         if 'return_type' in member and member['return_type']:
-            render_type(member['return_type'], status, doc_link_class)
+            member['return_type']['type'] = render_type(member['return_type'], status, doc_link_class)
         if 'arguments' in member:
             for arg in member['arguments']:
-                render_type(arg, status, doc_link_class)
+                arg['type'] = render_type(arg, status, doc_link_class)
         if 'template_parameters' in member:
             for arg in member['template_parameters']:
                 if arg['type'] == 'type':
                     arg['type'] = 'typename'
                     if arg['default']:
-                        render_type(arg['default'], status, doc_link_class)
+                        arg['default'] = render_type(arg['default'], status, doc_link_class)
                 else:  # isinstance(arg['type'], 'dict'):
-                    render_type(arg['type'], status, doc_link_class)
+                    arg['type'] = render_type(arg['type'], status, doc_link_class)
                 arg['name'] = html.escape(arg['name'])  # just in case this is "<SFINAE>".
 
 
@@ -781,6 +792,7 @@ def fixup_namespace_compound_members(compound, status: Status):
 
 def fixup_class_compound_members(compound, status: Status):
     # This function works like `fixup_namespace_compound_members`, but is for when the compound is a class/struct/union.
+    # - TODO: fixup referenced types in each member to be relative to compound
     def has_details(member):
         if is_class_like(member):
             if not member['simple']:
