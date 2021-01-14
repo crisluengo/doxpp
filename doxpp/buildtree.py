@@ -1,5 +1,5 @@
 # dox++
-# Copyright 2020, Cris Luengo
+# Copyright 2020-2021, Cris Luengo
 # Based on cldoc: Copyright 2013-2018, Jesse van den Kieboom
 #
 # This file is part of dox++.  dox++ is free software: you can

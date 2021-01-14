@@ -26,8 +26,9 @@ Typesetting, creating indices, etc. is left to the generator (or back-end), whic
 the program simple.
 
 **dox++html** produces a series of HTML files documenting the project, using the
-JSON created by dox++parse. The generated HTML is based on [m.css](https://mcss.mosra.cz/)
-by Vladimír Vondruš.
+JSON created by dox++parse. The generated HTML is based on [m.css](https://mcss.mosra.cz/),
+and its fantastic Doxygen C++ theme, by Vladimír Vondruš. It is all static HTML5 with
+customizable CSS, and wonderful client-side search functionality that uses JavaScript.
 
 **TODO** Eventually we'll have other generators here, for example to generate PDF through
 Pandoc.
@@ -69,28 +70,24 @@ that I am aware of.
 
 Things we'd like to add/fix/improve:
 
-1. Function pointer types.
-2. SFINAE template parameters are hard to parse. The current solution is to record "<SFINAE>"
+1. SFINAE template parameters are hard to parse. The current solution is to record "<SFINAE>"
    as the type of any template parameter without a name. This is obviously not right, but it
    works for me for now.
-3. Types in a (partial) template specialization are not always recorded.
-4. If a templated type is used as the type of a parameter or variable, it is not linked to
+2. Types in a (partial) template specialization are not always recorded.
+3. If a templated type is used as the type of a parameter or variable, it is not linked to
    the documentation for that type.
-5. Link override and overridden functions together.
-6. There's no way to have the literal text "`\ref`" (and similar commands) in the documentation,
+4. Link override and overridden functions together.
+5. There's no way to have the literal text "`\ref`" (and similar commands) in the documentation,
    we need to avoid matching commands inside backticks or in code blocks.
-7. References to a member that is injected into a different namespace it was declared in are not
+6. References to a member that is injected into a different namespace it was declared in are not
    resolved (e.g. through a `using` statement, or members of an anonymous or inline namespace).
-
-Things that Clang doesn't tell us:
-
-1. Clang doesn't easily report on pre-processor macros. Instead of making things complicated,
+7. Clang doesn't easily report on pre-processor macros. Instead of making things complicated,
 we just require adding the `\macro` (or `\def`) command at the top of the documentation block.
-2. Clang doesn't say if a variable or function is `constexpr`, but we worked our way around that.
+
 
 # License
 
-Copyright 2020, Cris Luengo  
+Copyright 2020-2021, Cris Luengo  
 Most code and documentation in this project is distributed with the GPL-2.0 license.  
 See the file `COPYING` for details.  
 Some files have more permissive licenses.
