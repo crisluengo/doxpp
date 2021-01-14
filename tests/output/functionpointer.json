@@ -1,7 +1,7 @@
 {
   "members": [
     {
-      "id": "sort_ints-int (int, int)-P",
+      "id": "sort_ints-int(*)(int, int)-",
       "name": "sort_ints",
       "brief": "",
       "doc": "",
@@ -23,8 +23,26 @@
       },
       "arguments": [
         {
-          "typename": "int (int, int)",
-          "qualifiers": "*",
+          "typename": "int(*)(int, int)",
+          "qualifiers": "",
+          "function_prototype": true,
+          "retval": {
+            "typename": "int",
+            "qualifiers": [],
+            "id": ""
+          },
+          "arguments": [
+            {
+              "typename": "int",
+              "qualifiers": [],
+              "id": ""
+            },
+            {
+              "typename": "int",
+              "qualifiers": [],
+              "id": ""
+            }
+          ],
           "name": "comparator",
           "default": null,
           "id": ""

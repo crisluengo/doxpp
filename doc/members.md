@@ -329,3 +329,8 @@ Types are encoded as a dictionary with the following fields:
 - `"qualifiers"` (string): qualifiers.
 
 The type could be rendered in Markdown as follows: `[typename](#id) qualifiers`.
+
+If the type represents a function prototype, `"typename"` is a full representation,
+but the dictionary will additionally contain the following fields:
+- `"retval"`: Type dictionary for the function's return value
+- `"arguments"`: List of type dictionaries for the function arguments

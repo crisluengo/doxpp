@@ -176,7 +176,7 @@
       ]
     },
     {
-      "id": "operator%20new-size_t-",
+      "id": "operator%20new-std-size_t-",
       "name": "operator new",
       "brief": "",
       "doc": "",
@@ -198,7 +198,7 @@
       },
       "arguments": [
         {
-          "typename": "size_t",
+          "typename": "std::size_t",
           "qualifiers": "",
           "name": "",
           "default": null,
@@ -207,7 +207,7 @@
       ]
     },
     {
-      "id": "operator%20new%5B%5D-size_t-",
+      "id": "operator%20new%5B%5D-std-size_t-",
       "name": "operator new[]",
       "brief": "",
       "doc": "",
@@ -229,7 +229,7 @@
       },
       "arguments": [
         {
-          "typename": "size_t",
+          "typename": "std::size_t",
           "qualifiers": "",
           "name": "",
           "default": null,

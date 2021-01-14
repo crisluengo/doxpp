@@ -17,7 +17,7 @@
       "constexpr": false,
       "noexcept": false,
       "return_type": {
-        "typename": "std::basic_string<char> > >",
+        "typename": "std::list<std::string>",
         "qualifiers": "",
         "id": ""
       },
@@ -62,6 +62,7 @@
           "header": "file--templatereference-h",
           "group": "",
           "deprecated": false,
+          "oldfashioned": false,
           "templated": false,
           "access": "public",
           "type": {
@@ -86,9 +87,10 @@
       "header": "file--templatereference-h",
       "group": "",
       "deprecated": false,
+      "oldfashioned": false,
       "templated": false,
       "type": {
-        "typename": "std::allocator<int> >",
+        "typename": "std::list<WithInner<int>::Type>",
         "qualifiers": "",
         "id": ""
       }

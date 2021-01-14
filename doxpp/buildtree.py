@@ -392,25 +392,29 @@ def parse_function_arguments(arg_list, start_id, members):
 def same_argument(arg1, arg2):
     return arg1['typename'] == arg2['typename'] and arg1['qualifiers'] == arg2['qualifiers']
 
+def find_member_match_names(member, names, function_params):
+    if len(names) == 1:
+        # We've matched the whole name
+        if function_params is None:
+            # No need to match function parameters
+            return member['id']
+        else:
+            # We need to match function parameters too
+            if member['member_type'] == 'function':
+                args = member['arguments']
+                if len(args) == len(function_params) and \
+                        all([same_argument(arg1, arg2) for arg1, arg2 in zip(args, function_params)]):
+                    return member['id']
+            # TODO: We need to distinguish const member functions from the non-const version.
+            #       This requires improving the matching for the type...
+    elif 'members' in member:
+        return find_member_inner(member['members'], names[1:], function_params)
+    return ''
+
 def find_member_inner(member_list, names, function_params):
     for member in member_list:
         if member['name'] == names[0]:
-            if len(names) == 1:
-                # We've matched the whole name
-                if function_params is None:
-                    # No need to match function parameters
-                    return member['id']
-                else:
-                    # We need to match function parameters too
-                    if member['member_type'] == 'function':
-                        args = member['arguments']
-                        if len(args) == len(function_params) and \
-                                all([same_argument(arg1, arg2) for arg1, arg2 in zip(args, function_params)]):
-                            return member['id']
-                    # TODO: We need to distinguish const member functions from the non-const version.
-                    #       This requires improving the matching for the type...
-            elif 'members' in member:
-                return find_member_inner(member['members'], names[1:], function_params)
+            return find_member_match_names(member, names, function_params)
     return ''
 
 def find_member(name, start_id, members):
@@ -487,6 +491,11 @@ def find_member(name, start_id, members):
     if not 'members' in base:
         base = members[base['parent']]
     while True:
+        if 'name' in base and base['name'] == names[0]:
+            # prefer 'Name' over 'Name::Name'
+            id = find_member_match_names(base, names, function_params)
+            if id:
+                return id
         id = find_member_inner(base['members'], names, function_params)
         if id:
             return id
@@ -513,11 +522,15 @@ def find_file(name, headers):
 
 # --- Post-process documentation to add links ---
 
-def get_type_id_or_empty_string(type, template_params, members):
+def get_type_id_or_empty_string(type, start_id, template_params, members):
     if type['typename'] in template_params:
         return ''
-    else:
-        return find_member(type['typename'], '', members)
+    if 'function_prototype' in type and type['function_prototype']:
+        type['retval']['id'] = get_type_id_or_empty_string(type['retval'], start_id, template_params, members)
+        for arg in type['arguments']:
+            arg['id'] = get_type_id_or_empty_string(arg, start_id, template_params, members)
+        return ''
+    return find_member(type['typename'], start_id, members)
 
 def collect_template_params(member, template_params, members):
     # Recurse through `member` and its ancestors, noting any template parameter names they have
@@ -534,18 +547,18 @@ def post_process_types(members):
         template_params = set()
         collect_template_params(member, template_params, members)
         if 'type' in member and isinstance(member['type'], dict):
-            member['type']['id'] = get_type_id_or_empty_string(member['type'], template_params, members)
+            member['type']['id'] = get_type_id_or_empty_string(member['type'], member['id'], template_params, members)
         if 'return_type' in member and member['return_type']:
-            member['return_type']['id'] = get_type_id_or_empty_string(member['return_type'], template_params, members)
+            member['return_type']['id'] = get_type_id_or_empty_string(member['return_type'], member['id'], template_params, members)
         if 'arguments' in member:
             for arg in member['arguments']:
-                arg['id'] = get_type_id_or_empty_string(arg, template_params, members)
+                arg['id'] = get_type_id_or_empty_string(arg, member['id'], template_params, members)
         if 'template_parameters' in member:
             for arg in member['template_parameters']:
                 if isinstance(arg['default'], dict):
-                    arg['default']['id'] = get_type_id_or_empty_string(arg['default'], template_params, members)
+                    arg['default']['id'] = get_type_id_or_empty_string(arg['default'], member['id'], template_params, members)
                 elif isinstance(arg['type'], dict):
-                    arg['type']['id'] = get_type_id_or_empty_string(arg['type'], template_params, members)
+                    arg['type']['id'] = get_type_id_or_empty_string(arg['type'], member['id'], template_params, members)
 
 def cleanup_qualifiers(member):
     # Replace 'qualifiers' member in 'type' dicts with a string
@@ -1159,7 +1172,7 @@ def full_typename(decl):
         return parent_type + '::' + type
     return type
 
-std_namespace_match = re.compile(r"^std::__.*::(.+)*$")
+fixup_angled_brackets_match = re.compile(r"> >")
 
 def process_type_recursive(type, cursor, output):
     kind = type.kind
@@ -1167,7 +1180,8 @@ def process_type_recursive(type, cursor, output):
     # Reference/pointer qualifiers
     if kind in type_kind_to_type_map:
         process_type_recursive(type.get_pointee(), cursor, output)
-        output['qualifiers'].append(type_kind_to_type_map[kind])
+        if not('function_prototype' in output and output['function_prototype']):
+            output['qualifiers'].append(type_kind_to_type_map[kind])
         done = True
     # Is it an array?
     if kind in type_kind_array_types:
@@ -1180,30 +1194,28 @@ def process_type_recursive(type, cursor, output):
     if done:
         return
     # Actual type
-    decl = type.get_declaration()
-    if decl and decl.displayname:
-        typename = full_typename(decl)
-    elif kind in type_kind_to_name_map:
-        typename = type_kind_to_name_map[kind]
+    if kind in type_kind_to_name_map:
+        output['typename'] = type_kind_to_name_map[kind]
+    elif kind == cindex.TypeKind.FUNCTIONPROTO:
+        # Parse function prototype
+        output['function_prototype'] = True
+        output['retval'] = process_type(type.get_result(), None)
+        output['arguments'] = [process_type(arg) for arg in type.argument_types()]
+        # output['typename'] = type.spelling
+        output['typename'] = output['retval']['typename'] + '(*)(' + \
+                             ', '.join([arg['typename'] for arg in output['arguments']]) + ')'
     elif hasattr(type, 'spelling'):
-        #canon = type.get_canonical()  # TODO: this is for function pointer types
-        #if canon.kind == cindex.TypeKind.FUNCTIONPROTO:
-        #    kind = canon.kind
-        #    result = process_type(canon.get_result())
-        #    arguments = [process_type(arg) for arg in canon.argument_types()]
         typename = type.spelling
         if typename.startswith('const '):
             typename = typename[len('const '):]
+        typename = fixup_angled_brackets_match.sub('>>', typename)
+        output['typename'] = typename
     elif cursor:
-        typename = cursor.displayname
+        output['typename'] = cursor.displayname
     else:
-        typename = ''
-    # Remove std namespace shenanigans
-    match = std_namespace_match.fullmatch(typename)
-    if match:
-        typename = 'std::' + match[1]
-    # Done
-    output['typename'] = typename
+        output['typename'] = ''
+    # TODO: For template types, we might want to split up the type and the template arguments (recursively!)
+    #       so that we can later link the type to its docs.
 
 def process_type(type, cursor=None):
     output = {'typename': '', 'qualifiers': []}
@@ -1282,7 +1294,7 @@ def process_template_type_parameter(item):
     for child in item.get_children():
         if child.kind == cindex.CursorKind.TYPE_REF:
             default = process_type(child.type, child)
-        break
+            break
     return {
         'name': name,
         'type': 'type',
