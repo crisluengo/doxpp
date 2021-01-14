@@ -17,23 +17,22 @@ This is a list of everything that is defined at the global scope. Members are li
 in which they were found in the header file. Each `members[i]` is a dictionary as follows:
 ```json
 {
-   "id": "",           // this is a unique identifier used for referencing
-   "name": "",         // name of the member
-   "brief": "",        // brief description, in Markdown
-   "doc": "",          // full documentation, in Markdown
-   "sections": [],     // (ID, title, level) for sections in "doc"
-   "anchors": [],      // IDs of anchors in "doc"
-   "member_type": "",  // class/function/enum/variable/define/namespace/etc.
-   "parent": "",       // ID of parent member
-   "header": "",       // ID of the header file it is in (or the first one it is encountered in)
-   "group": "",        // ID of the group it is in (or empty string)
-   "deprecated": false // false or true
-
-   "parameters": [],   // (if a function)
-   "return_type": "",  // (if a function)
-   "members": [],      // (if a class or namespace) recursively list members
-   "related": [],      // (if a class) list of IDs of functions related to this class (`\relates` command)
-   ...                 // other elements with additional information as needed ("virtual", "mutable", etc.)
+   "id": "",             # this is a unique identifier used for referencing
+   "name": "",           # name of the member
+   "brief": "",          # brief description, in Markdown
+   "doc": "",            # full documentation, in Markdown
+   "sections": [],       # (ID, title, level) for sections in "doc"
+   "anchors": [],        # IDs of anchors in "doc"
+   "member_type": "",    # class/function/enum/variable/define/namespace/etc.
+   "parent": "",         # ID of parent member
+   "header": "",         # ID of the header file it is in (or the first one it is encountered in)
+   "group": "",          # ID of the group it is in (or empty string)
+   "deprecated": false,  # false or true
+   "parameters": [],     # (if a function)
+   "return_type": "",    # (if a function)
+   "members": [],        # (if a class or namespace) recursively list members
+   "related": [],        # (if a class) list of IDs of functions related to this class (`\relates` command)
+   ...                   # other elements with additional information as needed ("virtual", "mutable", etc.)
 }
 ```
 
@@ -53,13 +52,13 @@ on the dictionary fields for each of the types of members.
 This is a list of files. Each `headers[i]` is a dictionary as follows:
 ```json
 {
-   "id": "",           // unique identifier
-   "name": "",         // file name, with path from project root
-   "brief": "",        // brief description, in Markdown
-   "doc": "",          // full documentation, in Markdown
-   "sections": [],     // (ID, title, level) for sections in "doc"
-   "anchors": [],      // IDs of anchors in "doc"
-   "includes": []      // list of files included by the header
+   "id": "",             # unique identifier
+   "name": "",           # file name, with path from project root
+   "brief": "",          # brief description, in Markdown
+   "doc": "",            # full documentation, in Markdown
+   "sections": [],       # (ID, title, level) for sections in "doc"
+   "anchors": [],        # IDs of anchors in "doc"
+   "includes": []        # list of files included by the header
 }
 ```
 
@@ -74,14 +73,14 @@ it is not explicitly stored here.
 A list of defined groups. Each `groups[i]` is a dictionary as follows:
 ```json
 {
-   "id": "",           // unique identifier
-   "name": "",         // group name
-   "brief": "",        // brief description, in Markdown
-   "doc": "",          // full documentation, in Markdown
-   "sections": [],     // (ID, title, level) for sections in "doc"
-   "anchors": [],      // IDs of anchors in "doc"
-   "parent": "",       // ID of the parent group, if any
-   "subgroups": []     // list of IDs of child groups
+   "id": "",             # unique identifier
+   "name": "",           # group name
+   "brief": "",          # brief description, in Markdown
+   "doc": "",            # full documentation, in Markdown
+   "sections": [],       # (ID, title, level) for sections in "doc"
+   "anchors": [],        # IDs of anchors in "doc"
+   "parent": "",         # ID of the parent group, if any
+   "subgroups": []       # list of IDs of child groups
 }
 ```
 
@@ -92,13 +91,13 @@ Groups can be nested.
 A list of pages. Each `pages[i]` is a dictionary as follows:
 ```json
 {
-   "id": "",           // unique identifier
-   "title": "",        // page title
-   "doc": "",          // full documentation, in Markdown
-   "sections": [],     // (ID, title, level) for sections in "doc"
-   "anchors": [],      // IDs of anchors in "doc"
-   "parent": "",       // ID of the parent page, if any
-   "subpages": []      // list of IDs of child pages
+   "id": "",             # unique identifier
+   "title": "",          # page title
+   "doc": "",            # full documentation, in Markdown
+   "sections": [],       # (ID, title, level) for sections in "doc"
+   "anchors": [],        # IDs of anchors in "doc"
+   "parent": "",         # ID of the parent page, if any
+   "subpages": []        # list of IDs of child pages
 }
 ```
 

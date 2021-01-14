@@ -1,6 +1,6 @@
 # Commands
 
-Commands can start with `\\` or `@`. Here we show the `\\` variant only.
+Commands can start with `\` or `@`. Here we show the `\` variant only.
 
 Note that we try to keep compatibility with Doxygen, but chose to make some changes:
 

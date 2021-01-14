@@ -113,7 +113,7 @@ will be given if it is missing.
 
 Doxygen uses the `\{` and `\}` commands to group members into a group. These are not
 recognized by dox++. Left is Doxygen, right is corresponding dox++:
-```none
+```cpp
 /// \defgroup name title            /// \group name title
 /// \{                              /// \addtogroup
 
