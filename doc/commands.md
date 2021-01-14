@@ -46,7 +46,7 @@ Must be matched by a `endgroup`.
 `\addtogroup` can also be used at the end of a `\group` documentation block. In this
 case it must not have a `<name>` parameter.
 
-See `grouping.md` for more information on grouping.
+See [`grouping.md`](https://github.com/crisluengo/doxpp/tree/main/doc/grouping.md) for more information on grouping.
 
 The remainder of the comment block is ignored.
 
@@ -78,7 +78,8 @@ Do we need to implement this? Is it useful?
 
 ### `\endgroup`
 
-Closes the nearest previous `\addtogroup`. See `grouping.md` for more information.
+Closes the nearest previous `\addtogroup`.
+See [`grouping.md`](https://github.com/crisluengo/doxpp/tree/main/doc/grouping.md) for more information.
 
 ### `\endname`
 
@@ -98,7 +99,7 @@ Alternatively, provide the ID for the enumerator.
 
 Adds documentation for the current file, or a different file if the file name is given.
 The rest of the comment block is considered documentation.
-```
+```cpp
 /// \file
 /// This is the brief description for the current file.
 /// This is the detailed description right here.
@@ -113,7 +114,7 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 `<name>` is not the fully qualified name of the matched function.
 
 To disambiguate overloaded functions, provide in `<name>` the argument list types, for example:
-```
+```cpp
 /// \function namesp::funcname(int, double*)
 ```
 
@@ -143,7 +144,7 @@ will become active.
 `\defgroup` is an alias for compatibility with Doxygen, even tough the command is used
 somewhat differently.
 
-See `grouping.md` for more information on grouping.
+See [`grouping.md`](https://github.com/crisluengo/doxpp/tree/main/doc/grouping.md) for more information on grouping.
 
 ### `\macro <name>` (or `\def <name>`)
 
@@ -259,7 +260,7 @@ attribute.
 ### `\brief`
 
 Used at the beginning of the first line of a comment block, turns the first paragraph into the "brief" string.
-```
+```cpp
 /// \brief This is a rather long brief descrition
 /// of the member below.
 ///
@@ -275,7 +276,7 @@ group listed. It can also appear in the comment block of a group, to nest groups
 
 `\ingroup` overrules the group name of the enclosing `\addtogroup`/`\endgroup`.
 
-See `grouping.md` for more information on grouping.
+See [`grouping.md`](https://github.com/crisluengo/doxpp/tree/main/doc/grouping.md) for more information on grouping.
 
 This command is expected to be on its own on a line.
 
