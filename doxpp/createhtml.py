@@ -43,6 +43,7 @@ import html
 import mimetypes
 import shutil
 import enum
+import glob
 from types import SimpleNamespace as Empty
 
 import markdown
@@ -56,6 +57,7 @@ from .search import CssClass, ResultFlag, ResultMap, Trie, serialize_search_data
 
 from .markdown.admonition import AdmonitionExtension
 from .markdown.fix_links import FixLinksExtension
+from .markdown.add_classes import AddClassesExtension
 from .markdown.record_images import RecordLinkedImagesExtension
 from .markdown.mdx_subscript import SubscriptExtension
 from .markdown.mdx_superscript import SuperscriptExtension
@@ -643,6 +645,7 @@ def parse_markdown(status: Status):
         # Our own concoctions
         AdmonitionExtension(),              # Modification of the standard 'admonition' extension
         FixLinksExtension(status.id_map),   # Fixes links from '#id' to 'page_id.html#id'
+        AddClassesExtension(),              # Adds m.css classes to <img> and <table>
         RecordLinkedImagesExtension(status.images),  # Stores names of images linked in the documentation
         # Two extensions not installed through PyPI because they cause a downgrade of the Markdown package
         # (would be installed with packages `MarkdownSuperscript` and `MarkdownSubscript`)
@@ -1206,7 +1209,11 @@ def createhtml(input_file, output_dir, options, template_params):
     # The images we need to search for in the input directories
     source_dirs = set()
     for s in options['source_files']:
-        source_dirs.add(os.path.dirname(s))
+        if ('*' in s) or ('?' in s):
+            for s in glob.glob(s):
+                source_dirs.add(os.path.dirname(s))
+        else:
+            source_dirs.add(os.path.dirname(s))
     for i in status.images:
         found = False
         for s in source_dirs:

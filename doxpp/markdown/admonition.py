@@ -155,6 +155,9 @@ class AdmonitionProcessor(markdown.blockprocessors.BlockProcessor):
         if type == 'see':
             def_title = 'See also'
             type = 'm-default'
+        elif type == 'literature':
+            def_title = 'Literature'
+            type = 'm-default'
         elif type == 'note':
             def_title = 'Note'
             type = 'm-info'
@@ -196,7 +199,7 @@ class AdmonitionProcessor(markdown.blockprocessors.BlockProcessor):
             type = 'm-default'
         elif type == 'par':
             def_title = None
-            type = 'm-default'
+            type = 'm-dim'
         elif type == 'rcs':
             def_title = None
             type = 'm-default'
