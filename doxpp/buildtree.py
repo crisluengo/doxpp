@@ -414,7 +414,9 @@ def find_member_match_names(member, names, function_params):
 def find_member_inner(member_list, names, function_params):
     for member in member_list:
         if member['name'] == names[0]:
-            return find_member_match_names(member, names, function_params)
+            id = find_member_match_names(member, names, function_params)
+            if id:
+                return id
     return ''
 
 def find_member(name, start_id, members):
