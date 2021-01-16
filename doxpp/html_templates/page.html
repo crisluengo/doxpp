@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if 1 in compound.breadcrumb or compound.breadcrumb[-1][0] != PROJECT_NAME %}{% set j = joiner(' &raquo; ') %}{% for name, _ in compound.breadcrumb %}{{ j() }}{{ name }}{% endfor %} | {{ super() }}{% else %}{{ super() }}{% endif %}{% endblock %}
+{% block title %}{% if 1 in compound.breadcrumb or compound.breadcrumb[-1][0] != PROJECT_NAME %}{% set j = joiner(' &raquo; ') %}{% for _, _, name in compound.breadcrumb %}{{ j() }}{{ name }}{% endfor %} | {{ super() }}{% else %}{{ super() }}{% endif %}{% endblock %}
 
 {% block header_links %}
 {% if compound.footer_navigation and compound.footer_navigation[0] %}
@@ -13,7 +13,7 @@
 
 {% block main %}
         <h1>
-          {% for name, target in compound.breadcrumb[:-1] %}
+          {% for name, target, _ in compound.breadcrumb[:-1] %}
           <span class="m-breadcrumb"><a href="{{ target }}">{{ name }}</a> &raquo;</span>
           {% endfor %}
           {{ compound.breadcrumb[-1][0] }}{% if compound.since %} {{ compound.since }}{% endif %}
@@ -46,6 +46,8 @@
 {{ compound.doc }}
         {% endif %}
         {% if compound.footer_navigation %}
-        <div class="m-note m-dim m-thin m-text-center">{% if compound.footer_navigation[0] %}<a href="{{ compound.footer_navigation[0][0] }}" class="m-doc">&laquo; {{ compound.footer_navigation[0][1] }}</a> | {% endif %}<a href="{{ compound.footer_navigation[1][0] }}" class="m-doc">{{ compound.footer_navigation[1][1] }}</a>{% if compound.footer_navigation[2] %} | <a href="{{ compound.footer_navigation[2][0] }}" class="m-doc">{{ compound.footer_navigation[2][1] }} &raquo;</a>{% endif %}</div>
+        <div class="m-note m-dim m-thin m-text-center">{% if compound.footer_navigation[0] %}<a href="{{ compound.footer_navigation[0][0] }}" class="m-doc">&laquo; {{ compound.footer_navigation[0][1] }}</a> | {% endif -%}
+                                                                                             <a href="{{ compound.footer_navigation[1][0] }}" class="m-doc">{{ compound.footer_navigation[1][1] }}</a>
+                                                   {%- if compound.footer_navigation[2] %} | <a href="{{ compound.footer_navigation[2][0] }}" class="m-doc">{{ compound.footer_navigation[2][1] }} &raquo;</a>{% endif %}</div>
         {% endif %}
 {% endblock %}

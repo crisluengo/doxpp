@@ -154,6 +154,10 @@ class Status:
             return {}
 
 
+html_tag_re = re.compile('<.*?>')
+def strip_html_tags(title):
+    return html_tag_re.sub('', title)
+
 def generate_fully_qualified_names(members, status: Status):
     for member in members:
         name = member['name']
@@ -585,8 +589,20 @@ def create_indices(status: Status):
         if not page['parent']:
             index['pages'].append(page)
         page['children'] = []
+        prev = None
+        nav_list = []
         for s in page['subpages']:
-            page['children'].append(status.pages[s])  # We don't sort these, but use them in the order they're referenced in the parent page
+            # We don't sort children, but use them in the order they're referenced in the parent page
+            child = status.pages[s]
+            page['children'].append(child)
+            nav_list.append((child['id'] + '.html', child['title']))
+        if nav_list:
+            prev = None
+            parent = (page['id'] + '.html', page['title'])
+            for i in range(len(nav_list)):
+                next = nav_list[i + 1] if len(nav_list) > i + 1 else None
+                page['children'][i]['footer_navigation'] = (prev, parent, next)
+                prev = nav_list[i]
     return index
 
 
@@ -654,7 +670,8 @@ def parse_markdown(status: Status):
     ]
     extension_configs = {
         'codehilite': {
-            'css_class': 'm-code'
+            'css_class': 'm-code',
+            'wrapcode': False
         },
         'mdx_headdown': {
             'offset': 1
@@ -748,7 +765,7 @@ def add_breadcrumb(compound, name, compounds):
         parent = compounds[parent]['parent']
     compound['breadcrumb'] = []
     for elem in reversed(path_reverse):
-        compound['breadcrumb'].append((compounds[elem][name], elem + '.html'))
+        compound['breadcrumb'].append([compounds[elem][name], elem + '.html'])
 
 
 def fixup_namespace_compound_members(compound, status: Status):
@@ -1141,6 +1158,8 @@ def createhtml(input_file, output_dir, options, template_params):
             fixup_namespace_compound_members(compound, status)
         elif type == 'page':
             add_breadcrumb(compound, 'title', status.pages)
+            for elem in compound['breadcrumb']:
+                elem.append(strip_html_tags(elem[0]))
         else:
             add_breadcrumb(compound, 'name', status.members)
             if type == 'namespace':
