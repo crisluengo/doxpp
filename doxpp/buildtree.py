@@ -438,6 +438,18 @@ def find_member(name, start_id, members):
     if not name:
         return ''
     function_params = None
+    templated = False
+    if name.startswith('typename '):
+        name = name[len('typename '):].strip()
+    if '<' in name and not name.startswith('operator<'):
+        name = name[:name.index('<')]
+        templated = True
+        # TODO: We don't need to match template, but we do want our match to be a templated type with
+        #       the right number of arguments. We might also want to link
+        # TODO: In cases such as `foo<T>::type`, we're linking to `foo`, not to it's `type` member.
+        #       This would be much more nicely be solved if we had a better way to encode types, making
+        #       template parameters explicit elements in some sort of list of dict elements:
+        #       [{'foo',template_params},{'type',id}]
     if name.startswith('operator'):
         part = name[len('operator'):].strip()
         # We can have:
@@ -584,7 +596,7 @@ def post_process_inheritance(members):
         if 'bases' in member:
             for base in member['bases']:
                 name = base['typename']
-                id = find_member(name, '', members)
+                id = find_member(name, member['id'], members)
                 if id:
                     base['id'] = id
                     base_member = members[id]

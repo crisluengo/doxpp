@@ -110,8 +110,8 @@ class Status:
         try:
             page = self.id_map[id]
         except KeyError:
-            log.error('Referencing type %s, which was excluded from documentation', id)
-            return '#id'
+            log.warning('Referencing type %s, which was excluded from documentation', id)  # TODO: this is normal, though...
+            return None
         if page == id:
             return page + '.html'
         else:
@@ -458,8 +458,8 @@ def process_base_derived_related_lists(status: Status):
                         'member_type': 'class',  # TODO: we don't know, could be struct.
                         'id': '',
                         'page_id': '',
-                        'name': base['typename'],
-                        'fully_qualified_name': base['typename'],
+                        'name': html.escape(base['typename']),
+                        'fully_qualified_name': html.escape(base['typename']),
                         'access': base['access']
                     }
                     member['base_classes'].append(tmp)
@@ -539,6 +539,12 @@ def assign_page(status: Status):
             if status.groups[id]['page_id']:
                 group['modules'].append(status.groups[id])
         group['modules'].sort(key=lambda x: x['name'].casefold())
+    # Set module value of all members in each module
+    for group in status.groups.values():
+        module = (group['name'], group['id'] + '.html')
+        for members in [group['namespaces'], group['classes']]:
+            for member in members:
+                member['module'] = module
     # All pages have a page, obviously
     for page in status.pages.values():
         page['member_type'] = 'page'
@@ -613,6 +619,8 @@ def process_navbar_links(navbar, status: Status):
         if sub:
             sub = process_navbar_links(sub, status)
         link = status.get_link(id)
+        if not link:
+            log.error("Navbar references an id that is not in the documentation")
         if not title:
             title = status.find_title(id)
         out.append((title, link, id, sub))
@@ -715,7 +723,9 @@ def render_type(type, status: Status, doc_link_class):
     typename = html.escape(type['typename'])
     if typename:
         if type['id']:
-            typename = '<a href="' + status.get_link(type['id']) + '" class="' + doc_link_class + '">' + typename + '</a>'
+            link = status.get_link(type['id'])
+            if link:
+                typename = '<a href="' + link + '" class="' + doc_link_class + '">' + typename + '</a>'
         if type['qualifiers']:
             if type['qualifiers'][0] == 'c':
                 typename += ' '

@@ -85,6 +85,11 @@ All pages can define:
 All reference pages define:
 - `compound`
 File/module/namespace reference pages, `compound` contains:
+- `compound.breadcrumb` array of (name, target)
+- `compound.inline` (for namespace only)
+- `compound.since` # TODO
+- `compound.include` (not for file)
+- `compound.module` (for namespace only) (name, target)
 - `compound.brief`
 - `compound.sections`
 - `compound.modules`
@@ -108,8 +113,9 @@ Class/struct/union reference pages, `compound` contains:
 - `compound.templated`
 - `compound.template_parameters` (if `compound.templated`)
 - `compound.include`
+- `compound.module` (name, target)
 - `compound.final`
-- `compound.since`
+- `compound.since` # TODO
 - `compound.brief`
 - `compound.has_template_details` # TODO
 - `compound.sections`
@@ -137,6 +143,7 @@ Page reference pages, `compound` contains:
 - `compound.brief`
 - `compound.sections`
 - `compound.doc`
+
 All index pages define:
 - `index`
 Classes/Namespaces index pages, `index` contains:

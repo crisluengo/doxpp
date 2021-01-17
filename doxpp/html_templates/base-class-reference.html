@@ -18,19 +18,19 @@
 
 {% block main %}
         <h1>
-          {% if compound.templated %}
-          {% if compound.include %}
-          <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ compound.include[1] }}">{{ compound.include[0] }}</a></div>
+          {% if compound.include or compound.module %}
+          <div class="m-doc-include m-right-m m-text-right">
+              {% if compound.module %}<a href="{{ compound.module[1] }}">{{ compound.module[0] }}</a> <span class="m-thin">module</span>{% endif %}
+            {% if compound.include and compound.module %}<br/>{% endif %}
+            {% if compound.include %}<span class="m-code m-inverted"><span class="cp">#include</span> <a class="cpf" href="{{ compound.include[1] }}">{{ compound.include[0] }}</a></span>{% endif %}
+          </div>
           {% endif %}
+
+          {% if compound.templated %}
           {% set j = joiner(',\n    ') %}
-           <div class="m-doc-template"><span class="m-doc-wrap-bumper">template&lt;</span><span class="m-doc-wrap">{% for t in compound.template_parameters %}{{ j() }}{{ t.type }}{% if t.name %} {{ t.name }}{% endif %}{% if t.default %} = {{ t.default }}{% endif%}{% endfor %}&gt;</span></div>
+          <div class="m-doc-template"><span class="m-doc-wrap-bumper">template&lt;</span><span class="m-doc-wrap">{% for t in compound.template_parameters %}{{ j() }}{{ t.type }}{% if t.name %} {{ t.name }}{% endif %}{% if t.default %} = {{ t.default }}{% endif%}{% endfor %}&gt;</span></div>
           {% endif %}
           {%+ for name, target in compound.breadcrumb[:-1] %}<span class="m-breadcrumb"><a href="{{ target }}">{{ name }}</a>::<wbr/></span>{% endfor %}{{ compound.breadcrumb[-1][0] }} <span class="m-thin">{{ compound.member_type }}</span>{% if compound.final %} <span class="m-label m-flat m-warning">final</span>{% endif %}{% if compound.since %} {{ compound.since }}{% endif %}
-          {# need an explicit space here otherwise the newline gets removed #}
-
-          {% if compound.include and not compound.templated %}
-          <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ compound.include[1] }}">{{ compound.include[0] }}</a></div>
-          {% endif %}
         </h1>
         {% if compound.brief %}
         <p>{{ compound.brief }}</p>
@@ -109,7 +109,7 @@
         {% endif %}
         {% if compound.base_classes %}
         <section id="base-classes">
-          <h2><a href="#base-classes">Base classes</a></h2>
+          <h2>Base classes</h2>
           <dl class="m-doc">
             {% for class in compound.base_classes %}
 {{ entry_class(class, show_full_name=True) }}
@@ -119,7 +119,7 @@
         {% endif %}
         {% if compound.derived_classes %}
         <section id="derived-classes">
-          <h2><a href="#derived-classes">Derived classes</a></h2>
+          <h2>Derived classes</h2>
           <dl class="m-doc">
             {% for class in compound.derived_classes %}
 {{ entry_class(class, show_full_name=True) }}
@@ -129,7 +129,7 @@
         {% endif %}
         {% if compound.typeless_functions %}
         <section id="typeless-methods">
-            <h2><a href="#typeless-methods">Constructors, destructors, assignment and conversion operators</a></h2>
+            <h2>Constructors, destructors, assignment and conversion operators</h2>
             <dl class="m-doc">
                 {% for function in compound.typeless_functions %}
 {{ entry_function(function) }}
@@ -139,7 +139,7 @@
         {% endif %}
         {% for group in compound.groups %}
         <section id="{{ group.id }}">
-            <h2><a href="#{{ group.id }}">{{ group.name }}</a></h2>
+            <h2>{{ group.name }}</h2>
             <dl class="m-doc">
                 {% for member in group.members %}
                 {% if member.member_type in ['class', 'struct', 'union'] %}
@@ -159,7 +159,7 @@
         {% endfor %}
         {% if compound.classes %}
         <section id="nested-classes">
-          <h2><a href="#nested-classes">Classes</a></h2>
+          <h2>Classes</h2>
           <dl class="m-doc">
             {% for type in compound.classes %}
 {{ entry_class(type) }}
@@ -169,7 +169,7 @@
         {% endif %}
         {% if compound.aliases %}
         <section id="alias-members">
-            <h2><a href="#alias-members">Aliases</a></h2>
+            <h2>Aliases</h2>
             <dl class="m-doc">
                 {% for function in compound.aliases %}
                 {{ entry_alias(function) }}
@@ -179,7 +179,7 @@
         {% endif %}
         {% if compound.enums %}
         <section id="enum-members">
-          <h2><a href="#enum-members">Enums</a></h2>
+          <h2>Enums</h2>
           <dl class="m-doc">
             {% for type in compound.enums %}
 {{ entry_enum(type) }}
@@ -189,7 +189,7 @@
         {% endif %}
         {% if compound.functions %}
         <section id="function-members">
-          <h2><a href="#function-members">Functions</a></h2>
+          <h2>Functions</h2>
           <dl class="m-doc">
             {% for variable in compound.functions %}
 {{ entry_function(variable) }}
@@ -199,7 +199,7 @@
         {% endif %}
         {% if compound.variables %}
         <section id="variable-members">
-           <h2><a href="#variable-members">Variables</a></h2>
+           <h2>Variables</h2>
            <dl class="m-doc">
               {% for function in compound.variables %}
 {{ entry_variable(function) }}
@@ -209,7 +209,7 @@
         {% endif %}
         {% if compound.related %}
         <section id="related">
-          <h2><a href="#related">Related</a></h2>
+          <h2>Related</h2>
           <dl class="m-doc">
             {% for member in compound.related %}
             {% if member.member_type == 'alias' %}

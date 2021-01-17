@@ -80,7 +80,7 @@
         {% endif %}
         {% if compound.modules %}
         <section id="modules">
-          <h2><a href="#modules">Modules</a></h2>
+          <h2>Modules</h2>
           <dl class="m-doc">
             {% for module in compound.modules %}
 {{ entry_module(module) }}
@@ -90,7 +90,7 @@
         {% endif %}
         {% if compound.namespaces %}
         <section id="namespaces">
-          <h2><a href="#namespaces">Namespaces</a></h2>
+          <h2>Namespaces</h2>
           <dl class="m-doc">
             {% for namespace in compound.namespaces %}
 {{ entry_namespace(namespace) }}
@@ -100,7 +100,7 @@
         {% endif %}
         {% if compound.classes %}
         <section id="nested-classes">
-          <h2><a href="#nested-classes">Classes</a></h2>
+          <h2>Classes</h2>
           <dl class="m-doc">
             {% for class in compound.classes %}
 {{ entry_class(class) }}
@@ -110,7 +110,7 @@
         {% endif %}
         {% if compound.aliases %}
         <section id="alias-members">
-            <h2><a href="#alias-members">Aliases</a></h2>
+            <h2>Aliases</h2>
             <dl class="m-doc">
                 {% for alias in compound.aliases %}
                 {{ entry_alias(alias) }}
@@ -120,7 +120,7 @@
         {% endif %}
         {% if compound.enums %}
         <section id="enum-members">
-          <h2><a href="#enum-members">Enums</a></h2>
+          <h2>Enums</h2>
           <dl class="m-doc">
             {% for enum in compound.enums %}
 {{ entry_enum(enum) }}
@@ -130,7 +130,7 @@
         {% endif %}
         {% if compound.functions %}
         <section id="function-members">
-          <h2><a href="#function-members">Functions</a></h2>
+          <h2>Functions</h2>
           <dl class="m-doc">
             {% for function in compound.functions %}
 {{ entry_function(function) }}
@@ -140,7 +140,7 @@
         {% endif %}
         {% if compound.variables %}
         <section id="variable-members">
-          <h2><a href="#variable-members">Variables</a></h2>
+          <h2>Variables</h2>
           <dl class="m-doc">
             {% for variable in compound.variables %}
 {{ entry_variable(variable) }}
@@ -150,7 +150,7 @@
         {% endif %}
         {% if compound.macros %}
         <section id="macro-members">
-          <h2><a href="#macro-members">Macros</a></h2>
+          <h2>Macros</h2>
           <dl class="m-doc">
             {% for macro in compound.macros %}
 {{ entry_macro(macro) }}
