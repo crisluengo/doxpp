@@ -1269,6 +1269,15 @@ def is_explicit(item):
             return False
     return False
 
+def item_is_template(item):
+    # For class/struct template specializations, item.get_num_template_arguments() returns -1, which
+    # it shouldn't. Let's look at the first token to see if it's "template".
+    if item.get_num_template_arguments() >= 0:
+        return True
+    for t in item.get_tokens():
+        return t.spelling == 'template'
+    return False
+
 def get_defaulted_or_deleted(item):
     # `item` is a declaration for a constructor, destructor or assignment operator.
     # We look for the first '(' character, then for the matching ')' character. If the next
@@ -1368,6 +1377,25 @@ def process_function_declaration(item, member):
         member['template_parameters'] = template_parameters
     elif template_parameters:
         log.warning('Unexpected thing happened here: a non-templated function has template parameters!')
+
+def is_same_member(member1, member2):
+    # Verify that these are two templated members, whose only difference is in the SFINAE
+    # template parameters. The difficulty is that we haven't processed the template parameters
+    # for `member1` yet!
+    if member1['templated'] and member2['templated'] and member1['name'] == member2['name'] and \
+       member1['member_type'] == member2['member_type']:
+        # TODO: compare non-SFINAE template arguments (which we cannot do here).
+        if member1['member_type'] != 'function':
+            # For classes and aliases we're done
+            return True
+        # For functions we can do some more comparisons
+        if 'method_type' in member1:
+            if 'method_type' not in member2 or member1['method_type'] != member2['method_type']:
+                return False
+        elif 'method_type' in member2:
+            return False
+        return len(member1['arguments']) == len(member2['arguments'])  # This is a little lame...
+    return False
 
 def merge_member(member, new_member):
     # Merges the two member structures, filling in empty elements in `member` with new data.
@@ -1595,6 +1623,9 @@ def extract_declarations(citer, parent, status: Status, level = 0):
             elif member_type == 'usingtemplate':
                 is_template = True
                 member_type = 'using'
+            elif item_is_template(item):
+                log.debug('Skipping template specialization: %s %s', member_type, item.displayname)
+                continue
 
             # Create a member data structure for this member
             member = members.new_member('', name, member_type, semantic_parent, status.current_header['id'])
@@ -1769,23 +1800,6 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                 member['static'] = item.storage_class == cindex.StorageClass.STATIC
                 member['constexpr'] = is_constexpr(item)
             member['member_type'] = member_type
-            # TODO: For template specializations, the following should be useful:
-            # for ii in range(item.get_num_template_arguments()):
-            #     kind = item.get_template_argument_kind(ii)
-            #     if kind == cindex.TemplateArgumentKind.NULL:
-            #         pass
-            #     elif kind == cindex.TemplateArgumentKind.TYPE:
-            #         item.get_template_argument_type(ii)
-            #     elif kind == cindex.TemplateArgumentKind.DECLARATION:
-            #         pass
-            #     elif kind == cindex.TemplateArgumentKind.NULLPTR:
-            #         pass
-            #     elif kind == cindex.TemplateArgumentKind.INTEGRAL:
-            #         item.get_template_argument_value(ii)
-            #         item.get_template_argument_unsigned_value(ii)
-            #     else:
-            #         log.error("Template parameter kind not recognized")
-            #         continue
 
             # Deal with IDs -- we do this at the end of the above so we can use all that data to generate our ID.
             usr = item.get_usr()
@@ -1797,20 +1811,27 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                 merge_member(status.members[id], member)
             else:
                 id = unique_id.member(member, status)
-                log.debug("Member %s (%s) is new, adding.", id, usr)
                 member['id'] = id
                 status.member_ids[usr] = id
-                if id in status.members:
-                    log.error("USR for member %s was unknown, but ID %s was already there! This means that " +
-                              "there is a name clash, unique_id.member is not good enough.\n   in file %s",
-                              member['name'], id, status.current_header_name)
-                    continue  # skip the rest of this function, we're in trouble here...
                 cleanup_qualifiers(member)
-                status.members[id] = member
-                if semantic_parent:
-                    status.members[semantic_parent]['members'].append(member)
+                if id in status.members:
+                    if is_same_member(member, status.members[id]):
+                        log.info("Member %s already exists (members differ by SFINAE only), merging.", id)
+                        log.debug("Member %s (%s) already exists (members differ by SFINAE only), merging.", id, usr)
+                        merge_member(status.members[id], member)
+                        process_children = False  # Don't process the children, they'd be duplicates too
+                    else:
+                        log.error("USR for member %s was unknown, but ID %s was already there! This means that " +
+                                  "there is a name clash, unique_id.member is not good enough.\n   in file %s",
+                                  member['name'], id, status.current_header_name)
+                        continue  # skip the rest of this function, we're in trouble here...
                 else:
-                    status.data['members'].append(member)
+                    log.debug("Member %s (%s) is new, adding.", id, usr)
+                    status.members[id] = member
+                    if semantic_parent:
+                        status.members[semantic_parent]['members'].append(member)
+                    else:
+                        status.data['members'].append(member)
 
             # Process child members
             if process_children:
