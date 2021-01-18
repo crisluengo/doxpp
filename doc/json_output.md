@@ -1,6 +1,6 @@
 # JSON Output
 
-This program outputs a single JSON file, which should be easy to convert into any representation
+The dox++parse program outputs a single JSON file, which should be easy to convert into any representation
 the user desires. The JSON file has the following format:
 ```json
 {
@@ -44,7 +44,7 @@ qualified name and parameters, guaranteeing uniqueness. For example:
  - `class ns::bar`                     ⇒ `"ns-bar"`
  - `ns::bar::bar(float*)`              ⇒ `"ns-bar-bar-float-P"`
 
-See [`members.md`](https://github.com/crisluengo/doxpp/tree/main/doc/members.md) for more information
+See [`members.md`](members.md) for more information
 on the dictionary fields for each of the types of members.
 
 ## "headers"
@@ -107,7 +107,7 @@ One page has the ID 'index', this is the main page, and the root of the hierarch
 
 Any Markdown in the documentation will not be parsed, this is something for the generator to do.
 However, we will look for `\ref`, `\ingroup` and similar commands, as described in the
-[`commands.md`](https://github.com/crisluengo/doxpp/tree/main/doc/commands.md) page.
+[`commands.md`](commands.md) page.
 
 Commands that create a link are replaced by the Markdown syntax for a link, linking to
 `#<id>`. For example, `\ref foo::bar` will be replaced by `[foo::bar](#foo-bar)`, and
@@ -117,7 +117,7 @@ to identify these and change them to links to another page if necessary (only th
 will know what page the documentation for a given member is put in).
 
 Other recognized commands will be similarly replaced with Markdown or removed, as appropriate.
-Any command not listed in in the [`commands.md`](https://github.com/crisluengo/doxpp/tree/main/doc/commands.md)
+Any command not listed in in the [`commands.md`](commands.md)
 page will be left as-is.
 
 ## The "anchors" field

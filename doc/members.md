@@ -5,14 +5,15 @@ These are the member types that will be output by dox++, and how they nest.
 - `namespace`
     - can contain anything except `macro`
 - `class` or `struct`
+    - `alias`
     - `function`
     - `variable`
-    - Can also contain `class`, `struct`, `union`, `enum`, `alias`.
+    - Can also contain `class`, `struct`, `union`, `enum`.
 - `union`
     - `variable`
 - `enum`
     - `enumvalue`
-- `alias` (identical for `using` and `typedef` style aliases, we don't distinguish them)
+- `alias`
 - `function`
 - `variable`
 - `macro`

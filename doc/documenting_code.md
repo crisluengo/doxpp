@@ -34,7 +34,7 @@ The `\brief` command changes the parsing so that the first paragraph, rather tha
 the first line, is the "brief" string. This command must be at the beginning of
 the fist comment line in a block:
 ```cpp
-/// \brief This is a rather long brief descrition
+/// \brief This is a rather long brief description
 /// of the member below.
 ///
 /// This is the detailed description right here.

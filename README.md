@@ -1,13 +1,12 @@
 [dox++](https://github.com/crisluengo/doxpp) is a Clang-based documentation preparation
 system for C++.
 
-**This is work in progress, hold on while we complete the work**
-
 Doxygen is the de-facto standard documentation system for C++. Its HTML output is not
 flexible enough for many people, who resort to using the XML output and parsing that
 into their own HTML. However, Doxygen's XML output has some issues and does not contain
 all information present in the HTML output. For example, when using groups ("modules"),
-the XML output does not have links for types documented in other groups.
+the XML output does not have links for types documented in other groups. Doxygen also
+often requires weird workarounds where its Markdown parsing is incorrect.
 
 There are several Doxygen alternatives, but none seemed suitable for my purposes.
 
@@ -36,32 +35,48 @@ Pandoc.
 
 # How code is parsed and documented
 
-dox++ follows Doxygen syntax for documentation, but with some changes. Full documentation
-is in the [`doc/`](https://github.com/crisluengo/doxpp/tree/main/doc) directory.
+dox++ follows Doxygen syntax only partially. Full documentation is in the
+[`doc/`](https://github.com/crisluengo/doxpp/tree/main/doc) directory.
 
 Changes from Doxygen are as follows:
+
 1. Markup commands are passed as-is into the output JSON file, and left to the generator
-to parse.
-2. Documented members can belong to one group at most. Groups form a tree structure.
+   to parse. Our current generator does not parse any of the Doxygen markup commands, and
+   assumes pure Markdown. Markdown formatting works also in page and section titles.
+
+2. Documented members can belong to one group (module) at most. Groups form a tree structure.
+   Grouping commands have the same names but work slightly differently. Namespace and
+   class pages link back to the group they belong to, if applicable.
+
 3. It is meant to parse header files only, not the implementation files. It documents the API
-of a library, not all the code in a project.
-4. It documents everything declared in the header files, even if no documentation block
-is associated to the declaration. The generator can choose what to output.
-5. Commands intended to document members cannot define non-existing members. For example,
-the `\class <name>` command adds documentation to a class. The class must be declared somewhere
-in the header files.
-6. These comment blocks cannot define properties of the documented members, those properties
-must be reflected in the code itself. For example, `\extends`, `\pure` or `\static` are not
-recognized.
-6. Some of those commands have simpler interfaces, and some have aliases that make more sense
-(for example `\macro` for `\def`, `\alias` for `\typedef`, `\function` for `\fn`).
-7. Markdown files can contain comments with the `\comment` command.
-8. Directories are not documented, only the header files themselves.
-9. Unique identifiers for members are fairly readable, and don't look like the hashes that
-Doxygen generates. This should allow the generator to create more meaningful URLs.
-10. There is no "autolink", all links must be explicitly made with `\ref`.
-11. You can use Markdown formatting in page and section titles.
-12. There is no empty page generated for Markdown files that contain member documentation.
+   of a library, not all the code in a project. It documents everything declared in the header
+   files, even if no documentation block is associated to the declaration. The generator can
+   choose what to output. Directories are not documented, only the header files themselves.
+
+4. Commands intended to document members cannot define non-existing members. For example,
+   the `\class <name>` command adds documentation to a class. The class must be declared somewhere
+   in the header files. These comment blocks cannot define properties of the documented members,
+   those properties must be reflected in the code itself. For example, `\extends`, `\pure` or
+   `\static` are not recognized. Some of those commands have simpler interfaces, and some have
+   aliases that make more sense (for example `\macro` for `\def`, `\alias` for `\typedef`,
+   `\function` for `\fn`).
+
+5. Markdown files can contain comments with the `\comment` command. There is no empty page generated
+   for Markdown files that contain member documentation.
+
+6. Unique identifiers for members are fairly readable, and don't look like the hashes that
+   Doxygen generates. This should allow the generator to create more meaningful URLs.
+
+7. SFINAE template parameters are summarized as "<SFINAE>". Multiple definitions of a template
+   with different SFINAE results (such as when one version is defined for unsigned numeric types
+   and another one for signed numeric types) are collapsed into a single element.
+
+8. There is no "autolink", all links must be explicitly made with `\ref`. Consequently, it is
+    not necessary to prepend `%` to avoid turning some words into links.
+
+9. The generator creates pages for undocumented classes, namespaces and files that have documented
+   members. Thus, it is not necessary to document a file just to be able to document the functions
+   that are declared in it.
 
 ## What is missing
 
@@ -70,18 +85,17 @@ that I am aware of.
 
 Things we'd like to add/fix/improve:
 
-1. SFINAE template parameters are hard to parse. The current solution is to record "<SFINAE>"
-   as the type of any template parameter without a name. This is obviously not right, but it
-   works for me for now.
-2. Types in a (partial) template specialization are not always recorded.
-3. If a templated type is used as the type of a parameter or variable, it is not linked to
-   the documentation for that type.
-4. Link override and overridden functions together.
-5. There's no way to have the literal text "`\ref`" (and similar commands) in the documentation,
+1. Template parameters that are templated types are treated a bit too simplistically.
+
+2. Link override and overridden functions together.
+
+3. There's no way to have the literal text "`\ref`" (and similar commands) in the documentation,
    we need to avoid matching commands inside backticks or in code blocks.
-6. References to a member that is injected into a different namespace it was declared in are not
+
+4. References to a member that is injected into a different namespace it was declared in are not
    resolved (e.g. through a `using` statement, or members of an anonymous or inline namespace).
-7. Clang doesn't easily report on pre-processor macros. Instead of making things complicated,
+
+5. Clang doesn't easily report on pre-processor macros. Instead of making things complicated,
 we just require adding the `\macro` (or `\def`) command at the top of the documentation block.
 
 
