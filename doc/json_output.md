@@ -1,4 +1,4 @@
-# JSON Output
+# JSON output of dox++parse
 
 The dox++parse program outputs a single JSON file, which should be easy to convert into any representation
 the user desires. The JSON file has the following format:

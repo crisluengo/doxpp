@@ -1,6 +1,7 @@
-# Commands
+# Documentation commands
 
-Commands can start with `\` or `@`. Here we show the `\` variant only.
+These are the commands recognized by dox++parse. Commands can start with `\` or `@`.
+Here we show the `\` variant only, but you can use the other variant if you prefer.
 
 Note that we try to keep compatibility with Doxygen, but chose to make some changes:
 
@@ -21,10 +22,10 @@ Note that we try to keep compatibility with Doxygen, but chose to make some chan
    to create a link to the member documentation. `\ref` is used to link to anything
    in the documentation, not just pages and sections.
 
-5. All Doxygen commands related to markup are not recognized. Any non-recognized
+5. Doxygen commands related to markup are not recognized. Any non-recognized
    command is kept in the output JSON file, so that the backend can act on it if it
-   desires. It is typically simpler to use Markdown syntax for markup anyway.
-   It is also possible to use HTML tags for markup, if the backend can handle it.
+   desires (but dox++html will not recognize any of these commands either).
+   dox++ assumes [Markdown formatting](markdown.md).
 
 Note that commands are recognized and processed outside of any Markdown parsing, so
 commands inside of backticks or code fences are processed the same way as outside
@@ -280,6 +281,14 @@ See [`grouping.md`](https://github.com/crisluengo/doxpp/tree/main/doc/grouping.m
 
 This command is expected to be on its own on a line.
 
+### `\n`
+
+Inserts a line break. The Markdown for a line break is two spaces at the end of a line.
+Because many code editors automatically remove such spaces, use this command instead.
+It will be replaced by two spaces, and a newline will be added if it's not there already.
+
+TODO!
+
 ### `\ref <name> ["<text>"]` or `\ref "<name>" ["<text>"]`
 
 Creates a link to the entity (member, header, group or page) called `<name>`. Optionally,
@@ -318,7 +327,7 @@ after the link.
 
 When using quotes around `<name>`, the space between the closing quotes and the opening quotes
 for `<text>` is mandatory. Two sequential quotes are considered part of an operator name,
-such as in `\ref "operator""_w"`. 
+such as in `\ref "operator""_w"`.
 
 ### `\relates <name>` or `\related <name>`
 
@@ -486,7 +495,6 @@ documentation, file copyright notices, etc.
 - `\manonly` / `\endmanonly`
 - `\msc` / `\endmsc`
 - `\mscfile`
-- `\n`
 - `\note`
 - `\p`
 - `\par`

@@ -1,4 +1,4 @@
-# Members
+# Detailed description of keys for C++ members
 
 These are the member types that will be output by dox++, and how they nest.
 

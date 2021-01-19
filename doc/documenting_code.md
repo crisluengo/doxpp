@@ -1,4 +1,4 @@
-# Documenting Code
+# How to document your code
 
 Put a decorated comment before the declaration of each member:
 ```cpp
