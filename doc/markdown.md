@@ -97,12 +97,12 @@ The standard method is to use 4 spaces of indentation:
 ```
 
 A fenced code block looks like this ([fenced_code](https://python-markdown.github.io/extensions/fenced_code_blocks/)):
-```text
-\```
+````text
+```
 // This is code
 foo(bar);
-\```
 ```
+````
 
 We use the [codehilite](https://python-markdown.github.io/extensions/code_hilite/) extension
 to apply syntax highlighting to the code. This uses Pygments to identify the language and
@@ -114,12 +114,12 @@ and specify the language explicitly:
     foo(bar);
 ```
 or
-```text
-\```cpp
+````text
+```cpp
 // This is code
 foo(bar);
-\```
 ```
+````
 
 To identify the language (the "cpp" string in the examples above), use the "short name"
 as listed [in the Pygments documentation](https://pygments.org/docs/lexers/).
@@ -143,9 +143,12 @@ will be rendered as
 * list item 1
 * list item 2
 
-7\. numbered list item 7  
-8\. numbered list item 8  
-9\. numbered list item 9
+7. numbered list item 7
+8. numbered list item 8
+9. numbered list item 9
+
+It is important to separate the list items from a preceding paragraph with an empty
+line.
 
 It is not possible to mix numbered and unnumbered list items in the same list.
 
@@ -156,10 +159,12 @@ A list item can contain multiple paragraphs, code blocks, other lists, etc. Simp
 indent the additional blocks by 4 spaces:
 ```text
 * list item 1
+
     * sublist item 1.1
     * sublist item 1.2
 
 * list item 2
+
     * sublist item 2.1
 
     Another paragraph in list item 2
@@ -228,27 +233,27 @@ It is possible to include HTML code into your documentation. Everything enclosed
 in HTML tags is copied as-is into the generated HTML pages. That is, the
 text marked up using HTML is not parsed by the Markdown parser:
 ```text
-This is a paragraph with **some bold text**.
+This is a paragraph **with some bold text**.
 
 <p>This is a paragraph without **any** bolding.</p>
 ```
-is rendered as
-```html
-<p>This is a paragraph with <b>some bold text</b>.</p>
-<p>This is a paragraph without **any** bolding.</p>
-```
+will be rendered as
+
+This is a paragraph **with some bold text**.  
+This is a paragraph without \*\*any\*\* bolding.
+
 The [md_in_html](https://python-markdown.github.io/extensions/md_in_html/) extension
 allows the content of HTML blocks to be parsed by Markdown:
 ```text
-This is a paragraph with **some bold text**.
+This is a paragraph **with some bold text**.
 
 <p markdown="1">This is a paragraph with **some** bolding.</p>
 ```
-is rendered as
-```html
-<p>This is a paragraph with <b>some bold text</b>.</p>
-<p>This is a paragraph with <b>some</b> bolding.</p>
-```
+will be rendered as
+
+This is a paragraph **with some bold text**.  
+This is a paragraph with **some** bolding.
+
 This can be useful to add a CSS class to a portion of the text, for example:
 ```html
 <div markdown="1" class="m-text m-tiny">
@@ -260,4 +265,7 @@ Content Cell  | Content Cell
 ```
 will create a table with a smaller font. Since we can only add attributes to individual
 cells of a table, not the table itself, this is the only way to add special styling
-to a whole table. It is also the only wat to add special styling to lists.
+to a whole table. It is also the only way to add special styling to lists.
+
+Examine the CSS style sheets as well as the generated HTML to learn what classes exist.
+You can modify the default CSS style sheets as well, see [Configuring dox++](configuration.md).

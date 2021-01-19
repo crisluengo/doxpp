@@ -36,7 +36,7 @@ Pandoc.
 # How code is parsed and documented
 
 dox++ follows Doxygen syntax only partially. Full documentation is in the
-[`doc/`](https://github.com/crisluengo/doxpp/tree/main/doc) directory.
+[`doc/`](doc/README.md) directory.
 
 Changes from Doxygen are as follows:
 
@@ -123,7 +123,7 @@ relevant packages from PyPI, but for now the copied files avoid some dependencie
 # Requirements
 
 dox++ requires Python 3, and has been tested (so far) with Python 3.9. Packages required:
-`jinja2`, `markdown`, `markdown-headdown`
+`jinja2`, `markdown`, `markdown-headdown`, `Pygments`
 
 dox++ requires Clang to be installed on the system. I don't know which is the minimal
 version, but there's no reason to use a very old one.

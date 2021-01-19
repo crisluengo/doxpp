@@ -9,8 +9,8 @@ level = debug
 
 [input]
 root directory = .
-header files = transport/*.h
-markdown files = transport/*.md
+header files = transport/transport.h
+markdown files = 
 tab size = 3
 
 [json]
