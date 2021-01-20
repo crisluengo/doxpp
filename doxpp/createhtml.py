@@ -618,11 +618,16 @@ def process_navbar_links(navbar, status: Status):
     for title, id, sub in navbar:
         if sub:
             sub = process_navbar_links(sub, status)
-        link = status.get_link(id)
-        if not link:
-            log.error("Navbar references an id that is not in the documentation")
-        if not title:
-            title = status.find_title(id)
+        if len(id) > 1 and id[0] == '#':
+            id = id[1:]
+            link = status.get_link(id)
+            if not link:
+                log.error("Navbar references an id that is not in the documentation")
+            if not title:
+                title = status.find_title(id)
+        else:
+            link = id
+            id = ''
         out.append((title, link, id, sub))
     return out
 
@@ -1084,9 +1089,10 @@ def createhtml(input_file, output_dir, options, template_params):
     - 'templates': path to templates to use instead of default ones
     - 'source_files': list of source files (header files + markdown files), used to locate
                       image files referenced in documentation.
-    - 'search_add_lookahead_barriers': TODO: document
+    - 'doc_link_class': TODO: document
     - 'add_snake_case_suffixes': TODO: document
     - 'add_camel_case_suffixes': TODO: document
+    - 'search_add_lookahead_barriers': TODO: document
     - 'search_merge_subtrees': TODO: document
     - 'search_merge_prefixes': TODO: document
     """
@@ -1114,7 +1120,7 @@ def createhtml(input_file, output_dir, options, template_params):
     parse_markdown(status)
 
     # Convert type name strings into HTML links if appropriate
-    parse_types(status, template_params['DOC_LINK_CLASS'])
+    parse_types(status, options['doc_link_class'])
 
     # Create tree structure for index pages
     index = create_indices(status)

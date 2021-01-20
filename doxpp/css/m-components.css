@@ -897,7 +897,7 @@ figure.m-figure figcaption a, .m-code-figure figcaption a, .m-console-figure fig
 }
 
 /* Code block (uses Pygments CSS classes) */
-pre.m-code span.hll {
+pre.m-code span.hll, div.m-code > span.hll {
   margin-left: -1.0rem;
   margin-right: -1.0rem;
   padding-left: 1.0rem;
@@ -1573,7 +1573,7 @@ div.m-plot svg .m-bar.m-dim,
 p, ul, ol, dl, blockquote, pre, .m-code-figure, .m-console-figure, hr, .m-note,
 .m-frame, .m-block, div.m-button, div.m-scroll, table.m-table, div.m-image,
 img.m-image, svg.m-image, figure.m-figure, .m-imagegrid, div.m-math,
-div.m-graph, div.m-plot {
+div.m-graph, div.m-plot, div.m-code {
   margin-bottom: 1rem;
 }
 p:last-child, p.m-nopadb, ul:last-child, ul.m-nopadb,
@@ -1593,7 +1593,7 @@ figure.m-figure:last-child, figure.m-figure.m-nopadb,
 .m-imagegrid:last-child, .m-imagegrid.m-nopadb,
 div.m-math:last-child, div.m-math.m-nopadb,
 div.m-graph:last-child, div.m-graph.m-nopadb,
-div.m-plot:last-child, div.m-plot.m-nopadb {
+div.m-plot:last-child, div.m-plot.m-nopadb, aside:last-child {
   margin-bottom: 0;
 }
 

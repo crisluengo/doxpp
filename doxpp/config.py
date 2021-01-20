@@ -52,10 +52,24 @@ default_config_values = {
         'favicon': '',                # favicon to use instead of the default one
         'stylesheets': '',            # style sheets to use instead of the default ones (separate multiple files with spaces)
         'templates': '',              # relative path to templates to use instead of the default ones
+        'documentation link class': 'm-doc',  # CSS name of class used in templates for styling links to documented members
         'extra files': '',            # additional files to copy to output directory (separate multiple files with spaces)
         'html header': '',            # HTML code to add to the <head> section of each HTML page
         'page header': '',            # HTML code to add to the top of each page
-        'fine print': '[default]'     # text to use at the bottom of each page, leave empty for no footer
+        'fine print': '[default]',    # text to use at the bottom of each page, leave empty for no footer
+        'navigation bar 1': "[('', '#pages', []),('', '#modules', []),('', '#namespaces', [])]",
+        'navigation bar 2': "[('', '#classes', []),('', '#files', [])]",
+        'file index expand levels': '1',
+        'class index expand levels': '1',
+        'class index expand inner': 'no',
+    },
+    'search': {
+        'enable': True,
+        'download binary': False,  # Set to false for Chromium-based browsers when browsing HTML from the local file system. Keep True for deployment to server.
+        'base URL': '',
+        'external URL': '',
+        'add snake case suffixes': 'yes',  # Turn off if this creates too many symbols in the search table
+        'add camel case suffixes': 'yes'   # Turn off if this creates too many symbols in the search table
     }
 }
 
@@ -68,6 +82,7 @@ def generate(filename: str):
     config['json'] = default_config_values['json']
     config['project'] = default_config_values['project']
     config['html'] = default_config_values['html']
+    config['search'] = default_config_values['search']
     with open(filename, 'w') as configfile:
         configfile.write('# Default dox++ configuration file\n\n')
         config.write(configfile)
@@ -88,6 +103,8 @@ def read(filename: str):
         config['project'] = {}
     if not 'html' in config:
         config['html'] = {}
+    if not 'search' in config:
+        config['search'] = {}
     return config
 
 
@@ -95,4 +112,7 @@ def get(config: configparser.ConfigParser, section: str, value: str):
     return config[section].get(value, fallback=default_config_values[section][value])
 
 def get_boolean(config: configparser.ConfigParser, section: str, value: str):
-    return config[section].getboolean(value, fallback=default_config_values[section][value])
+    return True if config[section].get(value, fallback=default_config_values[section][value]) == 'yes' else False
+
+def get_int(config: configparser.ConfigParser, section: str, value: str):
+    return int(config[section].get(value, fallback=default_config_values[section][value]))

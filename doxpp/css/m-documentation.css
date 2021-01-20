@@ -208,7 +208,7 @@ article section.m-doc-details:target > div {
   padding-left: 0.75rem;
 }
 .m-container-inflatable section.m-doc-details:target > div::before,
-.m-container-inflatable section-dox-details:target section > div.m::before {
+.m-container-inflatable section.m-doc-details:target section > div.m::before {
   border-left-width: 0.25rem;
   border-left-color: var(--article-heading-color);
 }
