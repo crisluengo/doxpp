@@ -1,4 +1,4 @@
-# Grouping
+\page grouping Grouping
 
 ## Grouping namespace members
 

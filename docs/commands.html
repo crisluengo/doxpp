@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Documentation &raquo; Documentation commands | dox++ | Documentation preparation system for C++</title>
+  <link rel="stylesheet" href="m-light-documentation.compiled.css" />
+  <link rel="icon" href="favicon-light.png" type="image/png" />
+  <link rel="prev" href="documenting_code.html" />
+  <link rel="next" href="grouping.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22272e" />
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <span id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">
+        <a href="https://crisluengo.github.io/doxpp">dox++</a><span class="m-breadcrumb">┃</span><a href="index.html" class="m-thin">Documentation preparation system for C++</a>      </span>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path id="m-doc-search-icon-path" d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z"/>
+        </svg></a>
+        <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
+        <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
+      </div>
+      <div id="m-navbar-collapse" class="m-col-t-12 m-show-m m-col-m-none m-right-m">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li>
+              <a href="documentation.html">Documentation</a>
+              <ol>
+                <li><a href="documenting_code.html">How to document your code</a></li>
+                <li><a href="configuration.html">Configuring dox++</a></li>
+                <li><a href="running_the_tools.html">Running dox++parse and dox++html</a></li>
+                <li><a href="json_output.html">JSON output of dox++parse</a></li>
+              </ol>
+            </li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="2">
+            <li><a href="example/index.html">example site</a></li>
+            <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path" />
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          <span class="m-breadcrumb"><a href="documentation.html">Documentation</a> &raquo;</span>
+          Documentation commands
+        </h1>
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              <a href="#commands_start_block">At the start of a documentation block</a>
+              <ul>
+                <li><a href="#command_addtogroup"><code>\addtogroup</code></a></li>
+                <li><a href="#command_alias"><code>\alias</code></a></li>
+                <li><a href="#command_class"><code>\class</code></a></li>
+                <li><a href="#command_dir"><code>\dir</code></a></li>
+                <li><a href="#command_endgroup"><code>\endgroup</code></a></li>
+                <li><a href="#command_endname"><code>\endname</code></a></li>
+                <li><a href="#command_enum"><code>\enum</code></a></li>
+                <li><a href="#command_file"><code>\file</code></a></li>
+                <li><a href="#command_function"><code>\function</code></a></li>
+                <li><a href="#command_group"><code>\group</code></a></li>
+                <li><a href="#command_macro"><code>\macro</code></a></li>
+                <li><a href="#command_mainpage"><code>\mainpage</code></a></li>
+                <li><a href="#command_name"><code>\name</code></a></li>
+                <li><a href="#command_namespace"><code>\namespace</code></a></li>
+                <li><a href="#command_page"><code>\page</code></a></li>
+                <li><a href="#command_struct"><code>\struct</code></a></li>
+                <li><a href="#command_union"><code>\union</code></a></li>
+                <li><a href="#command_variable"><code>\variable</code></a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#commands_inside">Inside documentation blocks</a>
+              <ul>
+                <li><a href="#command_anchor"><code>\‍anchor</code></a></li>
+                <li><a href="#command_brief"><code>\brief</code></a></li>
+                <li><a href="#command_ingroup"><code>\ingroup</code></a></li>
+                <li><a href="#command_n"><code>\‍n</code></a></li>
+                <li><a href="#command_ref"><code>\‍ref</code></a></li>
+                <li><a href="#command_relates"><code>\‍relates</code></a></li>
+                <li><a href="#command_section"><code>\section</code></a></li>
+                <li><a href="#command_see"><code>\‍see</code></a></li>
+                <li><a href="#command_subpage"><code>\‍subpage</code></a></li>
+                <li><a href="#command_subsection"><code>\subsection</code></a></li>
+                <li><a href="#command_subsubsection"><code>\subsubsection</code></a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#commands_start_of_line">At the start of a line in Markdown files only</a>
+              <ul>
+                <li><a href="#command_comment"><code>\‍comment</code></a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#commands_not_implemented">Doxygen commands that will not be implemented</a>
+              <ul>
+                <li><a href="#commands_not_implemented_illegal">Because the information is always retrieved from the code</a></li>
+                <li><a href="#commands_not_implemented_notcpp">Because it doesn&rsquo;t apply to C++</a></li>
+                <li><a href="#commands_not_implemented_nonsensical">Because it doesn&rsquo;t make sense to me</a></li>
+                <li><a href="#commands_not_implemented_markup">All the stuff that is related to markup, use Markdown instead</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+<p>These are the commands recognized by dox++parse. Commands can start with <code>\</code> or <code>@</code>.
+Here we show the <code>\</code> variant only, but you can use the other variant if you prefer.</p>
+<p>Note that we try to keep compatibility with Doxygen, but chose to make some changes:</p>
+<ol>
+<li>
+<p>Documenting a function, variable or typedef with <code>\fn</code>, <code>\var</code>, <code>\typedef</code> doesn&rsquo;t
+   take a declaration, only a name. The declaration is always taken from the sources.
+   You cannot document non-existing things.</p>
+</li>
+<li>
+<p>Documenting a preprocessor macro with <code>\def</code> (new better name: <code>\macro</code>) must always
+   carry the macro name. Clang doesn&rsquo;t preserve preprocessor directives in its AST.</p>
+</li>
+<li>
+<p>Grouping has improved, but this comes with some syntax changes.
+   We don&rsquo;t recognize <code>\{</code> and <code>\}</code>. Instead, use <code>\addtogroup</code> instead of the opening <code>\{</code>,
+   and <code>\endgroup</code> instead of the closing <code>\}</code>. <code>\defgroup</code> is still recognized, but works
+   the same way as <code>\group</code>, which is not exactly the same way that <code>\defgroup</code> works in
+   Doxygen. Furthermore, groups are disjoint, each member can only belong to one group.</p>
+</li>
+<li>
+<p>There is no &ldquo;autolink&rdquo;, all member names must be preceded by the <code>\‍ref</code> command
+   to create a link to the member documentation. <code>\‍ref</code> is used to link to anything
+   in the documentation, not just pages and sections.</p>
+</li>
+<li>
+<p>Doxygen commands related to markup are not recognized. Any non-recognized
+   command is kept in the output JSON file, so that the backend can act on it if it
+   desires (but dox++html will not recognize any of these commands either).
+   dox++ assumes <a href="markdown.html">Markdown formatting</a>.</p>
+</li>
+</ol>
+<p>Note that commands are recognized and processed outside of any Markdown parsing, so
+commands inside of backticks or code fences are processed the same way as outside
+of them.</p>
+<h2 id="commands_start_block">At the start of a documentation block</h2>
+<p>These define what the documentation block does. The first line of the block must start
+with one of these commands, otherwise it will be associated to the next declaration
+(or previous if it starts with <code>&lt;</code>).</p>
+<h3 id="command_addtogroup"><code>\addtogroup</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍addtogroup &lt;name&gt;</span>
+</pre></div>
+
+<p>Sets <code>&lt;name&gt;</code> as the active group. If the group is not defined, a new group will be created
+with no name and no documentation. Use <code>\group</code> to name and document the group.
+Must be matched by a <code>endgroup</code>.</p>
+<p><code>\addtogroup</code> can also be used at the end of a <code>\group</code> documentation block. In this
+case it must not have a <code>&lt;name&gt;</code> parameter.</p>
+<p>See <a href="grouping.html">Grouping</a> for more information on grouping.</p>
+<p>The remainder of the comment block is ignored.</p>
+<h3 id="command_alias"><code>\alias</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍alias &lt;name&gt;</span>
+<span class="err">\‍typedef &lt;name&gt;</span>
+</pre></div>
+
+<p>Documents an alias declared in the headers with <code>using</code> or <code>typedef</code>. The declaration must actually
+exist. <code>&lt;name&gt;</code> is the fully qualified name of the alias, or, if not fully qualified, the alias
+with the &ldquo;best&rdquo; match is assumed (&ldquo;best&rdquo; means that the fewest number of scopes have to be prepended
+to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
+<code>&lt;name&gt;</code> is not the fully qualified name of the matched alias.</p>
+<p><code>\typedef</code> is an alias for compatibility with Doxygen.</p>
+<h3 id="command_class"><code>\class</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍class &lt;name&gt;</span>
+<span class="err">\‍class &lt;id&gt;</span>
+</pre></div>
+
+<p>Documents a class declared in the headers with <code>class</code>. The declaration must actually
+exist. <code>&lt;name&gt;</code> is the fully qualified name of the class, or, if not fully qualified, the class
+with the &ldquo;best&rdquo; match is assumed (&ldquo;best&rdquo; means that the fewest number of scopes have to be prepended
+to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
+<code>&lt;name&gt;</code> is not the fully qualified name of the matched class.</p>
+<p>Alternatively, provide the ID for the class.</p>
+<h3 id="command_dir"><code>\dir</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍dir [&lt;path fragment&gt;]</span>
+</pre></div>
+
+<p>dox++ doesn&rsquo;t document directories. This Doxygen command is recognized and a warning
+message is produced.</p>
+<h3 id="command_endgroup"><code>\endgroup</code></h3>
+<p>Closes the nearest previous <code>\addtogroup</code>.
+See <a href="grouping.html">Grouping</a> for more information.</p>
+<h3 id="command_endname"><code>\endname</code></h3>
+<p>See <a href="commands.html#command_name"><code>\name</code></a>.</p>
+<h3 id="command_enum"><code>\enum</code></h3>
+<div class="m-code"><pre><span></span>\<span class="err">‍</span><span class="k">enum</span> <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span>
+\<span class="err">‍</span><span class="k">enum</span> <span class="o">&lt;</span><span class="n">id</span><span class="o">&gt;</span>
+</pre></div>
+
+<p>Documents an enumerator declared in the headers with <code>enum</code> or <code>enum class</code>. The declaration must actually
+exist. <code>&lt;name&gt;</code> is the fully qualified name of the enumerator, or, if not fully qualified, the enumerator
+with the &ldquo;best&rdquo; match is assumed (&ldquo;best&rdquo; means that the fewest number of scopes have to be prepended
+to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
+<code>&lt;name&gt;</code> is not the fully qualified name of the matched enumerator.</p>
+<p>Alternatively, provide the ID for the enumerator.</p>
+<h3 id="command_file"><code>\file</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍file [&lt;name&gt;]</span>
+</pre></div>
+
+<p>Adds documentation for the current file, or a different file if the file name is given.
+The rest of the comment block is considered documentation.</p>
+<div class="m-code"><pre><span></span><span class="c1">/// \file</span>
+<span class="c1">/// This is the brief description for the current file.</span>
+<span class="c1">/// This is the detailed description right here.</span>
+</pre></div>
+
+<h3 id="command_function"><code>\function</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍function &lt;name&gt;</span>
+<span class="err">\‍function &lt;id&gt;</span>
+<span class="err">\‍fn &lt;name&gt;</span>
+<span class="err">\‍fn &lt;id&gt;</span>
+</pre></div>
+
+<p>Documents a function or class method declared in the headers. The declaration must actually
+exist. <code>&lt;name&gt;</code> is the fully qualified name of the function, or, if not fully qualified, the function
+with the &ldquo;best&rdquo; match is assumed (&ldquo;best&rdquo; means that the fewest number of scopes have to be prepended
+to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
+<code>&lt;name&gt;</code> is not the fully qualified name of the matched function.</p>
+<p>To disambiguate overloaded functions, provide in <code>&lt;name&gt;</code> the argument list types, for example:</p>
+<div class="m-code"><pre><span></span><span class="c1">/// \function namesp::funcname(int, double*)</span>
+</pre></div>
+
+<p>Alternatively, provide the ID for the function.</p>
+<p><code>\fn</code> is an alias for compatibility with Doxygen.</p>
+<h3 id="command_group"><code>\group</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍group &lt;name&gt; [&lt;title&gt;]</span>
+<span class="err">\‍defgroup &lt;name&gt; [&lt;title&gt;]</span>
+</pre></div>
+
+<p>Documents a group.</p>
+<p><code>&lt;name&gt;</code> is the unique identifier for the group.</p>
+<p><code>&lt;title&gt;</code> is the title for the group, everything after the <code>&lt;name&gt;</code> and until the first newline
+is considered the title.</p>
+<p>The remainder of the comment block is the documentation, the first line being the &ldquo;brief&rdquo;
+string.</p>
+<p>A second <code>\group</code> command encountered with the same <code>id</code> will add documentation to the group,
+but the <code>name</code> and <code>brief</code> string will be ignored. Thus, multiple <code>\group</code> commands
+can co-exist, but only the first one encountered can set the <code>name</code> and <code>brief</code> strings.</p>
+<p>The documentation group can end with <code>\addtogroup</code>, in which case the group with ID <code>&lt;name&gt;</code>
+will become active.</p>
+<p><code>\defgroup</code> is an alias for compatibility with Doxygen, even tough the command is used
+somewhat differently.</p>
+<p>See <a href="grouping.html">Grouping</a> for more information on grouping.</p>
+<h3 id="command_macro"><code>\macro</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍macro &lt;name&gt;</span>
+<span class="err">\‍def &lt;name&gt;</span>
+</pre></div>
+
+<p>The only way of documenting preprocessor macros, as Clang doesn&rsquo;t report on the work of
+the preprocessor (well, it&rsquo;s possible, but it makes things a lot more complex).</p>
+<p><code>&lt;name&gt;</code> can contain the argument list in parenthesis, but doesn&rsquo;t need to. For example:</p>
+<div class="m-code"><pre><span></span><span class="c1">/// \macro FOO</span>
+<span class="cp">#define FOO(a)</span>
+<span class="c1">/// \macro BAR(b)</span>
+<span class="cp"># define BAR(b)</span>
+</pre></div>
+
+<p>The backend has the option of showing <code>b</code> as the argument to macro <code>BAR</code>, but will not
+know anything about <code>a</code>, the argument to macro <code>FOO</code>.</p>
+<p>Because Clang doesn&rsquo;t report where the macro is defined, we take the file where this
+documentation block lives as the include file for the macro. Therefore, you should always
+put this command in the same file where the macro is actually defined.</p>
+<p>TODO: Maybe eventually <code>\headerfile</code> can be used to indicate which header the macro is defined in.</p>
+<p><code>\def</code> is an alias for compatibility with Doxygen.</p>
+<h3 id="command_mainpage"><code>\mainpage</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍mainpage [&lt;title&gt;]</span>
+</pre></div>
+
+<p>Creates a page with the ID <code>index</code>, and <code>&lt;title&gt;</code> as the page&rsquo;s title. This is the start page
+for the documentation. Text in this block is the page&rsquo;s text. See <code>\page</code> for more information.</p>
+<h3 id="command_name"><code>\name</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍name &lt;header&gt;</span>
+</pre></div>
+
+<p>Creates a group for class or struct members.  The <code>&lt;header&gt;</code> text
+is used to label the group in the documentation. Each <code>\name</code> command closes the previous
+group and starts a new one. Use <code>\endname</code> to close off the group without starting a new one.</p>
+<p>Any members declared in between a <code>\name</code> and the next <code>\name</code> or <code>\endname</code> belong to the
+group introduced by that first <code>\name</code> command.</p>
+<p>Unlike with the <code>\addtogroup</code> command, <code>\name</code> and <code>\endname</code> must enclose the declaration
+of the class or struct members, not their documentation blocks.</p>
+<p>The parser is not very clever, and so a class/struct member group remains active in the remainder
+of the file until <code>\endname</code> is encountered, even within other classes.</p>
+<p>It is not possible to reference these groups.
+The backend can choose to group class or struct members by access (private/protected/public), or
+by <code>\name</code> grouping, or both.</p>
+<h3 id="command_namespace"><code>\namespace</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍namespace &lt;name&gt;</span>
+<span class="err">\‍namespace &lt;id&gt;</span>
+</pre></div>
+
+<p>Documents a namespace declared in the headers. The declaration must actually exist. <code>&lt;name&gt;</code> is the
+fully qualified name of the namespace, or, if not fully qualified, the namespace with the &ldquo;best&rdquo;
+match is assumed (&ldquo;best&rdquo; means that the fewest number of scopes have to be prepended to make the
+match). In case of ambiguity, the first match is chosen. A warning is produced if <code>&lt;name&gt;</code> is not
+the fully qualified name of the matched namespace.</p>
+<p>Alternatively, provide the ID for the namespace.</p>
+<h3 id="command_page"><code>\page</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍page &lt;name&gt; &lt;title&gt;</span>
+</pre></div>
+
+<p>Creates a page with <code>&lt;name&gt;</code> as ID and <code>&lt;title&gt;</code> as the title. Text in this block is the page&rsquo;s text.
+The page can be referenced by its ID.</p>
+<p>Use <code>\‍subpage</code> commands in a page to reference other pages and make those referenced pages sub-pages to
+this page. Use <code>\‍ref</code> commands to reference other pages but not impose any hierarchy.</p>
+<p>By default, all pages are at the same level, not subordinate to any other page.</p>
+<h3 id="command_struct"><code>\struct</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍struct &lt;name&gt;</span>
+<span class="err">\‍struct &lt;id&gt;</span>
+</pre></div>
+
+<p>Documents a struct declared in the headers. The declaration must actually exist.
+<code>&lt;name&gt;</code> is the fully qualified name of the struct, or, if not fully qualified, the struct
+with the &ldquo;best&rdquo; match is assumed (&ldquo;best&rdquo; means that the fewest number of scopes have to be prepended
+to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
+<code>&lt;name&gt;</code> is not the fully qualified name of the matched struct.</p>
+<p>Alternatively, provide the ID for the struct.</p>
+<h3 id="command_union"><code>\union</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍union &lt;name&gt;</span>
+<span class="err">\‍union &lt;id&gt;</span>
+</pre></div>
+
+<p>Documents a union or constant declared in the headers. The declaration must actually exist.
+<code>&lt;name&gt;</code> is the fully qualified name of the union, or, if not fully qualified, the union
+with the &ldquo;best&rdquo; match is assumed (&ldquo;best&rdquo; means that the fewest number of scopes have to be prepended
+to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
+<code>&lt;name&gt;</code> is not the fully qualified name of the matched union.</p>
+<p>Alternatively, provide the ID for the union.</p>
+<h3 id="command_variable"><code>\variable</code></h3>
+<div class="m-code"><pre><span></span>\<span class="err">‍</span><span class="n">variable</span> <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span>
+\<span class="err">‍</span><span class="n">variable</span> <span class="o">&lt;</span><span class="n">id</span><span class="o">&gt;</span>
+\<span class="err">‍</span><span class="k">var</span> <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span>
+\<span class="err">‍</span><span class="k">var</span> <span class="o">&lt;</span><span class="n">id</span><span class="o">&gt;</span>
+</pre></div>
+
+<p>Documents a variable or constant declared in the headers. The declaration must actually exist.
+<code>&lt;name&gt;</code> is the fully qualified name of the variable, or, if not fully qualified, the variable
+with the &ldquo;best&rdquo; match is assumed (&ldquo;best&rdquo; means that the fewest number of scopes have to be prepended
+to make the match). In case of ambiguity, the first match is chosen. A warning is produced if
+<code>&lt;name&gt;</code> is not the fully qualified name of the matched variable.</p>
+<p>Alternatively, provide the ID for the variable.</p>
+<p><code>\var</code> is an alias for compatibility with Doxygen.</p>
+<h2 id="commands_inside">Inside documentation blocks</h2>
+<h3 id="command_anchor"><code>\‍anchor</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍anchor &lt;name&gt;</span>
+</pre></div>
+
+<p>Anywhere in a documentation block, adds an anchor that can be referenced elsewhere with <code>\‍ref</code>.</p>
+<p>The <code>\anchor</code> command must happen at the end of a paragraph or in a paragraph of its own,
+in either case it references the preceding paragraph. The paragraph is assigned the <code>#&lt;name&gt;</code>
+attribute.</p>
+<h3 id="command_brief"><code>\brief</code></h3>
+<p>Used at the beginning of the first line of a comment block, turns the first paragraph into the &ldquo;brief&rdquo; string.</p>
+<div class="m-code"><pre><span></span><span class="c1">/// \brief This is a rather long brief description</span>
+<span class="c1">/// of the member below.</span>
+<span class="c1">///</span>
+<span class="c1">/// This is the detailed description right here.</span>
+<span class="c1">/// Note the empty line that separates paragraphs.</span>
+<span class="kt">int</span> <span class="n">foo</span><span class="p">;</span>
+</pre></div>
+
+<h3 id="command_ingroup"><code>\ingroup</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\ingroup &lt;name&gt;</span>
+</pre></div>
+
+<p>If this appears in the comment block for a namespace member, the member will become part of the
+group listed. It can also appear in the comment block of a group, to nest groups.</p>
+<p><code>\ingroup</code> overrules the group name of the enclosing <code>\addtogroup</code>/<code>\endgroup</code>.</p>
+<p>See <a href="grouping.html">Grouping</a> for more information on grouping.</p>
+<p>This command is expected to be on its own on a line.</p>
+<h3 id="command_n"><code>\‍n</code></h3>
+<p>Inserts a line break. The Markdown for a line break is two spaces at the end of a line.
+Because many code editors automatically remove such spaces, use this command instead.
+It will be replaced by two spaces, and a newline will be added if it&rsquo;s not there already.</p>
+<p>TODO!</p>
+<h3 id="command_ref"><code>\‍ref</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍ref &lt;name&gt; [&quot;&lt;text&gt;&quot;]</span>
+<span class="err">\‍ref &quot;&lt;name&gt;&quot; [&quot;&lt;text&gt;&quot;]</span>
+</pre></div>
+
+<p>Creates a link to the entity (member, header, group or page) called <code>&lt;name&gt;</code>. Optionally,
+the link text can be set to <code>&lt;text&gt;</code>. If left out, the link text will be the tile of the page
+or the name of the member referenced.</p>
+<p><code>&lt;name&gt;</code> will be looked up according to logical rules: in the documentation for <code>ns::foo</code>,
+<code>\‍ref bar</code> will see if <code>ns::foo::bar</code> exists, otherwise it will look for <code>ns::bar</code>, or
+finally <code>::bar</code>. If no match exists, <code>&lt;name&gt;</code> will be interpreted as an ID. Use the ID
+to link to a member, a header, a group, a page, a section or an anchor. If <code>&lt;name&gt;</code> does not
+match any IDs either, then <code>&lt;name&gt;</code> (or <code>&lt;text&gt;</code>) will be output without linking to anything.
+In a page, always use the fully qualified name for members, or their ID.</p>
+<p>If <code>bar</code> is a function with multiple overloads, then <code>\‍ref bar</code> will match the first function with that name.
+To disambiguate overloaded functions, <code>&lt;name&gt;</code> should be the full function declaration,
+without parameter names, and the types must match exactly. For example, <code>\‍ref bar(int, double const&amp;)</code>
+will match a function <code>bar(int, double const&amp;)</code>, but not <code>bar(int, double const)</code> nor
+<code>bar(int, double&amp;)</code> nor <code>bar(int, double const&amp;, int)</code>.</p>
+<p>To link to a header file, give its ID, or specify the file name (optionally with a partial path)
+in quotes, for example <code>\‍ref "path/header.h" "link text"</code>. When giving a file name, the header
+with a matching name and the fewest path elements prepended will be linked to. The link text,
+if not given explicitly, is the header file name with path starting at the project root
+(as specified in the options).</p>
+<p>Quotes around <code>&lt;name&gt;</code> are also required if the member is a function that overloads an operator,
+since operators contain characters that are otherwise not seen as part of <code>&lt;name&gt;</code>. For example,
+<code>\‍ref operator==</code> will see the <code>==</code> as not being part of <code>&lt;name&gt;</code>, and will try to find a member
+called <code>operator</code> (which is an illegal member name, since it&rsquo;s a reserved keyword in C++). Instead,
+use <code>\‍ref "operator=="</code>.</p>
+<p>Finally, if a link must be immediately followed by a character that is considered part of <code>&lt;name&gt;</code>
+by the parser, one can use quotes to disambiguate: <code>\‍ref foo--</code> would try to match &ldquo;<code>foo--</code>&rdquo; (maybe
+as the ID of a function), whereas <code>\‍ref "foo"--</code> will correctly match &ldquo;<code>foo</code>&rdquo; and put two dashes
+after the link.</p>
+<p>When using quotes around <code>&lt;name&gt;</code>, the space between the closing quotes and the opening quotes
+for <code>&lt;text&gt;</code> is mandatory. Two sequential quotes are considered part of an operator name,
+such as in <code>\‍ref "operator""_w"</code>.</p>
+<h3 id="command_relates"><code>\‍relates</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍relates &lt;name&gt;</span>
+<span class="err">\‍related &lt;name&gt;</span>
+</pre></div>
+
+<p>Added to the documentation block of a function or variable, and with <code>&lt;name&gt;</code> referencing
+a class, adds the function or variable to a &ldquo;Related&rdquo; section in the class&rsquo; documentation.</p>
+<p>Note that this command should not be placed in class, struct, union or enum members, only
+in namespace members (including global scope).</p>
+<p>This command is expected to be on its own on a line. Each member can only have one <code>\relates</code>
+command.</p>
+<h3 id="command_section"><code>\section</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\section &lt;name&gt; &lt;title&gt;</span>
+</pre></div>
+
+<p>Starts a new section within a documentation block or a page. <code>&lt;name&gt;</code> is the ID that can
+be used with <code>\‍ref</code> to reference the section.</p>
+<p>This is replaced by the Markdown code <code># &lt;title&gt; {#name}</code>. The <code>#</code> represents a level 1 heading,
+but this will be demoted by the backend to be a lower level than the containing block.</p>
+<p>One can also directly write <code># My Title {#my-title}</code>, but then the <code>\‍ref</code> command will not recognize
+<code>my-title</code> as something that can be referenced.</p>
+<h3 id="command_see"><code>\‍see</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍see &lt;name&gt; [, &lt;name&gt; [, ...]</span>
+<span class="err">\‍sa &lt;name&gt; [, &lt;name&gt; [, ...]</span>
+</pre></div>
+
+<p>Starts a paragraph with a &ldquo;See also&rdquo; header linking the given entities (members, headers, groups, pages).
+See <code>\‍ref</code> for how <code>&lt;name&gt;</code> is interpreted and disambiguated.</p>
+<p>Note that this inserts a <code>\par See also</code> command that the backend must interpret to create the heading,
+and optionally box the whole paragraph.</p>
+<p>This command is expected to be on its own on a line. Cannot occur inside the brief description.</p>
+<h3 id="command_subpage"><code>\‍subpage</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\‍subpage &lt;name&gt; [&quot;&lt;text&gt;&quot;]</span>
+</pre></div>
+
+<p>This is similar to <code>\‍ref</code>, but for pages. It can only occur inside a page (see <code>\page</code>).
+<code>\‍subpage &lt;name&gt;</code> creates a link to page <code>&lt;name&gt;</code> and additionally builds a hierarchy
+structure, indicating that the linked page is subordinate to the current page. Only
+one <code>\‍subpage</code> command can reference each page, such that each page has only one &ldquo;parent&rdquo;
+page. Furthermore, these references should not form loops, the page hierarchy must form
+a tree structure.</p>
+<p>The page called <code>index</code> (see <code>\mainpage</code>) should not be made a subpage of another page.</p>
+<p><code>\‍subpage &lt;name&gt; "&lt;text&gt;"</code> uses <code>&lt;text&gt;</code> as the anchor text for the link.</p>
+<p>To create links without creating hierarchical relations, use <code>\‍ref</code>.</p>
+<h3 id="command_subsection"><code>\subsection</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\subsection &lt;name&gt; &lt;title&gt;</span>
+</pre></div>
+
+<p>Like <code>\section</code>, but for a level 2 heading (<code>##</code> in Markdown).</p>
+<h3 id="command_subsubsection"><code>\subsubsection</code></h3>
+<div class="m-code"><pre><span></span><span class="err">\subsubsection &lt;name&gt; &lt;title&gt;</span>
+</pre></div>
+
+<p>Like <code>\section</code>, but for a level 3 heading (<code>###</code> in Markdown).</p>
+<h2 id="commands_start_of_line">At the start of a line in Markdown files only</h2>
+<h3 id="command_comment"><code>\‍comment</code></h3>
+<p>The rest of the line is ignored. Use this to add comments not meant to be shown in the
+documentation, file copyright notices, etc.</p>
+<hr>
+<h2 id="commands_not_implemented">Doxygen commands that will not be implemented</h2>
+<h3 id="commands_not_implemented_illegal">Because the information is always retrieved from the code</h3>
+<ul>
+<li><code>\extends</code></li>
+<li><code>\implements</code></li>
+<li><code>\memberof</code></li>
+<li><code>\private</code></li>
+<li><code>\privatesection</code></li>
+<li><code>\protected</code></li>
+<li><code>\protectedsection</code></li>
+<li><code>\public</code></li>
+<li><code>\publicsection</code></li>
+<li><code>\pure</code></li>
+<li><code>\static</code></li>
+</ul>
+<h3 id="commands_not_implemented_notcpp">Because it doesn&rsquo;t apply to C++</h3>
+<ul>
+<li><code>\idlexcept</code> -&gt; IDL only</li>
+<li><code>\interface</code></li>
+<li><code>\package</code> -&gt; Java only</li>
+<li><code>\property</code></li>
+<li><code>\protocol</code> -&gt; Objective-C only</li>
+<li><code>\vhdlflow</code> -&gt; VHDL only</li>
+</ul>
+<h3 id="commands_not_implemented_nonsensical">Because it doesn&rsquo;t make sense to me</h3>
+<ul>
+<li><code>\callergraph</code></li>
+<li><code>\callgraph</code></li>
+<li><code>\cond</code> / <code>\endcond</code> -&gt; use an <code>#ifdef</code> conditional compilation to exclude things from the documentation</li>
+<li><code>\hidecallergraph</code></li>
+<li><code>\hidecallgraph</code></li>
+<li><code>\hideinitializer</code> -&gt; this is something that the backend can do</li>
+<li><code>\hiderefby</code></li>
+<li><code>\hiderefs</code></li>
+<li><code>\internal</code> / <code>\endinternal</code></li>
+<li><code>\link</code> / <code>\endlink</code> -&gt; we&rsquo;re using <code>\‍ref</code> for everything</li>
+<li><code>\overload [(function declaration)]</code></li>
+<li><code>\relatedalso &lt;name&gt;</code></li>
+<li><code>\relatesalso &lt;name&gt;</code></li>
+<li><code>\showinitializer</code> -&gt; this is something that the backend can do</li>
+<li><code>\showrefby</code></li>
+<li><code>\showrefs</code></li>
+<li><code>\weakgroup</code></li>
+<li><code>\{</code> -&gt; we use <code>\addtogroup</code> instead</li>
+<li><code>\}</code> -&gt; we use <code>\endgroup</code> instead</li>
+</ul>
+<h3 id="commands_not_implemented_markup">All the stuff that is related to markup, use Markdown instead</h3>
+<p>(There might be some other stuff in here that I missed?)</p>
+<ul>
+<li><code>\a</code></li>
+<li><code>\addindex</code></li>
+<li><code>\arg</code></li>
+<li><code>\attention</code></li>
+<li><code>\author</code></li>
+<li><code>\authors</code></li>
+<li><code>\b</code></li>
+<li><code>\brief</code></li>
+<li><code>\bug</code></li>
+<li><code>\c</code></li>
+<li><code>\category</code></li>
+<li><code>\cite</code></li>
+<li><code>\code</code> / <code>\endcode</code></li>
+<li><code>\copybrief</code></li>
+<li><code>\copydetails</code></li>
+<li><code>\copydoc</code></li>
+<li><code>\copyright</code></li>
+<li><code>\date</code></li>
+<li><code>\deprecated</code></li>
+<li><code>\details</code></li>
+<li><code>\diafile</code></li>
+<li><code>\docbookinclude</code></li>
+<li><code>\docbookonly</code> / <code>\enddocbookonly</code></li>
+<li><code>\dontinclude</code></li>
+<li><code>\dot</code> / <code>\enddot</code></li>
+<li><code>\dotfile</code></li>
+<li><code>\e</code></li>
+<li><code>\em</code></li>
+<li><code>\emoji</code></li>
+<li><code>\exception</code></li>
+<li><code>\f$</code></li>
+<li><code>\f[</code> / <code>\f]</code></li>
+<li><code>\f{</code> / <code>\f}</code></li>
+<li><code>\htmlinclude</code></li>
+<li><code>\htmlonly</code> / <code>\endhtmlonly</code></li>
+<li><code>\if</code> / <code>\ifnot</code> / <code>\elseif</code> / <code>\else</code> / <code>\endif</code></li>
+<li><code>\image</code></li>
+<li><code>\include</code></li>
+<li><code>\includedoc</code></li>
+<li><code>\includelineno</code></li>
+<li><code>\invariant</code></li>
+<li><code>\latexinclude</code></li>
+<li><code>\latexonly</code> / <code>\endlatexonly</code></li>
+<li><code>\li</code></li>
+<li><code>\line</code></li>
+<li><code>\maninclude</code></li>
+<li><code>\manonly</code> / <code>\endmanonly</code></li>
+<li><code>\msc</code> / <code>\endmsc</code></li>
+<li><code>\mscfile</code></li>
+<li><code>\note</code></li>
+<li><code>\p</code></li>
+<li><code>\par</code></li>
+<li><code>\paragraph</code></li>
+<li><code>\param</code></li>
+<li><code>\parblock</code> / <code>\endparblock</code></li>
+<li><code>\post</code></li>
+<li><code>\pre</code></li>
+<li><code>\refitem</code></li>
+<li><code>\remark</code></li>
+<li><code>\remarks</code></li>
+<li><code>\result</code></li>
+<li><code>\return</code></li>
+<li><code>\returns</code></li>
+<li><code>\retval</code></li>
+<li><code>\rtfinclude</code></li>
+<li><code>\rtfonly</code> / <code>\endrtfonly</code></li>
+<li><code>\secreflist</code> / <code>\endsecreflist</code></li>
+<li><code>\short</code></li>
+<li><code>\since</code></li>
+<li><code>\skip</code></li>
+<li><code>\skipline</code></li>
+<li><code>\snippet</code></li>
+<li><code>\snippetdoc</code></li>
+<li><code>\snippetlineno</code></li>
+<li><code>\startuml</code> / <code>\enduml</code></li>
+<li><code>\tableofcontents</code></li>
+<li><code>\test</code></li>
+<li><code>\throw</code></li>
+<li><code>\throws</code></li>
+<li><code>\todo</code></li>
+<li><code>\tparam</code></li>
+<li><code>\until</code></li>
+<li><code>\verbatim</code> / <code>\endverbatim</code></li>
+<li><code>\verbinclude</code></li>
+<li><code>\version</code></li>
+<li><code>\warning</code></li>
+<li><code>\xmlinclude</code></li>
+<li><code>\xmlonly</code> / <code>\endxmlonly</code></li>
+<li><code>\xrefitem</code></li>
+<li><code>\$</code></li>
+<li><code>\@</code></li>
+<li><code>\\</code></li>
+<li><code>\&amp;</code></li>
+<li><code>\~</code></li>
+<li><code>\&lt;</code></li>
+<li><code>\=</code></li>
+<li><code>\&gt;</code></li>
+<li><code>\#</code></li>
+<li><code>\%</code></li>
+<li><code>\"</code></li>
+<li><code>\.</code></li>
+<li><code>\::</code></li>
+<li><code>\|</code></li>
+<li><code>\--</code></li>
+<li><code>\---</code></li>
+</ul>
+        <div class="m-note m-dim m-thin m-text-center"><a href="documenting_code.html" class="m-doc">&laquo; How to document your code</a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="grouping.html" class="m-doc">Grouping &raquo;</a></div>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">&hellip;</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div id="search-help" class="m-text m-dim m-text-center">
+            <p class="m-noindent">Search for symbols, directories, files, pages or modules.
+              You can omit any prefix from the symbol or file path; adding a <code>:</code> or
+              <code>/</code> suffix lists all members of given symbol or directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span> / <span class="m-label m-dim">&uarr;</span> to navigate through the list,
+              <span class="m-label m-dim">Enter</span> to go.
+              <span class="m-label m-dim">Tab</span> autocompletes common prefix.
+              You can copy a link to the result using <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">L</span>,
+              or <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">M</span> to copy a Markdown link.</p>
+          </div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v1.js"></script>
+<script>
+  Search.download(window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') + 1) + 'searchdata-v1.bin');
+</script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <p>dox++, Documentation preparation system for C++. Documentation compiled with <a href="https://github.com/crisluengo/doxpp">dox++</a> and styled with <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+      </div>
+    </div>
+  </div>
+</nav></footer>
+</body>
+</html>

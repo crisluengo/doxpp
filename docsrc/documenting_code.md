@@ -1,4 +1,4 @@
-# How to document your code
+\page documenting_code How to document your code
 
 Put a decorated comment before the declaration of each member:
 ```cpp
@@ -26,9 +26,8 @@ But it depends on the generator that consumes the JSON file how it is interprete
 If your generator supports HTML tags, you can use those. If you generator supports
 special commands, you can use those.
 
-dox++ will identify certain commands, and change its behavior. See the
-[`commands.md`](https://github.com/crisluengo/doxpp/tree/main/doc/commands.md)
-file for details.
+dox++ will identify certain commands, and change its behavior. See \ref commands
+for details.
 
 The `\brief` command changes the parsing so that the first paragraph, rather than
 the first line, is the "brief" string. This command must be at the beginning of

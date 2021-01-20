@@ -5,13 +5,13 @@ compiler flags = -xc++ -std=c++14
 include directories =
 
 [log]
-level = debug
+level = warning
 
 [input]
 root directory = .
-header files = transport/transport.h
-markdown files = 
-tab size = 3
+header files = transport/*.h
+markdown files = transport/*.md
+tab size = 4
 
 [json]
 filename = transport.json
@@ -19,10 +19,31 @@ use typewriter font = yes
 formatting = readable
 
 [project]
-name = Example
+name = dox++ example
 brief = An example project
 
 [html]
-output directory = html
+output directory = ../docs/example
 document private members = yes
+document protected members = yes
 document undocumented members = yes
+stylesheets = css/m-dark-documentation.compiled.css
+templates = 
+documentation link class = m-doc
+extra files = 
+html header = 
+page header = 
+fine print = [default]
+navigation bar 1 = [('', '#modules', []),('', '#namespaces', [])]
+navigation bar 2 = [('', '#classes', []),('', '#files', [])]
+file index expand levels = 1
+class index expand levels = 1
+class index expand inner = no
+
+[search]
+enable = yes
+download binary = no
+base url =
+external url = 
+add snake case suffixes = yes
+add camel case suffixes = yes

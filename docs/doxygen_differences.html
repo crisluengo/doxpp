@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Differences with Doxygen | dox++ | Documentation preparation system for C++</title>
+  <link rel="stylesheet" href="m-light-documentation.compiled.css" />
+  <link rel="icon" href="favicon-light.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22272e" />
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <span id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">
+        <a href="https://crisluengo.github.io/doxpp">dox++</a><span class="m-breadcrumb">┃</span><a href="index.html" class="m-thin">Documentation preparation system for C++</a>      </span>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path id="m-doc-search-icon-path" d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z"/>
+        </svg></a>
+        <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
+        <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
+      </div>
+      <div id="m-navbar-collapse" class="m-col-t-12 m-show-m m-col-m-none m-right-m">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li>
+              <a href="documentation.html">Documentation</a>
+              <ol>
+                <li><a href="documenting_code.html">How to document your code</a></li>
+                <li><a href="configuration.html">Configuring dox++</a></li>
+                <li><a href="running_the_tools.html">Running dox++parse and dox++html</a></li>
+                <li><a href="json_output.html">JSON output of dox++parse</a></li>
+              </ol>
+            </li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="2">
+            <li><a href="example/index.html">example site</a></li>
+            <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path" />
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          Differences with Doxygen
+        </h1>
+<p>dox++ follows Doxygen syntax only partially. Here we highlight the more important
+differences. See the <a href="documentation.html">Documentation</a> for more details.</p>
+<p>Changes from Doxygen are as follows:</p>
+<ol>
+<li>
+<p>Markup commands are passed as-is into the output JSON file, and left to the generator
+   to parse. Our current generator does not parse any of the Doxygen markup commands, and
+   assumes pure Markdown. Markdown formatting works also in page and section titles.</p>
+</li>
+<li>
+<p>Documented members can belong to one group (module) at most. Groups form a tree structure.
+   Grouping commands have the same names but work slightly differently. Namespace and
+   class pages link back to the group they belong to, if applicable.</p>
+</li>
+<li>
+<p>It is meant to parse header files only, not the implementation files. It documents the API
+   of a library, not all the code in a project. It documents everything declared in the header
+   files, even if no documentation block is associated to the declaration. The generator can
+   choose what to output. Directories are not documented, only the header files themselves.</p>
+</li>
+<li>
+<p>Commands intended to document members cannot define non-existing members. For example,
+   the <code>\class &lt;name&gt;</code> command adds documentation to a class. The class must be declared somewhere
+   in the header files. These comment blocks cannot define properties of the documented members,
+   those properties must be reflected in the code itself. For example, <code>\extends</code>, <code>\pure</code> or
+   <code>\static</code> are not recognized. Some of those commands have simpler interfaces, and some have
+   aliases that make more sense (for example <code>\macro</code> for <code>\def</code>, <code>\alias</code> for <code>\typedef</code>,
+   <code>\function</code> for <code>\fn</code>).</p>
+</li>
+<li>
+<p>Markdown files can contain comments with the <code>\comment</code> command. There is no empty page generated
+   for Markdown files that contain member documentation.</p>
+</li>
+<li>
+<p>Unique identifiers for members are fairly readable, and don&rsquo;t look like the hashes that
+   Doxygen generates. This should allow the generator to create more meaningful URLs.</p>
+</li>
+<li>
+<p>SFINAE template parameters are summarized as &ldquo;&lt;SFINAE>&ldquo;. Multiple definitions of a template
+   with different SFINAE results (such as when one version is defined for unsigned numeric types
+   and another one for signed numeric types) are collapsed into a single (documented) template.</p>
+</li>
+<li>
+<p>There is no &ldquo;autolink&rdquo;, all links must be explicitly made with <code>\‍ref</code>. Consequently, it is
+   not necessary to prepend <code>%</code> to avoid turning some words into links.</p>
+</li>
+<li>
+<p>The generator creates pages for undocumented classes, namespaces and files that have documented
+   members. Thus, it is not necessary to document a file just to be able to document the functions
+   that are declared in it.</p>
+</li>
+</ol>
+<h3>What is missing</h3>
+<p>I&rsquo;m sure there are lots of things missing I&rsquo;m not even aware of. Here are a few missing things
+that I am aware of.</p>
+<p>Things we&rsquo;d like to add/fix/improve:</p>
+<ol>
+<li>
+<p>Template parameters that are templated types are treated a bit too simplistically.</p>
+</li>
+<li>
+<p>Link override and overridden functions together.</p>
+</li>
+<li>
+<p>There&rsquo;s no way to have the literal text &ldquo;<code>\‍ref</code>&rdquo; (and similar commands) in the documentation,
+   we need to avoid matching commands inside backticks or in code blocks.</p>
+</li>
+<li>
+<p>References to a member that is injected into a different namespace it was declared in are not
+   resolved (e.g. through a <code>using</code> statement, or members of an anonymous or inline namespace).</p>
+</li>
+<li>
+<p>Clang doesn&rsquo;t easily report on pre-processor macros. Instead of making things complicated,
+   we just require adding the <code>\macro</code> (or <code>\def</code>) command at the top of the documentation block.</p>
+</li>
+<li>
+<p>Function arguments can not yet be individually documented. <code>\param</code>, <code>\return</code> and <code>\exception</code>
+   are not yet supported.</p>
+</li>
+<li>
+<p>Soon we&rsquo;ll have the ability to typeset equations from LaTeX strings.</p>
+</li>
+</ol>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">&hellip;</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div id="search-help" class="m-text m-dim m-text-center">
+            <p class="m-noindent">Search for symbols, directories, files, pages or modules.
+              You can omit any prefix from the symbol or file path; adding a <code>:</code> or
+              <code>/</code> suffix lists all members of given symbol or directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span> / <span class="m-label m-dim">&uarr;</span> to navigate through the list,
+              <span class="m-label m-dim">Enter</span> to go.
+              <span class="m-label m-dim">Tab</span> autocompletes common prefix.
+              You can copy a link to the result using <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">L</span>,
+              or <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">M</span> to copy a Markdown link.</p>
+          </div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v1.js"></script>
+<script>
+  Search.download(window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') + 1) + 'searchdata-v1.bin');
+</script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <p>dox++, Documentation preparation system for C++. Documentation compiled with <a href="https://github.com/crisluengo/doxpp">dox++</a> and styled with <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+      </div>
+    </div>
+  </div>
+</nav></footer>
+</body>
+</html>

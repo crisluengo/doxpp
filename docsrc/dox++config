@@ -1,0 +1,34 @@
+# Default dox++ configuration file
+
+[log]
+level = warning
+
+[input]
+root directory = .
+header files =
+markdown files = *.md
+tab size = 4
+
+[json]
+filename = dox++out.json
+use typewriter font = no
+formatting = compact
+
+[project]
+name = dox++
+brief = Documentation preparation system for C++
+url = https://crisluengo.github.io/doxpp
+
+[html]
+output directory = ../docs
+theme color = #22272e
+favicon = 
+stylesheets = css/m-light-documentation.compiled.css
+navigation bar 1 = [('','#documentation',[('','#documenting_code',[]),('','#configuration',[]),('','#running_the_tools',[]),('','#json_output',[])])]
+navigation bar 2 = [('example site','example/index.html',[])]
+
+[search]
+enable = no
+download binary = no
+base url =
+external url = 

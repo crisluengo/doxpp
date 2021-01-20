@@ -1,4 +1,4 @@
-# Documentation commands
+\page commands Documentation commands
 
 These are the commands recognized by dox++parse. Commands can start with `\` or `@`.
 Here we show the `\` variant only, but you can use the other variant if you prefer.
@@ -18,27 +18,29 @@ Note that we try to keep compatibility with Doxygen, but chose to make some chan
    the same way as `\group`, which is not exactly the same way that `\defgroup` works in
    Doxygen. Furthermore, groups are disjoint, each member can only belong to one group.
 
-4. There is no "autolink", all member names must be preceded by the `\ref` command
-   to create a link to the member documentation. `\ref` is used to link to anything
+4. There is no "autolink", all member names must be preceded by the `\‍ref` command
+   to create a link to the member documentation. `\‍ref` is used to link to anything
    in the documentation, not just pages and sections.
 
 5. Doxygen commands related to markup are not recognized. Any non-recognized
    command is kept in the output JSON file, so that the backend can act on it if it
    desires (but dox++html will not recognize any of these commands either).
-   dox++ assumes [Markdown formatting](markdown.md).
+   dox++ assumes [Markdown formatting](#markdown).
 
 Note that commands are recognized and processed outside of any Markdown parsing, so
 commands inside of backticks or code fences are processed the same way as outside
 of them.
 
 
-## At the start of a documentation block
+\section commands_start_block At the start of a documentation block
 
 These define what the documentation block does. The first line of the block must start
 with one of these commands, otherwise it will be associated to the next declaration
 (or previous if it starts with `<`).
 
-### `\addtogroup <name>`
+\subsection command_addtogroup `\addtogroup`
+
+    \‍addtogroup <name>
 
 Sets `<name>` as the active group. If the group is not defined, a new group will be created
 with no name and no documentation. Use `\group` to name and document the group.
@@ -47,11 +49,14 @@ Must be matched by a `endgroup`.
 `\addtogroup` can also be used at the end of a `\group` documentation block. In this
 case it must not have a `<name>` parameter.
 
-See [`grouping.md`](https://github.com/crisluengo/doxpp/tree/main/doc/grouping.md) for more information on grouping.
+See \ref grouping for more information on grouping.
 
 The remainder of the comment block is ignored.
 
-### `\alias <name>` (or `\typedef <name>`)
+\subsection command_alias `\alias`
+
+    \‍alias <name>
+    \‍typedef <name>
 
 Documents an alias declared in the headers with `using` or `typedef`. The declaration must actually
 exist. `<name>` is the fully qualified name of the alias, or, if not fully qualified, the alias
@@ -61,7 +66,10 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 
 `\typedef` is an alias for compatibility with Doxygen.
 
-### `\class <name>`, `\class <id>`
+\subsection command_class `\class`
+
+    \‍class <name>
+    \‍class <id>
 
 Documents a class declared in the headers with `class`. The declaration must actually
 exist. `<name>` is the fully qualified name of the class, or, if not fully qualified, the class
@@ -71,22 +79,26 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 
 Alternatively, provide the ID for the class.
 
-### `\dir [<path fragment>]`
+\subsection command_dir `\dir`
 
-Currently not implemented
+    \‍dir [<path fragment>]
 
-Do we need to implement this? Is it useful?
+dox++ doesn't document directories. This Doxygen command is recognized and a warning
+message is produced.
 
-### `\endgroup`
+\subsection command_endgroup `\endgroup`
 
 Closes the nearest previous `\addtogroup`.
-See [`grouping.md`](https://github.com/crisluengo/doxpp/tree/main/doc/grouping.md) for more information.
+See \ref grouping for more information.
 
-### `\endname`
+\subsection command_endname `\endname`
 
-See `\name`.
+See \ref command_name.
 
-### `\enum <name>`, `\enum <id>`
+\subsection command_enum `\enum`
+
+    \‍enum <name>
+    \‍enum <id>
 
 Documents an enumerator declared in the headers with `enum` or `enum class`. The declaration must actually
 exist. `<name>` is the fully qualified name of the enumerator, or, if not fully qualified, the enumerator
@@ -96,7 +108,9 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 
 Alternatively, provide the ID for the enumerator.
 
-### `\file [<name>]`
+\subsection command_file `\file`
+
+    \‍file [<name>]
 
 Adds documentation for the current file, or a different file if the file name is given.
 The rest of the comment block is considered documentation.
@@ -106,7 +120,12 @@ The rest of the comment block is considered documentation.
 /// This is the detailed description right here.
 ```
 
-### `\function <name>`, `\function <id>` (`\fn` is an alias)
+\subsection command_function `\function`
+
+    \‍function <name>
+    \‍function <id>
+    \‍fn <name>
+    \‍fn <id>
 
 Documents a function or class method declared in the headers. The declaration must actually
 exist. `<name>` is the fully qualified name of the function, or, if not fully qualified, the function
@@ -123,7 +142,10 @@ Alternatively, provide the ID for the function.
 
 `\fn` is an alias for compatibility with Doxygen.
 
-### `\group <name> [<title>]` (`\defgroup` is an alias)
+\subsection command_group `\group`
+
+    \‍group <name> [<title>]
+    \‍defgroup <name> [<title>]
 
 Documents a group.
 
@@ -145,9 +167,12 @@ will become active.
 `\defgroup` is an alias for compatibility with Doxygen, even tough the command is used
 somewhat differently.
 
-See [`grouping.md`](https://github.com/crisluengo/doxpp/tree/main/doc/grouping.md) for more information on grouping.
+See \ref grouping for more information on grouping.
 
-### `\macro <name>` (or `\def <name>`)
+\subsection command_macro `\macro`
+
+    \‍macro <name>
+    \‍def <name>
 
 The only way of documenting preprocessor macros, as Clang doesn't report on the work of
 the preprocessor (well, it's possible, but it makes things a lot more complex).
@@ -166,16 +191,20 @@ Because Clang doesn't report where the macro is defined, we take the file where 
 documentation block lives as the include file for the macro. Therefore, you should always
 put this command in the same file where the macro is actually defined.
 
-TODO: Maybe eventually `\headerfile` can be used to indicate which header the macro is defined in.
+**TODO:** Maybe eventually `\headerfile` can be used to indicate which header the macro is defined in.
 
 `\def` is an alias for compatibility with Doxygen.
 
-### `\mainpage [<title>]`
+\subsection command_mainpage `\mainpage`
+
+    \‍mainpage [<title>]
 
 Creates a page with the ID `index`, and `<title>` as the page's title. This is the start page
 for the documentation. Text in this block is the page's text. See `\page` for more information.
 
-### `\name <header>`
+\subsection command_name `\name`
+
+    \‍name <header>
 
 Creates a group for class or struct members.  The `<header>` text
 is used to label the group in the documentation. Each `\name` command closes the previous
@@ -194,7 +223,10 @@ It is not possible to reference these groups.
 The backend can choose to group class or struct members by access (private/protected/public), or
 by `\name` grouping, or both.
 
-### `\namespace <name>`, `\namespace <id>`
+\subsection command_namespace `\namespace`
+
+    \‍namespace <name>
+    \‍namespace <id>
 
 Documents a namespace declared in the headers. The declaration must actually exist. `<name>` is the
 fully qualified name of the namespace, or, if not fully qualified, the namespace with the "best"
@@ -204,17 +236,22 @@ the fully qualified name of the matched namespace.
 
 Alternatively, provide the ID for the namespace.
 
-### `\page <name> <title>`
+\subsection command_page `\page`
+
+    \‍page <name> <title>
 
 Creates a page with `<name>` as ID and `<title>` as the title. Text in this block is the page's text.
 The page can be referenced by its ID.
 
-Use `\subpage` commands in a page to reference other pages and make those referenced pages sub-pages to
-this page. Use `\ref` commands to reference other pages but not impose any hierarchy.
+Use `\‍subpage` commands in a page to reference other pages and make those referenced pages sub-pages to
+this page. Use `\‍ref` commands to reference other pages but not impose any hierarchy.
 
 By default, all pages are at the same level, not subordinate to any other page.
 
-### `\struct <name>`, `\struct <id>`
+\subsection command_struct `\struct`
+
+    \‍struct <name>
+    \‍struct <id>
 
 Documents a struct declared in the headers. The declaration must actually exist.
 `<name>` is the fully qualified name of the struct, or, if not fully qualified, the struct
@@ -224,7 +261,10 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 
 Alternatively, provide the ID for the struct.
 
-### `\union <name>`, `\union <id>`
+\subsection command_union `\union`
+
+    \‍union <name>
+    \‍union <id>
 
 Documents a union or constant declared in the headers. The declaration must actually exist.
 `<name>` is the fully qualified name of the union, or, if not fully qualified, the union
@@ -234,7 +274,12 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 
 Alternatively, provide the ID for the union.
 
-### `\variable <name>`, `\variable <id>` (`\var` is an alias)
+\subsection command_variable `\variable`
+
+    \‍variable <name>
+    \‍variable <id>
+    \‍var <name>
+    \‍var <id>
 
 Documents a variable or constant declared in the headers. The declaration must actually exist.
 `<name>` is the fully qualified name of the variable, or, if not fully qualified, the variable
@@ -247,22 +292,23 @@ Alternatively, provide the ID for the variable.
 `\var` is an alias for compatibility with Doxygen.
 
 
-## Inside documentation blocks
+\section commands_inside Inside documentation blocks
 
-### `\anchor <name>`
+\subsection command_anchor `\‍anchor`
 
-Anywhere in a documentation block, adds an anchor that can be referenced elsewhere with `\ref`.
-Is replaced by `{#<name>}` in the Markdown output.
+    \‍anchor <name>
+
+Anywhere in a documentation block, adds an anchor that can be referenced elsewhere with `\‍ref`.
 
 The `\anchor` command must happen at the end of a paragraph or in a paragraph of its own,
 in either case it references the preceding paragraph. The paragraph is assigned the `#<name>`
 attribute.
 
-### `\brief`
+\subsection command_brief `\brief`
 
 Used at the beginning of the first line of a comment block, turns the first paragraph into the "brief" string.
 ```cpp
-/// \brief This is a rather long brief descrition
+/// \brief This is a rather long brief description
 /// of the member below.
 ///
 /// This is the detailed description right here.
@@ -270,66 +316,74 @@ Used at the beginning of the first line of a comment block, turns the first para
 int foo;
 ```
 
-### `\ingroup <name>`
+\subsection command_ingroup `\ingroup`
+
+    \ingroup <name>
 
 If this appears in the comment block for a namespace member, the member will become part of the
 group listed. It can also appear in the comment block of a group, to nest groups.
 
 `\ingroup` overrules the group name of the enclosing `\addtogroup`/`\endgroup`.
 
-See [`grouping.md`](https://github.com/crisluengo/doxpp/tree/main/doc/grouping.md) for more information on grouping.
+See \ref grouping for more information on grouping.
 
 This command is expected to be on its own on a line.
 
-### `\n`
+\subsection command_n `\‍n`
 
 Inserts a line break. The Markdown for a line break is two spaces at the end of a line.
 Because many code editors automatically remove such spaces, use this command instead.
 It will be replaced by two spaces, and a newline will be added if it's not there already.
 
-TODO!
+**TODO!**
 
-### `\ref <name> ["<text>"]` or `\ref "<name>" ["<text>"]`
+\subsection command_ref `\‍ref`
+
+    \‍ref <name> ["<text>"]
+    \‍ref "<name>" ["<text>"]
 
 Creates a link to the entity (member, header, group or page) called `<name>`. Optionally,
 the link text can be set to `<text>`. If left out, the link text will be the tile of the page
 or the name of the member referenced.
 
 `<name>` will be looked up according to logical rules: in the documentation for `ns::foo`,
-`\ref bar` will see if `ns::foo::bar` exists, otherwise it will look for `ns::bar`, or
+`\‍ref bar` will see if `ns::foo::bar` exists, otherwise it will look for `ns::bar`, or
 finally `::bar`. If no match exists, `<name>` will be interpreted as an ID. Use the ID
 to link to a member, a header, a group, a page, a section or an anchor. If `<name>` does not
 match any IDs either, then `<name>` (or `<text>`) will be output without linking to anything.
 In a page, always use the fully qualified name for members, or their ID.
 
-If `bar` is a function with multiple overloads, then `\ref bar` will match the first function with that name.
+If `bar` is a function with multiple overloads, then `\‍ref bar` will match the first function with that name.
 To disambiguate overloaded functions, `<name>` should be the full function declaration,
-without parameter names, and the types must match exactly. For example, `\ref bar(int, double const&)`
+without parameter names, and the types must match exactly. For example, `\‍ref bar(int, double const&)`
 will match a function `bar(int, double const&)`, but not `bar(int, double const)` nor
 `bar(int, double&)` nor `bar(int, double const&, int)`.
 
 To link to a header file, give its ID, or specify the file name (optionally with a partial path)
-in quotes, for example `\ref "path/header.h" "link text"`. When giving a file name, the header
+in quotes, for example `\‍ref "path/header.h" "link text"`. When giving a file name, the header
 with a matching name and the fewest path elements prepended will be linked to. The link text,
 if not given explicitly, is the header file name with path starting at the project root
 (as specified in the options).
 
 Quotes around `<name>` are also required if the member is a function that overloads an operator,
 since operators contain characters that are otherwise not seen as part of `<name>`. For example,
-`\ref operator==` will see the `==` as not being part of `<name>`, and will try to find a member
+`\‍ref operator==` will see the `==` as not being part of `<name>`, and will try to find a member
 called `operator` (which is an illegal member name, since it's a reserved keyword in C++). Instead,
-use `\ref "operator=="`.
+use `\‍ref "operator=="`.
 
 Finally, if a link must be immediately followed by a character that is considered part of `<name>`
-by the parser, one can use quotes to disambiguate: `\ref foo--` would try to match "`foo--`" (maybe
-as the ID of a function), whereas `\ref "foo"--` will correctly match "`foo`" and put two dashes
+by the parser, one can use quotes to disambiguate: `\‍ref foo--` would try to match "`foo--`" (maybe
+as the ID of a function), whereas `\‍ref "foo"--` will correctly match "`foo`" and put two dashes
 after the link.
 
 When using quotes around `<name>`, the space between the closing quotes and the opening quotes
 for `<text>` is mandatory. Two sequential quotes are considered part of an operator name,
-such as in `\ref "operator""_w"`.
+such as in `\‍ref "operator""_w"`.
 
-### `\relates <name>` or `\related <name>`
+\subsection command_relates `\‍relates`
+
+    \‍relates <name>
+    \‍related <name>
 
 Added to the documentation block of a function or variable, and with `<name>` referencing
 a class, adds the function or variable to a "Related" section in the class' documentation.
@@ -340,54 +394,65 @@ in namespace members (including global scope).
 This command is expected to be on its own on a line. Each member can only have one `\relates`
 command.
 
-### `\section <name> <title>`
+\subsection command_section `\section`
+
+    \section <name> <title>
 
 Starts a new section within a documentation block or a page. `<name>` is the ID that can
-be used with `\ref` to reference the section.
+be used with `\‍ref` to reference the section.
 
 This is replaced by the Markdown code `# <title> {#name}`. The `#` represents a level 1 heading,
 but this will be demoted by the backend to be a lower level than the containing block.
 
-One can also directly write `# My Title {#my-title}`, but then the `\ref` command will not recognize
+One can also directly write `# My Title {#my-title}`, but then the `\‍ref` command will not recognize
 `my-title` as something that can be referenced.
 
-### `\see <name> [, <name> [, ...]` (`\sa` is an alias)
+\subsection command_see `\‍see`
+
+    \‍see <name> [, <name> [, ...]
+    \‍sa <name> [, <name> [, ...]
 
 Starts a paragraph with a "See also" header linking the given entities (members, headers, groups, pages).
-See `\ref` for how `<name>` is interpreted and disambiguated.
+See `\‍ref` for how `<name>` is interpreted and disambiguated.
 
 Note that this inserts a `\par See also` command that the backend must interpret to create the heading,
 and optionally box the whole paragraph.
 
 This command is expected to be on its own on a line. Cannot occur inside the brief description.
 
-### `\subpage <name> ["<text>"]`
+\subsection command_subpage `\‍subpage`
 
-This is similar to `\ref`, but for pages. It can only occur inside a page (see `\page`).
-`\subpage <name>` creates a link to page `<name>` and additionally builds a hierarchy
+    \‍subpage <name> ["<text>"]
+
+This is similar to `\‍ref`, but for pages. It can only occur inside a page (see `\page`).
+`\‍subpage <name>` creates a link to page `<name>` and additionally builds a hierarchy
 structure, indicating that the linked page is subordinate to the current page. Only
-one `\subpage` command can reference each page, such that each page has only one "parent"
+one `\‍subpage` command can reference each page, such that each page has only one "parent"
 page. Furthermore, these references should not form loops, the page hierarchy must form
 a tree structure.
 
 The page called `index` (see `\mainpage`) should not be made a subpage of another page.
 
-`\subpage <name> "<text>"` uses `<text>` as the anchor text for the link.
+`\‍subpage <name> "<text>"` uses `<text>` as the anchor text for the link.
 
-To create links without creating hierarchical relations, use `\ref`.
+To create links without creating hierarchical relations, use `\‍ref`.
 
-### `\subsection <name> <title>`
+\subsection command_subsection `\subsection`
+
+    \subsection <name> <title>
 
 Like `\section`, but for a level 2 heading (`##` in Markdown).
 
-### `\subsubsection <name> <title>`
+\subsection command_subsubsection `\subsubsection`
+
+    \subsubsection <name> <title>
 
 Like `\section`, but for a level 3 heading (`###` in Markdown).
 
 
-## At the start of a line in Markdown files only
+\section commands_start_of_line At the start of a line in Markdown files only
 
-### `\comment`
+\subsection command_comment `\‍comment`
 
 The rest of the line is ignored. Use this to add comments not meant to be shown in the
 documentation, file copyright notices, etc.
@@ -395,9 +460,9 @@ documentation, file copyright notices, etc.
 
 ---
 
-## Doxygen commands that will not be implemented
+\section commands_not_implemented Doxygen commands that will not be implemented
 
-### Because the information is always retrieved from the code
+\subsection commands_not_implemented_illegal Because the information is always retrieved from the code
 
 - `\extends`
 - `\implements`
@@ -411,7 +476,7 @@ documentation, file copyright notices, etc.
 - `\pure`
 - `\static`
 
-### Because it doesn't apply to C++
+\subsection commands_not_implemented_notcpp Because it doesn't apply to C++
 
 - `\idlexcept` -> IDL only
 - `\interface`
@@ -420,7 +485,7 @@ documentation, file copyright notices, etc.
 - `\protocol` -> Objective-C only
 - `\vhdlflow` -> VHDL only
 
-### Because it doesn't make sense to me
+\subsection commands_not_implemented_nonsensical Because it doesn't make sense to me
 
 - `\callergraph`
 - `\callgraph`
@@ -431,7 +496,7 @@ documentation, file copyright notices, etc.
 - `\hiderefby`
 - `\hiderefs`
 - `\internal` / `\endinternal`
-- `\link` / `\endlink` -> we're using `\ref` for everything
+- `\link` / `\endlink` -> we're using `\‍ref` for everything
 - `\overload [(function declaration)]`
 - `\relatedalso <name>`
 - `\relatesalso <name>`
@@ -442,7 +507,7 @@ documentation, file copyright notices, etc.
 - `\{` -> we use `\addtogroup` instead
 - `\}` -> we use `\endgroup` instead
 
-### All the stuff that is related to markup, which we delegate to the backend
+\subsection commands_not_implemented_markup All the stuff that is related to markup, use Markdown instead
 
 (There might be some other stuff in here that I missed?)
 

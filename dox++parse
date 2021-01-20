@@ -39,7 +39,7 @@ doxpp.log.setLevel(doxpp.config.get(config, 'log', 'level'))
 
 options = {
     'code_formatting': doxpp.config.get(config, 'json', 'use typewriter font'),
-    'tab_size': int(doxpp.config.get(config, 'input', 'tab size'))
+    'tab_size': doxpp.config.get_int(config, 'input', 'tab size')
 }
 
 # Process files

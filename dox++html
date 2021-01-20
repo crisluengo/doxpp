@@ -45,11 +45,12 @@ options = {
     'templates': doxpp.config.get(config, 'html', 'templates'),
     'source_files': shlex.split(doxpp.config.get(config, 'input', 'header files'), posix=False) +
                     shlex.split(doxpp.config.get(config, 'input', 'markdown files'), posix=False),
+    'doc_link_class': doxpp.config.get(config, 'html', 'documentation link class'),
+    'add_snake_case_suffixes': doxpp.config.get_boolean(config, 'search', 'add snake case suffixes'),
+    'add_camel_case_suffixes': doxpp.config.get_boolean(config, 'search', 'add camel case suffixes'),
     'search_add_lookahead_barriers': True,
-    'add_snake_case_suffixes': True,
-    'add_camel_case_suffixes': True,
     'search_merge_subtrees': True,
-    'search_merge_prefixes': True,
+    'search_merge_prefixes': True
 }
 
 template_params = {
@@ -63,36 +64,15 @@ template_params = {
     'HTML_HEADER': doxpp.config.get(config, 'html', 'html header'),
     'PAGE_HEADER': doxpp.config.get(config, 'html', 'page header'),
     'FINE_PRINT': doxpp.config.get(config, 'html', 'fine print'),
-    'LINKS_NAVBAR1': [
-        ('', 'pages', []),
-        ('', 'modules', []),
-        ('', 'namespaces', [])
-    ],
-    'LINKS_NAVBAR2': [
-        ('', 'classes', []),
-        ('', 'files', [])
-    ],
-    'FILE_INDEX_EXPAND_LEVELS': 1,
-    'CLASS_INDEX_EXPAND_LEVELS': 1,
-    'CLASS_INDEX_EXPAND_INNER': False,
-    'SEARCH_DISABLED': False,
-    'SEARCH_DOWNLOAD_BINARY': False,  # Set to false for Chromium-based browsers when browsing HTML from the local file system. Keep True for deployment to server.
-    'SEARCH_HELP':
-        """<p class="m-noindent">Search for symbols, directories, files, pages or
-        modules. You can omit any prefix from the symbol or file path; adding a
-        <code>:</code> or <code>/</code> suffix lists all members of given symbol or
-        directory.</p>
-        <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span>
-        / <span class="m-label m-dim">&uarr;</span> to navigate through the list,
-        <span class="m-label m-dim">Enter</span> to go.
-        <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
-        copy a link to the result using <span class="m-label m-dim">⌘</span>
-        <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
-        <span class="m-label m-dim">M</span> produces a Markdown link.</p>
-        """,
-    'SEARCH_BASE_URL': None,
-    'SEARCH_EXTERNAL_URL': None,
-    'DOC_LINK_CLASS': 'm-doc',  # not used in the templates, but used in the code; should match what is used in the templates
+    'LINKS_NAVBAR1': eval(doxpp.config.get(config, 'html', 'navigation bar 1')),
+    'LINKS_NAVBAR2': eval(doxpp.config.get(config, 'html', 'navigation bar 2')),
+    'FILE_INDEX_EXPAND_LEVELS': doxpp.config.get_int(config, 'html', 'file index expand levels'),
+    'CLASS_INDEX_EXPAND_LEVELS': doxpp.config.get_int(config, 'html', 'class index expand levels'),
+    'CLASS_INDEX_EXPAND_INNER': doxpp.config.get_boolean(config, 'html', 'class index expand inner'),
+    'SEARCH_DISABLED': not doxpp.config.get(config, 'search', 'enable'),
+    'SEARCH_DOWNLOAD_BINARY': doxpp.config.get(config, 'search', 'download binary'),
+    'SEARCH_BASE_URL': doxpp.config.get(config, 'search', 'base URL'),
+    'SEARCH_EXTERNAL_URL': doxpp.config.get(config, 'search', 'external URL')
 }
 
 outdir = doxpp.config.get(config, 'html', 'output directory')

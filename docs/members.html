@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Documentation &raquo; Detailed description of keys for C++ members | dox++ | Documentation preparation system for C++</title>
+  <link rel="stylesheet" href="m-light-documentation.compiled.css" />
+  <link rel="icon" href="favicon-light.png" type="image/png" />
+  <link rel="prev" href="json_output.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22272e" />
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <span id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">
+        <a href="https://crisluengo.github.io/doxpp">dox++</a><span class="m-breadcrumb">┃</span><a href="index.html" class="m-thin">Documentation preparation system for C++</a>      </span>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path id="m-doc-search-icon-path" d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z"/>
+        </svg></a>
+        <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
+        <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
+      </div>
+      <div id="m-navbar-collapse" class="m-col-t-12 m-show-m m-col-m-none m-right-m">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li>
+              <a href="documentation.html">Documentation</a>
+              <ol>
+                <li><a href="documenting_code.html">How to document your code</a></li>
+                <li><a href="configuration.html">Configuring dox++</a></li>
+                <li><a href="running_the_tools.html">Running dox++parse and dox++html</a></li>
+                <li><a href="json_output.html">JSON output of dox++parse</a></li>
+              </ol>
+            </li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="2">
+            <li><a href="example/index.html">example site</a></li>
+            <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path" />
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          <span class="m-breadcrumb"><a href="documentation.html">Documentation</a> &raquo;</span>
+          Detailed description of keys for C++ members
+        </h1>
+<p>These are the member types that will be output by dox++, and how they nest.</p>
+<ul>
+<li><code>namespace</code><ul>
+<li>can contain anything except <code>macro</code></li>
+</ul>
+</li>
+<li><code>class</code> or <code>struct</code><ul>
+<li><code>alias</code></li>
+<li><code>function</code></li>
+<li><code>variable</code></li>
+<li>Can also contain <code>class</code>, <code>struct</code>, <code>union</code>, <code>enum</code>.</li>
+</ul>
+</li>
+<li><code>union</code><ul>
+<li><code>variable</code></li>
+</ul>
+</li>
+<li><code>enum</code><ul>
+<li><code>enumvalue</code></li>
+</ul>
+</li>
+<li><code>alias</code></li>
+<li><code>function</code></li>
+<li><code>variable</code></li>
+<li><code>macro</code></li>
+</ul>
+<p>Below we give a description of all the dictionary fields for each of these types of member.</p>
+<h3>Common fields</h3>
+<h4>&ldquo;id&rdquo; (string)</h4>
+<p>This is a unique identifier. When the member is referenced, a link to its ID is used.</p>
+<h4>&ldquo;name&rdquo; (string)</h4>
+<p>Name of the member. The fully qualified name can be obtained by iterating through the
+&ldquo;parent&rdquo; links and prepending their names.</p>
+<h4>&ldquo;brief&rdquo; (string)</h4>
+<p>A brief description, typically the first line of the documentation block for the member.
+Should be rendered through a Markdown processor.</p>
+<p>This description can be shown in a list of members.</p>
+<h4>&ldquo;doc&rdquo; (string)</h4>
+<p>The full documentation, excluding the first line, which is in <code>"brief"</code>.[&lsquo;derived-class-member-id&rsquo;, &lsquo;derived-class-member-id&rsquo;, &hellip;]
+Should be rendered through a Markdown processor.</p>
+<h4>&ldquo;sections&rdquo; (list)</h4>
+<p>List of tuples: (ID, title, level) for all sections present in the &ldquo;doc&rdquo; string.</p>
+<h4>&ldquo;anchors&rdquo; (list)</h4>
+<p>List of strings with anchor IDs present in the &ldquo;doc&rdquo; string.</p>
+<h4>&ldquo;member_type&rdquo; (string)</h4>
+<p>One of:
+- <code>"alias"</code>
+- <code>"class"</code>
+- <code>"enum"</code>
+- <code>"enumvalue"</code>
+- <code>"function"</code>
+- <code>"macro"</code>
+- <code>"namespace"</code>
+- <code>"struct"</code>
+- <code>"union"</code>
+- <code>"variable"</code></p>
+<h4>&ldquo;parent&rdquo; (string)</h4>
+<p>ID of the parent member.</p>
+<h4>&ldquo;relates&rdquo; (string)</h4>
+<p>ID of a class/struct that this member relates to. The class/struct will list this member in its &ldquo;related&rdquo;
+list. This value can only be set in functions, variables, enums, aliases and macros.</p>
+<h4>&ldquo;header&rdquo; (string)</h4>
+<p>ID of the header file where the member is declared. If the declaration appears in multiple files, the first
+one it was encountered in will be used.</p>
+<h4>&ldquo;group&rdquo; (string)</h4>
+<p>For namespace members, ID of the group that this member belongs to. If an empty string,
+the member doesn&rsquo;t belong to any groups.</p>
+<p>For class or struct members, the header text for the group. Can be an empty string if no
+grouping is used.</p>
+<p>For members of type <code>"enumvalue"</code> (enum members), the group is always the empty string.</p>
+<h4>&ldquo;deprecated&rdquo; (boolean)</h4>
+<p><code>true</code> or <code>false</code> depending on if the member has a <code>[[deprecated]]</code> attribute.</p>
+<h3>alias-specific fields</h3>
+<h4>&ldquo;templated&rdquo; (boolean)</h4>
+<p><code>true</code> if this is an alias template.</p>
+<h4>&ldquo;type&rdquo; (dictionary)</h4>
+<p>See below under &ldquo;The type dictionary&rdquo;.</p>
+<h4>&ldquo;oldfashioned&rdquo; (boolean)</h4>
+<p><code>true</code> if this is a <code>typedef</code> declaration, <code>false</code> if it is a <code>using</code> declaration.</p>
+<h3>class- or struct-specific fields</h3>
+<h4>&ldquo;templated&rdquo; (boolean)</h4>
+<p><code>true</code> if this is a class template.</p>
+<h4>&ldquo;abstract&rdquo; (boolean)</h4>
+<p><code>true</code> if this is an abstract class (has a pure virtual member function).</p>
+<h4>&ldquo;bases&rdquo; (list)</h4>
+<p>A list of dictionaries listing the base classes. It contains the following fields:
+- <code>"typename"</code> (string): the fully qualified name of the base class.
+- <code>"id"</code> (string): ID of the type, if declared in the project being documented.
+- <code>"access"</code> (string): set to a string <code>"public"</code>, <code>"protected"</code> or <code>"private"</code>.</p>
+<h4>&ldquo;derived&rdquo; (list)</h4>
+<p>A list of strings, the IDs of derived classes.</p>
+<h4>&ldquo;members&rdquo; (list)</h4>
+<p>The list of dictionaries for the child members.</p>
+<h4>&ldquo;related&rdquo; (list)</h4>
+<p>A list of strings, the IDs of related members. These are not child members, but are related
+to the class and their documentation could be shown together with that of the class&rsquo; members.</p>
+<h3>enum-specific fields</h3>
+<h4>&ldquo;scoped&rdquo; (boolean)</h4>
+<p><code>true</code> if scoped enum (declared as <code>enum class</code>), or <code>false</code> if unscoped (a plain <code>enum</code>).</p>
+<h4>&ldquo;type&rdquo; (string)</h4>
+<p>The type underlying the enumerator (<code>"int"</code>, <code>"short"</code>, <code>"char"</code>, etc.)</p>
+<h4>&ldquo;members&rdquo; (list)</h4>
+<p>Member dictionaries. These members should all be of type <code>"enumvalue</code>.</p>
+<h3>enumvalue-specific fields</h3>
+<h4>&ldquo;value&rdquo; (integer)</h4>
+<p>The value of the enumerator constant.</p>
+<h3>function-specific fields</h3>
+<h4>&ldquo;templated&rdquo; (boolean)</h4>
+<p><code>true</code> if this is a function template.</p>
+<h4>&ldquo;constexpr&rdquo; (boolean)</h4>
+<p><code>true</code> if this is a <code>constexpr</code> function.</p>
+<h4>&ldquo;noexcept&rdquo; (boolean)</h4>
+<p><code>true</code> if the function is marked <code>noexcept</code>.</p>
+<h4>&ldquo;return_type&rdquo;  (dictionary)</h4>
+<p>The function&rsquo;s return type. See below under &ldquo;The type dictionary&rdquo;.
+For constructors, destructors and conversion functions (see <code>"method_type"</code>) this key is empty.</p>
+<h4>&ldquo;arguments&rdquo; (list)</h4>
+<p>A list of dictionaries listing the input arguments. It contains the standard &ldquo;type&rdquo; fields
+(see below under &ldquo;The type dictionary&rdquo;) as well as the following fields:
+- <code>"name"</code> (string): The name of the argument.
+- <code>"default"</code> (string): The default value for the argument.</p>
+<h3>function-specific fields, if class or struct member</h3>
+<p>If the function is a class or struct member, it additionally has the following fields:</p>
+<h4>&ldquo;static&rdquo; (boolean)</h4>
+<p><code>true</code> or <code>false</code> depending on if the function is declared static or not.</p>
+<h4>&ldquo;virtual&rdquo; (boolean)</h4>
+<p><code>true</code> or <code>false</code> depending on if the function is declared virtual or not.</p>
+<h4>&ldquo;pure_virtual&rdquo; (boolean)</h4>
+<p><code>true</code> or <code>false</code> depending on if the function is pure virtual or not.</p>
+<h4>&ldquo;final&rdquo; (boolean)</h4>
+<p><code>true</code> or <code>false</code> depending on if the function is marked <code>final</code>.</p>
+<h4>&ldquo;override&rdquo; (boolean)</h4>
+<p><code>true</code> or <code>false</code> depending on if the function is marked <code>override</code>.</p>
+<h4>&ldquo;const&rdquo; (boolean)</h4>
+<p><code>true</code> or <code>false</code> depending on if the function is declared const or not.</p>
+<h4>&ldquo;access&rdquo; (string)</h4>
+<p>Set to a string <code>"public"</code>, <code>"protected"</code> or <code>"private"</code>.</p>
+<h4>&ldquo;method_type&rdquo; (string)</h4>
+<p>Set to a string <code>"method"</code>, <code>"conversionfunction"</code>, <code>"assignmentoperator"</code>, <code>"constructor"</code> or <code>"destructor"</code>.</p>
+<h4>&ldquo;explicit&rdquo; (boolean)</h4>
+<p><code>true</code> or <code>false</code> depending on if the function is marked <code>explicit</code>.
+Exists only if <code>"method_type"</code> is either <code>"conversionfunction"</code> or <code>"constructor"</code>.</p>
+<h3>macro-specific fields</h3>
+<p>For a macro, the <code>"parent"</code> field is always the empty string.</p>
+<h4>&ldquo;macro_params&rdquo; (list)</h4>
+<p>List of strings containing macro parameters, if given.</p>
+<h3>namespace-specific fields</h3>
+<h4>&ldquo;inline&rdquo; (boolean)</h4>
+<p><code>true</code> for inline namespaces.</p>
+<h4>&ldquo;members&rdquo; (list)</h4>
+<p>The list of dictionaries for the child members.</p>
+<h3>union-specific fields</h3>
+<h4>&ldquo;templated&rdquo; (boolean)</h4>
+<p><code>true</code> if this is a union template.</p>
+<h4>&ldquo;members&rdquo; (list)</h4>
+<p>The list of dictionaries for the child members.</p>
+<h4>&ldquo;related&rdquo; (list)</h4>
+<p>A list of strings, the IDs of related members. These are not child members, but are related
+to the union and their documentation could be shown together with that of the union&rsquo;s members.</p>
+<h3>variable-specific fields</h3>
+<h4>&ldquo;type&rdquo; (dictionary)</h4>
+<p>The variable&rsquo;s type. See below under &ldquo;The type dictionary&rdquo;.</p>
+<h4>&ldquo;static&rdquo; (boolean)</h4>
+<p><code>true</code> or <code>false</code> depending on if the variable is declared static or not.</p>
+<h4>&ldquo;constexpr&rdquo; (boolean)</h4>
+<p><code>true</code> if this is a <code>constexpr</code> value.</p>
+<h3>variable-specific fields, if class, struct or union member</h3>
+<p>If the variable is a class or struct or union member, it additionally has the following fields:</p>
+<h4>&ldquo;mutable&rdquo; (boolean)</h4>
+<p><code>true</code> or <code>false</code> depending on if the member is declared mutable or not.</p>
+<h4>&ldquo;access&rdquo;</h4>
+<p>Set to a string <code>"public"</code>, <code>"protected"</code> or <code>"private"</code>.</p>
+<h3>variable-specific fields, if bitfield</h3>
+<p>If the variable is a bitfield, it additionally has the following field:</p>
+<h4>&ldquo;width&rdquo; (integer)</h4>
+<p>The bitfield width.</p>
+<h3>template-specific fields</h3>
+<p>For members that are a class template, struct template, union template, function template or alias template,
+the following field is additionally present:</p>
+<h4>&ldquo;template_parameters&rdquo; (list)</h4>
+<p>A list of dictionaries, one for each template parameter. It contains the following
+fields:
+- <code>"name"</code> (string): name of template parameter.
+- <code>"type"</code>: Type of template parameter: <code>"type"</code> or a dictionary encoding
+  the type in case of a non-type template parameter, see below under &ldquo;The type dictionary&rdquo;.
+- <code>"default"</code>: A type dictionary for type parameters, a string for non-type parameters,
+  or <code>null</code> (translates to <code>None</code> in Python) if no default is given.</p>
+<p>For example, for <code>template&lt;typename A&gt;</code>, <code>"type"</code> will be equal to <code>"type"</code>, whereas
+for <code>template&lt;int A&gt;</code>, <code>"type"</code> will be <code>"int"</code>.</p>
+<h3>The type dictionary</h3>
+<p>Types are encoded as a dictionary with the following fields:
+- <code>"typename"</code> (string): name of the type.
+- <code>"id"</code> (string): ID of the type, if declared in the project being documented.
+- <code>"qualifiers"</code> (string): qualifiers.</p>
+<p>The type could be rendered in Markdown as follows: <code>[typename](#id) qualifiers</code>.</p>
+<p>If the type represents a function prototype, <code>"typename"</code> is a full representation,
+but the dictionary will additionally contain the following fields:
+- <code>"retval"</code>: Type dictionary for the function&rsquo;s return value
+- <code>"arguments"</code>: List of type dictionaries for the function arguments</p>
+        <div class="m-note m-dim m-thin m-text-center"><a href="json_output.html" class="m-doc">&laquo; JSON output of dox++parse</a> | <a href="documentation.html" class="m-doc">Documentation</a></div>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">&hellip;</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div id="search-help" class="m-text m-dim m-text-center">
+            <p class="m-noindent">Search for symbols, directories, files, pages or modules.
+              You can omit any prefix from the symbol or file path; adding a <code>:</code> or
+              <code>/</code> suffix lists all members of given symbol or directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span> / <span class="m-label m-dim">&uarr;</span> to navigate through the list,
+              <span class="m-label m-dim">Enter</span> to go.
+              <span class="m-label m-dim">Tab</span> autocompletes common prefix.
+              You can copy a link to the result using <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">L</span>,
+              or <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">M</span> to copy a Markdown link.</p>
+          </div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v1.js"></script>
+<script>
+  Search.download(window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') + 1) + 'searchdata-v1.bin');
+</script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <p>dox++, Documentation preparation system for C++. Documentation compiled with <a href="https://github.com/crisluengo/doxpp">dox++</a> and styled with <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+      </div>
+    </div>
+  </div>
+</nav></footer>
+</body>
+</html>

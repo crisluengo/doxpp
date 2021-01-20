@@ -6,12 +6,17 @@ project (the rest of the project is irrelevant to generating documentation
 and therefore not present here), as well as a Markdown file with additional
 documentation.
 
-To build the documentation, run
+To parse the sources and extract all relevant information, run
 
     ../dox++parse
 
-from this directory. The `dox++config` file can be adjusted to change what
-input files are read, the name and location of the output file, and some
-other options.
+from this directory. A file `transport.json` will be created in the current
+directory. Next, generate the HTML with
 
-The output file will be `transport.json`.
+    ../dox++html
+
+The HTML will be placed in `../docs/example/`
+
+The `dox++config` file can be adjusted to change what input files are read,
+the name and location of the output files, and many other options for
+what to present and how.

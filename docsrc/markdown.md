@@ -1,8 +1,10 @@
-# Markdown markup
+\page markdown Markdown markup
+
+**TODO:** This page still needs to be formatted correctly.
 
 dox++ expects documentation to be marked up using the common Markdown format.
 dox++parse inserts Markdown formatting into the documentation for some
-commands (such as `\ref` and `\see`).
+commands (such as `\‍ref` and `\‍see`).
 
 dox++html uses [Python-Markdown](https://python-markdown.github.io) to convert
 the Markdown-formatted text into HTML with a small set of addons:
@@ -73,7 +75,7 @@ You should always use `\section`, `\subsection` and `\subsubsection` instead
 
 Insert a line break by adding two spaces at the end of a line. Because many
 code editors will remove trailing spaces, the command `\n` will be replaced
-by two trailing spaces by dox++parse. (TODO!)
+by two trailing spaces by dox++parse. (**TODO!**)
 
 ## Links
 
@@ -81,10 +83,12 @@ Links are inserted using the following syntax: `[link text](URL)` or `[link text
 or simply `<URL>`. URL can be a full URL (`https://foo.com`), a local resource (`pages.html`)
 or `#id` to reference an ID on the current page.
 
-To link to other parts of the documentation, one would normally use the `\ref` command,
+To link to other parts of the documentation, one would normally use the `\‍ref` command
+(see [Documentation commands](commands.md)),
 but it is possible to use a simple Markdown link if one knows the ID of the referenced
 documentation element. For example, `[ns::foo](#ns-foo-int--double-)` would be equivalent
-to `\ref ns::foo` if there existed a function declared as `int ns::foo(int, double)`.
+to `\‍ref ns::foo` if there existed a function declared as `int ns::foo(int, double)`.
+Note that dox++parse inserts links like this for each `\‍ref` and each `\‍see` command.
 
 ## Code blocks
 
@@ -206,25 +210,25 @@ code and links.
 
 ## Tables
 
-TODO
+**TODO**
 [tables](https://python-markdown.github.io/extensions/tables/)
 
 ## Admonitions
 
-TODO
+**TODO**
 [admonition](https://python-markdown.github.io/extensions/admonition/)
 
 ## Equations
 
-TODO
+**TODO**
 
 ## Images
 
-TODO
+**TODO**
 
 ## Attributes
 
-TODO
+**TODO**
 [attr_list](https://python-markdown.github.io/extensions/attr_list/)
 
 ## HTML tags

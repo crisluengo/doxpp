@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Documentation &raquo; Grouping | dox++ | Documentation preparation system for C++</title>
+  <link rel="stylesheet" href="m-light-documentation.compiled.css" />
+  <link rel="icon" href="favicon-light.png" type="image/png" />
+  <link rel="prev" href="commands.html" />
+  <link rel="next" href="markdown.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22272e" />
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <span id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">
+        <a href="https://crisluengo.github.io/doxpp">dox++</a><span class="m-breadcrumb">┃</span><a href="index.html" class="m-thin">Documentation preparation system for C++</a>      </span>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path id="m-doc-search-icon-path" d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z"/>
+        </svg></a>
+        <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
+        <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
+      </div>
+      <div id="m-navbar-collapse" class="m-col-t-12 m-show-m m-col-m-none m-right-m">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li>
+              <a href="documentation.html">Documentation</a>
+              <ol>
+                <li><a href="documenting_code.html">How to document your code</a></li>
+                <li><a href="configuration.html">Configuring dox++</a></li>
+                <li><a href="running_the_tools.html">Running dox++parse and dox++html</a></li>
+                <li><a href="json_output.html">JSON output of dox++parse</a></li>
+              </ol>
+            </li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="2">
+            <li><a href="example/index.html">example site</a></li>
+            <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <use href="#m-doc-search-icon-path" />
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          <span class="m-breadcrumb"><a href="documentation.html">Documentation</a> &raquo;</span>
+          Grouping
+        </h1>
+<h3>Grouping namespace members</h3>
+<p>Namespace members can be assigned to one group. If assigned to a group, the
+backend can choose to document those members in the group&rsquo;s page rather
+than the namespace&rsquo;s page. Alternatively, the backend can index members
+by their group.</p>
+<p>Groups can be nested, forming a tree structure. That is, it is not legal
+to form loops (a group being both an ancestor and a descendant of another
+group) nor to assign two parent groups to one group. Groups are assigned
+to a parent group just like a namespace member is.</p>
+<p>A group can be documented using the <code>\group</code> command.</p>
+<p>Members can be assigned to a group in one of two ways:</p>
+<ol>
+<li>
+<p>Using the <code>\ingroup</code> command in the documentation block. Each documentation
+block can have one of these commands (others will be ignored).</p>
+</li>
+<li>
+<p>By enclosing the member&rsquo;s declaration or documentation block in between
+a pair of <code>\addtogroup</code> and <code>\endgroup</code>  commands.</p>
+</li>
+</ol>
+<p>Method #1 has priority. That is, a member declared after a <code>\addtogroup</code> command,
+but which has an <code>\ingroup</code> in its documentation, will be placed in the group
+specified by the <code>\ingroup</code> command.</p>
+<p>For example:</p>
+<div class="m-code"><pre><span></span><span class="c1">/// \group name This is a group</span>
+<span class="c1">/// This is the brief description for the group.</span>
+<span class="c1">/// This is the longer description</span>
+<span class="c1">/// for the</span>
+<span class="c1">/// group</span>
+<span class="c1">/// \addtogroup</span>
+
+<span class="c1">/// A function in group `name`</span>
+<span class="kt">void</span> <span class="nf">function1</span><span class="p">();</span>
+
+<span class="c1">/// A function in a different group `foo`</span>
+<span class="c1">/// \ingroup foo</span>
+<span class="kt">void</span> <span class="nf">function2</span><span class="p">();</span>
+
+<span class="c1">/// \endgroup</span>
+</pre></div>
+
+<p>Note that <code>\group</code> and <code>\endgroup</code> must be at the start of a documentation block.
+Empty lines in between these commands in the code above is therefore relevant.
+<code>\addtogroup</code> can be in a documentation block on its own, in which case it needs
+a parameter to indicate which group is being made active, or it can be at the
+end of a <code>\group</code> documentation block, in which case it should not have a parameter.</p>
+<h3>Grouping class members</h3>
+<p>For class members, the grouping system is a lot simpler. Typically class members
+are grouped by access (public, protected and private). But by adding <code>\name</code> commands
+inside the class definition, an alternative grouping can be established. This is
+useful mostly for complex classes with many members.</p>
+<p>The class member groups do not have documentation nor an ID (they cannot be referenced).
+They only have a title, which will be used by the back end to make headers and
+split up the class&rsquo; table of contents.</p>
+<p>Class member groups also cannot be nested, there is no parent/child relationship between
+these groups.</p>
+<p>Class members will be assigned to a group if their declaration (not their documentation
+block) comes after the <code>\name</code> command that creates this block, and before another <code>\name</code>
+or <code>\endname</code> command.</p>
+<p>For example:</p>
+<div class="m-code"><pre><span></span><span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
+   <span class="c1">/// \name Group A</span>
+   <span class="kt">int</span> <span class="n">foo</span><span class="p">;</span>
+   <span class="kt">int</span> <span class="n">bar</span><span class="p">;</span>
+   <span class="c1">/// \name Group B</span>
+   <span class="kt">int</span> <span class="n">baz</span><span class="p">;</span>
+<span class="k">public</span><span class="o">:</span>
+   <span class="n">A</span><span class="p">();</span>
+   <span class="c1">/// \name Group C</span>
+   <span class="n">A</span><span class="p">(</span><span class="kt">int</span> <span class="n">foo</span><span class="p">);</span>
+   <span class="kt">int</span> <span class="nf">getFoo</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+   <span class="c1">/// \endname</span>
+<span class="p">};</span>
+</pre></div>
+
+<p>In this code, <code>foo</code> and <code>bar</code> are in a group called &ldquo;Group A&rdquo;, <code>baz</code> and the default constructor
+<code>A()</code> are in a group called &ldquo;Group B&rdquo;, and <code>A(int)</code> and <code>getFoo()</code> are in a group called &ldquo;Group C&rdquo;.</p>
+<p>Note that the parsing of the <code>\name</code> and <code>\endname</code> commands is rather primitive,
+this causes their influence to extend beyond a class declaration. If you don&rsquo;t put
+an <code>\endname</code> at the end of a class, then in the next class&rsquo; declaration, the previous
+<code>\name</code> command will still be in effect. Thus:</p>
+<div class="m-code"><pre><span></span><span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
+   <span class="c1">/// \name Group A</span>
+   <span class="kt">int</span> <span class="n">foo</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="k">class</span> <span class="nc">B</span> <span class="p">{</span>
+   <span class="kt">int</span> <span class="n">bar</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+
+<p>Both classes will have a group called &ldquo;Group A&rdquo;, and both <code>A::foo</code> and <code>B::bar</code> will be
+in these respective groups.</p>
+<p>There is always an implicit <code>\endname</code> at the end of a header file, though a warning
+will be given if it is missing.</p>
+<h3>Differences with Doxygen</h3>
+<p>Doxygen uses the <code>\{</code> and <code>\}</code> commands to group members into a group. These are not
+recognized by dox++. Left is Doxygen, right is corresponding dox++:</p>
+<div class="m-code"><pre><span></span><span class="c1">/// \defgroup name title            /// \group name title</span>
+<span class="c1">/// \{                              /// \addtogroup</span>
+
+<span class="kt">void</span> <span class="nf">function1</span><span class="p">();</span>                   <span class="kt">void</span> <span class="nf">function1</span><span class="p">();</span>
+
+<span class="c1">/// \}                              /// \endgroup</span>
+
+<span class="c1">/// \addtogroup name                /// \addtogroup name</span>
+<span class="c1">/// \{</span>
+
+<span class="kt">void</span> <span class="nf">function2</span><span class="p">();</span>                   <span class="kt">void</span> <span class="nf">function2</span><span class="p">();</span>
+
+<span class="c1">/// \}                              /// \endgroup</span>
+</pre></div>
+        <div class="m-note m-dim m-thin m-text-center"><a href="commands.html" class="m-doc">&laquo; Documentation commands</a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="markdown.html" class="m-doc">Markdown markup &raquo;</a></div>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">&hellip;</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div id="search-help" class="m-text m-dim m-text-center">
+            <p class="m-noindent">Search for symbols, directories, files, pages or modules.
+              You can omit any prefix from the symbol or file path; adding a <code>:</code> or
+              <code>/</code> suffix lists all members of given symbol or directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span> / <span class="m-label m-dim">&uarr;</span> to navigate through the list,
+              <span class="m-label m-dim">Enter</span> to go.
+              <span class="m-label m-dim">Tab</span> autocompletes common prefix.
+              You can copy a link to the result using <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">L</span>,
+              or <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">M</span> to copy a Markdown link.</p>
+          </div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search-v1.js"></script>
+<script>
+  Search.download(window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') + 1) + 'searchdata-v1.bin');
+</script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <p>dox++, Documentation preparation system for C++. Documentation compiled with <a href="https://github.com/crisluengo/doxpp">dox++</a> and styled with <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+      </div>
+    </div>
+  </div>
+</nav></footer>
+</body>
+</html>
