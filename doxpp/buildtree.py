@@ -202,10 +202,10 @@ def split_string(string, separator=None):
     return part1, part2
 
 def separate_brief(comment):
-    if comment.startswith('\\brief') or comment.startswith('@brief'):
+    if comment.startswith('\\brief') or comment.startswith('@brief') or comment.startswith('\\short') or comment.startswith('@short'):
         # The full first paragraph is the brief string
         brief, comment = split_string(comment, '\n\n')
-        brief = brief[len('@brief'):].strip()
+        brief = brief[len('@brief'):].strip()  # Note that "short" has the same length as "brief".
     else:
         # Only the first line is the brief string
         brief, comment = split_string(comment, '\n')
@@ -322,6 +322,7 @@ def find_ingroup_cmd(doc):
 
 section_cmd_match = re.compile(r'^ *[\\@]((?:sub){,2})section +((?:\w|-)+) +(.*?) *$', re.MULTILINE)
 anchor_cmd_match = re.compile(r'\n* *[\\@]anchor +((?:\w|-)+) *(?:$|\n)')
+newline_cmd_match = re.compile(r'[\\@]n(?: +\n?|\n)')
 
 def find_anchor_cmds(doc, status: Status):
     # Finds section headings and explicit anchors, and adds them to a list.
@@ -329,6 +330,8 @@ def find_anchor_cmds(doc, status: Status):
     # We're replacing with:
     # `# title {#name}`,     `## title {#name}`,       `### title {#name}`,         `{#name}`
     # We're listing them in the status.anchors dictionary.
+    #
+    # Since this function is called for all documentation, we'll handle the `\n` command here also.
 
     sections = []
     anchors = []
@@ -353,6 +356,7 @@ def find_anchor_cmds(doc, status: Status):
         anchors.append(name)
         return '\n{{: #{} }}\n\n'.format(name)
 
+    doc = newline_cmd_match.sub('  \n', doc)
     doc = section_cmd_match.sub(section_cmd_replace, doc)
     doc = anchor_cmd_match.sub(anchor_cmd_replace, doc)
     return doc, sections, anchors
