@@ -38,9 +38,9 @@ class AdmonitionExtension(markdown.extensions.Extension):
 
 class AdmonitionProcessor(markdown.blockprocessors.BlockProcessor):
 
-    CLASSNAME = 'm-note'
+    CLASSNAME1 = 'm-note'
+    CLASSNAME2 = 'm-block'
     RE = re.compile(r'(?:^|\n)!!! ?([\w\-]+(?: +[\w\-]+)*)(?: +"(.*?)")? *(?:\n|$)')
-    RE_SPACES = re.compile('  +')
 
     def __init__(self, parser):
         """Initialization."""
@@ -51,9 +51,9 @@ class AdmonitionProcessor(markdown.blockprocessors.BlockProcessor):
         self.content_indention = 0
 
     def get_sibling(self, parent, block):
-        """Get sibling admontion.
+        """Get sibling admonition.
 
-        Retrieve the appropriate siblimg element. This can get trickly when
+        Retrieve the appropriate sibling element. This can get tricky when
         dealing with lists.
 
         """
@@ -68,11 +68,12 @@ class AdmonitionProcessor(markdown.blockprocessors.BlockProcessor):
 
         sibling = self.lastChild(parent)
 
-        if sibling is None or sibling.get('class', '').find(self.CLASSNAME) == -1:
+        if sibling is None or (sibling.get('class', '').find(self.CLASSNAME1) == -1 and
+                               sibling.get('class', '').find(self.CLASSNAME2) == -1):
             sibling = None
         else:
-            # If the last child is a list and the content is idented sufficient
-            # to be under it, then the content's is sibling is in the list.
+            # If the last child is a list and the content is indented sufficient
+            # to be under it, then the content's sibling is in the list.
             last_child = self.lastChild(sibling)
             indent = 0
             while last_child:
@@ -87,7 +88,7 @@ class AdmonitionProcessor(markdown.blockprocessors.BlockProcessor):
                     last_child = self.lastChild(sibling) if sibling else None
 
                     # Context has been lost at this point, so we must adjust the
-                    # text's identation level so it will be evaluated correctly
+                    # text's indentation level so it will be evaluated correctly
                     # under the list.
                     block = block[self.tab_length:]
                     indent += self.tab_length
@@ -124,7 +125,7 @@ class AdmonitionProcessor(markdown.blockprocessors.BlockProcessor):
         if m:
             klass, title = self.get_class_and_title(m)
             div = etree.SubElement(parent, 'aside')
-            div.set('class', '{} {}'.format(self.CLASSNAME, klass))
+            div.set('class', klass)
             if title:
                 p = etree.SubElement(div, 'h4')
                 p.text = title
@@ -148,10 +149,11 @@ class AdmonitionProcessor(markdown.blockprocessors.BlockProcessor):
 
     def get_class_and_title(self, match):
         klass, title = match.group(1).lower(), match.group(2)
-        klass = self.RE_SPACES.sub(' ', klass)
-        list = klass.split(maxsplit=1)
+        list = klass.split()
         type = list[0] if list else ''
-        klass = list[1] if len(list) > 1 else ''
+        klass = list[1:]
+        if self.CLASSNAME1 not in klass and self.CLASSNAME2 not in klass:
+            klass = [self.CLASSNAME1] + klass
         if type == 'see':
             def_title = 'See also'
             type = 'm-default'
@@ -196,17 +198,16 @@ class AdmonitionProcessor(markdown.blockprocessors.BlockProcessor):
             type = 'm-success'
         elif type == 'remark':
             def_title = 'Remark'
-            type = 'm-default'
+            type = 'm-primary'
         elif type == 'par':
             def_title = None
-            type = 'm-dim'
-        elif type == 'rcs':
+            type = 'm-frame'
+        elif type == 'aside':
             def_title = None
-            type = 'm-default'
+            type = 'm-dim'
         else:
             def_title = type.capitalize()
-            type = 'm-default'
-        klass = ' '.join([type, klass])
+        klass = ' '.join(klass + [type])
         if title is None:
             # no title was provided
             title = def_title
