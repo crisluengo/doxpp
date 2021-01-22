@@ -157,17 +157,20 @@ class AdmonitionProcessor(markdown.blockprocessors.BlockProcessor):
         if type == 'see':
             def_title = 'See also'
             type = 'm-default'
-        elif type == 'note':
-            def_title = 'Note'
+        elif type in ['note', 'remark']:
+            def_title = type.capitalize()
             type = 'm-primary'
         elif type == 'attention':
-            def_title = 'Attention'
+            def_title = type.capitalize()
             type = 'm-info'
-        elif type == 'warning':
-            def_title = 'Warning'
+        elif type == 'todo':
+            def_title = 'TODO'
+            type = 'm-info'
+        elif type in ['deprecated', 'warning']:
+            def_title = type.capitalize()
             type = 'm-warning'
         elif type == 'bug':
-            def_title = 'Bug'
+            def_title = type.capitalize()
             type = 'm-danger'
         elif type in ['literature', 'author', 'authors', 'copyright', 'version', 'since', 'date']:
             def_title = type.capitalize()
