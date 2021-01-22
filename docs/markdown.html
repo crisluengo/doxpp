@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="m-light-documentation.compiled.css" />
   <link rel="icon" href="favicon-light.png" type="image/png" />
   <link rel="prev" href="grouping.html" />
-  <link rel="next" href="configuration.html" />
+  <link rel="next" href="running_the_tools.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#22272e" />
 </head>
@@ -30,9 +30,9 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
-                <li><a href="configuration.html">Configuring dox++</a></li>
-                <li><a href="running_the_tools.html">Running dox++parse and dox++html</a></li>
-                <li><a href="json_output.html">JSON output of dox++parse</a></li>
+                <li><a href="configuration.html">Configuring <strong>dox++</strong></a></li>
+                <li><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
+                <li><a href="json_output.html">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
             </li>
           </ol>
@@ -55,52 +55,121 @@
           <span class="m-breadcrumb"><a href="documentation.html">Documentation</a> &raquo;</span>
           Markdown markup
         </h1>
-<p>dox++ expects documentation to be marked up using the common Markdown format.
-dox++parse inserts Markdown formatting into the documentation for some
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li><a href="#markdown_basic">Basic formatting</a></li>
+            <li><a href="#markdown_links">Links</a></li>
+            <li><a href="#markdown_code">Code blocks</a></li>
+            <li><a href="#markdown_lists">Lists</a></li>
+            <li><a href="#markdown_bockquotes">Blockquotes</a></li>
+            <li><a href="#markdown_tables">Tables</a></li>
+            <li><a href="#markdown_boxes">Boxes</a></li>
+            <li><a href="#markdown_equations">Equations</a></li>
+            <li><a href="#markdown_images">Images</a></li>
+            <li><a href="#markdown_attributes">Attributes</a></li>
+            <li><a href="#markdown_html">HTML tags</a></li>
+          </ul>
+        </div>
+<p><strong>dox++</strong> expects documentation to be marked up using the common Markdown format.
+<strong>dox++parse</strong> inserts Markdown formatting into the documentation for some
 commands (such as <code>\‍ref</code> and <code>\‍see</code>).</p>
-<p>dox++html uses <a href="https://python-markdown.github.io">Python-Markdown</a> to convert
-the Markdown-formatted text into HTML with a small set of addons:</p>
+<p><strong>dox++html</strong> uses <a href="https://python-markdown.github.io">Python-Markdown</a> to convert
+the Markdown-formatted text into HTML with a small set of extensions:</p>
 <ul>
-<li><a href="https://python-markdown.github.io/extensions/admonition/">admonition</a></li>
-<li><a href="https://python-markdown.github.io/extensions/attr_list/">attr_list</a></li>
-<li><a href="https://python-markdown.github.io/extensions/code_hilite/">codehilite</a></li>
-<li><a href="https://python-markdown.github.io/extensions/fenced_code_blocks/">fenced_code</a></li>
-<li><a href="https://python-markdown.github.io/extensions/md_in_html/">md_in_html</a></li>
-<li><a href="https://python-markdown.github.io/extensions/sane_lists/">sane_lists</a></li>
-<li><a href="https://python-markdown.github.io/extensions/smarty/">smarty</a></li>
-<li><a href="https://python-markdown.github.io/extensions/tables/">tables</a></li>
-<li><a href="https://github.com/SaschaCowley/Markdown-Headdown">mdx_headdown</a></li>
-<li><a href="https://github.com/jambonrose/markdown_subscript_extension">markdown_subscript_extension</a></li>
-<li><a href="https://github.com/jambonrose/markdown_superscript_extension">markdown_superscript_extension</a></li>
+<li>Standard extensions
+  <a href="https://python-markdown.github.io/extensions/admonition/">admonition</a>,
+  <a href="https://python-markdown.github.io/extensions/attr_list/">attr_list</a>,
+  <a href="https://python-markdown.github.io/extensions/code_hilite/">codehilite</a>,
+  <a href="https://python-markdown.github.io/extensions/fenced_code_blocks/">fenced_code</a>, and
+  <a href="https://python-markdown.github.io/extensions/tables/">tables</a> to add features.</li>
+<li>Standard extensions
+  <a href="https://python-markdown.github.io/extensions/md_in_html/">md_in_html</a>,
+  <a href="https://python-markdown.github.io/extensions/sane_lists/">sane_lists</a>, and
+  <a href="https://python-markdown.github.io/extensions/smarty/">smarty</a> to improve standard formatting.</li>
+<li>Andrew Pinkham&rsquo;s
+  <a href="https://github.com/jambonrose/markdown_subscript_extension">markdown_subscript_extension</a>, and
+  <a href="https://github.com/jambonrose/markdown_superscript_extension">markdown_superscript_extension</a>.</li>
+<li>Sascha Cowley&rsquo;s
+  <a href="https://github.com/SaschaCowley/Markdown-Headdown">mdx_headdown</a> for internal purposes.</li>
+<li>Some <strong>dox++</strong>-specific extensions to allow it to correct internal links and retrieve
+  information from the Markdown parser.</li>
 </ul>
 <p>Thus, the documentation text is parsed as
 <a href="https://daringfireball.net/projects/markdown/">John Gruber’s Markdown</a>,
-with some additions that are useful for code documentation and some modifications
-that improve it. This page describes the formatting you can use, the links above
-might be useful for obtain more details.</p>
-<h3>Basic formatting</h3>
+with some modifications that improve it and some additions that are useful for code documentation.
+This page describes the formatting you can use, the links above might be useful for obtain more details.</p>
+<h2 id="markdown_basic">Basic formatting</h2>
 <p>Write documentation text as you would write any comment in your code, within the
-comment sections as described in <a href="documenting_code.md">How to document your code</a>.
+comment sections as described in <a href="documenting_code.html">How to document your code</a>).
 Newlines are ignored within a paragraph. An empty line indicates a new paragraph.</p>
 <p>Format your text using the following syntax:</p>
-<ul>
-<li><code>*italics*</code>: <em>italics</em></li>
-<li><code>_italics_</code>: <em>italics</em></li>
-<li><code>**bold**</code>: <strong>bold</strong></li>
-<li><code>__bold__</code>: <strong>bold</strong></li>
-<li><code>but no*italics*here</code>: but no*italics*here</li>
-<li><code>and no \*italics\* here either</code>: and no *italics* here either</li>
-<li><code>`code formatting`</code>: <code>code formatting</code></li>
-<li><code>`` code with a backtick ` in it ``</code>: <code>code with a backtick ` in it</code></li>
-<li><code>x~i~^2^</code>: x<sub>i</sub><sup>2</sup>
-  (<a href="https://github.com/jambonrose/markdown_subscript_extension">markdown_subscript_extension</a> and
-  <a href="https://github.com/jambonrose/markdown_superscript_extension">markdown_superscript_extension</a>)</li>
-<li><code>'quotes' and "double quotes" are automatically prettified</code>:
-  ‘quotes’ and “double quotes” are automatically prettified
-  (<a href="https://python-markdown.github.io/extensions/smarty/">smarty</a>)</li>
-<li><code>create dashes with -- and ---</code>: create dashes with – and —
-  (also <a href="https://python-markdown.github.io/extensions/smarty/">smarty</a>)</li>
-</ul>
+<table class="m-table">
+<thead>
+<tr>
+<th>Markup</th>
+<th>Result</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>*italics*</code></td>
+<td><em>italics</em></td>
+<td></td>
+</tr>
+<tr>
+<td><code>_italics_</code></td>
+<td><em>italics</em></td>
+<td></td>
+</tr>
+<tr>
+<td><code>**bold**</code></td>
+<td><strong>bold</strong></td>
+<td></td>
+</tr>
+<tr>
+<td><code>__bold__</code></td>
+<td><strong>bold</strong></td>
+<td></td>
+</tr>
+<tr>
+<td><code>no_italics_here</code></td>
+<td>no_italics_here</td>
+<td></td>
+</tr>
+<tr>
+<td><code>yes*italics*here</code></td>
+<td>yes<em>italics</em>here</td>
+<td></td>
+</tr>
+<tr>
+<td><code>`code formatting`</code></td>
+<td><code>code formatting</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>`` with backtick ` ``</code></td>
+<td><code>with backtick `</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>x~i~^2^</code></td>
+<td>x<sub>i</sub><sup>2</sup></td>
+<td>through <a href="https://github.com/jambonrose/markdown_subscript_extension">markdown_subscript_extension</a> and <a href="https://github.com/jambonrose/markdown_superscript_extension">markdown_superscript_extension</a>)</td>
+</tr>
+<tr>
+<td><code>'quotes' and "double quotes"</code></td>
+<td>&lsquo;quotes&rsquo; and &ldquo;double quotes&rdquo;</td>
+<td>through <a href="https://python-markdown.github.io/extensions/smarty/">smarty</a>)</td>
+</tr>
+<tr>
+<td><code>dashes -- and ---</code></td>
+<td>dashes &ndash; and &mdash;</td>
+<td>also through <a href="https://python-markdown.github.io/extensions/smarty/">smarty</a>)</td>
+</tr>
+</tbody>
+</table>
 <p>Note that the <code>\</code> character can be used to escape any character that might otherwise
 be interpreted as Markdown formatting:</p>
 <ul>
@@ -118,23 +187,23 @@ be interpreted as Markdown formatting:</p>
 <li>!   exclamation mark</li>
 </ul>
 <p>It is possible to create headers using Markdown formatting, but this will prevent
-dox++ from linking to them from other documentation blocks and from generating indexes.
+<strong>dox++</strong> from linking to them from other documentation blocks and from generating indexes.
 You should always use <code>\section</code>, <code>\subsection</code> and <code>\subsubsection</code> instead
-(see <a href="commands.md">Documentation commands</a>).</p>
+(see <a href="commands.html">Documentation commands</a>).</p>
 <p>Insert a line break by adding two spaces at the end of a line. Because many
 code editors will remove trailing spaces, the command <code>\n</code> will be replaced
-by two trailing spaces by dox++parse. (TODO!)</p>
-<h3>Links</h3>
+by two trailing spaces by <strong>dox++parse</strong>. (<strong>TODO!</strong>)</p>
+<h2 id="markdown_links">Links</h2>
 <p>Links are inserted using the following syntax: <code>[link text](URL)</code> or <code>[link text](URL "title")</code>,
 or simply <code>&lt;URL&gt;</code>. URL can be a full URL (<code>https://foo.com</code>), a local resource (<code>pages.html</code>)
 or <code>#id</code> to reference an ID on the current page.</p>
 <p>To link to other parts of the documentation, one would normally use the <code>\‍ref</code> command
-(see <a href="commands.md">Documentation commands</a>),
+(see <a href="commands.html">Documentation commands</a>),
 but it is possible to use a simple Markdown link if one knows the ID of the referenced
 documentation element. For example, <code>[ns::foo](#ns-foo-int--double-)</code> would be equivalent
 to <code>\‍ref ns::foo</code> if there existed a function declared as <code>int ns::foo(int, double)</code>.
-Note that dox++parse inserts links like this for each <code>\‍ref</code> and each <code>\‍see</code> command.</p>
-<h3>Code blocks</h3>
+Note that <strong>dox++parse</strong> inserts links like this for each <code>\‍ref</code> and each <code>\‍see</code> command.</p>
+<h2 id="markdown_code">Code blocks</h2>
 <p>There are two ways to format code blocks: using &ldquo;fences&rdquo;, and using indentation.</p>
 <p>The standard method is to use 4 spaces of indentation:</p>
 <div class="m-code"><pre><span></span>    // This is code
@@ -148,9 +217,17 @@ foo(bar);
 ```
 </pre></div>
 
+<p>Both will be rendered in the same way:</p>
+<aside class="m-note m-frame">
+<div class="m-code"><pre><span></span><span class="err">// This is code</span>
+<span class="err">foo(bar);</span>
+</pre></div>
+
+</aside>
 <p>We use the <a href="https://python-markdown.github.io/extensions/code_hilite/">codehilite</a> extension
 to apply syntax highlighting to the code. This uses Pygments to identify the language and
-apply highlighting. We recommend that you don&rsquo;t leave the language identification to chance,
+apply highlighting. We recommend that you don&rsquo;t leave the language identification to chance
+(we see above that identification failed for this short snipped),
 and specify the language explicitly:</p>
 <div class="m-code"><pre><span></span>    :::cpp
     // This is code
@@ -164,10 +241,23 @@ foo(bar);
 ```
 </pre></div>
 
+<p>These are rendered as</p>
+<aside class="m-note m-frame">
+<div class="m-code"><pre><span></span><span class="c1">// This is code</span>
+<span class="n">foo</span><span class="p">(</span><span class="n">bar</span><span class="p">);</span>
+</pre></div>
+
+</aside>
 <p>To identify the language (the &ldquo;cpp&rdquo; string in the examples above), use the &ldquo;short name&rdquo;
 as listed <a href="https://pygments.org/docs/lexers/">in the Pygments documentation</a>.
-Specifically, use &ldquo;text&rdquo; to turn off syntax highlighting.</p>
-<h3>Lists</h3>
+Specifically, use &ldquo;text&rdquo; to turn off syntax highlighting:</p>
+<div class="m-code"><pre><span></span>```text
+// This is code
+foo(bar);
+```
+</pre></div>
+
+<h2 id="markdown_lists">Lists</h2>
 <p>To create a list, start each list item with a <code>-</code>, <code>+</code> or <code>*</code>. Create numbered lists
 by starting each line with a number followed by a period. The first number in the list
 is meaningful, but other list items simply follow it:</p>
@@ -180,6 +270,7 @@ is meaningful, but other list items simply follow it:</p>
 </pre></div>
 
 <p>will be rendered as</p>
+<aside class="m-note m-frame">
 <ul>
 <li>list item 1</li>
 <li>list item 2</li>
@@ -189,21 +280,40 @@ is meaningful, but other list items simply follow it:</p>
 <li>numbered list item 8</li>
 <li>numbered list item 9</li>
 </ol>
+</aside>
 <p>It is important to separate the list items from a preceding paragraph with an empty
 line.</p>
 <p>It is not possible to mix numbered and unnumbered list items in the same list.</p>
 <p>Note that if you separate list items with an empty line, list items will be rendered
-with paragraph separation, as you would expect.</p>
+with paragraph separation, as you would expect:</p>
+<div class="m-code"><pre><span></span>* list item 1
+
+* list item 2
+
+* list item 3
+</pre></div>
+
+<p>will be rendered as</p>
+<aside class="m-note m-frame">
+<ul>
+<li>
+<p>list item 1</p>
+</li>
+<li>
+<p>list item 2</p>
+</li>
+<li>
+<p>list item 3</p>
+</li>
+</ul>
+</aside>
 <p>A list item can contain multiple paragraphs, code blocks, other lists, etc. Simply
 indent the additional blocks by 4 spaces:</p>
 <div class="m-code"><pre><span></span>* list item 1
-
     * sublist item 1.1
     * sublist item 1.2
 
 * list item 2
-
-    * sublist item 2.1
 
     Another paragraph in list item 2
 
@@ -214,11 +324,33 @@ indent the additional blocks by 4 spaces:</p>
         foo(bar);
 </pre></div>
 
+<aside class="m-note m-frame">
+<ul>
+<li>
+<p>list item 1</p>
+<ul>
+<li>sublist item 1.1</li>
+<li>sublist item 1.2</li>
+</ul>
+</li>
+<li>
+<p>list item 2</p>
+<p>Another paragraph in list item 2</p>
+</li>
+<li>
+<p>list item 3</p>
+<div class="m-code"><pre><span></span>    <span class="c1">// A C++ code block in list item 3</span>
+    <span class="n">foo</span><span class="p">(</span><span class="n">bar</span><span class="p">);</span>
+</pre></div>
+
+</li>
+</ul>
+</aside>
 <p>Note that fenced code blocks cannot be indented, so it is necessary to use the
 other code block format.</p>
 <p>We use the <a href="https://python-markdown.github.io/extensions/sane_lists/">sane_lists</a>
 extension to improve the standard Markdown list implementation.</p>
-<h3>Blockquotes</h3>
+<h2 id="markdown_bockquotes">Blockquotes</h2>
 <p>Insert an <code>&gt;</code> as the first character on the first line of a paragraph (or on
 each line of the paragraph). Block quotes can be nested:</p>
 <div class="m-code"><pre><span></span>&gt; This is the first level of quoting.
@@ -229,6 +361,7 @@ each line of the paragraph). Block quotes can be nested:</p>
 </pre></div>
 
 <p>will be rendered as</p>
+<aside class="m-note m-frame">
 <blockquote>
 <p>This is the first level of quoting.</p>
 <blockquote>
@@ -236,22 +369,285 @@ each line of the paragraph). Block quotes can be nested:</p>
 </blockquote>
 <p>Back to the first level.</p>
 </blockquote>
+</aside>
 <p>It is possible to put other Markdown elements inside a blockquote, including lists,
 code and links.</p>
-<h3>Tables</h3>
-<p>TODO
-<a href="https://python-markdown.github.io/extensions/tables/">tables</a></p>
-<h3>Admonitions</h3>
-<p>TODO
-<a href="https://python-markdown.github.io/extensions/admonition/">admonition</a></p>
-<h3>Equations</h3>
-<p>TODO</p>
-<h3>Images</h3>
-<p>TODO</p>
-<h3>Attributes</h3>
-<p>TODO
-<a href="https://python-markdown.github.io/extensions/attr_list/">attr_list</a></p>
-<h3>HTML tags</h3>
+<h2 id="markdown_tables">Tables</h2>
+<p>We use the <a href="https://python-markdown.github.io/extensions/tables/">tables</a> extension to allow
+producing tables. The syntax requires adding pipe characters (<code>|</code>) in between cells, and lines
+formed by dashes (<code>-</code>) in between the header row and the rest of the table, as follows:</p>
+<div class="m-code"><pre><span></span>First Header  | Second Header
+------------- | -------------
+Content Cell  | Content Cell
+Content Cell  | Content Cell
+</pre></div>
+
+<p>This is rendered as</p>
+<aside class="m-note m-frame">
+<table class="m-table">
+<thead>
+<tr>
+<th>First Header</th>
+<th>Second Header</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Content Cell</td>
+<td>Content Cell</td>
+</tr>
+<tr>
+<td>Content Cell</td>
+<td>Content Cell</td>
+</tr>
+</tbody>
+</table>
+</aside>
+<p>It is possible to add a pipe character at the beginning and end of each line as well.</p>
+<p>Cell content can contain Markdown formatting.</p>
+<p>To align columns add colons (<code>:</code>) at the beginning and/or end of the dashed lines that
+separate the header from the rest of the column:</p>
+<div class="m-code"><pre><span></span>Left aligned | Center aligned | Rigt aligned
+:----------- |:--------------:| ------------:
+Text         | Text           | Text
+Other text   | Other text     | Other text
+</pre></div>
+
+<p>This is rendered as</p>
+<aside class="m-note m-frame">
+<table class="m-table">
+<thead>
+<tr>
+<th align="left">Left aligned</th>
+<th align="center">Center aligned</th>
+<th align="right">Rigt aligned</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Text</td>
+<td align="center">Text</td>
+<td align="right">Text</td>
+</tr>
+<tr>
+<td align="left">Other text</td>
+<td align="center">Other text</td>
+<td align="right">Other text</td>
+</tr>
+</tbody>
+</table>
+</aside>
+<h2 id="markdown_boxes">Boxes</h2>
+<p>Boxes can be generated using the &ldquo;admonition&rdquo; syntax from rST (implemented here through the
+<a href="https://python-markdown.github.io/extensions/admonition/">admonition</a> extension).</p>
+<div class="m-code"><pre><span></span>!!! note &quot;Box title&quot;
+    Paragraph 1
+
+    Paragraph 2
+</pre></div>
+
+<p>is rendered as a box like this one:</p>
+<aside class="m-note m-info">
+<h4>Box title</h4>
+<p>Paragraph 1</p>
+<p>Paragraph 2</p>
+</aside>
+<p>The syntax is <code>!!! type "optional title"</code>. Type indicates what the color of the box will
+be, and what the default title will be. It is always possible to specify a custom title.
+Using <code>""</code> for the title will cause there to not be a title at all.</p>
+<p>These are the types and the corresponding default title and CSS classes currently implemented:</p>
+<table class="m-table">
+<thead>
+<tr>
+<th>Type</th>
+<th>Default title</th>
+<th>CSS class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>par</code></td>
+<td>(no title)</td>
+<td class="m-frame">&lsquo;m-frame&rsquo;</td>
+</tr>
+<tr>
+<td><code>note</code></td>
+<td>Note</td>
+<td class="m-info">&lsquo;m-info&rsquo;</td>
+</tr>
+<tr>
+<td><code>remark</code></td>
+<td>Remark</td>
+<td class="m-primary">&lsquo;m-primary&rsquo;</td>
+</tr>
+<tr>
+<td><code>attention</code></td>
+<td>Attention</td>
+<td class="m-warning">&lsquo;m-warning&rsquo;</td>
+</tr>
+<tr>
+<td><code>warning</code></td>
+<td>Warning</td>
+<td class="m-danger">&lsquo;m-danger&rsquo;</td>
+</tr>
+<tr>
+<td><code>see</code></td>
+<td>See also</td>
+<td class="m-default">&lsquo;m-default&rsquo;</td>
+</tr>
+<tr>
+<td><code>literature</code></td>
+<td>Literature</td>
+<td class="m-default">&lsquo;m-default&rsquo;</td>
+</tr>
+<tr>
+<td><code>author</code></td>
+<td>Author</td>
+<td class="m-default">&lsquo;m-default&rsquo;</td>
+</tr>
+<tr>
+<td><code>authors</code></td>
+<td>Authors</td>
+<td class="m-default">&lsquo;m-default&rsquo;</td>
+</tr>
+<tr>
+<td><code>copyright</code></td>
+<td>Copyright</td>
+<td class="m-default">&lsquo;m-default&rsquo;</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td>Version</td>
+<td class="m-default">&lsquo;m-default&rsquo;</td>
+</tr>
+<tr>
+<td><code>since</code></td>
+<td>Since</td>
+<td class="m-default">&lsquo;m-default&rsquo;</td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td>Date</td>
+<td class="m-default">&lsquo;m-default&rsquo;</td>
+</tr>
+<tr>
+<td><code>pre</code></td>
+<td>Precondition</td>
+<td class="m-success">&lsquo;m-success&rsquo;</td>
+</tr>
+<tr>
+<td><code>post</code></td>
+<td>Postcondition</td>
+<td class="m-success">&lsquo;m-success&rsquo;</td>
+</tr>
+<tr>
+<td><code>invariant</code></td>
+<td>Invariant</td>
+<td class="m-success">&lsquo;m-success&rsquo;</td>
+</tr>
+<tr>
+<td><code>aside</code></td>
+<td>(no title)</td>
+<td class="m-dim">&lsquo;m-dim&rsquo;</td>
+</tr>
+<tr>
+<td>(anything_else)</td>
+<td>(capitalized)</td>
+<td>&lsquo;anything_else&rsquo;</td>
+</tr>
+</tbody>
+</table>
+<p>Note that most of these (except <code>literature</code>) correspond to Doxygen commands to generate
+boxes.</p>
+<p>It is possible to add additional CSS classes after <code>type</code>: <code>!!! type class1 class2 "optional title"</code></p>
+<p>By default, the class &lsquo;m-note&rsquo; is used for admonitions. This class renders a colored
+box as shown above. If &lsquo;m-block&rsquo; is added as an additional class, then that one is
+used instead of &lsquo;m-note&rsquo;. For example,</p>
+<div class="m-code"><pre><span></span>!!! note m-block &quot;Box title&quot;
+    Paragraph 1
+
+    Paragraph 2
+</pre></div>
+
+<p>is rendered as a &ldquo;block&rdquo; like this one:</p>
+<aside class="m-block m-info">
+<h4>Box title</h4>
+<p>Paragraph 1</p>
+<p>Paragraph 2</p>
+</aside>
+<h2 id="markdown_equations">Equations</h2>
+<p><strong>TODO</strong> This is not yet implemented</p>
+<h2 id="markdown_images">Images</h2>
+<p>To inert an image, use the syntax <code>![Alt text](/path/to/image_file.jpg "Optional title")</code>. The
+&ldquo;Alt text&rdquo; is the text that is rendered instead of the image if the image file cannot be
+opened (or if image display is disabled in the browser). The &ldquo;Optional title&rdquo; is the text
+shown when hovering over the image. This optional title can be left out:
+<code>![Alt text](/path/to/image_file.jpg)</code>. Note how the syntax is identical to a link,
+but with a <code>!</code> prepended.</p>
+<p>Images can appear inside other elements, including links. For example,</p>
+<div class="m-code"><pre><span></span>[<span class="nt">![Manuals</span>](<span class="na">manuals.png &quot;The most ridiculous offender of all is the sudoers man page,</span>
+<span class="na">which for 15 years has started with a &#39;quick guide&#39; to EBNF, a system for defining the</span>
+<span class="na">grammar of a language. &#39;Don&#39;t despair&#39;, it says, &#39;the definitions below are annotated.&#39;</span>
+<span class="na">&quot;</span>)](https://xkcd.com/1343/)
+</pre></div>
+
+<p>is rendered as</p>
+<aside class="m-note m-frame">
+<p><a href="https://xkcd.com/1343/"><img alt="Manuals" class="m-image" src="manuals.png" title="The most ridiculous offender of all is the sudoers man page, which for 15 years has started with a 'quick guide' to EBNF, a system for defining the grammar of a language. 'Don't despair', it says, 'the definitions below are annotated.'"></a></p>
+</aside>
+<h2 id="markdown_attributes">Attributes</h2>
+<p>One can add CSS attributes to an element by adding the following syntax:</p>
+<div class="m-code"><pre><span></span>{ #someid .someclass somekey=&#39;some value&#39; }
+</pre></div>
+
+<p>This is implemented through the
+<a href="https://python-markdown.github.io/extensions/attr_list/">attr_list</a> extension.
+<code>someid</code> will be the ID of the element, <code>someclass</code> will be added the list of classes,
+and the (<code>somekey</code>/<code>some value</code>) pair will be added directly to the element. Note that
+the spaces inside the braces are required. It is allowed to add a colon right after
+the opening brace, for compatibility with other Markdown parsers: <code>{: ... }</code>.</p>
+<p>To add the CSS attributes to a block element, put them in a line by themselves at the
+end of the block element:</p>
+<div class="m-code"><pre><span></span>This is a paragraph.
+{ .m-text .m-tiny }
+</pre></div>
+
+<p>will be rendered as</p>
+<aside class="m-note m-frame">
+<p class="m-text m-tiny">This is a paragraph.</p>
+</aside>
+<p>To add the attributes to inline elements, add them right after the element, with no
+space in between:</p>
+<div class="m-code"><pre><span></span>This is a **paragraph**{ .m-text .m-tiny }.
+</pre></div>
+
+<p>will be rendered as</p>
+<aside class="m-note m-success m-block">
+<p>This is a <strong class="m-text m-tiny">paragraph</strong>.</p>
+</aside>
+<p>Note that it is not possible to assign attributes to a single word, unless it is wrapped
+in an element as above.</p>
+<p>For code blocks, use the fences syntax and apply the attributes to the opening fences:</p>
+<div class="m-code"><pre><span></span>``` { .cpp .m-text .m-tiny }
+// This is code
+foo(bar);
+```
+</pre></div>
+
+<p>The first class name is interpreted as the language, the remaining ones are CSS classes.</p>
+<aside class="m-note m-frame">
+<div class="m-text m-tiny m-code"><pre><span></span><span class="c1">// This is code</span>
+<span class="n">foo</span><span class="p">(</span><span class="n">bar</span><span class="p">);</span>
+</pre></div>
+
+</aside>
+<p>For tables cells, put the attributes after the cell contents, separated with at least one space.
+Without a space, the attributes would be applied to the element they&rsquo;re connected to.
+There is no way to apply the attributes to a table row or the whole table.</p>
+<p>Note that there are many limitations to this system, see
+<a href="https://python-markdown.github.io/extensions/attr_list/">the attr_list documentation</a>.
+If you don&rsquo;t manage to set required attributes this way, use HTML instead.</p>
+<h2 id="markdown_html">HTML tags</h2>
 <p>It is possible to include HTML code into your documentation. Everything enclosed
 in HTML tags is copied as-is into the generated HTML pages. That is, the
 text marked up using HTML is not parsed by the Markdown parser:</p>
@@ -261,8 +657,10 @@ text marked up using HTML is not parsed by the Markdown parser:</p>
 </pre></div>
 
 <p>will be rendered as</p>
-<p>This is a paragraph <strong>with some bold text</strong>.<br>
-This is a paragraph without **any** bolding.</p>
+<aside class="m-note m-frame">
+<p>This is a paragraph <strong>with some bold text</strong>.</p>
+<p>This is a paragraph without **any** bolding.</p>
+</aside>
 <p>The <a href="https://python-markdown.github.io/extensions/md_in_html/">md_in_html</a> extension
 allows the content of HTML blocks to be parsed by Markdown:</p>
 <div class="m-code"><pre><span></span>This is a paragraph **with some bold text**.
@@ -271,23 +669,50 @@ allows the content of HTML blocks to be parsed by Markdown:</p>
 </pre></div>
 
 <p>will be rendered as</p>
-<p>This is a paragraph <strong>with some bold text</strong>.<br>
-This is a paragraph with <strong>some</strong> bolding.</p>
+<aside class="m-note m-frame">
+<p>This is a paragraph <strong>with some bold text</strong>.</p>
+<p>This is a paragraph with <strong>some</strong> bolding.</p>
+</aside>
 <p>This can be useful to add a CSS class to a portion of the text, for example:</p>
-<div class="m-code"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">markdown</span><span class="o">=</span><span class="s">&quot;1&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;m-text m-tiny&quot;</span><span class="p">&gt;</span>
+<div class="m-code"><pre><span></span>&lt;div markdown=&quot;1&quot; class=&quot;m-text m-tiny&quot;&gt;
+
 First Header  | Second Header
 ------------- | -------------
 Content Cell  | Content Cell
 Content Cell  | Content Cell
-<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+&lt;/div&gt;
 </pre></div>
 
-<p>will create a table with a smaller font. Since we can only add attributes to individual
+<p>will create a table with a very small font:</p>
+<aside class="m-note m-frame">
+<div markdown="1" class="m-text m-tiny">
+<table class="m-table">
+<thead>
+<tr>
+<th>First Header</th>
+<th>Second Header</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Content Cell</td>
+<td>Content Cell</td>
+</tr>
+<tr>
+<td>Content Cell</td>
+<td>Content Cell</td>
+</tr>
+</tbody>
+</table>
+</div>
+</aside>
+<p>Since we can only add attributes to individual
 cells of a table, not the table itself, this is the only way to add special styling
 to a whole table. It is also the only way to add special styling to lists.</p>
 <p>Examine the CSS style sheets as well as the generated HTML to learn what classes exist.
-You can modify the default CSS style sheets as well, see <a href="configuration.md">Configuring dox++</a>.</p>
-        <div class="m-note m-dim m-thin m-text-center"><a href="grouping.html" class="m-doc">&laquo; Grouping</a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="configuration.html" class="m-doc">Configuring dox++ &raquo;</a></div>
+You can modify the default CSS style sheets as well, see <a href="configuration.html">Configuring <strong>dox++</strong></a>.</p>
+        <div class="m-note m-dim m-thin m-text-center"><a href="grouping.html" class="m-doc">&laquo; Grouping</a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="running_the_tools.html" class="m-doc">Running <strong>dox++parse</strong> and <strong>dox++html</strong> &raquo;</a></div>
       </div>
     </div>
   </div>
@@ -324,9 +749,7 @@ You can modify the default CSS style sheets as well, see <a href="configuration.
   </div>
 </div>
 <script src="search-v1.js"></script>
-<script>
-  Search.download(window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') + 1) + 'searchdata-v1.bin');
-</script>
+<script src="searchdata-v1.js" async="async"></script>
 <footer><nav>
   <div class="m-container">
     <div class="m-row">

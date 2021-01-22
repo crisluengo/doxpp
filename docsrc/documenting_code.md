@@ -24,9 +24,9 @@ Stuff is copied verbatim to the output JSON file. The stuff is assumed to be val
 Markdown. Some commands will inject standard Markdown into the documentation.
 But it depends on the generator that consumes the JSON file how it is interpreted.
 If your generator supports HTML tags, you can use those. If you generator supports
-special commands, you can use those.
+special commands, you can use those. **dox++html** supports both.
 
-dox++ will identify certain commands, and change its behavior. See \ref commands
+**dox++parse** will identify certain commands, and change its behavior. See \ref commands
 for details.
 
 The `\brief` command changes the parsing so that the first paragraph, rather than

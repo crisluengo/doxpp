@@ -2,7 +2,7 @@
 
 **TODO:** This page still needs to be formatted correctly.
 
-These are the member types that will be output by dox++, and how they nest.
+These are the member types that will be output by **dox++**, and how they nest.
 
 - `namespace`
     - can contain anything except `macro`
@@ -43,7 +43,7 @@ This description can be shown in a list of members.
 
 ### "doc" (string)
 
-The full documentation, excluding the first line, which is in `"brief"`.['derived-class-member-id', 'derived-class-member-id', ...]
+The full documentation, excluding the first line, which is in `"brief"`.
 Should be rendered through a Markdown processor.
 
 ### "sections" (list)

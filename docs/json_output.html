@@ -5,7 +5,7 @@
   <title>Documentation &raquo; JSON output of dox++parse | dox++ | Documentation preparation system for C++</title>
   <link rel="stylesheet" href="m-light-documentation.compiled.css" />
   <link rel="icon" href="favicon-light.png" type="image/png" />
-  <link rel="prev" href="running_the_tools.html" />
+  <link rel="prev" href="configuration.html" />
   <link rel="next" href="members.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#22272e" />
@@ -30,9 +30,9 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
-                <li><a href="configuration.html">Configuring dox++</a></li>
-                <li><a href="running_the_tools.html">Running dox++parse and dox++html</a></li>
-                <li><a href="json_output.html" id="m-navbar-current">JSON output of dox++parse</a></li>
+                <li><a href="configuration.html">Configuring <strong>dox++</strong></a></li>
+                <li><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
+                <li><a href="json_output.html" id="m-navbar-current">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
             </li>
           </ol>
@@ -53,9 +53,10 @@
       <div class="m-col-l-10 m-push-l-1">
         <h1>
           <span class="m-breadcrumb"><a href="documentation.html">Documentation</a> &raquo;</span>
-          JSON output of dox++parse
+          JSON output of <strong>dox++parse</strong>
         </h1>
-<p>The dox++parse program outputs a single JSON file, which should be easy to convert into any representation
+<p><strong>TODO:</strong> This page still needs to be formatted correctly.</p>
+<p>The <strong>dox++parse</strong> program outputs a single JSON file, which should be easy to convert into any representation
 the user desires. The JSON file has the following format:</p>
 <div class="m-code"><pre><span></span><span class="p">{</span>
    <span class="nt">&quot;members&quot;</span><span class="p">:</span> <span class="p">[],</span>
@@ -169,7 +170,7 @@ information to the generator for this.</p>
 These are created with the commands <code>\section</code>, <code>\subsection</code> and <code>\subsubsection</code>. These commands
 are replaced with the appropriate Markdown syntax, and the section ID, title and level (1 for section,
 2 for subsection, etc.) is stored as tuples in the &ldquo;sections&rdquo; field.</p>
-        <div class="m-note m-dim m-thin m-text-center"><a href="running_the_tools.html" class="m-doc">&laquo; Running dox++parse and dox++html</a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="members.html" class="m-doc">Detailed description of keys for C++ members &raquo;</a></div>
+        <div class="m-note m-dim m-thin m-text-center"><a href="configuration.html" class="m-doc">&laquo; Configuring <strong>dox++</strong></a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="members.html" class="m-doc">Detailed description of keys for C++ members &raquo;</a></div>
       </div>
     </div>
   </div>
@@ -206,9 +207,7 @@ are replaced with the appropriate Markdown syntax, and the section ID, title and
   </div>
 </div>
 <script src="search-v1.js"></script>
-<script>
-  Search.download(window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') + 1) + 'searchdata-v1.bin');
-</script>
+<script src="searchdata-v1.js" async="async"></script>
 <footer><nav>
   <div class="m-container">
     <div class="m-row">

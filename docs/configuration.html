@@ -5,8 +5,8 @@
   <title>Documentation &raquo; Configuring dox++ | dox++ | Documentation preparation system for C++</title>
   <link rel="stylesheet" href="m-light-documentation.compiled.css" />
   <link rel="icon" href="favicon-light.png" type="image/png" />
-  <link rel="prev" href="markdown.html" />
-  <link rel="next" href="running_the_tools.html" />
+  <link rel="prev" href="running_the_tools.html" />
+  <link rel="next" href="json_output.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#22272e" />
 </head>
@@ -30,9 +30,9 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
-                <li><a href="configuration.html" id="m-navbar-current">Configuring dox++</a></li>
-                <li><a href="running_the_tools.html">Running dox++parse and dox++html</a></li>
-                <li><a href="json_output.html">JSON output of dox++parse</a></li>
+                <li><a href="configuration.html" id="m-navbar-current">Configuring <strong>dox++</strong></a></li>
+                <li><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
+                <li><a href="json_output.html">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
             </li>
           </ol>
@@ -53,10 +53,163 @@
       <div class="m-col-l-10 m-push-l-1">
         <h1>
           <span class="m-breadcrumb"><a href="documentation.html">Documentation</a> &raquo;</span>
-          Configuring dox++
+          Configuring <strong>dox++</strong>
         </h1>
-<p>TODO: write this documentation</p>
-        <div class="m-note m-dim m-thin m-text-center"><a href="markdown.html" class="m-doc">&laquo; Markdown markup</a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="running_the_tools.html" class="m-doc">Running dox++parse and dox++html &raquo;</a></div>
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li><a href="#clang">Section clang</a></li>
+            <li><a href="#log">Section log</a></li>
+            <li><a href="#input">Section input</a></li>
+            <li><a href="#json">Section json</a></li>
+            <li><a href="#project">Section project</a></li>
+            <li><a href="#html">Section html</a></li>
+            <li><a href="#search">Section search</a></li>
+          </ul>
+        </div>
+<p>This is the default configuration file created by <code>dox++parse -g</code>:</p>
+<div class="m-code"><pre><span></span><span class="c1"># Default dox++ configuration file</span>
+
+<span class="k">[clang]</span>
+<span class="na">compiler flags</span> <span class="o">=</span> 
+<span class="na">include directories</span> <span class="o">=</span> 
+
+<span class="k">[log]</span>
+<span class="na">level</span> <span class="o">=</span> <span class="s">warning</span>
+
+<span class="k">[input]</span>
+<span class="na">root directory</span> <span class="o">=</span> <span class="s">.</span>
+<span class="na">header files</span> <span class="o">=</span> <span class="s">*.h *.hpp</span>
+<span class="na">markdown files</span> <span class="o">=</span> <span class="s">*.md</span>
+<span class="na">tab size</span> <span class="o">=</span> <span class="s">4</span>
+
+<span class="k">[json]</span>
+<span class="na">filename</span> <span class="o">=</span> <span class="s">dox++out.json</span>
+<span class="na">use typewriter font</span> <span class="o">=</span> <span class="s">no</span>
+<span class="na">formatting</span> <span class="o">=</span> <span class="s">compact</span>
+
+<span class="k">[project]</span>
+<span class="na">name</span> <span class="o">=</span> <span class="s">Project Name</span>
+<span class="na">brief</span> <span class="o">=</span> <span class="s">Short project description</span>
+<span class="na">url</span> <span class="o">=</span> 
+<span class="na">logo</span> <span class="o">=</span> 
+
+<span class="k">[html]</span>
+<span class="na">output directory</span> <span class="o">=</span> <span class="s">html</span>
+<span class="na">document private virtual members</span> <span class="o">=</span> <span class="s">yes</span>
+<span class="na">document private non-virtual members</span> <span class="o">=</span> <span class="s">yes</span>
+<span class="na">document protected members</span> <span class="o">=</span> <span class="s">yes</span>
+<span class="na">document undocumented members</span> <span class="o">=</span> <span class="s">no</span>
+<span class="na">modify include statement</span> <span class="o">=</span> <span class="s">def modify_include_statement(id): return id</span>
+<span class="na">theme color</span> <span class="o">=</span> <span class="s">#22272e</span>
+<span class="na">favicon</span> <span class="o">=</span> 
+<span class="na">stylesheets</span> <span class="o">=</span> 
+<span class="na">templates</span> <span class="o">=</span> 
+<span class="na">documentation link class</span> <span class="o">=</span> <span class="s">m-doc</span>
+<span class="na">extra files</span> <span class="o">=</span> 
+<span class="na">html header</span> <span class="o">=</span> 
+<span class="na">page header</span> <span class="o">=</span> 
+<span class="na">fine print</span> <span class="o">=</span> <span class="s">[default]</span>
+<span class="na">navigation bar 1</span> <span class="o">=</span> <span class="s">[(&#39;&#39;, &#39;#pages&#39;, []),(&#39;&#39;, &#39;#modules&#39;, []),(&#39;&#39;, &#39;#namespaces&#39;, [])]</span>
+<span class="na">navigation bar 2</span> <span class="o">=</span> <span class="s">[(&#39;&#39;, &#39;#classes&#39;, []),(&#39;&#39;, &#39;#files&#39;, [])]</span>
+<span class="na">file index expand levels</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">class index expand levels</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">class index expand inner</span> <span class="o">=</span> <span class="s">no</span>
+
+<span class="k">[search]</span>
+<span class="na">enable</span> <span class="o">=</span> <span class="s">True</span>
+<span class="na">download binary</span> <span class="o">=</span> <span class="s">False</span>
+<span class="na">base url</span> <span class="o">=</span> 
+<span class="na">external url</span> <span class="o">=</span> 
+<span class="na">add snake case suffixes</span> <span class="o">=</span> <span class="s">yes</span>
+<span class="na">add camel case suffixes</span> <span class="o">=</span> <span class="s">yes</span>
+</pre></div>
+
+<h2 id="clang">Section clang</h2>
+<p>Options to configure Clang.</p>
+<p><strong>compiler flags</strong>: Flags to pass to Clang when parsing the project header files. Specify
+the C++ standard used (e.g. <code>-std=c++17</code>), preprocessor macro definitions (e.g. <code>-DFOO</code>),
+and options such as <code>-xc++</code> (ensures sources are interpreted as C++, not C). </p>
+<p><strong>include directories</strong>: Directories to add to the include search path. Separate them with
+spaces. If a directory name has a space in it, enclose the name in double quotes. For
+example,</p>
+<div class="m-code"><pre><span></span><span class="na">include directories</span> <span class="o">=</span> <span class="s">include/ &quot;/opt/my thing/include/&quot;</span>
+</pre></div>
+
+<h2 id="log">Section log</h2>
+<p>Options to configure the logger.</p>
+<p><strong>level</strong>: &lsquo;error&rsquo;, &lsquo;warning&rsquo;, &lsquo;info&rsquo; or &lsquo;debug&rsquo;. &lsquo;error&rsquo; provides the lowest level of
+diagnostic output (only errors are shown). &lsquo;warning&rsquo; (the default) shows also warnings.
+&lsquo;info&rsquo; gives some additional information about what the program is doing. &lsquo;debug&rsquo; should
+only be used to debug the <strong>dox++</strong> programs, and shouldn&rsquo;t be necessary to debug your
+documentation sources; it produces a huge amount of output, we recommend only using it
+with very small test projects.</p>
+<h2 id="input">Section input</h2>
+<p>Options to describe the input to be parsed.</p>
+<p><strong>root directory</strong>: The root directory for the header files. This is the directory that
+you would pass to the compiler with <code>-I</code> when using the library. Header file names
+will be shown in the documentation relative to this directory.</p>
+<p><strong>header files</strong>: List of header file names to parse for documentation. Separate names
+with a space, enclose names with spaces in quotes. Names can contain wildcards. Paths
+are relative to the current directory at the time of running the tools, not relative
+to the configuration file&rsquo;s directory or to the <strong>root directory</strong> option.</p>
+<p><strong>markdown files</strong>: List of Markdown files with additional documentation, provided in the
+same way as the header files.</p>
+<p><strong>tab size</strong>: Integer value for how many spaces each tab character advances. If the source code
+uses tabs, they will be converted to spaces according to this value. It is important to match
+this value correctly so that Markdown indenting is interpreted as intended.
+This does not affect the Markdown parsing, which always assumes 4 spaces indentation. </p>
+<h2 id="json">Section json</h2>
+<p>Options to configure the intermediate JSON file.</p>
+<p><strong>filename</strong>: Name of the intermediate JSON file. Defaults to <code>dox++out.json</code>. The path
+given is relative to the current directory at the time of running <strong>dox++parse</strong> or
+<strong>dox++html</strong>, not relative to the directory containing the configuration file.</p>
+<p><strong>use typewriter font</strong>: &lsquo;yes&rsquo; or &lsquo;no&rsquo; (defaults to &lsquo;no&rsquo;),
+indicating whether to use &ldquo;<code>&lt;name&gt;</code>&rdquo; or &ldquo;<name>&rdquo; when writing the name of members when processing
+the <code>\‍ref</code> command. The `` is Markdown for code formatting. Note that member names elsewhere
+are formatted by the generator, not by <strong>dox++parse</strong> which processes the <code>\‍ref</code> command.
+Note that a member name in the documentation text not preceded by the <code>\‍ref</code> command will not
+be recognized as a member name, and not typeset accordingly. Instead, manually add `` around
+member names if not referenced.</p>
+<p><strong>formatting</strong>: &lsquo;compact&rsquo; (default) or &lsquo;readable&rsquo;. Set to &lsquo;readable&rsquo; to pretty-format the
+JSON file.</p>
+<h2 id="project">Section project</h2>
+<p>Options describing the project.</p>
+<p><strong>name</strong>: Project name, shown in the header of each HTML page.</p>
+<p><strong>brief</strong>: Project short description, shown in the header of each HTML page.</p>
+<p><strong>url</strong>: Project homepage URL, the project&rsquo;s name will be a link to the homepage.</p>
+<p><strong>logo</strong>: Project logo, shown in the header of each HTML page.</p>
+<h2 id="html">Section html</h2>
+<p>Options to configure how the HTML pages are generated and what is shown in them.</p>
+<p><strong>output directory</strong>:</p>
+<p><strong>document private virtual members</strong>:</p>
+<p><strong>document private non-virtual members</strong>:</p>
+<p><strong>document protected members</strong>:</p>
+<p><strong>document undocumented members</strong>:</p>
+<p><strong>modify include statement</strong>:</p>
+<p><strong>theme color</strong>:</p>
+<p><strong>favicon</strong>:</p>
+<p><strong>stylesheets</strong>:</p>
+<p><strong>templates</strong>:</p>
+<p><strong>documentation link class</strong>:</p>
+<p><strong>extra files</strong>:</p>
+<p><strong>html header</strong>:</p>
+<p><strong>page header</strong>:</p>
+<p><strong>fine print</strong>:</p>
+<p><strong>navigation bar 1</strong>:</p>
+<p><strong>navigation bar 2</strong>:</p>
+<p><strong>file index expand levels</strong>:</p>
+<p><strong>class index expand levels</strong>:</p>
+<p><strong>class index expand inner</strong>:</p>
+<h2 id="search">Section search</h2>
+<p>Options to configure the search functionality on the generated website.</p>
+<p><strong>enable</strong>:</p>
+<p><strong>download binary</strong>:</p>
+<p><strong>base url</strong>:</p>
+<p><strong>external url</strong>:</p>
+<p><strong>add snake case suffixes</strong>:</p>
+<p><strong>add camel case suffixes</strong>:</p>
+        <div class="m-note m-dim m-thin m-text-center"><a href="running_the_tools.html" class="m-doc">&laquo; Running <strong>dox++parse</strong> and <strong>dox++html</strong></a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="json_output.html" class="m-doc">JSON output of <strong>dox++parse</strong> &raquo;</a></div>
       </div>
     </div>
   </div>
@@ -93,9 +246,7 @@
   </div>
 </div>
 <script src="search-v1.js"></script>
-<script>
-  Search.download(window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') + 1) + 'searchdata-v1.bin');
-</script>
+<script src="searchdata-v1.js" async="async"></script>
 <footer><nav>
   <div class="m-container">
     <div class="m-row">

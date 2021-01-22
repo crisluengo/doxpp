@@ -1,35 +1,14 @@
 \page commands Documentation commands
 
-These are the commands recognized by dox++parse. Commands can start with `\` or `@`.
+This page describes the commands recognized by **dox++parse**. Commands can start with `\` or `@`.
 Here we show the `\` variant only, but you can use the other variant if you prefer.
 
-Note that we try to keep compatibility with Doxygen, but chose to make some changes:
+We try to keep only partial compatibility with Doxygen, see \ref doxygen_differences.
 
-1. Documenting a function, variable or typedef with `\fn`, `\var`, `\typedef` doesn't
-   take a declaration, only a name. The declaration is always taken from the sources.
-   You cannot document non-existing things.
-
-2. Documenting a preprocessor macro with `\def` (new better name: `\macro`) must always
-   carry the macro name. Clang doesn't preserve preprocessor directives in its AST.
-
-3. Grouping has improved, but this comes with some syntax changes.
-   We don't recognize `\{` and `\}`. Instead, use `\addtogroup` instead of the opening `\{`,
-   and `\endgroup` instead of the closing `\}`. `\defgroup` is still recognized, but works
-   the same way as `\group`, which is not exactly the same way that `\defgroup` works in
-   Doxygen. Furthermore, groups are disjoint, each member can only belong to one group.
-
-4. There is no "autolink", all member names must be preceded by the `\‍ref` command
-   to create a link to the member documentation. `\‍ref` is used to link to anything
-   in the documentation, not just pages and sections.
-
-5. Doxygen commands related to markup are not recognized. Any non-recognized
-   command is kept in the output JSON file, so that the backend can act on it if it
-   desires (but dox++html will not recognize any of these commands either).
-   dox++ assumes [Markdown formatting](#markdown).
-
-Note that commands are recognized and processed outside of any Markdown parsing, so
-commands inside of backticks or code fences are processed the same way as outside
-of them.
+!!! note
+    Commands are recognized and processed outside of any Markdown parsing, so
+    commands inside of backticks or code blocks are processed the same way as outside
+    of them.
 
 
 \section commands_start_block At the start of a documentation block
@@ -83,7 +62,7 @@ Alternatively, provide the ID for the class.
 
     \‍dir [<path fragment>]
 
-dox++ doesn't document directories. This Doxygen command is recognized and a warning
+**dox++** doesn't document directories. This Doxygen command is recognized and a warning
 message is produced.
 
 \subsection command_endgroup `\endgroup`
@@ -316,6 +295,8 @@ Used at the beginning of the first line of a comment block, turns the first para
 int foo;
 ```
 
+`\short` is an alias.
+
 \subsection command_ingroup `\ingroup`
 
     \ingroup <name>
@@ -334,8 +315,6 @@ This command is expected to be on its own on a line.
 Inserts a line break. The Markdown for a line break is two spaces at the end of a line.
 Because many code editors automatically remove such spaces, use this command instead.
 It will be replaced by two spaces, and a newline will be added if it's not there already.
-
-**TODO!**
 
 \subsection command_ref `\‍ref`
 
@@ -449,6 +428,17 @@ Like `\section`, but for a level 2 heading (`##` in Markdown).
 
 Like `\section`, but for a level 3 heading (`###` in Markdown).
 
+\subsection command_not_yet_implemented Not yet implemented
+
+- `\deprecated` (might be relevant for things that cannot be marked as such in source code)
+- `\example`
+- `\exception` / `\throw` / `\throws`
+- `\headerfile`
+- `\param`
+- `\parblock` / `\endparblock`
+- `\return` / `\returns` / `\result`
+- `\since`
+- `\tparam`
 
 \section commands_start_of_line At the start of a line in Markdown files only
 
@@ -478,58 +468,66 @@ documentation, file copyright notices, etc.
 
 \subsection commands_not_implemented_notcpp Because it doesn't apply to C++
 
-- `\idlexcept` -> IDL only
+- `\category` (Objective-C only)
+- `\idlexcept` (IDL only)
 - `\interface`
-- `\package` -> Java only
+- `\package` (Java only)
 - `\property`
-- `\protocol` -> Objective-C only
-- `\vhdlflow` -> VHDL only
+- `\protocol` (Objective-C only)
+- `\retval`
+- `\vhdlflow` (VHDL only)
 
-\subsection commands_not_implemented_nonsensical Because it doesn't make sense to me
+\subsection commands_not_implemented_latex Because they're specific to LaTeX output
 
+- `\addindex`
+- `\cite`
+
+\subsection commands_not_implemented_nonsensical Because it doesn't make sense with the **dox++** logic
+
+- `\bug`
 - `\callergraph`
 - `\callgraph`
-- `\cond` / `\endcond` -> use an `#ifdef` conditional compilation to exclude things from the documentation
+- `\cond` / `\endcond` (use an `#ifdef` conditional compilation to exclude things from the documentation)
+- `\copybrief`
+- `\copydetails`
+- `\copydoc`
 - `\hidecallergraph`
 - `\hidecallgraph`
-- `\hideinitializer` -> this is something that the backend can do
+- `\hideinitializer`
 - `\hiderefby`
 - `\hiderefs`
 - `\internal` / `\endinternal`
-- `\link` / `\endlink` -> we're using `\‍ref` for everything
+- `\link` / `\endlink` (we use `\‍ref` for everything)
+- `\nosubgrouping`
 - `\overload [(function declaration)]`
+- `\refitem`
 - `\relatedalso <name>`
 - `\relatesalso <name>`
-- `\showinitializer` -> this is something that the backend can do
+- `\secreflist` / `\endsecreflist`
+- `\showinitializer`
 - `\showrefby`
 - `\showrefs`
+- `\tableofcontents` (these are automatically generated by the default templates)
+- `\todo`
 - `\weakgroup`
-- `\{` -> we use `\addtogroup` instead
-- `\}` -> we use `\endgroup` instead
+- `\xrefitem`
+- `\{` (use `\addtogroup` instead)
+- `\}` (use `\endgroup` instead)
 
 \subsection commands_not_implemented_markup All the stuff that is related to markup, use Markdown instead
 
 (There might be some other stuff in here that I missed?)
 
 - `\a`
-- `\addindex`
 - `\arg`
 - `\attention`
 - `\author`
 - `\authors`
 - `\b`
-- `\brief`
-- `\bug`
 - `\c`
-- `\category`
-- `\cite`
 - `\code` / `\endcode`
-- `\copybrief`
-- `\copydetails`
-- `\copydoc`
 - `\copyright`
 - `\date`
-- `\deprecated`
 - `\details`
 - `\diafile`
 - `\docbookinclude`
@@ -540,7 +538,6 @@ documentation, file copyright notices, etc.
 - `\e`
 - `\em`
 - `\emoji`
-- `\exception`
 - `\f$`
 - `\f[` / `\f]`
 - `\f{` / `\f}`
@@ -564,34 +561,20 @@ documentation, file copyright notices, etc.
 - `\p`
 - `\par`
 - `\paragraph`
-- `\param`
-- `\parblock` / `\endparblock`
 - `\post`
 - `\pre`
-- `\refitem`
 - `\remark`
 - `\remarks`
-- `\result`
-- `\return`
-- `\returns`
-- `\retval`
 - `\rtfinclude`
 - `\rtfonly` / `\endrtfonly`
-- `\secreflist` / `\endsecreflist`
 - `\short`
-- `\since`
 - `\skip`
 - `\skipline`
 - `\snippet`
 - `\snippetdoc`
 - `\snippetlineno`
 - `\startuml` / `\enduml`
-- `\tableofcontents`
 - `\test`
-- `\throw`
-- `\throws`
-- `\todo`
-- `\tparam`
 - `\until`
 - `\verbatim` / `\endverbatim`
 - `\verbinclude`
@@ -599,7 +582,6 @@ documentation, file copyright notices, etc.
 - `\warning`
 - `\xmlinclude`
 - `\xmlonly` / `\endxmlonly`
-- `\xrefitem`
 - `\$`
 - `\@`
 - `\\`

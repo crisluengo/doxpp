@@ -5,8 +5,8 @@
   <title>Documentation &raquo; Running dox++parse and dox++html | dox++ | Documentation preparation system for C++</title>
   <link rel="stylesheet" href="m-light-documentation.compiled.css" />
   <link rel="icon" href="favicon-light.png" type="image/png" />
-  <link rel="prev" href="configuration.html" />
-  <link rel="next" href="json_output.html" />
+  <link rel="prev" href="markdown.html" />
+  <link rel="next" href="configuration.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#22272e" />
 </head>
@@ -30,9 +30,9 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
-                <li><a href="configuration.html">Configuring dox++</a></li>
-                <li><a href="running_the_tools.html" id="m-navbar-current">Running dox++parse and dox++html</a></li>
-                <li><a href="json_output.html">JSON output of dox++parse</a></li>
+                <li><a href="configuration.html">Configuring <strong>dox++</strong></a></li>
+                <li><a href="running_the_tools.html" id="m-navbar-current">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
+                <li><a href="json_output.html">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
             </li>
           </ol>
@@ -53,10 +53,32 @@
       <div class="m-col-l-10 m-push-l-1">
         <h1>
           <span class="m-breadcrumb"><a href="documentation.html">Documentation</a> &raquo;</span>
-          Running dox++parse and dox++html
+          Running <strong>dox++parse</strong> and <strong>dox++html</strong>
         </h1>
-<p>TODO: write this documentation</p>
-        <div class="m-note m-dim m-thin m-text-center"><a href="configuration.html" class="m-doc">&laquo; Configuring dox++</a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="json_output.html" class="m-doc">JSON output of dox++parse &raquo;</a></div>
+<p><strong>dox++parse</strong> parses the sources and creates a single JSON file containing
+all the information extracted (see <a href="json_output.html">JSON output of <strong>dox++parse</strong></a>). <strong>dox++html</strong> takes
+this JSON file and produces a web site for the documentation.</p>
+<p>First, create a configuration file, see <a href="configuration.html">Configuring <strong>dox++</strong></a> for options.</p>
+<div class="m-code"><pre><span></span>dox++parse -g <span class="o">[</span>&lt;config_file&gt;<span class="o">]</span>
+</pre></div>
+
+<p>If <code>&lt;config_file&gt;</code> is left out, a file named <code>dox++config</code> will be created in the
+current directory. Specifying a configuration file name could be useful for
+example if multiple different web sites are created for the same project.
+Paths in the configuration file are relative to the current
+directory, not the configuration file (<strong>TODO:</strong> should we change that?).</p>
+<p>The configuration file indicates the source files, the name and location
+of the intermediate JSON file, and the location for the output HTML files.
+After completing the configuration,</p>
+<div class="m-code"><pre><span></span>dox++parse <span class="o">[</span>&lt;config_file&gt;<span class="o">]</span>
+</pre></div>
+
+<p>will create the JSON data file. Next,</p>
+<div class="m-code"><pre><span></span>dox++html <span class="o">[</span>&lt;config_file&gt;<span class="o">]</span>
+</pre></div>
+
+<p>will create the website.</p>
+        <div class="m-note m-dim m-thin m-text-center"><a href="markdown.html" class="m-doc">&laquo; Markdown markup</a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="configuration.html" class="m-doc">Configuring <strong>dox++</strong> &raquo;</a></div>
       </div>
     </div>
   </div>
@@ -93,9 +115,7 @@
   </div>
 </div>
 <script src="search-v1.js"></script>
-<script>
-  Search.download(window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') + 1) + 'searchdata-v1.bin');
-</script>
+<script src="searchdata-v1.js" async="async"></script>
 <footer><nav>
   <div class="m-container">
     <div class="m-row">

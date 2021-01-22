@@ -30,9 +30,9 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
-                <li><a href="configuration.html">Configuring dox++</a></li>
-                <li><a href="running_the_tools.html">Running dox++parse and dox++html</a></li>
-                <li><a href="json_output.html">JSON output of dox++parse</a></li>
+                <li><a href="configuration.html">Configuring <strong>dox++</strong></a></li>
+                <li><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
+                <li><a href="json_output.html">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
             </li>
           </ol>
@@ -55,7 +55,15 @@
           <span class="m-breadcrumb"><a href="documentation.html">Documentation</a> &raquo;</span>
           Grouping
         </h1>
-<h3>Grouping namespace members</h3>
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li><a href="#grouping_namespace">Grouping namespace members</a></li>
+            <li><a href="#grouping_class">Grouping class members</a></li>
+            <li><a href="#grouping_differences">How grouping differs from Doxygen</a></li>
+          </ul>
+        </div>
+<h2 id="grouping_namespace">Grouping namespace members</h2>
 <p>Namespace members can be assigned to one group. If assigned to a group, the
 backend can choose to document those members in the group&rsquo;s page rather
 than the namespace&rsquo;s page. Alternatively, the backend can index members
@@ -102,7 +110,7 @@ Empty lines in between these commands in the code above is therefore relevant.
 <code>\addtogroup</code> can be in a documentation block on its own, in which case it needs
 a parameter to indicate which group is being made active, or it can be at the
 end of a <code>\group</code> documentation block, in which case it should not have a parameter.</p>
-<h3>Grouping class members</h3>
+<h2 id="grouping_class">Grouping class members</h2>
 <p>For class members, the grouping system is a lot simpler. Typically class members
 are grouped by access (public, protected and private). But by adding <code>\name</code> commands
 inside the class definition, an alternative grouping can be established. This is
@@ -150,9 +158,9 @@ an <code>\endname</code> at the end of a class, then in the next class&rsquo; de
 in these respective groups.</p>
 <p>There is always an implicit <code>\endname</code> at the end of a header file, though a warning
 will be given if it is missing.</p>
-<h3>Differences with Doxygen</h3>
+<h2 id="grouping_differences">How grouping differs from Doxygen</h2>
 <p>Doxygen uses the <code>\{</code> and <code>\}</code> commands to group members into a group. These are not
-recognized by dox++. Left is Doxygen, right is corresponding dox++:</p>
+recognized by <strong>dox++</strong>. Left is Doxygen, right is corresponding <strong>dox++</strong>:</p>
 <div class="m-code"><pre><span></span><span class="c1">/// \defgroup name title            /// \group name title</span>
 <span class="c1">/// \{                              /// \addtogroup</span>
 
@@ -204,9 +212,7 @@ recognized by dox++. Left is Doxygen, right is corresponding dox++:</p>
   </div>
 </div>
 <script src="search-v1.js"></script>
-<script>
-  Search.download(window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') + 1) + 'searchdata-v1.bin');
-</script>
+<script src="searchdata-v1.js" async="async"></script>
 <footer><nav>
   <div class="m-container">
     <div class="m-row">

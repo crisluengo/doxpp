@@ -29,9 +29,9 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html" id="m-navbar-current">How to document your code</a></li>
-                <li><a href="configuration.html">Configuring dox++</a></li>
-                <li><a href="running_the_tools.html">Running dox++parse and dox++html</a></li>
-                <li><a href="json_output.html">JSON output of dox++parse</a></li>
+                <li><a href="configuration.html">Configuring <strong>dox++</strong></a></li>
+                <li><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
+                <li><a href="json_output.html">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
             </li>
           </ol>
@@ -76,8 +76,8 @@
 Markdown. Some commands will inject standard Markdown into the documentation.
 But it depends on the generator that consumes the JSON file how it is interpreted.
 If your generator supports HTML tags, you can use those. If you generator supports
-special commands, you can use those.</p>
-<p>dox++ will identify certain commands, and change its behavior. See <a href="commands.html">Documentation commands</a>
+special commands, you can use those. <strong>dox++html</strong> supports both.</p>
+<p><strong>dox++parse</strong> will identify certain commands, and change its behavior. See <a href="commands.html">Documentation commands</a>
 for details.</p>
 <p>The <code>\brief</code> command changes the parsing so that the first paragraph, rather than
 the first line, is the &ldquo;brief&rdquo; string. This command must be at the beginning of
@@ -157,9 +157,7 @@ be declared in a documented header file.</p>
   </div>
 </div>
 <script src="search-v1.js"></script>
-<script>
-  Search.download(window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') + 1) + 'searchdata-v1.bin');
-</script>
+<script src="searchdata-v1.js" async="async"></script>
 <footer><nav>
   <div class="m-container">
     <div class="m-row">

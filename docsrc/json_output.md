@@ -1,8 +1,8 @@
-\page json_output JSON output of dox++parse
+\page json_output JSON output of **dox++parse**
 
 **TODO:** This page still needs to be formatted correctly.
 
-The dox++parse program outputs a single JSON file, which should be easy to convert into any representation
+The **dox++parse** program outputs a single JSON file, which should be easy to convert into any representation
 the user desires. The JSON file has the following format:
 ```json
 {

@@ -30,9 +30,9 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
-                <li><a href="configuration.html">Configuring dox++</a></li>
-                <li><a href="running_the_tools.html">Running dox++parse and dox++html</a></li>
-                <li><a href="json_output.html">JSON output of dox++parse</a></li>
+                <li><a href="configuration.html">Configuring <strong>dox++</strong></a></li>
+                <li><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
+                <li><a href="json_output.html">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
             </li>
           </ol>
@@ -95,6 +95,7 @@
                 <li><a href="#command_subpage"><code>\‍subpage</code></a></li>
                 <li><a href="#command_subsection"><code>\subsection</code></a></li>
                 <li><a href="#command_subsubsection"><code>\subsubsection</code></a></li>
+                <li><a href="#command_not_yet_implemented">Not yet implemented</a></li>
               </ul>
             </li>
             <li>
@@ -108,47 +109,22 @@
               <ul>
                 <li><a href="#commands_not_implemented_illegal">Because the information is always retrieved from the code</a></li>
                 <li><a href="#commands_not_implemented_notcpp">Because it doesn&rsquo;t apply to C++</a></li>
-                <li><a href="#commands_not_implemented_nonsensical">Because it doesn&rsquo;t make sense to me</a></li>
+                <li><a href="#commands_not_implemented_latex">Because they&rsquo;re specific to LaTeX output</a></li>
+                <li><a href="#commands_not_implemented_nonsensical">Because it doesn&rsquo;t make sense with the <strong>dox++</strong> logic</a></li>
                 <li><a href="#commands_not_implemented_markup">All the stuff that is related to markup, use Markdown instead</a></li>
               </ul>
             </li>
           </ul>
         </div>
-<p>These are the commands recognized by dox++parse. Commands can start with <code>\</code> or <code>@</code>.
+<p>This page describes the commands recognized by <strong>dox++parse</strong>. Commands can start with <code>\</code> or <code>@</code>.
 Here we show the <code>\</code> variant only, but you can use the other variant if you prefer.</p>
-<p>Note that we try to keep compatibility with Doxygen, but chose to make some changes:</p>
-<ol>
-<li>
-<p>Documenting a function, variable or typedef with <code>\fn</code>, <code>\var</code>, <code>\typedef</code> doesn&rsquo;t
-   take a declaration, only a name. The declaration is always taken from the sources.
-   You cannot document non-existing things.</p>
-</li>
-<li>
-<p>Documenting a preprocessor macro with <code>\def</code> (new better name: <code>\macro</code>) must always
-   carry the macro name. Clang doesn&rsquo;t preserve preprocessor directives in its AST.</p>
-</li>
-<li>
-<p>Grouping has improved, but this comes with some syntax changes.
-   We don&rsquo;t recognize <code>\{</code> and <code>\}</code>. Instead, use <code>\addtogroup</code> instead of the opening <code>\{</code>,
-   and <code>\endgroup</code> instead of the closing <code>\}</code>. <code>\defgroup</code> is still recognized, but works
-   the same way as <code>\group</code>, which is not exactly the same way that <code>\defgroup</code> works in
-   Doxygen. Furthermore, groups are disjoint, each member can only belong to one group.</p>
-</li>
-<li>
-<p>There is no &ldquo;autolink&rdquo;, all member names must be preceded by the <code>\‍ref</code> command
-   to create a link to the member documentation. <code>\‍ref</code> is used to link to anything
-   in the documentation, not just pages and sections.</p>
-</li>
-<li>
-<p>Doxygen commands related to markup are not recognized. Any non-recognized
-   command is kept in the output JSON file, so that the backend can act on it if it
-   desires (but dox++html will not recognize any of these commands either).
-   dox++ assumes <a href="markdown.html">Markdown formatting</a>.</p>
-</li>
-</ol>
-<p>Note that commands are recognized and processed outside of any Markdown parsing, so
-commands inside of backticks or code fences are processed the same way as outside
+<p>We try to keep only partial compatibility with Doxygen, see <a href="doxygen_differences.html">Differences with Doxygen</a>.</p>
+<aside class="m-note m-info">
+<h4>Note</h4>
+<p>Commands are recognized and processed outside of any Markdown parsing, so
+commands inside of backticks or code blocks are processed the same way as outside
 of them.</p>
+</aside>
 <h2 id="commands_start_block">At the start of a documentation block</h2>
 <p>These define what the documentation block does. The first line of the block must start
 with one of these commands, otherwise it will be associated to the next declaration
@@ -190,7 +166,7 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 <div class="m-code"><pre><span></span><span class="err">\‍dir [&lt;path fragment&gt;]</span>
 </pre></div>
 
-<p>dox++ doesn&rsquo;t document directories. This Doxygen command is recognized and a warning
+<p><strong>dox++</strong> doesn&rsquo;t document directories. This Doxygen command is recognized and a warning
 message is produced.</p>
 <h3 id="command_endgroup"><code>\endgroup</code></h3>
 <p>Closes the nearest previous <code>\addtogroup</code>.
@@ -275,7 +251,7 @@ know anything about <code>a</code>, the argument to macro <code>FOO</code>.</p>
 <p>Because Clang doesn&rsquo;t report where the macro is defined, we take the file where this
 documentation block lives as the include file for the macro. Therefore, you should always
 put this command in the same file where the macro is actually defined.</p>
-<p>TODO: Maybe eventually <code>\headerfile</code> can be used to indicate which header the macro is defined in.</p>
+<p><strong>TODO:</strong> Maybe eventually <code>\headerfile</code> can be used to indicate which header the macro is defined in.</p>
 <p><code>\def</code> is an alias for compatibility with Doxygen.</p>
 <h3 id="command_mainpage"><code>\mainpage</code></h3>
 <div class="m-code"><pre><span></span><span class="err">\‍mainpage [&lt;title&gt;]</span>
@@ -374,6 +350,7 @@ attribute.</p>
 <span class="kt">int</span> <span class="n">foo</span><span class="p">;</span>
 </pre></div>
 
+<p><code>\short</code> is an alias.</p>
 <h3 id="command_ingroup"><code>\ingroup</code></h3>
 <div class="m-code"><pre><span></span><span class="err">\ingroup &lt;name&gt;</span>
 </pre></div>
@@ -387,7 +364,6 @@ group listed. It can also appear in the comment block of a group, to nest groups
 <p>Inserts a line break. The Markdown for a line break is two spaces at the end of a line.
 Because many code editors automatically remove such spaces, use this command instead.
 It will be replaced by two spaces, and a newline will be added if it&rsquo;s not there already.</p>
-<p>TODO!</p>
 <h3 id="command_ref"><code>\‍ref</code></h3>
 <div class="m-code"><pre><span></span><span class="err">\‍ref &lt;name&gt; [&quot;&lt;text&gt;&quot;]</span>
 <span class="err">\‍ref &quot;&lt;name&gt;&quot; [&quot;&lt;text&gt;&quot;]</span>
@@ -478,6 +454,18 @@ a tree structure.</p>
 </pre></div>
 
 <p>Like <code>\section</code>, but for a level 3 heading (<code>###</code> in Markdown).</p>
+<h3 id="command_not_yet_implemented">Not yet implemented</h3>
+<ul>
+<li><code>\deprecated</code> (might be relevant for things that cannot be marked as such in source code)</li>
+<li><code>\example</code></li>
+<li><code>\exception</code> / <code>\throw</code> / <code>\throws</code></li>
+<li><code>\headerfile</code></li>
+<li><code>\param</code></li>
+<li><code>\parblock</code> / <code>\endparblock</code></li>
+<li><code>\return</code> / <code>\returns</code> / <code>\result</code></li>
+<li><code>\since</code></li>
+<li><code>\tparam</code></li>
+</ul>
 <h2 id="commands_start_of_line">At the start of a line in Markdown files only</h2>
 <h3 id="command_comment"><code>\‍comment</code></h3>
 <p>The rest of the line is ignored. Use this to add comments not meant to be shown in the
@@ -500,57 +488,65 @@ documentation, file copyright notices, etc.</p>
 </ul>
 <h3 id="commands_not_implemented_notcpp">Because it doesn&rsquo;t apply to C++</h3>
 <ul>
-<li><code>\idlexcept</code> -&gt; IDL only</li>
+<li><code>\category</code> (Objective-C only)</li>
+<li><code>\idlexcept</code> (IDL only)</li>
 <li><code>\interface</code></li>
-<li><code>\package</code> -&gt; Java only</li>
+<li><code>\package</code> (Java only)</li>
 <li><code>\property</code></li>
-<li><code>\protocol</code> -&gt; Objective-C only</li>
-<li><code>\vhdlflow</code> -&gt; VHDL only</li>
+<li><code>\protocol</code> (Objective-C only)</li>
+<li><code>\retval</code></li>
+<li><code>\vhdlflow</code> (VHDL only)</li>
 </ul>
-<h3 id="commands_not_implemented_nonsensical">Because it doesn&rsquo;t make sense to me</h3>
+<h3 id="commands_not_implemented_latex">Because they&rsquo;re specific to LaTeX output</h3>
 <ul>
+<li><code>\addindex</code></li>
+<li><code>\cite</code></li>
+</ul>
+<h3 id="commands_not_implemented_nonsensical">Because it doesn&rsquo;t make sense with the <strong>dox++</strong> logic</h3>
+<ul>
+<li><code>\bug</code></li>
 <li><code>\callergraph</code></li>
 <li><code>\callgraph</code></li>
-<li><code>\cond</code> / <code>\endcond</code> -&gt; use an <code>#ifdef</code> conditional compilation to exclude things from the documentation</li>
+<li><code>\cond</code> / <code>\endcond</code> (use an <code>#ifdef</code> conditional compilation to exclude things from the documentation)</li>
+<li><code>\copybrief</code></li>
+<li><code>\copydetails</code></li>
+<li><code>\copydoc</code></li>
 <li><code>\hidecallergraph</code></li>
 <li><code>\hidecallgraph</code></li>
-<li><code>\hideinitializer</code> -&gt; this is something that the backend can do</li>
+<li><code>\hideinitializer</code></li>
 <li><code>\hiderefby</code></li>
 <li><code>\hiderefs</code></li>
 <li><code>\internal</code> / <code>\endinternal</code></li>
-<li><code>\link</code> / <code>\endlink</code> -&gt; we&rsquo;re using <code>\‍ref</code> for everything</li>
+<li><code>\link</code> / <code>\endlink</code> (we use <code>\‍ref</code> for everything)</li>
+<li><code>\nosubgrouping</code></li>
 <li><code>\overload [(function declaration)]</code></li>
+<li><code>\refitem</code></li>
 <li><code>\relatedalso &lt;name&gt;</code></li>
 <li><code>\relatesalso &lt;name&gt;</code></li>
-<li><code>\showinitializer</code> -&gt; this is something that the backend can do</li>
+<li><code>\secreflist</code> / <code>\endsecreflist</code></li>
+<li><code>\showinitializer</code></li>
 <li><code>\showrefby</code></li>
 <li><code>\showrefs</code></li>
+<li><code>\tableofcontents</code> (these are automatically generated by the default templates)</li>
+<li><code>\todo</code></li>
 <li><code>\weakgroup</code></li>
-<li><code>\{</code> -&gt; we use <code>\addtogroup</code> instead</li>
-<li><code>\}</code> -&gt; we use <code>\endgroup</code> instead</li>
+<li><code>\xrefitem</code></li>
+<li><code>\{</code> (use <code>\addtogroup</code> instead)</li>
+<li><code>\}</code> (use <code>\endgroup</code> instead)</li>
 </ul>
 <h3 id="commands_not_implemented_markup">All the stuff that is related to markup, use Markdown instead</h3>
 <p>(There might be some other stuff in here that I missed?)</p>
 <ul>
 <li><code>\a</code></li>
-<li><code>\addindex</code></li>
 <li><code>\arg</code></li>
 <li><code>\attention</code></li>
 <li><code>\author</code></li>
 <li><code>\authors</code></li>
 <li><code>\b</code></li>
-<li><code>\brief</code></li>
-<li><code>\bug</code></li>
 <li><code>\c</code></li>
-<li><code>\category</code></li>
-<li><code>\cite</code></li>
 <li><code>\code</code> / <code>\endcode</code></li>
-<li><code>\copybrief</code></li>
-<li><code>\copydetails</code></li>
-<li><code>\copydoc</code></li>
 <li><code>\copyright</code></li>
 <li><code>\date</code></li>
-<li><code>\deprecated</code></li>
 <li><code>\details</code></li>
 <li><code>\diafile</code></li>
 <li><code>\docbookinclude</code></li>
@@ -561,7 +557,6 @@ documentation, file copyright notices, etc.</p>
 <li><code>\e</code></li>
 <li><code>\em</code></li>
 <li><code>\emoji</code></li>
-<li><code>\exception</code></li>
 <li><code>\f$</code></li>
 <li><code>\f[</code> / <code>\f]</code></li>
 <li><code>\f{</code> / <code>\f}</code></li>
@@ -585,34 +580,20 @@ documentation, file copyright notices, etc.</p>
 <li><code>\p</code></li>
 <li><code>\par</code></li>
 <li><code>\paragraph</code></li>
-<li><code>\param</code></li>
-<li><code>\parblock</code> / <code>\endparblock</code></li>
 <li><code>\post</code></li>
 <li><code>\pre</code></li>
-<li><code>\refitem</code></li>
 <li><code>\remark</code></li>
 <li><code>\remarks</code></li>
-<li><code>\result</code></li>
-<li><code>\return</code></li>
-<li><code>\returns</code></li>
-<li><code>\retval</code></li>
 <li><code>\rtfinclude</code></li>
 <li><code>\rtfonly</code> / <code>\endrtfonly</code></li>
-<li><code>\secreflist</code> / <code>\endsecreflist</code></li>
 <li><code>\short</code></li>
-<li><code>\since</code></li>
 <li><code>\skip</code></li>
 <li><code>\skipline</code></li>
 <li><code>\snippet</code></li>
 <li><code>\snippetdoc</code></li>
 <li><code>\snippetlineno</code></li>
 <li><code>\startuml</code> / <code>\enduml</code></li>
-<li><code>\tableofcontents</code></li>
 <li><code>\test</code></li>
-<li><code>\throw</code></li>
-<li><code>\throws</code></li>
-<li><code>\todo</code></li>
-<li><code>\tparam</code></li>
 <li><code>\until</code></li>
 <li><code>\verbatim</code> / <code>\endverbatim</code></li>
 <li><code>\verbinclude</code></li>
@@ -620,7 +601,6 @@ documentation, file copyright notices, etc.</p>
 <li><code>\warning</code></li>
 <li><code>\xmlinclude</code></li>
 <li><code>\xmlonly</code> / <code>\endxmlonly</code></li>
-<li><code>\xrefitem</code></li>
 <li><code>\$</code></li>
 <li><code>\@</code></li>
 <li><code>\\</code></li>
@@ -675,9 +655,7 @@ documentation, file copyright notices, etc.</p>
   </div>
 </div>
 <script src="search-v1.js"></script>
-<script>
-  Search.download(window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') + 1) + 'searchdata-v1.bin');
-</script>
+<script src="searchdata-v1.js" async="async"></script>
 <footer><nav>
   <div class="m-container">
     <div class="m-row">

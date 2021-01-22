@@ -1,4 +1,4 @@
-# Default dox++ configuration file
+# dox++ configuration file for the dox++ website
 
 [log]
 level = warning
@@ -28,7 +28,7 @@ navigation bar 1 = [('','#documentation',[('','#documenting_code',[]),('','#conf
 navigation bar 2 = [('example site','example/index.html',[])]
 
 [search]
-enable = no
+enable = yes
 download binary = no
 base url =
 external url = 

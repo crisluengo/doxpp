@@ -1,6 +1,6 @@
 \page grouping Grouping
 
-## Grouping namespace members
+\section grouping_namespace Grouping namespace members
 
 Namespace members can be assigned to one group. If assigned to a group, the
 backend can choose to document those members in the group's page rather
@@ -52,7 +52,7 @@ a parameter to indicate which group is being made active, or it can be at the
 end of a `\group` documentation block, in which case it should not have a parameter.
 
 
-## Grouping class members
+\section grouping_class Grouping class members
 
 For class members, the grouping system is a lot simpler. Typically class members
 are grouped by access (public, protected and private). But by adding `\name` commands
@@ -109,10 +109,10 @@ There is always an implicit `\endname` at the end of a header file, though a war
 will be given if it is missing.
 
 
-## Differences with Doxygen
+\section grouping_differences How grouping differs from Doxygen
 
 Doxygen uses the `\{` and `\}` commands to group members into a group. These are not
-recognized by dox++. Left is Doxygen, right is corresponding dox++:
+recognized by **dox++**. Left is Doxygen, right is corresponding **dox++**:
 ```cpp
 /// \defgroup name title            /// \group name title
 /// \{                              /// \addtogroup
