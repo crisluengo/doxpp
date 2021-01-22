@@ -20,7 +20,7 @@ import platform
 import subprocess
 
 from . import log
-from .clang import cindex
+from clang import cindex
 
 
 def get_system_includes(f):
