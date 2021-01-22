@@ -913,6 +913,7 @@ camel_case_point = '[^A-Z][A-Z].'
 snake_case_point_re = re.compile(snake_case_point)
 camel_case_point_re = re.compile(camel_case_point)
 camel_or_snake_case_point_re = re.compile('({})|({})'.format(snake_case_point, camel_case_point))
+space_point_re = re.compile(' [^ ]')
 
 def add_entry_to_search_data(result, joiner: str, trie: Trie, map: ResultMap, add_lookahead_barriers,
                              add_snake_case_suffixes, add_camel_case_suffixes):
@@ -949,14 +950,17 @@ def add_entry_to_search_data(result, joiner: str, trie: Trie, map: ResultMap, ad
             if add_lookahead_barriers else [])
 
     # Add the result multiple times again for all parts of the name
-    if add_camel_case_suffixes and add_snake_case_suffixes:
-        prefix_end_re = camel_or_snake_case_point_re
-    elif add_camel_case_suffixes:
-        prefix_end_re = camel_case_point_re
-    elif add_snake_case_suffixes:
-        prefix_end_re = snake_case_point_re
+    if joiner == ' » ':
+        prefix_end_re = space_point_re
     else:
-        prefix_end_re = None
+        if add_camel_case_suffixes and add_snake_case_suffixes:
+            prefix_end_re = camel_or_snake_case_point_re
+        elif add_camel_case_suffixes:
+            prefix_end_re = camel_case_point_re
+        elif add_snake_case_suffixes:
+            prefix_end_re = snake_case_point_re
+        else:
+            prefix_end_re = None
     if prefix_end_re:
         for m in prefix_end_re.finditer(result.name.lstrip('__')):
             name = result.name[m.start(0)+1:]
@@ -972,6 +976,17 @@ def add_entry_to_search_data(result, joiner: str, trie: Trie, map: ResultMap, ad
         trie.insert(search.lower(), keyword_index)
 
     return len(result.keywords) + 1
+
+def fixup_title_for_search(title):
+    title = title.replace('‍', '')
+    title = strip_html_tags(title)
+    return title
+
+def fixup_titles_for_search(list_of_titles):
+    out = []
+    for title in list_of_titles:
+        out.append(fixup_title_for_search(title))
+    return out
 
 def build_search_data(status: Status, merge_subtrees=True, add_lookahead_barriers=True, add_snake_case_suffixes=True,
                       add_camel_case_suffixes=True, merge_prefixes=True) -> bytearray:
@@ -1052,8 +1067,8 @@ def build_search_data(status: Status, merge_subtrees=True, add_lookahead_barrier
 
     for page in status.pages.values():
         result = Empty()
-        result.prefix = walktree.get_prefix(page['id'], status.pages, key='title')
-        result.name = page['title']
+        result.prefix = fixup_titles_for_search(walktree.get_prefix(page['id'], status.pages, key='title'))
+        result.name = fixup_title_for_search(page['title'])
         result.flags = ResultFlag.from_type(ResultFlag(0), entry_type_map['page'])
                         # ResultFlag.DEPRECATED if page['deprecated'] else ResultFlag(0)
         result.url = page['id'] + '.html'
@@ -1064,6 +1079,16 @@ def build_search_data(status: Status, merge_subtrees=True, add_lookahead_barrier
         # Add the symbol with all its different prefixes and suffixes and so on
         symbol_count += add_entry_to_search_data(result, ' » ', trie, map, add_lookahead_barriers,
                                                  add_snake_case_suffixes, add_camel_case_suffixes)
+
+        # Now handle its sections # TODO: should we skip subsections and subsubsections?
+        url_base = result.url
+        result.prefix.append(result.name)
+        for section in page['sections']:
+            result.name = fixup_title_for_search(section[1])
+            result.url = url_base + '#' + section[0]
+            result.name_with_args = result.name
+            symbol_count += add_entry_to_search_data(result, ' » ', trie, map, add_lookahead_barriers,
+                                                     add_snake_case_suffixes, add_camel_case_suffixes)
 
     # For each node in the trie sort the results so the found items have sane order by default
     log.info("Indexed %d symbols for search data", symbol_count)
