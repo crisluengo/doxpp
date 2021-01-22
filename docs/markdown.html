@@ -447,7 +447,7 @@ Other text   | Other text     | Other text
 </pre></div>
 
 <p>is rendered as a box like this one:</p>
-<aside class="m-note m-info">
+<aside class="m-note m-primary">
 <h4>Box title</h4>
 <p>Paragraph 1</p>
 <p>Paragraph 2</p>
@@ -473,21 +473,21 @@ Using <code>""</code> for the title will cause there to not be a title at all.</
 <tr>
 <td><code>note</code></td>
 <td>Note</td>
-<td class="m-info">&lsquo;m-info&rsquo;</td>
-</tr>
-<tr>
-<td><code>remark</code></td>
-<td>Remark</td>
 <td class="m-primary">&lsquo;m-primary&rsquo;</td>
 </tr>
 <tr>
 <td><code>attention</code></td>
 <td>Attention</td>
-<td class="m-warning">&lsquo;m-warning&rsquo;</td>
+<td class="m-info">&lsquo;m-info&rsquo;</td>
 </tr>
 <tr>
 <td><code>warning</code></td>
 <td>Warning</td>
+<td class="m-warning">&lsquo;m-warning&rsquo;</td>
+</tr>
+<tr>
+<td><code>bug</code></td>
+<td>Bug</td>
 <td class="m-danger">&lsquo;m-danger&rsquo;</td>
 </tr>
 <tr>
@@ -570,7 +570,7 @@ used instead of &lsquo;m-note&rsquo;. For example,</p>
 </pre></div>
 
 <p>is rendered as a &ldquo;block&rdquo; like this one:</p>
-<aside class="m-block m-info">
+<aside class="m-block m-primary">
 <h4>Box title</h4>
 <p>Paragraph 1</p>
 <p>Paragraph 2</p>
@@ -622,7 +622,7 @@ space in between:</p>
 </pre></div>
 
 <p>will be rendered as</p>
-<aside class="m-note m-success m-block">
+<aside class="m-note m-frame">
 <p>This is a <strong class="m-text m-tiny">paragraph</strong>.</p>
 </aside>
 <p>Note that it is not possible to assign attributes to a single word, unless it is wrapped

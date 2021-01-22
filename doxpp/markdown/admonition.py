@@ -157,35 +157,20 @@ class AdmonitionProcessor(markdown.blockprocessors.BlockProcessor):
         if type == 'see':
             def_title = 'See also'
             type = 'm-default'
-        elif type == 'literature':
-            def_title = 'Literature'
-            type = 'm-default'
         elif type == 'note':
             def_title = 'Note'
-            type = 'm-info'
+            type = 'm-primary'
         elif type == 'attention':
             def_title = 'Attention'
-            type = 'm-warning'
+            type = 'm-info'
         elif type == 'warning':
             def_title = 'Warning'
+            type = 'm-warning'
+        elif type == 'bug':
+            def_title = 'Bug'
             type = 'm-danger'
-        elif type == 'author':
-            def_title = 'Author'
-            type = 'm-default'
-        elif type == 'authors':
-            def_title = 'Authors'
-            type = 'm-default'
-        elif type == 'copyright':
-            def_title = 'Copyright'
-            type = 'm-default'
-        elif type == 'version':
-            def_title = 'Version'
-            type = 'm-default'
-        elif type == 'since':
-            def_title = 'Since'
-            type = 'm-default'
-        elif type == 'date':
-            def_title = 'Date'
+        elif type in ['literature', 'author', 'authors', 'copyright', 'version', 'since', 'date']:
+            def_title = type.capitalize()
             type = 'm-default'
         elif type == 'pre':
             def_title = 'Precondition'
@@ -196,9 +181,6 @@ class AdmonitionProcessor(markdown.blockprocessors.BlockProcessor):
         elif type == 'invariant':
             def_title = 'Invariant'
             type = 'm-success'
-        elif type == 'remark':
-            def_title = 'Remark'
-            type = 'm-primary'
         elif type == 'par':
             def_title = None
             type = 'm-frame'

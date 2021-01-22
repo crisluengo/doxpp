@@ -322,10 +322,10 @@ These are the types and the corresponding default title and CSS classes currentl
 Type            | Default title | CSS class
 ----------------|---------------|--------------------------
 `par`           | (no title)    | 'm-frame' { .m-frame }
-`note`          | Note          | 'm-info' { .m-info }
-`remark`        | Remark        | 'm-primary' { .m-primary }
-`attention`     | Attention     | 'm-warning' { .m-warning }
-`warning`       | Warning       | 'm-danger' { .m-danger }
+`note`          | Note          | 'm-primary' { .m-primary }
+`attention`     | Attention     | 'm-info' { .m-info }
+`warning`       | Warning       | 'm-warning' { .m-warning }
+`bug`           | Bug           | 'm-danger' { .m-danger }
 `see`           | See also      | 'm-default' { .m-default }
 `literature`    | Literature    | 'm-default' { .m-default }
 `author`        | Author        | 'm-default' { .m-default }
@@ -422,7 +422,7 @@ This is a **paragraph**{ .m-text .m-tiny }.
 ```
 will be rendered as
 
-!!! m-block m-success ""
+!!! par
     This is a **paragraph**{ .m-text .m-tiny }.
 
 Note that it is not possible to assign attributes to a single word, unless it is wrapped
