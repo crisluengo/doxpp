@@ -176,11 +176,19 @@ def generate_fully_qualified_names(members, status: Status):
 
 def register_anchors_to_page(compound, page_id, status: Status):
     for section in compound['sections']:
+        if section[0] == 'search':
+            log.error("ID of (sub-)section is 'search', this will interfere with the search functionality.")
         status.id_map[section[0]] = page_id
     for anchor in compound['anchors']:
+        if anchor == 'search':
+            log.error("ID of anchor is 'search', this will interfere with the search functionality.")
         status.id_map[anchor] = page_id
 
 def document_member_on_page(member, page_id, status: Status):
+    if member['id'] == 'search':
+        log.error("ID of documented element is 'search', this will interfere with the search functionality.")
+        # TODO: Solve by changing ID of element?
+        # TODO: There are other "reserved IDs" on documentation pages, should we protect those as well?
     member['page_id'] = page_id
     status.id_map[member['id']] = page_id
     register_anchors_to_page(member, page_id, status)
@@ -921,7 +929,7 @@ camel_case_point = '[^A-Z][A-Z].'
 snake_case_point_re = re.compile(snake_case_point)
 camel_case_point_re = re.compile(camel_case_point)
 camel_or_snake_case_point_re = re.compile('({})|({})'.format(snake_case_point, camel_case_point))
-space_point_re = re.compile(' [^ ]')
+word_point_re = re.compile('\W\w')
 
 def add_entry_to_search_data(result, joiner: str, trie: Trie, map: ResultMap,
                              add_snake_case_suffixes, add_camel_case_suffixes):
@@ -958,7 +966,7 @@ def add_entry_to_search_data(result, joiner: str, trie: Trie, map: ResultMap,
 
     # Add the result multiple times again for all parts of the name
     if joiner == ' » ':
-        prefix_end_re = space_point_re
+        prefix_end_re = word_point_re
     else:
         if add_camel_case_suffixes and add_snake_case_suffixes:
             prefix_end_re = camel_or_snake_case_point_re
@@ -987,6 +995,8 @@ def add_entry_to_search_data(result, joiner: str, trie: Trie, map: ResultMap,
 def fixup_title_for_search(title):
     title = title.replace('‍', '')
     title = strip_html_tags(title)
+    if not title[-1].isalnum():
+        title += '\u2800'  # This fixes an issue that arises because of the rtl text in the search box
     return title
 
 def fixup_titles_for_search(list_of_titles):
@@ -1059,7 +1069,7 @@ def build_search_data(status: Status, add_snake_case_suffixes, add_camel_case_su
             continue
         result = Empty()
         result.prefix = walktree.get_prefix(group['id'], status.groups)
-        result.name = group['name']
+        result.name = fixup_title_for_search(group['name'])
         result.flags = ResultFlag.from_type(ResultFlag(0), entry_type_map['module'])
                         # ResultFlag.DEPRECATED if group['deprecated'] else ResultFlag(0)
         result.url = group['id'] + '.html'
