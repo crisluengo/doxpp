@@ -69,8 +69,8 @@ template_params = {
     'FILE_INDEX_EXPAND_LEVELS': doxpp.config.get_int(config, 'html', 'file index expand levels'),
     'CLASS_INDEX_EXPAND_LEVELS': doxpp.config.get_int(config, 'html', 'class index expand levels'),
     'CLASS_INDEX_EXPAND_INNER': doxpp.config.get_boolean(config, 'html', 'class index expand inner'),
-    'SEARCH_DISABLED': not doxpp.config.get(config, 'search', 'enable'),
-    'SEARCH_DOWNLOAD_BINARY': doxpp.config.get(config, 'search', 'download binary'),
+    'SEARCH_DISABLED': not doxpp.config.get_boolean(config, 'search', 'enable'),
+    'SEARCH_DOWNLOAD_BINARY': doxpp.config.get_boolean(config, 'search', 'download binary'),
     'SEARCH_BASE_URL': doxpp.config.get(config, 'search', 'base URL'),
     'SEARCH_EXTERNAL_URL': doxpp.config.get(config, 'search', 'external URL')
 }
