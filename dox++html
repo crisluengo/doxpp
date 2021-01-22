@@ -37,7 +37,8 @@ helper = importlib.util.module_from_spec(spec)
 exec(doxpp.config.get(config, 'html', 'modify include statement'), helper.__dict__)
 
 options = {
-    'show_private': doxpp.config.get_boolean(config, 'html', 'document private members'),
+    'show_private_virtual': doxpp.config.get_boolean(config, 'html', 'document private virtual members'),
+    'show_private_nonvirtual': doxpp.config.get_boolean(config, 'html', 'document private non-virtual members'),
     'show_protected': doxpp.config.get_boolean(config, 'html', 'document protected members'),
     'show_undocumented': doxpp.config.get_boolean(config, 'html', 'document undocumented members'),
     'modify_include_statement': helper.modify_include_statement,
@@ -47,10 +48,7 @@ options = {
                     shlex.split(doxpp.config.get(config, 'input', 'markdown files'), posix=False),
     'doc_link_class': doxpp.config.get(config, 'html', 'documentation link class'),
     'add_snake_case_suffixes': doxpp.config.get_boolean(config, 'search', 'add snake case suffixes'),
-    'add_camel_case_suffixes': doxpp.config.get_boolean(config, 'search', 'add camel case suffixes'),
-    'search_add_lookahead_barriers': True,
-    'search_merge_subtrees': True,
-    'search_merge_prefixes': True
+    'add_camel_case_suffixes': doxpp.config.get_boolean(config, 'search', 'add camel case suffixes')
 }
 
 template_params = {

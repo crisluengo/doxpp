@@ -44,7 +44,8 @@ default_config_values = {
     },
     'html': {
         'output directory' : 'html',  # relative path to where the HTML output is generated
-        'document private members': 'yes',
+        'document private virtual members': 'yes',
+        'document private non-virtual members': 'yes',
         'document protected members': 'yes',
         'document undocumented members': 'no',
         'modify include statement': 'def modify_include_statement(id): return id',

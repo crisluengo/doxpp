@@ -24,7 +24,8 @@ brief = An example project
 
 [html]
 output directory = ../docs/example
-document private members = yes
+document private virtual members = yes
+document private non-virtual members = yes
 document protected members = yes
 document undocumented members = yes
 stylesheets = css/m-dark-documentation.compiled.css

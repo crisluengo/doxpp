@@ -100,7 +100,8 @@ class Status:
         self.images = set()
 
         # Options
-        self.show_private = options['show_private']
+        self.show_private_virtual = options['show_private_virtual']
+        self.show_private_nonvirtual = options['show_private_nonvirtual']
         self.show_protected = options['show_protected']
         self.show_undocumented = options['show_undocumented']
         self.modify_include_statement = options['modify_include_statement']
@@ -201,12 +202,20 @@ def delete_page(compound, status: Status):
     # sections or anchors, so we don't have to worry about undoing any actions by `register_anchors_to_page()`.
 
 def show_member(member, status: Status):
-    if not (status.show_undocumented or member['brief'] or (member['member_type'] == 'enum' and member['has_value_details'])):
-        return False
-    if not status.show_private and 'access' in member and member['access'] == 'private':
-        return False
-    if not status.show_protected and 'access' in member and member['access'] == 'protected':
-        return False
+    if not (member['brief'] or (member['member_type'] == 'enum' and member['has_value_details'])):
+        if not status.show_undocumented:
+            return False
+    if 'access' in member:
+        if member['access'] == 'private':
+            if 'virtual' in member and member['virtual']:
+                if not status.show_private_virtual:
+                    return False
+            else:
+                if not status.show_private_nonvirtual:
+                    return False
+        elif member['access'] == 'protected':
+            if not status.show_protected:
+                return False
     return True
 
 def is_class_like(member):
@@ -690,7 +699,6 @@ def parse_markdown(status: Status):
             'offset': 1
         }
     }
-    # TODO: Create an extension that adds image file names to status.images
     # TODO: Create a LaTeX math extension based on some stuff in m.css as well as the following:
     #       https://github.com/justinvh/Markdown-LaTeX
     #       https://github.com/ShadowKyogre/python-asciimathml
@@ -915,7 +923,7 @@ camel_case_point_re = re.compile(camel_case_point)
 camel_or_snake_case_point_re = re.compile('({})|({})'.format(snake_case_point, camel_case_point))
 space_point_re = re.compile(' [^ ]')
 
-def add_entry_to_search_data(result, joiner: str, trie: Trie, map: ResultMap, add_lookahead_barriers,
+def add_entry_to_search_data(result, joiner: str, trie: Trie, map: ResultMap,
                              add_snake_case_suffixes, add_camel_case_suffixes):
     has_params = hasattr(result, 'params') and result.params is not None
 
@@ -940,14 +948,13 @@ def add_entry_to_search_data(result, joiner: str, trie: Trie, map: ResultMap, ad
                 lookahead_barriers += [len(name)]
                 name += joiner
             name += j
-        trie.insert(name.lower(), index, lookahead_barriers=lookahead_barriers if add_lookahead_barriers else [])
+        trie.insert(name.lower(), index, lookahead_barriers=lookahead_barriers)
 
         # Add functions and function macros the second time with () appended, referencing the other
         # result that expects () appended. The lookahead barrier is at the ( character to avoid the
         # result being shown twice.
         if has_params:
-            trie.insert(name.lower() + '()', index_args, lookahead_barriers=lookahead_barriers + [len(name)]
-            if add_lookahead_barriers else [])
+            trie.insert(name.lower() + '()', index_args, lookahead_barriers=lookahead_barriers + [len(name)])
 
     # Add the result multiple times again for all parts of the name
     if joiner == ' » ':
@@ -988,8 +995,7 @@ def fixup_titles_for_search(list_of_titles):
         out.append(fixup_title_for_search(title))
     return out
 
-def build_search_data(status: Status, merge_subtrees=True, add_lookahead_barriers=True, add_snake_case_suffixes=True,
-                      add_camel_case_suffixes=True, merge_prefixes=True) -> bytearray:
+def build_search_data(status: Status, add_snake_case_suffixes, add_camel_case_suffixes):
     symbol_count = 0
     trie = Trie()
     map = ResultMap()
@@ -1027,7 +1033,7 @@ def build_search_data(status: Status, merge_subtrees=True, add_lookahead_barrier
             result.suffix_length += len(' const')
 
         # Add the symbol with all its different prefixes and suffixes and so on
-        symbol_count += add_entry_to_search_data(result, '::', trie, map, add_lookahead_barriers,
+        symbol_count += add_entry_to_search_data(result, '::', trie, map,
                                                  add_snake_case_suffixes, add_camel_case_suffixes)
 
     for file in status.headers.values():
@@ -1045,7 +1051,7 @@ def build_search_data(status: Status, merge_subtrees=True, add_lookahead_barrier
         result.suffix_length = 0
 
         # Add the symbol with all its different prefixes and suffixes and so on
-        symbol_count += add_entry_to_search_data(result, '/', trie, map, add_lookahead_barriers,
+        symbol_count += add_entry_to_search_data(result, '/', trie, map,
                                                  add_snake_case_suffixes, add_camel_case_suffixes)
 
     for group in status.groups.values():
@@ -1062,7 +1068,7 @@ def build_search_data(status: Status, merge_subtrees=True, add_lookahead_barrier
         result.suffix_length = 0
 
         # Add the symbol with all its different prefixes and suffixes and so on
-        symbol_count += add_entry_to_search_data(result, ' » ', trie, map, add_lookahead_barriers,
+        symbol_count += add_entry_to_search_data(result, ' » ', trie, map,
                                                  add_snake_case_suffixes, add_camel_case_suffixes)
 
     for page in status.pages.values():
@@ -1077,17 +1083,17 @@ def build_search_data(status: Status, merge_subtrees=True, add_lookahead_barrier
         result.suffix_length = 0
 
         # Add the symbol with all its different prefixes and suffixes and so on
-        symbol_count += add_entry_to_search_data(result, ' » ', trie, map, add_lookahead_barriers,
+        symbol_count += add_entry_to_search_data(result, ' » ', trie, map,
                                                  add_snake_case_suffixes, add_camel_case_suffixes)
 
-        # Now handle its sections # TODO: should we skip subsections and subsubsections?
+        # Now handle its sections
         url_base = result.url
         result.prefix.append(result.name)
         for section in page['sections']:
             result.name = fixup_title_for_search(section[1])
             result.url = url_base + '#' + section[0]
             result.name_with_args = result.name
-            symbol_count += add_entry_to_search_data(result, ' » ', trie, map, add_lookahead_barriers,
+            symbol_count += add_entry_to_search_data(result, ' » ', trie, map,
                                                      add_snake_case_suffixes, add_camel_case_suffixes)
 
     # For each node in the trie sort the results so the found items have sane order by default
@@ -1106,7 +1112,8 @@ def createhtml(input_file, output_dir, options, template_params):
     :param template_params: dictionary with template parameters
 
     Options must contain the keys:
-    - 'show_private': include private members in the documentation
+    - 'show_private_virtual': include private virtual members in the documentation
+    - 'show_private_nonvirtual': include private members that are not virtual in the documentation
     - 'show_protected': include protected members in the documentation
     - 'show_undocumented': include undocumented members in the documentation
     - 'modify_include_statement': a Python function to rewrite the header ID of members
@@ -1114,12 +1121,9 @@ def createhtml(input_file, output_dir, options, template_params):
     - 'templates': path to templates to use instead of default ones
     - 'source_files': list of source files (header files + markdown files), used to locate
                       image files referenced in documentation.
-    - 'doc_link_class': TODO: document
-    - 'add_snake_case_suffixes': TODO: document
-    - 'add_camel_case_suffixes': TODO: document
-    - 'search_add_lookahead_barriers': TODO: document
-    - 'search_merge_subtrees': TODO: document
-    - 'search_merge_prefixes': TODO: document
+    - 'doc_link_class': CSS class to add to links to members (must match templates)
+    - 'add_snake_case_suffixes': split up names according to snake case for searching
+    - 'add_camel_case_suffixes': split up names according to camel case for searching
     """
 
     # Load data
@@ -1232,9 +1236,9 @@ def createhtml(input_file, output_dir, options, template_params):
 
     # Generate search data
     if not template_params['SEARCH_DISABLED']:
-        data = build_search_data(status, add_lookahead_barriers=options['search_add_lookahead_barriers'],
-                                 add_snake_case_suffixes=options['add_snake_case_suffixes'], add_camel_case_suffixes=options['add_camel_case_suffixes'],
-                                 merge_subtrees=options['search_merge_subtrees'], merge_prefixes=options['search_merge_prefixes'])
+        data = build_search_data(status,
+                                 add_snake_case_suffixes=options['add_snake_case_suffixes'],
+                                 add_camel_case_suffixes=options['add_camel_case_suffixes'])
 
         if template_params['SEARCH_DOWNLOAD_BINARY']:
             log.info("Writing search data to %s", searchdata_filename)
