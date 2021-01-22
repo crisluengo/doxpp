@@ -29,8 +29,8 @@
   --font: 'Libre Baskerville', serif;
   --code-font: 'Source Code Pro', monospace;
   --font-size: 14px;
-  --code-font-size: 1em; /* *not* rem, so it follows surrounding font size */
-  --line-height: normal;
+  --code-font-size: 0.9em; /* *not* rem, so it follows surrounding font size */
+  --line-height: 1.5;
   --paragraph-indent: 1.5rem;
   --paragraph-align: justify;
   --link-decoration: underline;
@@ -41,7 +41,7 @@
   --nav-heading-case: uppercase;
   --nav-categories-case: lowercase;
   --landing-header-case: lowercase;
-  --heading-font-weight: normal;
+  --heading-font-weight: 700;
 
   /* Shapes */
   --border-radius: 0.2rem;
