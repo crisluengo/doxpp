@@ -43,11 +43,11 @@
                   {% if variable.since %} {{ variable.since }}{% endif %}
                   </td>
                   <td>
-                  {% if variable.brief %}
-                  <p>{{ variable.brief }}</p>
-                  {% endif %}
                   {% if variable.doc %}
+                  <p>{{ variable.brief }}</p>
 {{ variable.doc }}
+                  {% elif variable.brief %}
+                  {{ variable.brief }}
                   {% endif %}
                   </td>
                 </tr>

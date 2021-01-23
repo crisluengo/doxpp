@@ -33,11 +33,11 @@
                 <tr>
                   <td><a href="#{{ value.id }}" class="m-doc-self" id="{{ value.id }}">{{ value.name }}</a> = {{ value.value }}{% if value.since %} {{ value.since }}{% endif %}</td>
                   <td>
-                  {% if value.brief %}{# brief is not required for values #}
+                  {% if value.doc %}
                   <p>{{ value.brief }}</p>
-                  {% endif %}
-                  {% if value.doc %}{# it can be only brief tho #}
 {{ value.doc }}
+                  {% elif value.brief %}
+                  {{ value.brief }}
                   {% endif %}
                   </td>
                 </tr>
