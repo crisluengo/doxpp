@@ -1097,14 +1097,21 @@ def build_search_data(status: Status, add_snake_case_suffixes, add_camel_case_su
                                                  add_snake_case_suffixes, add_camel_case_suffixes)
 
         # Now handle its sections
+        def add_section_to_search(sections, result, url_base, prefix):
+            symbol_count = 0
+            for section in sections:
+                result.prefix = prefix
+                result.name = fixup_title_for_search(section[1])
+                result.url = url_base + '#' + section[0]
+                result.name_with_args = result.name
+                symbol_count += add_entry_to_search_data(result, ' » ', trie, map,
+                                                         add_snake_case_suffixes, add_camel_case_suffixes)
+                if section[2]:
+                    symbol_count += add_section_to_search(section[2], result, url_base, prefix + [result.name])
+            return symbol_count
         url_base = result.url
         result.prefix.append(result.name)
-        for section in page['sections']:
-            result.name = fixup_title_for_search(section[1])
-            result.url = url_base + '#' + section[0]
-            result.name_with_args = result.name
-            symbol_count += add_entry_to_search_data(result, ' » ', trie, map,
-                                                     add_snake_case_suffixes, add_camel_case_suffixes)
+        symbol_count += add_section_to_search(page['sections'], result, url_base, result.prefix)
 
     # For each node in the trie sort the results so the found items have sane order by default
     log.info("Indexed %d symbols for search data", symbol_count)

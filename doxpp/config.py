@@ -65,8 +65,8 @@ default_config_values = {
         'class index expand inner': 'no',
     },
     'search': {
-        'enable': True,
-        'download binary': False,  # Set to False for browsing HTML from the local file system. Set to True for deployment to server (fewer bytes).
+        'enable': 'yes',
+        'download binary': 'no',  # Set to False for browsing HTML from the local file system. Set to True for deployment to server (fewer bytes).
         'base URL': '',
         'external URL': '',
         'add snake case suffixes': 'yes',  # Turn off if this creates too many symbols in the search table
