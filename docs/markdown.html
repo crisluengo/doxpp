@@ -438,6 +438,38 @@ Other text   | Other text     | Other text
 </tbody>
 </table>
 </aside>
+<p>To span columns, add a <code>colspan</code> property to the cell as described in <a href="markdown.html#markdown_attributes">Attributes</a>.
+For example,</p>
+<div class="m-code"><pre><span></span>First Header  | Second Header | Third Header
+------------- | ------------- | -------------
+This is one long sentence that should span all cells { colspan=&quot;3&quot; } ||
+Content Cell  | Content Cell  | Content Cell
+</pre></div>
+
+<p>is rendered as</p>
+<aside class="m-note m-frame">
+<table class="m-table">
+<thead>
+<tr>
+<th>First Header</th>
+<th>Second Header</th>
+<th>Third Header</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="3">This is one long sentence that should span all cells</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Content Cell</td>
+<td>Content Cell</td>
+<td>Content Cell</td>
+</tr>
+</tbody>
+</table>
+</aside>
 <h2 id="markdown_boxes">Boxes</h2>
 <p>Boxes can be generated using the &ldquo;admonition&rdquo; syntax from rST (implemented here through the
 <a href="https://python-markdown.github.io/extensions/admonition/">admonition</a> extension).</p>
@@ -769,7 +801,7 @@ You can modify the default CSS style sheets as well, see <a href="configuration.
   <div class="m-container">
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
-        <p>dox++, Documentation preparation system for C++. Documentation compiled with <a href="https://github.com/crisluengo/doxpp">dox++</a> and styled with <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+        <p>dox++, Documentation preparation system for C++. Documentation compiled with <a href="https://crisluengo.github.io/doxpp/">dox++</a> and styled with <a href="https://mcss.mosra.cz/">m.css</a>.</p>
       </div>
     </div>
   </div>

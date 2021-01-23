@@ -296,6 +296,22 @@ This is rendered as
     Text         | Text           | Text
     Other text   | Other text     | Other text
 
+To span columns, add a `colspan` property to the cell as described in \ref markdown_attributes.
+For example,
+```text
+First Header  | Second Header | Third Header
+------------- | ------------- | -------------
+This is one long sentence that should span all cells { colspan="3" } ||
+Content Cell  | Content Cell  | Content Cell
+```
+is rendered as
+
+!!! par
+    First Header  | Second Header | Third Header
+    ------------- | ------------- | -------------
+    This is one long sentence that should span all cells { colspan="3" } ||
+    Content Cell  | Content Cell  | Content Cell
+
 \section markdown_boxes Boxes
 
 Boxes can be generated using the "admonition" syntax from rST (implemented here through the
