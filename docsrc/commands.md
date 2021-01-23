@@ -17,7 +17,7 @@ These define what the documentation block does. The first line of the block must
 with one of these commands, otherwise it will be associated to the next declaration
 (or previous if it starts with `<`).
 
-\subsection command_addtogroup `\addtogroup`
+\subsection command_addtogroup Command `\addtogroup`
 
     \‍addtogroup <name>
 
@@ -32,7 +32,7 @@ See \ref grouping for more information on grouping.
 
 The remainder of the comment block is ignored.
 
-\subsection command_alias `\alias`
+\subsection command_alias Command `\alias` and `\typedef`
 
     \‍alias <name>
     \‍typedef <name>
@@ -45,7 +45,7 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 
 `\typedef` is an alias for compatibility with Doxygen.
 
-\subsection command_class `\class`
+\subsection command_class Command `\class`
 
     \‍class <name>
     \‍class <id>
@@ -58,23 +58,28 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 
 Alternatively, provide the ID for the class.
 
-\subsection command_dir `\dir`
+\subsection command_dir Command `\dir`
 
     \‍dir [<path fragment>]
 
 **dox++** doesn't document directories. This Doxygen command is recognized and a warning
 message is produced.
 
-\subsection command_endgroup `\endgroup`
+\subsection command_endgroup Command `\endgroup`
+
+    \‍endgroup
 
 Closes the nearest previous `\addtogroup`.
 See \ref grouping for more information.
 
-\subsection command_endname `\endname`
+\subsection command_endname Command `\endname`
 
+    \‍endname
+
+Closes the nearest previous `\name`.
 See \ref command_name.
 
-\subsection command_enum `\enum`
+\subsection command_enum Command `\enum`
 
     \‍enum <name>
     \‍enum <id>
@@ -87,7 +92,7 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 
 Alternatively, provide the ID for the enumerator.
 
-\subsection command_file `\file`
+\subsection command_file Command `\file`
 
     \‍file [<name>]
 
@@ -99,7 +104,7 @@ The rest of the comment block is considered documentation.
 /// This is the detailed description right here.
 ```
 
-\subsection command_function `\function`
+\subsection command_function Command `\function` and `\fn`
 
     \‍function <name>
     \‍function <id>
@@ -121,7 +126,7 @@ Alternatively, provide the ID for the function.
 
 `\fn` is an alias for compatibility with Doxygen.
 
-\subsection command_group `\group`
+\subsection command_group Command `\group` and `\defgroup`
 
     \‍group <name> [<title>]
     \‍defgroup <name> [<title>]
@@ -148,7 +153,7 @@ somewhat differently.
 
 See \ref grouping for more information on grouping.
 
-\subsection command_macro `\macro`
+\subsection command_macro Command `\macro` and `\def`
 
     \‍macro <name>
     \‍def <name>
@@ -174,14 +179,14 @@ put this command in the same file where the macro is actually defined.
 
 `\def` is an alias for compatibility with Doxygen.
 
-\subsection command_mainpage `\mainpage`
+\subsection command_mainpage Command `\mainpage`
 
     \‍mainpage [<title>]
 
 Creates a page with the ID `index`, and `<title>` as the page's title. This is the start page
 for the documentation. Text in this block is the page's text. See `\page` for more information.
 
-\subsection command_name `\name`
+\subsection command_name Command `\name`
 
     \‍name <header>
 
@@ -202,7 +207,7 @@ It is not possible to reference these groups.
 The backend can choose to group class or struct members by access (private/protected/public), or
 by `\name` grouping, or both.
 
-\subsection command_namespace `\namespace`
+\subsection command_namespace Command `\namespace`
 
     \‍namespace <name>
     \‍namespace <id>
@@ -215,7 +220,7 @@ the fully qualified name of the matched namespace.
 
 Alternatively, provide the ID for the namespace.
 
-\subsection command_page `\page`
+\subsection command_page Command `\page`
 
     \‍page <name> <title>
 
@@ -227,7 +232,7 @@ this page. Use `\‍ref` commands to reference other pages but not impose any hi
 
 By default, all pages are at the same level, not subordinate to any other page.
 
-\subsection command_struct `\struct`
+\subsection command_struct Command `\struct`
 
     \‍struct <name>
     \‍struct <id>
@@ -240,7 +245,7 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 
 Alternatively, provide the ID for the struct.
 
-\subsection command_union `\union`
+\subsection command_union Command `\union`
 
     \‍union <name>
     \‍union <id>
@@ -253,7 +258,7 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 
 Alternatively, provide the ID for the union.
 
-\subsection command_variable `\variable`
+\subsection command_variable Command `\variable` and `\var`
 
     \‍variable <name>
     \‍variable <id>
@@ -273,7 +278,7 @@ Alternatively, provide the ID for the variable.
 
 \section commands_inside Inside documentation blocks
 
-\subsection command_anchor `\‍anchor`
+\subsection command_anchor Command `\anchor`
 
     \‍anchor <name>
 
@@ -283,7 +288,10 @@ The `\anchor` command must happen at the end of a paragraph or in a paragraph of
 in either case it references the preceding paragraph. The paragraph is assigned the `#<name>`
 attribute.
 
-\subsection command_brief `\brief`
+\subsection command_brief Command `\brief` and `\short`
+
+    \brief <paragraph>
+    \short <paragraph>
 
 Used at the beginning of the first line of a comment block, turns the first paragraph into the "brief" string.
 ```cpp
@@ -297,7 +305,7 @@ int foo;
 
 `\short` is an alias.
 
-\subsection command_ingroup `\ingroup`
+\subsection command_ingroup Command `\ingroup`
 
     \ingroup <name>
 
@@ -310,13 +318,15 @@ See \ref grouping for more information on grouping.
 
 This command is expected to be on its own on a line.
 
-\subsection command_n `\‍n`
+\subsection command_n Command `\‍n`
+
+    \‍n
 
 Inserts a line break. The Markdown for a line break is two spaces at the end of a line.
 Because many code editors automatically remove such spaces, use this command instead.
 It will be replaced by two spaces, and a newline will be added if it's not there already.
 
-\subsection command_ref `\‍ref`
+\subsection command_ref Command `\‍ref`
 
     \‍ref <name> ["<text>"]
     \‍ref "<name>" ["<text>"]
@@ -359,7 +369,7 @@ When using quotes around `<name>`, the space between the closing quotes and the 
 for `<text>` is mandatory. Two sequential quotes are considered part of an operator name,
 such as in `\‍ref "operator""_w"`.
 
-\subsection command_relates `\‍relates`
+\subsection command_relates Command `\relates` and `\related`
 
     \‍relates <name>
     \‍related <name>
@@ -373,7 +383,7 @@ in namespace members (including global scope).
 This command is expected to be on its own on a line. Each member can only have one `\relates`
 command.
 
-\subsection command_section `\section`
+\subsection command_section Command `\section`
 
     \section <name> <title>
 
@@ -386,7 +396,7 @@ but this will be demoted by the backend to be a lower level than the containing 
 One can also directly write `# My Title {#my-title}`, but then the `\‍ref` command will not recognize
 `my-title` as something that can be referenced.
 
-\subsection command_see `\‍see`
+\subsection command_see Command `\see` and `\sa`
 
     \‍see <name> [, <name> [, ...]
     \‍sa <name> [, <name> [, ...]
@@ -399,7 +409,7 @@ and optionally box the whole paragraph.
 
 This command is expected to be on its own on a line. Cannot occur inside the brief description.
 
-\subsection command_subpage `\‍subpage`
+\subsection command_subpage Command `\‍subpage`
 
     \‍subpage <name> ["<text>"]
 
@@ -416,13 +426,13 @@ The page called `index` (see `\mainpage`) should not be made a subpage of anothe
 
 To create links without creating hierarchical relations, use `\‍ref`.
 
-\subsection command_subsection `\subsection`
+\subsection command_subsection Command `\subsection`
 
     \subsection <name> <title>
 
 Like `\section`, but for a level 2 heading (`##` in Markdown).
 
-\subsection command_subsubsection `\subsubsection`
+\subsection command_subsubsection Command `\subsubsection`
 
     \subsubsection <name> <title>
 
@@ -442,7 +452,7 @@ Like `\section`, but for a level 3 heading (`###` in Markdown).
 
 \section commands_start_of_line At the start of a line in Markdown files only
 
-\subsection command_comment `\‍comment`
+\subsection command_comment Command `\comment`
 
 The rest of the line is ignored. Use this to add comments not meant to be shown in the
 documentation, file copyright notices, etc.

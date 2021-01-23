@@ -5,6 +5,7 @@
   <title>Documentation &raquo; JSON output of dox++parse | dox++ | Documentation preparation system for C++</title>
   <link rel="stylesheet" href="m-light-documentation.compiled.css" />
   <link rel="icon" href="favicon-light.png" type="image/png" />
+  <link rel="search" type="application/opensearchdescription+xml" href="opensearch.xml" title="Search dox++ documentation" />
   <link rel="prev" href="configuration.html" />
   <link rel="next" href="members.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -30,7 +31,7 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
-                <li><a href="configuration.html">Configuring <strong>dox++</strong></a></li>
+                <li><a href="configuration.html">Configuring the <strong>dox++</strong> tools</a></li>
                 <li><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
                 <li><a href="json_output.html" id="m-navbar-current">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
@@ -170,7 +171,7 @@ information to the generator for this.</p>
 These are created with the commands <code>\section</code>, <code>\subsection</code> and <code>\subsubsection</code>. These commands
 are replaced with the appropriate Markdown syntax, and the section ID, title and level (1 for section,
 2 for subsection, etc.) is stored as tuples in the &ldquo;sections&rdquo; field.</p>
-        <div class="m-note m-dim m-thin m-text-center"><a href="configuration.html" class="m-doc">&laquo; Configuring <strong>dox++</strong></a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="members.html" class="m-doc">Detailed description of keys for C++ members &raquo;</a></div>
+        <div class="m-note m-dim m-thin m-text-center"><a href="configuration.html" class="m-doc">&laquo; Configuring the <strong>dox++</strong> tools</a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="members.html" class="m-doc">Detailed description of keys for C++ members &raquo;</a></div>
       </div>
     </div>
   </div>
@@ -185,10 +186,10 @@ are replaced with the appropriate Markdown syntax, and the section ID, title and
           <div id="search-symbolcount">&hellip;</div>
         </div>
         <div class="m-doc-search-content">
-          <form>
+          <form action="https://crisluengo.github.io/doxpp#search">
             <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
           </form>
-          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript. Enable it or <a href="https://google.com/search?q=site:crisluengo.github.io+">use an external search engine</a>.</noscript>
           <div id="search-help" class="m-text m-dim m-text-center">
             <p class="m-noindent">Search for symbols, directories, files, pages or modules.
               You can omit any prefix from the symbol or file path; adding a <code>:</code> or
@@ -199,7 +200,7 @@ are replaced with the appropriate Markdown syntax, and the section ID, title and
               You can copy a link to the result using <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">L</span>,
               or <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">M</span> to copy a Markdown link.</p>
           </div>
-          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.<br />Maybe try a full-text <a href="#" id="search-external" data-search-engine="https://google.com/search?q=site:crisluengo.github.io+{query}">search with external engine</a>?</div>
           <ul id="search-results"></ul>
         </div>
       </div>

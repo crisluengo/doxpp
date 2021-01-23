@@ -5,6 +5,7 @@
   <title>Differences with Doxygen | dox++ | Documentation preparation system for C++</title>
   <link rel="stylesheet" href="m-light-documentation.compiled.css" />
   <link rel="icon" href="favicon-light.png" type="image/png" />
+  <link rel="search" type="application/opensearchdescription+xml" href="opensearch.xml" title="Search dox++ documentation" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#22272e" />
 </head>
@@ -28,7 +29,7 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
-                <li><a href="configuration.html">Configuring <strong>dox++</strong></a></li>
+                <li><a href="configuration.html">Configuring the <strong>dox++</strong> tools</a></li>
                 <li><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
                 <li><a href="json_output.html">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
@@ -124,10 +125,10 @@ differences. See the <a href="documentation.html">Documentation</a> for more det
           <div id="search-symbolcount">&hellip;</div>
         </div>
         <div class="m-doc-search-content">
-          <form>
+          <form action="https://crisluengo.github.io/doxpp#search">
             <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
           </form>
-          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript. Enable it or <a href="https://google.com/search?q=site:crisluengo.github.io+">use an external search engine</a>.</noscript>
           <div id="search-help" class="m-text m-dim m-text-center">
             <p class="m-noindent">Search for symbols, directories, files, pages or modules.
               You can omit any prefix from the symbol or file path; adding a <code>:</code> or
@@ -138,7 +139,7 @@ differences. See the <a href="documentation.html">Documentation</a> for more det
               You can copy a link to the result using <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">L</span>,
               or <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">M</span> to copy a Markdown link.</p>
           </div>
-          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.<br />Maybe try a full-text <a href="#" id="search-external" data-search-engine="https://google.com/search?q=site:crisluengo.github.io+{query}">search with external engine</a>?</div>
           <ul id="search-results"></ul>
         </div>
       </div>

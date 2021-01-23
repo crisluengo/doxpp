@@ -30,5 +30,5 @@ navigation bar 2 = [('example site','example/index.html',[])]
 [search]
 enable = yes
 download binary = no
-base url =
-external url = 
+base url = https://crisluengo.github.io/doxpp
+external url = https://google.com/search?q=site:crisluengo.github.io+{query}

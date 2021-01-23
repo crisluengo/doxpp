@@ -5,6 +5,7 @@
   <title>Documentation &raquo; Running dox++parse and dox++html | dox++ | Documentation preparation system for C++</title>
   <link rel="stylesheet" href="m-light-documentation.compiled.css" />
   <link rel="icon" href="favicon-light.png" type="image/png" />
+  <link rel="search" type="application/opensearchdescription+xml" href="opensearch.xml" title="Search dox++ documentation" />
   <link rel="prev" href="markdown.html" />
   <link rel="next" href="configuration.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -30,7 +31,7 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
-                <li><a href="configuration.html">Configuring <strong>dox++</strong></a></li>
+                <li><a href="configuration.html">Configuring the <strong>dox++</strong> tools</a></li>
                 <li><a href="running_the_tools.html" id="m-navbar-current">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
                 <li><a href="json_output.html">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
@@ -58,7 +59,7 @@
 <p><strong>dox++parse</strong> parses the sources and creates a single JSON file containing
 all the information extracted (see <a href="json_output.html">JSON output of <strong>dox++parse</strong></a>). <strong>dox++html</strong> takes
 this JSON file and produces a web site for the documentation.</p>
-<p>First, create a configuration file, see <a href="configuration.html">Configuring <strong>dox++</strong></a> for options.</p>
+<p>First, create a configuration file, see <a href="configuration.html">Configuring the <strong>dox++</strong> tools</a> for options.</p>
 <div class="m-code"><pre><span></span>dox++parse -g <span class="o">[</span>&lt;config_file&gt;<span class="o">]</span>
 </pre></div>
 
@@ -78,7 +79,7 @@ After completing the configuration,</p>
 </pre></div>
 
 <p>will create the website.</p>
-        <div class="m-note m-dim m-thin m-text-center"><a href="markdown.html" class="m-doc">&laquo; Markdown markup</a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="configuration.html" class="m-doc">Configuring <strong>dox++</strong> &raquo;</a></div>
+        <div class="m-note m-dim m-thin m-text-center"><a href="markdown.html" class="m-doc">&laquo; Markdown markup</a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="configuration.html" class="m-doc">Configuring the <strong>dox++</strong> tools &raquo;</a></div>
       </div>
     </div>
   </div>
@@ -93,10 +94,10 @@ After completing the configuration,</p>
           <div id="search-symbolcount">&hellip;</div>
         </div>
         <div class="m-doc-search-content">
-          <form>
+          <form action="https://crisluengo.github.io/doxpp#search">
             <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
           </form>
-          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript. Enable it or <a href="https://google.com/search?q=site:crisluengo.github.io+">use an external search engine</a>.</noscript>
           <div id="search-help" class="m-text m-dim m-text-center">
             <p class="m-noindent">Search for symbols, directories, files, pages or modules.
               You can omit any prefix from the symbol or file path; adding a <code>:</code> or
@@ -107,7 +108,7 @@ After completing the configuration,</p>
               You can copy a link to the result using <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">L</span>,
               or <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">M</span> to copy a Markdown link.</p>
           </div>
-          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.<br />Maybe try a full-text <a href="#" id="search-external" data-search-engine="https://google.com/search?q=site:crisluengo.github.io+{query}">search with external engine</a>?</div>
           <ul id="search-results"></ul>
         </div>
       </div>

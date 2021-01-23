@@ -5,6 +5,7 @@
   <title>Documentation &raquo; Markdown markup | dox++ | Documentation preparation system for C++</title>
   <link rel="stylesheet" href="m-light-documentation.compiled.css" />
   <link rel="icon" href="favicon-light.png" type="image/png" />
+  <link rel="search" type="application/opensearchdescription+xml" href="opensearch.xml" title="Search dox++ documentation" />
   <link rel="prev" href="grouping.html" />
   <link rel="next" href="running_the_tools.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -30,7 +31,7 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
-                <li><a href="configuration.html">Configuring <strong>dox++</strong></a></li>
+                <li><a href="configuration.html">Configuring the <strong>dox++</strong> tools</a></li>
                 <li><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
                 <li><a href="json_output.html">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
@@ -192,7 +193,7 @@ You should always use <code>\section</code>, <code>\subsection</code> and <code>
 (see <a href="commands.html">Documentation commands</a>).</p>
 <p>Insert a line break by adding two spaces at the end of a line. Because many
 code editors will remove trailing spaces, the command <code>\n</code> will be replaced
-by two trailing spaces by <strong>dox++parse</strong>. (<strong>TODO!</strong>)</p>
+by two trailing spaces by <strong>dox++parse</strong>.</p>
 <h2 id="markdown_links">Links</h2>
 <p>Links are inserted using the following syntax: <code>[link text](URL)</code> or <code>[link text](URL "title")</code>,
 or simply <code>&lt;URL&gt;</code>. URL can be a full URL (<code>https://foo.com</code>), a local resource (<code>pages.html</code>)
@@ -476,9 +477,24 @@ Using <code>""</code> for the title will cause there to not be a title at all.</
 <td class="m-primary">&lsquo;m-primary&rsquo;</td>
 </tr>
 <tr>
+<td><code>remark</code></td>
+<td>Remark</td>
+<td class="m-primary">&lsquo;m-primary&rsquo;</td>
+</tr>
+<tr>
 <td><code>attention</code></td>
 <td>Attention</td>
 <td class="m-info">&lsquo;m-info&rsquo;</td>
+</tr>
+<tr>
+<td><code>todo</code></td>
+<td>TODO</td>
+<td class="m-info">&lsquo;m-info&rsquo;</td>
+</tr>
+<tr>
+<td><code>deprecated</code></td>
+<td>Deprecated</td>
+<td class="m-warning">&lsquo;m-warning&rsquo;</td>
 </tr>
 <tr>
 <td><code>warning</code></td>
@@ -557,8 +573,7 @@ Using <code>""</code> for the title will cause there to not be a title at all.</
 </tr>
 </tbody>
 </table>
-<p>Note that most of these (except <code>literature</code>) correspond to Doxygen commands to generate
-boxes.</p>
+<p>Note that most of these correspond to Doxygen commands to generate boxes.</p>
 <p>It is possible to add additional CSS classes after <code>type</code>: <code>!!! type class1 class2 "optional title"</code></p>
 <p>By default, the class &lsquo;m-note&rsquo; is used for admonitions. This class renders a colored
 box as shown above. If &lsquo;m-block&rsquo; is added as an additional class, then that one is
@@ -711,7 +726,7 @@ Content Cell  | Content Cell
 cells of a table, not the table itself, this is the only way to add special styling
 to a whole table. It is also the only way to add special styling to lists.</p>
 <p>Examine the CSS style sheets as well as the generated HTML to learn what classes exist.
-You can modify the default CSS style sheets as well, see <a href="configuration.html">Configuring <strong>dox++</strong></a>.</p>
+You can modify the default CSS style sheets as well, see <a href="configuration.html">Configuring the <strong>dox++</strong> tools</a>.</p>
         <div class="m-note m-dim m-thin m-text-center"><a href="grouping.html" class="m-doc">&laquo; Grouping</a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="running_the_tools.html" class="m-doc">Running <strong>dox++parse</strong> and <strong>dox++html</strong> &raquo;</a></div>
       </div>
     </div>
@@ -727,10 +742,10 @@ You can modify the default CSS style sheets as well, see <a href="configuration.
           <div id="search-symbolcount">&hellip;</div>
         </div>
         <div class="m-doc-search-content">
-          <form>
+          <form action="https://crisluengo.github.io/doxpp#search">
             <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
           </form>
-          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript. Enable it or <a href="https://google.com/search?q=site:crisluengo.github.io+">use an external search engine</a>.</noscript>
           <div id="search-help" class="m-text m-dim m-text-center">
             <p class="m-noindent">Search for symbols, directories, files, pages or modules.
               You can omit any prefix from the symbol or file path; adding a <code>:</code> or
@@ -741,7 +756,7 @@ You can modify the default CSS style sheets as well, see <a href="configuration.
               You can copy a link to the result using <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">L</span>,
               or <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">M</span> to copy a Markdown link.</p>
           </div>
-          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.<br />Maybe try a full-text <a href="#" id="search-external" data-search-engine="https://google.com/search?q=site:crisluengo.github.io+{query}">search with external engine</a>?</div>
           <ul id="search-results"></ul>
         </div>
       </div>

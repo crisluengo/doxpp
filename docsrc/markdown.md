@@ -75,7 +75,7 @@ You should always use `\section`, `\subsection` and `\subsubsection` instead
 
 Insert a line break by adding two spaces at the end of a line. Because many
 code editors will remove trailing spaces, the command `\n` will be replaced
-by two trailing spaces by **dox++parse**. (**TODO!**)
+by two trailing spaces by **dox++parse**.
 
 \section markdown_links Links
 
@@ -323,7 +323,10 @@ Type            | Default title | CSS class
 ----------------|---------------|--------------------------
 `par`           | (no title)    | 'm-frame' { .m-frame }
 `note`          | Note          | 'm-primary' { .m-primary }
+`remark`        | Remark        | 'm-primary' { .m-primary }
 `attention`     | Attention     | 'm-info' { .m-info }
+`todo`          | TODO          | 'm-info' { .m-info }
+`deprecated`    | Deprecated    | 'm-warning' { .m-warning }
 `warning`       | Warning       | 'm-warning' { .m-warning }
 `bug`           | Bug           | 'm-danger' { .m-danger }
 `see`           | See also      | 'm-default' { .m-default }
@@ -340,8 +343,7 @@ Type            | Default title | CSS class
 `aside`         | (no title)    | 'm-dim' { .m-dim }
 (anything_else) | (capitalized) | 'anything_else'
 
-Note that most of these (except `literature`) correspond to Doxygen commands to generate
-boxes.
+Note that most of these correspond to Doxygen commands to generate boxes.
 
 It is possible to add additional CSS classes after `type`: `!!! type class1 class2 "optional title"`
 

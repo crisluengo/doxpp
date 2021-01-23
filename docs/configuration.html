@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Documentation &raquo; Configuring dox++ | dox++ | Documentation preparation system for C++</title>
+  <title>Documentation &raquo; Configuring the dox++ tools | dox++ | Documentation preparation system for C++</title>
   <link rel="stylesheet" href="m-light-documentation.compiled.css" />
   <link rel="icon" href="favicon-light.png" type="image/png" />
+  <link rel="search" type="application/opensearchdescription+xml" href="opensearch.xml" title="Search dox++ documentation" />
   <link rel="prev" href="running_the_tools.html" />
   <link rel="next" href="json_output.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -30,7 +31,7 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
-                <li><a href="configuration.html" id="m-navbar-current">Configuring <strong>dox++</strong></a></li>
+                <li><a href="configuration.html" id="m-navbar-current">Configuring the <strong>dox++</strong> tools</a></li>
                 <li><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
                 <li><a href="json_output.html">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
@@ -53,18 +54,86 @@
       <div class="m-col-l-10 m-push-l-1">
         <h1>
           <span class="m-breadcrumb"><a href="documentation.html">Documentation</a> &raquo;</span>
-          Configuring <strong>dox++</strong>
+          Configuring the <strong>dox++</strong> tools
         </h1>
         <div class="m-block m-default">
           <h3>Contents</h3>
           <ul>
-            <li><a href="#clang">Section clang</a></li>
-            <li><a href="#log">Section log</a></li>
-            <li><a href="#input">Section input</a></li>
-            <li><a href="#json">Section json</a></li>
-            <li><a href="#project">Section project</a></li>
-            <li><a href="#html">Section html</a></li>
-            <li><a href="#search">Section search</a></li>
+            <li>
+              <a href="#config_section_clang">Section clang</a>
+              <ul>
+                <li><a href="#config_clang_compilerflags">compiler flags</a></li>
+                <li><a href="#config_clang_includedirectories">include directories</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#config_section_log">Section log</a>
+              <ul>
+                <li><a href="#config_clang_log_level">level</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#config_section_input">Section input</a>
+              <ul>
+                <li><a href="#config_input_rootdirectory">root directory</a></li>
+                <li><a href="#config_input_headerfiles">header files</a></li>
+                <li><a href="#config_input_markdownfiles">markdown files</a></li>
+                <li><a href="#config_input_tabsize">tab size</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#config_section_json">Section json</a>
+              <ul>
+                <li><a href="#config_json_filename">filename</a></li>
+                <li><a href="#config_json_usetypewriterfont">use typewriter font</a></li>
+                <li><a href="#config_json_formatting">formatting</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#config_section_project">Section project</a>
+              <ul>
+                <li><a href="#config_project_name">name</a></li>
+                <li><a href="#config_project_brief">brief</a></li>
+                <li><a href="#config_project_url">url</a></li>
+                <li><a href="#config_project_logo">logo</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#config_section_html">Section html</a>
+              <ul>
+                <li><a href="#config_html_outputdirectory">output directory</a></li>
+                <li><a href="#config_html_documentprivatevirtualmembers">document private virtual members</a></li>
+                <li><a href="#config_html_documentprivatenonvirtualmembers">document private non-virtual members</a></li>
+                <li><a href="#config_html_documentprotectedmembers">document protected members</a></li>
+                <li><a href="#config_html_documentundocumentedmembers">document undocumented members</a></li>
+                <li><a href="#config_html_modifyincludestatement">modify include statement</a></li>
+                <li><a href="#config_html_themecolor">theme color</a></li>
+                <li><a href="#config_html_favicon">favicon</a></li>
+                <li><a href="#config_html_stylesheets">stylesheets</a></li>
+                <li><a href="#config_html_templates">templates</a></li>
+                <li><a href="#config_html_documentationlinkclass">documentation link class</a></li>
+                <li><a href="#config_html_extrafiles">extra files</a></li>
+                <li><a href="#config_html_htmlheader">html header</a></li>
+                <li><a href="#config_html_pageheader">page header</a></li>
+                <li><a href="#config_html_fineprint">fine print</a></li>
+                <li><a href="#config_html_navigationbar1">navigation bar 1</a></li>
+                <li><a href="#config_html_navigationbar2">navigation bar 2</a></li>
+                <li><a href="#config_html_fileindexexpandlevels">file index expand levels</a></li>
+                <li><a href="#config_html_classindexexpandlevels">class index expand levels</a></li>
+                <li><a href="#config_classindexexpandinner">class index expand inner</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#config_section_search">Section search</a>
+              <ul>
+                <li><a href="#config_search_enable">enable</a></li>
+                <li><a href="#config_search_downloadbinary">download binary</a></li>
+                <li><a href="#config_search_baseurl">base url</a></li>
+                <li><a href="#config_search_externalurl">external url</a></li>
+                <li><a href="#config_search_addsnakecasesuffixes">add snake case suffixes</a></li>
+                <li><a href="#config_search_addcamelcasesuffixes">add camel case suffixes</a></li>
+              </ul>
+            </li>
           </ul>
         </div>
 <p>This is the default configuration file created by <code>dox++parse -g</code>:</p>
@@ -117,98 +186,184 @@
 <span class="na">class index expand inner</span> <span class="o">=</span> <span class="s">no</span>
 
 <span class="k">[search]</span>
-<span class="na">enable</span> <span class="o">=</span> <span class="s">True</span>
-<span class="na">download binary</span> <span class="o">=</span> <span class="s">False</span>
+<span class="na">enable</span> <span class="o">=</span> <span class="s">yes</span>
+<span class="na">download binary</span> <span class="o">=</span> <span class="s">no</span>
 <span class="na">base url</span> <span class="o">=</span> 
 <span class="na">external url</span> <span class="o">=</span> 
 <span class="na">add snake case suffixes</span> <span class="o">=</span> <span class="s">yes</span>
 <span class="na">add camel case suffixes</span> <span class="o">=</span> <span class="s">yes</span>
 </pre></div>
 
-<h2 id="clang">Section clang</h2>
+<p>Each line is formatted as <code>key = value</code>, where &ldquo;value&rdquo; can be just about anything. If including
+line breaks, indent subsequent lines to indicate continuation. Lines starting with a semicolon (<code>;</code>)
+or a hash (<code>#</code>) are ignored. Keys are grouped into sections, indicated with <code>[name]</code>. These
+sections are relevant, a key with the same name in a different section is not the same option.</p>
+<h2 id="config_section_clang">Section clang</h2>
 <p>Options to configure Clang.</p>
-<p><strong>compiler flags</strong>: Flags to pass to Clang when parsing the project header files. Specify
+<h3 id="config_clang_compilerflags">compiler flags</h3>
+<p>Flags to pass to Clang when parsing the project header files. Specify
 the C++ standard used (e.g. <code>-std=c++17</code>), preprocessor macro definitions (e.g. <code>-DFOO</code>),
 and options such as <code>-xc++</code> (ensures sources are interpreted as C++, not C). </p>
-<p><strong>include directories</strong>: Directories to add to the include search path. Separate them with
+<h3 id="config_clang_includedirectories">include directories</h3>
+<p>Directories to add to the include search path. Separate them with
 spaces. If a directory name has a space in it, enclose the name in double quotes. For
 example,</p>
 <div class="m-code"><pre><span></span><span class="na">include directories</span> <span class="o">=</span> <span class="s">include/ &quot;/opt/my thing/include/&quot;</span>
 </pre></div>
 
-<h2 id="log">Section log</h2>
+<h2 id="config_section_log">Section log</h2>
 <p>Options to configure the logger.</p>
-<p><strong>level</strong>: &lsquo;error&rsquo;, &lsquo;warning&rsquo;, &lsquo;info&rsquo; or &lsquo;debug&rsquo;. &lsquo;error&rsquo; provides the lowest level of
+<h3 id="config_clang_log_level">level</h3>
+<p>&lsquo;error&rsquo;, &lsquo;warning&rsquo;, &lsquo;info&rsquo; or &lsquo;debug&rsquo;. &lsquo;error&rsquo; provides the lowest level of
 diagnostic output (only errors are shown). &lsquo;warning&rsquo; (the default) shows also warnings.
 &lsquo;info&rsquo; gives some additional information about what the program is doing. &lsquo;debug&rsquo; should
 only be used to debug the <strong>dox++</strong> programs, and shouldn&rsquo;t be necessary to debug your
 documentation sources; it produces a huge amount of output, we recommend only using it
 with very small test projects.</p>
-<h2 id="input">Section input</h2>
+<h2 id="config_section_input">Section input</h2>
 <p>Options to describe the input to be parsed.</p>
-<p><strong>root directory</strong>: The root directory for the header files. This is the directory that
+<h3 id="config_input_rootdirectory">root directory</h3>
+<p>The root directory for the header files. This is the directory that
 you would pass to the compiler with <code>-I</code> when using the library. Header file names
 will be shown in the documentation relative to this directory.</p>
-<p><strong>header files</strong>: List of header file names to parse for documentation. Separate names
+<h3 id="config_input_headerfiles">header files</h3>
+<p>List of header file names to parse for documentation. Separate names
 with a space, enclose names with spaces in quotes. Names can contain wildcards. Paths
 are relative to the current directory at the time of running the tools, not relative
 to the configuration file&rsquo;s directory or to the <strong>root directory</strong> option.</p>
-<p><strong>markdown files</strong>: List of Markdown files with additional documentation, provided in the
+<h3 id="config_input_markdownfiles">markdown files</h3>
+<p>List of Markdown files with additional documentation, provided in the
 same way as the header files.</p>
-<p><strong>tab size</strong>: Integer value for how many spaces each tab character advances. If the source code
+<h3 id="config_input_tabsize">tab size</h3>
+<p>Integer value for how many spaces each tab character advances. If the source code
 uses tabs, they will be converted to spaces according to this value. It is important to match
 this value correctly so that Markdown indenting is interpreted as intended.
 This does not affect the Markdown parsing, which always assumes 4 spaces indentation. </p>
-<h2 id="json">Section json</h2>
+<h2 id="config_section_json">Section json</h2>
 <p>Options to configure the intermediate JSON file.</p>
-<p><strong>filename</strong>: Name of the intermediate JSON file. Defaults to <code>dox++out.json</code>. The path
+<h3 id="config_json_filename">filename</h3>
+<p>Name of the intermediate JSON file. Defaults to <code>dox++out.json</code>. The path
 given is relative to the current directory at the time of running <strong>dox++parse</strong> or
 <strong>dox++html</strong>, not relative to the directory containing the configuration file.</p>
-<p><strong>use typewriter font</strong>: &lsquo;yes&rsquo; or &lsquo;no&rsquo; (defaults to &lsquo;no&rsquo;),
-indicating whether to use &ldquo;<code>&lt;name&gt;</code>&rdquo; or &ldquo;<name>&rdquo; when writing the name of members when processing
-the <code>\‍ref</code> command. The `` is Markdown for code formatting. Note that member names elsewhere
+<h3 id="config_json_usetypewriterfont">use typewriter font</h3>
+<p>&lsquo;yes&rsquo; or &lsquo;no&rsquo; (defaults to &lsquo;no&rsquo;),
+indicating whether to use &ldquo;<code>`&lt;name&gt;`</code>&rdquo; or &ldquo;<code>&lt;name&gt;</code>&rdquo; when writing the name of members when processing
+the <code>\‍ref</code> command. The <code>`.`</code> is Markdown for code formatting. Note that member names elsewhere
 are formatted by the generator, not by <strong>dox++parse</strong> which processes the <code>\‍ref</code> command.
 Note that a member name in the documentation text not preceded by the <code>\‍ref</code> command will not
-be recognized as a member name, and not typeset accordingly. Instead, manually add `` around
+be recognized as a member name, and not typeset accordingly. Instead, manually add <code>`.`</code> around
 member names if not referenced.</p>
-<p><strong>formatting</strong>: &lsquo;compact&rsquo; (default) or &lsquo;readable&rsquo;. Set to &lsquo;readable&rsquo; to pretty-format the
+<h3 id="config_json_formatting">formatting</h3>
+<p>&lsquo;compact&rsquo; (default) or &lsquo;readable&rsquo;. Set to &lsquo;readable&rsquo; to pretty-format the
 JSON file.</p>
-<h2 id="project">Section project</h2>
+<h2 id="config_section_project">Section project</h2>
 <p>Options describing the project.</p>
-<p><strong>name</strong>: Project name, shown in the header of each HTML page.</p>
-<p><strong>brief</strong>: Project short description, shown in the header of each HTML page.</p>
-<p><strong>url</strong>: Project homepage URL, the project&rsquo;s name will be a link to the homepage.</p>
-<p><strong>logo</strong>: Project logo, shown in the header of each HTML page.</p>
-<h2 id="html">Section html</h2>
+<h3 id="config_project_name">name</h3>
+<p>Project name, shown in the header of each HTML page.</p>
+<h3 id="config_project_brief">brief</h3>
+<p>Project short description, shown in the header of each HTML page.</p>
+<h3 id="config_project_url">url</h3>
+<p>Project homepage URL, the project&rsquo;s name will be a link to the homepage.</p>
+<h3 id="config_project_logo">logo</h3>
+<p>Project logo, shown in the header of each HTML page.</p>
+<h2 id="config_section_html">Section html</h2>
 <p>Options to configure how the HTML pages are generated and what is shown in them.</p>
-<p><strong>output directory</strong>:</p>
-<p><strong>document private virtual members</strong>:</p>
-<p><strong>document private non-virtual members</strong>:</p>
-<p><strong>document protected members</strong>:</p>
-<p><strong>document undocumented members</strong>:</p>
-<p><strong>modify include statement</strong>:</p>
-<p><strong>theme color</strong>:</p>
-<p><strong>favicon</strong>:</p>
-<p><strong>stylesheets</strong>:</p>
-<p><strong>templates</strong>:</p>
-<p><strong>documentation link class</strong>:</p>
-<p><strong>extra files</strong>:</p>
-<p><strong>html header</strong>:</p>
-<p><strong>page header</strong>:</p>
-<p><strong>fine print</strong>:</p>
-<p><strong>navigation bar 1</strong>:</p>
-<p><strong>navigation bar 2</strong>:</p>
-<p><strong>file index expand levels</strong>:</p>
-<p><strong>class index expand levels</strong>:</p>
-<p><strong>class index expand inner</strong>:</p>
-<h2 id="search">Section search</h2>
+<h3 id="config_html_outputdirectory">output directory</h3>
+<p>The directory where the HTML files and search data are written to.
+Used CSS files, image files, etc. are copied there as well.</p>
+<h3 id="config_html_documentprivatevirtualmembers">document private virtual members</h3>
+<p>&lsquo;yes&rsquo; (default) or &lsquo;no&rsquo;. Whether to include class
+members that are private and virtual in the documentation.
+Some C++ coding practices require private virtual members as part of the public API,
+as clients can override those virtual members to implement functionality.</p>
+<h3 id="config_html_documentprivatenonvirtualmembers">document private non-virtual members</h3>
+<p>&lsquo;yes&rsquo; (default) or &lsquo;no&rsquo;. Whether to include
+the remaining private class members in the documentation. Turn on both this and the previous
+option to document all private members.</p>
+<h3 id="config_html_documentprotectedmembers">document protected members</h3>
+<p>&lsquo;yes&rsquo; (default) or &lsquo;no&rsquo;. Whether to include the protected
+class members in the documentation.</p>
+<h3 id="config_html_documentundocumentedmembers">document undocumented members</h3>
+<p>&lsquo;yes&rsquo; or &lsquo;no&rsquo; (default). Whether to include the undocumented
+members in the documentation (this includes files and namespaces and so on, but not macros because
+those are not reported by <strong>dox++parse</strong> if they&rsquo;re not explicitly documented).
+If &lsquo;no&rsquo;, undocumented members that have documented child members will still be shown.</p>
+<h3 id="config_html_modifyincludestatement">modify include statement</h3>
+<p>A Python function to modify include statements. The default is
+a no-op function:</p>
+<div class="m-code"><pre><span></span><span class="na">modify include statement</span> <span class="o">=</span> <span class="s">def modify_include_statement(id): return id</span>
+</pre></div>
+
+<p>The input to the function is the ID of the include file, the output is the ID for the
+include file to report instead.
+The DIPlib project uses the following function:</p>
+<div class="m-code"><pre><span></span><span class="na">modify include statement</span> <span class="o">=</span> <span class="s">def modify_include_statement(id): return &#39;file--diplib-h&#39; if id.startswith(&#39;file--diplib--library--&#39;) else id</span>
+</pre></div>
+
+<p>This causes all functions and classes documented in files under the <code>diplib/library/</code> directory to
+report the <code>diplib.h</code> file as their include file (which is a dummy file that includes other headers,
+and is considered the &ldquo;standard&rdquo; include file for the library).</p>
+<p>The reason we use a function like this for this modification, rather than having the user
+modify the JSON file before generating HTML, is that in this way, the header files are still properly
+documented and still show the members declared in them, but the members themselves show a different
+header to be used. If one were to modify the JSON file, the dummy <code>diplib.h</code> file would be
+shown to declare a lot of library functionality, which might be misleading.</p>
+<h3 id="config_html_themecolor">theme color</h3>
+<p>&lsquo;#hhhhhh&rsquo;. The 6-digit hexadecimal representation of a color, sets the
+<code>&lt;meta name="theme-color"&gt;</code> tag in the header of each HTML file. Defaults to &lsquo;#22272e&rsquo;.</p>
+<h3 id="config_html_favicon">favicon</h3>
+<p>Name of icon file. Sets the <code>&lt;link rel="icon"&gt;</code> tag in the header of each HTML file.</p>
+<h3 id="config_html_stylesheets">stylesheets</h3>
+<h3 id="config_html_templates">templates</h3>
+<h3 id="config_html_documentationlinkclass">documentation link class</h3>
+<p>Defaults to &lsquo;m-doc&rsquo;.</p>
+<h3 id="config_html_extrafiles">extra files</h3>
+<h3 id="config_html_htmlheader">html header</h3>
+<h3 id="config_html_pageheader">page header</h3>
+<h3 id="config_html_fineprint">fine print</h3>
+<p>Defaults to: <code>[default]</code>.</p>
+<h3 id="config_html_navigationbar1">navigation bar 1</h3>
+<p>Defaults to: <code>[('', '#pages', []),('', '#modules', []),('', '#namespaces', [])]</code>.</p>
+<h3 id="config_html_navigationbar2">navigation bar 2</h3>
+<p>Defaults to: <code>[('', '#classes', []),('', '#files', [])]</code>.</p>
+<h3 id="config_html_fileindexexpandlevels">file index expand levels</h3>
+<p>Defaults to &lsquo;1&rsquo;.</p>
+<h3 id="config_html_classindexexpandlevels">class index expand levels</h3>
+<p>Defaults to &lsquo;1&rsquo;.</p>
+<h3 id="config_classindexexpandinner">class index expand inner</h3>
+<p>&lsquo;yes&rsquo; or &lsquo;no&rsquo; (default).</p>
+<h2 id="config_section_search">Section search</h2>
 <p>Options to configure the search functionality on the generated website.</p>
-<p><strong>enable</strong>:</p>
-<p><strong>download binary</strong>:</p>
-<p><strong>base url</strong>:</p>
-<p><strong>external url</strong>:</p>
-<p><strong>add snake case suffixes</strong>:</p>
-<p><strong>add camel case suffixes</strong>:</p>
+<h3 id="config_search_enable">enable</h3>
+<p>&lsquo;yes&rsquo; (default) or &lsquo;no&rsquo;.</p>
+<h3 id="config_search_downloadbinary">download binary</h3>
+<p>&lsquo;yes&rsquo; or &lsquo;no&rsquo; (default). If &lsquo;yes&rsquo;, the client automatically downloads a tightly
+packed binary containing search data and performs search directly on it. However, in some
+browsers (Chormium, Safari) this does not work when reading from a local file system
+(i.e. when you&rsquo;re testing your site before deployment). For this case, set the option to &lsquo;no&rsquo;.
+This creates a base85-encoded representation of the search binary, which can be loaded asynchronously
+as a plain JavaScript file. The search data will be 25% larger. Set to &lsquo;yes&rsquo; for deployment.</p>
+<h3 id="config_search_baseurl">base url</h3>
+<p>When set, enables OpenSearch. Set to the URL where the documentation website is deployed.</p>
+<h3 id="config_search_externalurl">external url</h3>
+<p>When set, the search box will suggest to perform an full-text search using an
+external search engine if nothing matches. The substring <code>{query}</code> will be replaced with the
+word typed into the search box. For example, for this site it is set to:</p>
+<div class="m-code"><pre><span></span><span class="na">external url</span> <span class="o">=</span> <span class="s">https://google.com/search?q=site:crisluengo.github.io+{query}</span>
+</pre></div>
+
+<h3 id="config_search_addsnakecasesuffixes">add snake case suffixes</h3>
+<p>&lsquo;yes&rsquo; (default) or &lsquo;no&rsquo;. If &lsquo;yes&rsquo;, will add entries into the
+search data for each of the parts of names of functions, classes, variables, etc. that use
+snake case. This allows more flexible search, but it also increases the size of the search data.
+Note that there is a limit to the number of search symbols that can be included, if this limit
+is exceeded, turn off this option.</p>
+<h3 id="config_search_addcamelcasesuffixes">add camel case suffixes</h3>
+<p>&lsquo;yes&rsquo; (default) or &lsquo;no&rsquo;. If &lsquo;yes&rsquo;, will add entries into the
+search data for each of the parts of names of functions, classes, variables, etc. that use
+camel case. This allows more flexible search, but it also increases the size of the search data.
+Note that there is a limit to the number of search symbols that can be included, if this limit
+is exceeded, turn off this option.</p>
         <div class="m-note m-dim m-thin m-text-center"><a href="running_the_tools.html" class="m-doc">&laquo; Running <strong>dox++parse</strong> and <strong>dox++html</strong></a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="json_output.html" class="m-doc">JSON output of <strong>dox++parse</strong> &raquo;</a></div>
       </div>
     </div>
@@ -224,10 +379,10 @@ JSON file.</p>
           <div id="search-symbolcount">&hellip;</div>
         </div>
         <div class="m-doc-search-content">
-          <form>
+          <form action="https://crisluengo.github.io/doxpp#search">
             <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
           </form>
-          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript. Enable it or <a href="https://google.com/search?q=site:crisluengo.github.io+">use an external search engine</a>.</noscript>
           <div id="search-help" class="m-text m-dim m-text-center">
             <p class="m-noindent">Search for symbols, directories, files, pages or modules.
               You can omit any prefix from the symbol or file path; adding a <code>:</code> or
@@ -238,7 +393,7 @@ JSON file.</p>
               You can copy a link to the result using <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">L</span>,
               or <span class="m-label m-dim">⌘</span> <span class="m-label m-dim">M</span> to copy a Markdown link.</p>
           </div>
-          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.<br />Maybe try a full-text <a href="#" id="search-external" data-search-engine="https://google.com/search?q=site:crisluengo.github.io+{query}">search with external engine</a>?</div>
           <ul id="search-results"></ul>
         </div>
       </div>
