@@ -2,14 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Documentation &raquo; Configuring the dox++ tools | dox++ | Documentation preparation system for C++</title>
+  <title>Documentation &raquo; Running dox++parse and dox++html &raquo; Configuring the dox++ tools | dox++ | Documentation preparation system for C++</title>
   <link rel="stylesheet" href="m-light-documentation.compiled.css" />
   <link rel="icon" href="favicon-light.png" type="image/png" />
   <link rel="search" type="application/opensearchdescription+xml" href="opensearch.xml" title="Search dox++ documentation" />
-  <link rel="prev" href="running_the_tools.html" />
-  <link rel="next" href="json_output.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#22272e" />
+  <meta name="theme-color" content="#cb4b16" />
 </head>
 <body>
 <header><nav id="navigation">
@@ -31,14 +29,16 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
+                <li><a href="commands.html">Documentation commands</a></li>
+                <li><a href="markdown.html">Markdown markup</a></li>
                 <li><a href="configuration.html" id="m-navbar-current">Configuring the <strong>dox++</strong> tools</a></li>
                 <li><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
-                <li><a href="json_output.html">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
             </li>
           </ol>
           <ol class="m-col-t-6 m-col-m-none" start="2">
             <li><a href="example/index.html">example site</a></li>
+            <li><a href="https://github.com/crisluengo/doxpp">GitHub</a></li>
             <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
               <use href="#m-doc-search-icon-path" />
             </svg></a></li>
@@ -54,6 +54,7 @@
       <div class="m-col-l-10 m-push-l-1">
         <h1>
           <span class="m-breadcrumb"><a href="documentation.html">Documentation</a> &raquo;</span>
+          <span class="m-breadcrumb"><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a> &raquo;</span>
           Configuring the <strong>dox++</strong> tools
         </h1>
         <div class="m-block m-default">
@@ -198,6 +199,13 @@
 line breaks, indent subsequent lines to indicate continuation. Lines starting with a semicolon (<code>;</code>)
 or a hash (<code>#</code>) are ignored. Keys are grouped into sections, indicated with <code>[name]</code>. These
 sections are relevant, a key with the same name in a different section is not the same option.</p>
+<aside class="m-note m-primary">
+<h4>Note</h4>
+<p>All paths are relative to the current directory at the time of running the tools, not relative
+to the configuration file&rsquo;s directory or to the <a href="configuration.html#config_input_rootdirectory">root directory</a> option
+(of course absolute paths can be used as well).</p>
+<p>Directory names or file names with spaces in them must be enclosed in double quotes.</p>
+</aside>
 <h2 id="config_section_clang">Section clang</h2>
 <p>Options to configure Clang.</p>
 <h3 id="config_clang_compilerflags">compiler flags</h3>
@@ -228,9 +236,7 @@ you would pass to the compiler with <code>-I</code> when using the library. Head
 will be shown in the documentation relative to this directory.</p>
 <h3 id="config_input_headerfiles">header files</h3>
 <p>List of header file names to parse for documentation. Separate names
-with a space, enclose names with spaces in quotes. Names can contain wildcards. Paths
-are relative to the current directory at the time of running the tools, not relative
-to the configuration file&rsquo;s directory or to the <strong>root directory</strong> option.</p>
+with a space, enclose names with spaces in quotes. Names can contain wildcards.</p>
 <h3 id="config_input_markdownfiles">markdown files</h3>
 <p>List of Markdown files with additional documentation, provided in the
 same way as the header files.</p>
@@ -242,9 +248,7 @@ This does not affect the Markdown parsing, which always assumes 4 spaces indenta
 <h2 id="config_section_json">Section json</h2>
 <p>Options to configure the intermediate JSON file.</p>
 <h3 id="config_json_filename">filename</h3>
-<p>Name of the intermediate JSON file. Defaults to <code>dox++out.json</code>. The path
-given is relative to the current directory at the time of running <strong>dox++parse</strong> or
-<strong>dox++html</strong>, not relative to the directory containing the configuration file.</p>
+<p>Name of the intermediate JSON file. Defaults to <code>dox++out.json</code>.</p>
 <h3 id="config_json_usetypewriterfont">use typewriter font</h3>
 <p>&lsquo;yes&rsquo; or &lsquo;no&rsquo; (defaults to &lsquo;no&rsquo;),
 indicating whether to use &ldquo;<code>`&lt;name&gt;`</code>&rdquo; or &ldquo;<code>&lt;name&gt;</code>&rdquo; when writing the name of members when processing
@@ -289,14 +293,13 @@ members in the documentation (this includes files and namespaces and so on, but 
 those are not reported by <strong>dox++parse</strong> if they&rsquo;re not explicitly documented).
 If &lsquo;no&rsquo;, undocumented members that have documented child members will still be shown.</p>
 <h3 id="config_html_modifyincludestatement">modify include statement</h3>
-<p>A Python function to modify include statements. The default is
+<p>A Python function to modify include statements. The input to the function is the ID of the include file,
+the output is the ID for the include file to report instead. The default is
 a no-op function:</p>
 <div class="m-code"><pre><span></span><span class="na">modify include statement</span> <span class="o">=</span> <span class="s">def modify_include_statement(id): return id</span>
 </pre></div>
 
-<p>The input to the function is the ID of the include file, the output is the ID for the
-include file to report instead.
-The DIPlib project uses the following function:</p>
+<p>For example, the DIPlib project uses the following function:</p>
 <div class="m-code"><pre><span></span><span class="na">modify include statement</span> <span class="o">=</span> <span class="s">def modify_include_statement(id): return &#39;file--diplib-h&#39; if id.startswith(&#39;file--diplib--library--&#39;) else id</span>
 </pre></div>
 
@@ -310,28 +313,63 @@ header to be used. If one were to modify the JSON file, the dummy <code>diplib.h
 shown to declare a lot of library functionality, which might be misleading.</p>
 <h3 id="config_html_themecolor">theme color</h3>
 <p>&lsquo;#hhhhhh&rsquo;. The 6-digit hexadecimal representation of a color, sets the
-<code>&lt;meta name="theme-color"&gt;</code> tag in the header of each HTML file. Defaults to &lsquo;#22272e&rsquo;.</p>
+<code>&lt;meta name="theme-color"&gt;</code> tag in the header of each HTML file. Defaults to &lsquo;#cb4b16&rsquo;.</p>
 <h3 id="config_html_favicon">favicon</h3>
-<p>Name of icon file. Sets the <code>&lt;link rel="icon"&gt;</code> tag in the header of each HTML file.</p>
+<p>Name of icon file. Sets the <code>&lt;link rel="icon"&gt;</code> tag in the header of each HTML file.
+If empty (the default), uses the default <code>html_templates/favicon-light.png</code> (in the <code>doxpp</code> directory).</p>
 <h3 id="config_html_stylesheets">stylesheets</h3>
+<p>Style sheets to use instead of the default ones (separate multiple files with spaces).
+except if it is one of the two default CSS files:</p>
+<ul>
+<li><code>css/m-light-documentation.compiled.css</code></li>
+<li><code>css/m-dark-documentation.compiled.css</code>.</li>
+</ul>
+<p>If empty (the default), <code>css/m-light-documentation.compiled.css</code> is used.</p>
 <h3 id="config_html_templates">templates</h3>
+<p>Path to templates to use instead of the default ones. The default templates are used
+as fallback. Thus, you can copy and modify only one or a few of the templates, and give
+the directory containing these modified copies here. The missing templates will be
+taken from the default location.</p>
 <h3 id="config_html_documentationlinkclass">documentation link class</h3>
-<p>Defaults to &lsquo;m-doc&rsquo;.</p>
+<p>CSS class to add to links to documented members. Defaults to &lsquo;m-doc&rsquo;, and should match
+the class used in the templates.</p>
 <h3 id="config_html_extrafiles">extra files</h3>
+<p>Additional files to copy to output directory, separate multiple names with spaces.
+The files given in the <a href="configuration.html#config_html_favicon">favicon</a> and <a href="configuration.html#config_html_stylesheets">stylesheets</a> options
+are always copied. List here files referenced in your customized templates and stylesheets.</p>
 <h3 id="config_html_htmlheader">html header</h3>
+<p>HTML code to add to the <code>&lt;head&gt;</code> section of each HTML page.</p>
 <h3 id="config_html_pageheader">page header</h3>
+<p>HTML code to add to the top of each page.</p>
 <h3 id="config_html_fineprint">fine print</h3>
-<p>Defaults to: <code>[default]</code>.</p>
+<p>Text to use at the bottom of each page. If empty, no footer will be produced.
+Defaults to <code>[default]</code>, which inserts the default footer.</p>
 <h3 id="config_html_navigationbar1">navigation bar 1</h3>
+<p>Items to add to the first navigation bar. This is interpreted as a Python expression.
+The expression must evaluate to a list of tuples <code>(&lt;name&gt;, &lt;URL&gt;, &lt;submenu&gt;)</code>,
+with <code>&lt;name&gt;</code> the name shown, <code>&lt;URL&gt;</code> the URL that the item links to, and <code>&lt;submenu&gt;</code> a
+list of tuples <code>(&lt;name&gt;, &lt;URL&gt;, [])</code> defining the submenu. Only one level of submenus
+is supported.</p>
+<p>If <code>&lt;URL&gt;</code> starts with <code>#</code>, it is interpreted as the ID of the documented element to
+link to. Besides the explicitly documented elements, IDs <code>pages</code>, <code>modules</code>, <code>namespaces</code>,
+<code>classes</code> and <code>files</code> can be used. These reference the corresponding index pages.
+The page created with <code>\mainpage</code> has ID <code>index</code>.</p>
+<p>If <code>&lt;name&gt;</code> is empty, and <code>&lt;URL&gt;</code> is <code>#&lt;ID&gt;</code>, then the element&rsquo;s name or title will
+be shown in the menu.</p>
+<p>This can be an empty list to not display the first navigtation bar.</p>
 <p>Defaults to: <code>[('', '#pages', []),('', '#modules', []),('', '#namespaces', [])]</code>.</p>
 <h3 id="config_html_navigationbar2">navigation bar 2</h3>
-<p>Defaults to: <code>[('', '#classes', []),('', '#files', [])]</code>.</p>
+<p>Same as <a href="configuration.html#config_html_navigationbar1">navigation bar 1</a>, for the second navigation bar.
+Defaults to: <code>[('', '#classes', []),('', '#files', [])]</code>.</p>
 <h3 id="config_html_fileindexexpandlevels">file index expand levels</h3>
-<p>Defaults to &lsquo;1&rsquo;.</p>
+<p>How many levels of the file tree to expand. 0 means only the top-level dirs/files are shown.
+Defaults to 1.</p>
 <h3 id="config_html_classindexexpandlevels">class index expand levels</h3>
-<p>Defaults to &lsquo;1&rsquo;.</p>
+<p>How many levels of the class tree to expand. 0 means only the top-level symbols are shown.
+Defaults to 1.</p>
 <h3 id="config_classindexexpandinner">class index expand inner</h3>
-<p>&lsquo;yes&rsquo; or &lsquo;no&rsquo; (default).</p>
+<p>&lsquo;yes&rsquo; or &lsquo;no&rsquo; (default).
+Whether to expand inner types (i.e. a class inside a class) in the symbol tree.</p>
 <h2 id="config_section_search">Section search</h2>
 <p>Options to configure the search functionality on the generated website.</p>
 <h3 id="config_search_enable">enable</h3>
@@ -339,7 +377,7 @@ shown to declare a lot of library functionality, which might be misleading.</p>
 <h3 id="config_search_downloadbinary">download binary</h3>
 <p>&lsquo;yes&rsquo; or &lsquo;no&rsquo; (default). If &lsquo;yes&rsquo;, the client automatically downloads a tightly
 packed binary containing search data and performs search directly on it. However, in some
-browsers (Chormium, Safari) this does not work when reading from a local file system
+browsers (Chromium, Safari) this does not work when reading from a local file system
 (i.e. when you&rsquo;re testing your site before deployment). For this case, set the option to &lsquo;no&rsquo;.
 This creates a base85-encoded representation of the search binary, which can be loaded asynchronously
 as a plain JavaScript file. The search data will be 25% larger. Set to &lsquo;yes&rsquo; for deployment.</p>
@@ -364,7 +402,7 @@ search data for each of the parts of names of functions, classes, variables, etc
 camel case. This allows more flexible search, but it also increases the size of the search data.
 Note that there is a limit to the number of search symbols that can be included, if this limit
 is exceeded, turn off this option.</p>
-        <div class="m-note m-dim m-thin m-text-center"><a href="running_the_tools.html" class="m-doc">&laquo; Running <strong>dox++parse</strong> and <strong>dox++html</strong></a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="json_output.html" class="m-doc">JSON output of <strong>dox++parse</strong> &raquo;</a></div>
+        <div class="m-note m-dim m-thin m-text-center"><a href="running_the_tools.html" class="m-doc">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></div>
       </div>
     </div>
   </div>

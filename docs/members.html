@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Documentation &raquo; Detailed description of keys for C++ members | dox++ | Documentation preparation system for C++</title>
+  <title>Documentation &raquo; JSON output of dox++parse &raquo; Detailed description of fields for C++ members | dox++ | Documentation preparation system for C++</title>
   <link rel="stylesheet" href="m-light-documentation.compiled.css" />
   <link rel="icon" href="favicon-light.png" type="image/png" />
   <link rel="search" type="application/opensearchdescription+xml" href="opensearch.xml" title="Search dox++ documentation" />
-  <link rel="prev" href="json_output.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#22272e" />
+  <meta name="theme-color" content="#cb4b16" />
 </head>
 <body>
 <header><nav id="navigation">
@@ -30,14 +29,16 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
+                <li><a href="commands.html">Documentation commands</a></li>
+                <li><a href="markdown.html">Markdown markup</a></li>
                 <li><a href="configuration.html">Configuring the <strong>dox++</strong> tools</a></li>
                 <li><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
-                <li><a href="json_output.html">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
             </li>
           </ol>
           <ol class="m-col-t-6 m-col-m-none" start="2">
             <li><a href="example/index.html">example site</a></li>
+            <li><a href="https://github.com/crisluengo/doxpp">GitHub</a></li>
             <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
               <use href="#m-doc-search-icon-path" />
             </svg></a></li>
@@ -53,209 +54,275 @@
       <div class="m-col-l-10 m-push-l-1">
         <h1>
           <span class="m-breadcrumb"><a href="documentation.html">Documentation</a> &raquo;</span>
-          Detailed description of keys for C++ members
+          <span class="m-breadcrumb"><a href="json_output.html">JSON output of <strong>dox++parse</strong></a> &raquo;</span>
+          Detailed description of fields for C++ members
         </h1>
-<p><strong>TODO:</strong> This page still needs to be formatted correctly.</p>
-<p>These are the member types that will be output by <strong>dox++</strong>, and how they nest.</p>
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              <a href="#members_common">Common fields</a>
+              <ul>
+                <li><a href="#members_common_id">&ldquo;id&rdquo;</a></li>
+                <li><a href="#members_common_name">&ldquo;name&rdquo;</a></li>
+                <li><a href="#members_common_member_type">&ldquo;member_type&rdquo;</a></li>
+                <li><a href="#members_common_relates">&ldquo;relates&rdquo;</a></li>
+                <li><a href="#members_common_header">&ldquo;header&rdquo;</a></li>
+                <li><a href="#members_common_group">&ldquo;group&rdquo;</a></li>
+              </ul>
+            </li>
+            <li><a href="#member_alias">Alias-specific fields</a></li>
+            <li>
+              <a href="#member_class">Class- or struct-specific fields</a>
+              <ul>
+                <li><a href="#member_class_bases">&ldquo;bases&rdquo;</a></li>
+                <li><a href="#member_class_related">&ldquo;related&rdquo;</a></li>
+              </ul>
+            </li>
+            <li><a href="#member_enum">Enum-specific fields</a></li>
+            <li><a href="#member_enumvalue">Enumvalue-specific fields</a></li>
+            <li>
+              <a href="#member_function">Function-specific fields</a>
+              <ul>
+                <li><a href="#member_function_arguments">&ldquo;arguments&rdquo;</a></li>
+              </ul>
+            </li>
+            <li><a href="#member_function_member">Function-specific fields, if class or struct member</a></li>
+            <li><a href="#member_macro">Macro-specific fields</a></li>
+            <li><a href="#member_namespace">Namespace-specific fields</a></li>
+            <li><a href="#member_union">Union-specific fields</a></li>
+            <li><a href="#member_variable">Variable-specific fields</a></li>
+            <li><a href="#member_variable_field">Variable-specific fields, if class, struct or union member</a></li>
+            <li><a href="#member_variable_bitfield">variable-specific fields, if bitfield</a></li>
+            <li>
+              <a href="#member_template">Template-specific fields</a>
+              <ul>
+                <li><a href="#member_template_parameters">&ldquo;template_parameters&rdquo;</a></li>
+              </ul>
+            </li>
+            <li><a href="#member_type_dictionary">The type dictionary</a></li>
+          </ul>
+        </div>
+<p>Each member is a dictionary with the following fields:</p>
 <ul>
-<li><code>namespace</code><ul>
-<li>can contain anything except <code>macro</code></li>
+<li><a href="members.html#members_common_id">&ldquo;id&rdquo;</a>: unique identifier</li>
+<li><a href="members.html#members_common_name">&ldquo;name&rdquo;</a>: member name, with path from project root</li>
+<li>&ldquo;brief&rdquo;: brief description (see <a href="json_output.html#json_output_brief_doc">&ldquo;brief&rdquo; and &ldquo;doc&rdquo;</a>)</li>
+<li>&ldquo;doc&rdquo;: full documentation (see <a href="json_output.html#json_output_brief_doc">&ldquo;brief&rdquo; and &ldquo;doc&rdquo;</a>)</li>
+<li><a href="json_output.html#json_output_sections">&ldquo;sections&rdquo;</a>: (ID, title, level) for sections in &ldquo;doc&rdquo;</li>
+<li><a href="json_output.html#json_output_anchors">&ldquo;anchors&rdquo;</a>: IDs of anchors in &ldquo;doc&rdquo;</li>
+<li><a href="members.html#members_common_member_type">&ldquo;member_type&rdquo;</a>: member type </li>
+<li>&ldquo;parent&rdquo;: ID of the parent member</li>
+<li><a href="members.html#members_common_relates">&ldquo;relates&rdquo;</a>: ID of a class/struct that the member relates to</li>
+<li><a href="members.html#members_common_header">&ldquo;header&rdquo;</a>: ID of the header file where the member is declared</li>
+<li><a href="members.html#members_common_group">&ldquo;group&rdquo;</a>: group ID or name </li>
+<li>&ldquo;deprecated&rdquo;: <code>true</code> or <code>false</code> depending on if the member has a <code>[[deprecated]]</code> attribute</li>
 </ul>
-</li>
-<li><code>class</code> or <code>struct</code><ul>
-<li><code>alias</code></li>
-<li><code>function</code></li>
-<li><code>variable</code></li>
-<li>Can also contain <code>class</code>, <code>struct</code>, <code>union</code>, <code>enum</code>.</li>
+<p>Additionally, the dictionary will contain other fields that depend on the &ldquo;member_type&rdquo;
+value:</p>
+<ul>
+<li><a href="members.html#member_alias">Alias-specific fields</a></li>
+<li><a href="members.html#member_class">Class- or struct-specific fields</a></li>
+<li><a href="members.html#member_enum">Enum-specific fields</a></li>
+<li><a href="members.html#member_enumvalue">Enumvalue-specific fields</a></li>
+<li><a href="members.html#member_function">Function-specific fields</a></li>
+<li><a href="members.html#member_function_member">Function-specific fields, if class or struct member</a></li>
+<li><a href="members.html#member_macro">Macro-specific fields</a></li>
+<li><a href="members.html#member_namespace">Namespace-specific fields</a></li>
+<li><a href="members.html#member_union">Union-specific fields</a></li>
+<li><a href="members.html#member_variable">Variable-specific fields</a></li>
+<li><a href="members.html#member_variable_field">Variable-specific fields, if class, struct or union member</a></li>
+<li><a href="members.html#member_variable_bitfield">variable-specific fields, if bitfield</a></li>
 </ul>
-</li>
-<li><code>union</code><ul>
-<li><code>variable</code></li>
-</ul>
-</li>
-<li><code>enum</code><ul>
-<li><code>enumvalue</code></li>
-</ul>
-</li>
-<li><code>alias</code></li>
-<li><code>function</code></li>
-<li><code>variable</code></li>
-<li><code>macro</code></li>
-</ul>
-<p>Below we give a description of all the dictionary fields for each of these types of member.</p>
-<h3>Common fields</h3>
-<h4>&ldquo;id&rdquo; (string)</h4>
+<h2 id="members_common">Common fields</h2>
+<h3 id="members_common_id">&ldquo;id&rdquo;</h3>
 <p>This is a unique identifier. When the member is referenced, a link to its ID is used.</p>
-<h4>&ldquo;name&rdquo; (string)</h4>
+<p>Member IDs are not unrecognizable hash codes as Doxygen does it, but simply created from the fully
+qualified name and parameters, guaranteeing uniqueness. For example:</p>
+<ul>
+<li><code>int ns::foo()</code>                     ⇒ <code>"ns-foo"</code></li>
+<li><code>int ns::foo(int, double)</code>          ⇒ <code>"ns-foo-int--double-"</code></li>
+<li><code>int ns::foo(int&amp;, double const&amp;)</code>  ⇒ <code>"ns-foo-int-L-double-CL"</code></li>
+<li><code>class ns::bar</code>                     ⇒ <code>"ns-bar"</code></li>
+<li><code>ns::bar::bar(float*)</code>              ⇒ <code>"ns-bar-bar-float-P"</code></li>
+</ul>
+<h3 id="members_common_name">&ldquo;name&rdquo;</h3>
 <p>Name of the member. The fully qualified name can be obtained by iterating through the
 &ldquo;parent&rdquo; links and prepending their names.</p>
-<h4>&ldquo;brief&rdquo; (string)</h4>
-<p>A brief description, typically the first line of the documentation block for the member.
-Should be rendered through a Markdown processor.</p>
-<p>This description can be shown in a list of members.</p>
-<h4>&ldquo;doc&rdquo; (string)</h4>
-<p>The full documentation, excluding the first line, which is in <code>"brief"</code>.
-Should be rendered through a Markdown processor.</p>
-<h4>&ldquo;sections&rdquo; (list)</h4>
-<p>List of tuples: (ID, title, level) for all sections present in the &ldquo;doc&rdquo; string.</p>
-<h4>&ldquo;anchors&rdquo; (list)</h4>
-<p>List of strings with anchor IDs present in the &ldquo;doc&rdquo; string.</p>
-<h4>&ldquo;member_type&rdquo; (string)</h4>
-<p>One of:
-- <code>"alias"</code>
-- <code>"class"</code>
-- <code>"enum"</code>
-- <code>"enumvalue"</code>
-- <code>"function"</code>
-- <code>"macro"</code>
-- <code>"namespace"</code>
-- <code>"struct"</code>
-- <code>"union"</code>
-- <code>"variable"</code></p>
-<h4>&ldquo;parent&rdquo; (string)</h4>
-<p>ID of the parent member.</p>
-<h4>&ldquo;relates&rdquo; (string)</h4>
-<p>ID of a class/struct that this member relates to. The class/struct will list this member in its &ldquo;related&rdquo;
+<h3 id="members_common_member_type">&ldquo;member_type&rdquo;</h3>
+<p>The type of the member, one of:</p>
+<ul>
+<li><code>"alias"</code></li>
+<li><code>"class"</code></li>
+<li><code>"enum"</code></li>
+<li><code>"enumvalue"</code></li>
+<li><code>"function"</code></li>
+<li><code>"macro"</code></li>
+<li><code>"namespace"</code></li>
+<li><code>"struct"</code></li>
+<li><code>"union"</code></li>
+<li><code>"variable"</code></li>
+</ul>
+<h3 id="members_common_relates">&ldquo;relates&rdquo;</h3>
+<p>ID of a class/struct that the member relates to. The class/struct will list this member in its &ldquo;related&rdquo;
 list. This value can only be set in functions, variables, enums, aliases and macros.</p>
-<h4>&ldquo;header&rdquo; (string)</h4>
+<h3 id="members_common_header">&ldquo;header&rdquo;</h3>
 <p>ID of the header file where the member is declared. If the declaration appears in multiple files, the first
 one it was encountered in will be used.</p>
-<h4>&ldquo;group&rdquo; (string)</h4>
+<h3 id="members_common_group">&ldquo;group&rdquo;</h3>
 <p>For namespace members, ID of the group that this member belongs to. If an empty string,
 the member doesn&rsquo;t belong to any groups.</p>
 <p>For class or struct members, the header text for the group. Can be an empty string if no
 grouping is used.</p>
 <p>For members of type <code>"enumvalue"</code> (enum members), the group is always the empty string.</p>
-<h4>&ldquo;deprecated&rdquo; (boolean)</h4>
-<p><code>true</code> or <code>false</code> depending on if the member has a <code>[[deprecated]]</code> attribute.</p>
-<h3>alias-specific fields</h3>
-<h4>&ldquo;templated&rdquo; (boolean)</h4>
-<p><code>true</code> if this is an alias template.</p>
-<h4>&ldquo;type&rdquo; (dictionary)</h4>
-<p>See below under &ldquo;The type dictionary&rdquo;.</p>
-<h4>&ldquo;oldfashioned&rdquo; (boolean)</h4>
-<p><code>true</code> if this is a <code>typedef</code> declaration, <code>false</code> if it is a <code>using</code> declaration.</p>
-<h3>class- or struct-specific fields</h3>
-<h4>&ldquo;templated&rdquo; (boolean)</h4>
-<p><code>true</code> if this is a class template.</p>
-<h4>&ldquo;abstract&rdquo; (boolean)</h4>
-<p><code>true</code> if this is an abstract class (has a pure virtual member function).</p>
-<h4>&ldquo;bases&rdquo; (list)</h4>
-<p>A list of dictionaries listing the base classes. It contains the following fields:
-- <code>"typename"</code> (string): the fully qualified name of the base class.
-- <code>"id"</code> (string): ID of the type, if declared in the project being documented.
-- <code>"access"</code> (string): set to a string <code>"public"</code>, <code>"protected"</code> or <code>"private"</code>.</p>
-<h4>&ldquo;derived&rdquo; (list)</h4>
-<p>A list of strings, the IDs of derived classes.</p>
-<h4>&ldquo;members&rdquo; (list)</h4>
-<p>The list of dictionaries for the child members.</p>
-<h4>&ldquo;related&rdquo; (list)</h4>
+<h2 id="member_alias">Alias-specific fields</h2>
+<p>If the member is an alias (<code>using</code> or <code>typedef</code> declaration), then it additionally has the
+following fields:</p>
+<ul>
+<li>&ldquo;templated&rdquo;: <code>true</code> if this is an alias template.</li>
+<li>&ldquo;type&rdquo;: the type being aliased, see <a href="members.html#member_type_dictionary">The type dictionary</a>.</li>
+<li>&ldquo;oldfashioned&rdquo;: <code>true</code> if this is a <code>typedef</code> declaration, <code>false</code> if it is a <code>using</code> declaration.</li>
+</ul>
+<h2 id="member_class">Class- or struct-specific fields</h2>
+<p>If the member is a class or struct, it additionally has the following fields:</p>
+<ul>
+<li>&ldquo;templated&rdquo;: <code>true</code> if this is a class template</li>
+<li>&ldquo;abstract&rdquo;: <code>true</code> if this is an abstract class (has a pure virtual member function)</li>
+<li><a href="members.html#member_class_bases">&ldquo;bases&rdquo;</a>: a list of base classes</li>
+<li>&ldquo;derived&rdquo;: a list of strings, the IDs of derived classes</li>
+<li>&ldquo;members&rdquo;: a list of dictionaries for the child members</li>
+<li><a href="members.html#member_class_related">&ldquo;related&rdquo;</a>: a list of strings, the IDs of related members</li>
+</ul>
+<p>The &ldquo;members&rdquo; list contains dictionaries of members. These members can be of type
+alias, enum, function, variable, class, struct or union.</p>
+<h3 id="member_class_bases">&ldquo;bases&rdquo;</h3>
+<p>A list of dictionaries listing the base classes. It contains the following fields:</p>
+<ul>
+<li>&ldquo;typename&rdquo;: the fully qualified name of the base class.</li>
+<li>&ldquo;id&rdquo;: ID of the type, if declared in the project being documented.</li>
+<li>&ldquo;access&rdquo;: set to a string <code>"public"</code>, <code>"protected"</code> or <code>"private"</code>.</li>
+</ul>
+<h3 id="member_class_related">&ldquo;related&rdquo;</h3>
 <p>A list of strings, the IDs of related members. These are not child members, but are related
 to the class and their documentation could be shown together with that of the class&rsquo; members.</p>
-<h3>enum-specific fields</h3>
-<h4>&ldquo;scoped&rdquo; (boolean)</h4>
-<p><code>true</code> if scoped enum (declared as <code>enum class</code>), or <code>false</code> if unscoped (a plain <code>enum</code>).</p>
-<h4>&ldquo;type&rdquo; (string)</h4>
-<p>The type underlying the enumerator (<code>"int"</code>, <code>"short"</code>, <code>"char"</code>, etc.)</p>
-<h4>&ldquo;members&rdquo; (list)</h4>
-<p>Member dictionaries. These members should all be of type <code>"enumvalue</code>.</p>
-<h3>enumvalue-specific fields</h3>
-<h4>&ldquo;value&rdquo; (integer)</h4>
-<p>The value of the enumerator constant.</p>
-<h3>function-specific fields</h3>
-<h4>&ldquo;templated&rdquo; (boolean)</h4>
-<p><code>true</code> if this is a function template.</p>
-<h4>&ldquo;constexpr&rdquo; (boolean)</h4>
-<p><code>true</code> if this is a <code>constexpr</code> function.</p>
-<h4>&ldquo;noexcept&rdquo; (boolean)</h4>
-<p><code>true</code> if the function is marked <code>noexcept</code>.</p>
-<h4>&ldquo;return_type&rdquo;  (dictionary)</h4>
-<p>The function&rsquo;s return type. See below under &ldquo;The type dictionary&rdquo;.
-For constructors, destructors and conversion functions (see <code>"method_type"</code>) this key is empty.</p>
-<h4>&ldquo;arguments&rdquo; (list)</h4>
+<p>The members listed here will have the ID of this class as their <a href="members.html#members_common_relates">&ldquo;relates&rdquo;</a> field.</p>
+<h2 id="member_enum">Enum-specific fields</h2>
+<p>If the member is an enum, it additionally has the following fields:</p>
+<ul>
+<li>&ldquo;scoped&rdquo;: <code>true</code> if scoped enum (declared as <code>enum class</code>), or <code>false</code> if unscoped (a plain <code>enum</code>)</li>
+<li>&ldquo;type&rdquo;: the type underlying the enumerator (<code>"int"</code>, <code>"short"</code>, <code>"char"</code>, etc.)</li>
+<li>&ldquo;members&rdquo;: member dictionaries, these members should all be of type <code>"enumvalue</code></li>
+</ul>
+<h2 id="member_enumvalue">Enumvalue-specific fields</h2>
+<p>If the member is an enumvalue (a child of an enum), it additionally has the following field:</p>
+<ul>
+<li>&ldquo;value&rdquo;: the integer value of the enumerator constant</li>
+</ul>
+<h2 id="member_function">Function-specific fields</h2>
+<p>If the member is a function, it additionally has the following fields:</p>
+<ul>
+<li>&ldquo;templated&rdquo;: <code>true</code> if this is a function template</li>
+<li>&ldquo;constexpr&rdquo;: <code>true</code> if this is a <code>constexpr</code> function</li>
+<li>&ldquo;noexcept&rdquo;: <code>true</code> if the function is marked <code>noexcept</code></li>
+<li>&ldquo;return_type&rdquo;: the function&rsquo;s return type, see <a href="members.html#member_type_dictionary">The type dictionary</a></li>
+<li><a href="members.html#member_function_arguments">&ldquo;arguments&rdquo;</a>: the function&rsquo;s arguments</li>
+</ul>
+<p>For constructors, destructors and conversion functions (see the field &ldquo;method_type&rdquo;), &ldquo;return_type&rdquo; is empty.</p>
+<h3 id="member_function_arguments">&ldquo;arguments&rdquo;</h3>
 <p>A list of dictionaries listing the input arguments. It contains the standard &ldquo;type&rdquo; fields
-(see below under &ldquo;The type dictionary&rdquo;) as well as the following fields:
-- <code>"name"</code> (string): The name of the argument.
-- <code>"default"</code> (string): The default value for the argument.</p>
-<h3>function-specific fields, if class or struct member</h3>
+(see <a href="members.html#member_type_dictionary">The type dictionary</a>) as well as the following fields:</p>
+<ul>
+<li>&ldquo;name&rdquo;: the name of the argument</li>
+<li>&ldquo;default&rdquo;: the default value for the argument (as a string)</li>
+</ul>
+<h2 id="member_function_member">Function-specific fields, if class or struct member</h2>
 <p>If the function is a class or struct member, it additionally has the following fields:</p>
-<h4>&ldquo;static&rdquo; (boolean)</h4>
-<p><code>true</code> or <code>false</code> depending on if the function is declared static or not.</p>
-<h4>&ldquo;virtual&rdquo; (boolean)</h4>
-<p><code>true</code> or <code>false</code> depending on if the function is declared virtual or not.</p>
-<h4>&ldquo;pure_virtual&rdquo; (boolean)</h4>
-<p><code>true</code> or <code>false</code> depending on if the function is pure virtual or not.</p>
-<h4>&ldquo;final&rdquo; (boolean)</h4>
-<p><code>true</code> or <code>false</code> depending on if the function is marked <code>final</code>.</p>
-<h4>&ldquo;override&rdquo; (boolean)</h4>
-<p><code>true</code> or <code>false</code> depending on if the function is marked <code>override</code>.</p>
-<h4>&ldquo;const&rdquo; (boolean)</h4>
-<p><code>true</code> or <code>false</code> depending on if the function is declared const or not.</p>
-<h4>&ldquo;access&rdquo; (string)</h4>
-<p>Set to a string <code>"public"</code>, <code>"protected"</code> or <code>"private"</code>.</p>
-<h4>&ldquo;method_type&rdquo; (string)</h4>
-<p>Set to a string <code>"method"</code>, <code>"conversionfunction"</code>, <code>"assignmentoperator"</code>, <code>"constructor"</code> or <code>"destructor"</code>.</p>
-<h4>&ldquo;explicit&rdquo; (boolean)</h4>
-<p><code>true</code> or <code>false</code> depending on if the function is marked <code>explicit</code>.
-Exists only if <code>"method_type"</code> is either <code>"conversionfunction"</code> or <code>"constructor"</code>.</p>
-<h3>macro-specific fields</h3>
+<ul>
+<li>&ldquo;static&rdquo;: <code>true</code> or <code>false</code> depending on if the function is declared static or not</li>
+<li>&ldquo;virtual&rdquo;: <code>true</code> or <code>false</code> depending on if the function is declared virtual or not</li>
+<li>&ldquo;pure_virtual&rdquo;: <code>true</code> or <code>false</code> depending on if the function is pure virtual or not</li>
+<li>&ldquo;final&rdquo;: <code>true</code> or <code>false</code> depending on if the function is marked <code>final</code></li>
+<li>&ldquo;override&rdquo;: <code>true</code> or <code>false</code> depending on if the function is marked <code>override</code></li>
+<li>&ldquo;const&rdquo;: <code>true</code> or <code>false</code> depending on if the function is declared const or not</li>
+<li>&ldquo;access&rdquo;: set to a string <code>"public"</code>, <code>"protected"</code> or <code>"private"</code></li>
+<li>&ldquo;method_type&rdquo;: set to a string <code>"method"</code>, <code>"conversionfunction"</code>, <code>"assignmentoperator"</code>,
+  <code>"constructor"</code> or <code>"destructor"</code></li>
+<li>&ldquo;explicit&rdquo;: <code>true</code> or <code>false</code> depending on if the function is marked <code>explicit</code>
+  (exists only if &ldquo;method_type&rdquo; is either <code>"conversionfunction"</code> or <code>"constructor"</code>)</li>
+</ul>
+<h2 id="member_macro">Macro-specific fields</h2>
+<p>If the member is a macro, it additionally has the following field:</p>
+<ul>
+<li>&ldquo;macro_params&rdquo;: list of strings containing macro parameters, if given</li>
+</ul>
 <p>For a macro, the <code>"parent"</code> field is always the empty string.</p>
-<h4>&ldquo;macro_params&rdquo; (list)</h4>
-<p>List of strings containing macro parameters, if given.</p>
-<h3>namespace-specific fields</h3>
-<h4>&ldquo;inline&rdquo; (boolean)</h4>
-<p><code>true</code> for inline namespaces.</p>
-<h4>&ldquo;members&rdquo; (list)</h4>
-<p>The list of dictionaries for the child members.</p>
-<h3>union-specific fields</h3>
-<h4>&ldquo;templated&rdquo; (boolean)</h4>
-<p><code>true</code> if this is a union template.</p>
-<h4>&ldquo;members&rdquo; (list)</h4>
-<p>The list of dictionaries for the child members.</p>
-<h4>&ldquo;related&rdquo; (list)</h4>
-<p>A list of strings, the IDs of related members. These are not child members, but are related
-to the union and their documentation could be shown together with that of the union&rsquo;s members.</p>
-<h3>variable-specific fields</h3>
-<h4>&ldquo;type&rdquo; (dictionary)</h4>
-<p>The variable&rsquo;s type. See below under &ldquo;The type dictionary&rdquo;.</p>
-<h4>&ldquo;static&rdquo; (boolean)</h4>
-<p><code>true</code> or <code>false</code> depending on if the variable is declared static or not.</p>
-<h4>&ldquo;constexpr&rdquo; (boolean)</h4>
-<p><code>true</code> if this is a <code>constexpr</code> value.</p>
-<h3>variable-specific fields, if class, struct or union member</h3>
+<h2 id="member_namespace">Namespace-specific fields</h2>
+<p>If the member is a namespace, it additionally has the following fields:</p>
+<ul>
+<li>&ldquo;inline&rdquo;: <code>true</code> for inline namespaces</li>
+<li>&ldquo;members&rdquo;: a list of dictionaries for the child members</li>
+</ul>
+<p>Child members can be anything except macros.</p>
+<h2 id="member_union">Union-specific fields</h2>
+<p>If the member is a union, it additionally has the following fields:</p>
+<ul>
+<li>&ldquo;templated&rdquo;: <code>true</code> if this is a union template.</li>
+<li>&ldquo;members&rdquo;: a list of dictionaries for the child members</li>
+<li><a href="members.html#member_class_related">&ldquo;related&rdquo;</a>: a list of strings, the IDs of related members</li>
+</ul>
+<p>The &ldquo;members&rdquo; list contains dictionaries of members. These members can be of type
+alias, enum, function, variable, class, struct or union.</p>
+<h2 id="member_variable">Variable-specific fields</h2>
+<p>If the member is a variable, it additionally has the following field:</p>
+<ul>
+<li>&ldquo;type&rdquo;: the variable&rsquo;s type, see <a href="members.html#member_type_dictionary">The type dictionary</a></li>
+<li>&ldquo;static&rdquo;: <code>true</code> or <code>false</code> depending on if the variable is declared <code>static</code> or not</li>
+<li>&ldquo;constexpr&rdquo;: <code>true</code> if this is a <code>constexpr</code> value</li>
+</ul>
+<h2 id="member_variable_field">Variable-specific fields, if class, struct or union member</h2>
 <p>If the variable is a class or struct or union member, it additionally has the following fields:</p>
-<h4>&ldquo;mutable&rdquo; (boolean)</h4>
-<p><code>true</code> or <code>false</code> depending on if the member is declared mutable or not.</p>
-<h4>&ldquo;access&rdquo;</h4>
-<p>Set to a string <code>"public"</code>, <code>"protected"</code> or <code>"private"</code>.</p>
-<h3>variable-specific fields, if bitfield</h3>
+<ul>
+<li>&ldquo;mutable&rdquo;: <code>true</code> or <code>false</code> depending on if the member is declared <code>mutable</code> or not</li>
+<li>&ldquo;access&rdquo;: set to a string <code>"public"</code>, <code>"protected"</code> or <code>"private"</code></li>
+</ul>
+<h2 id="member_variable_bitfield">variable-specific fields, if bitfield</h2>
 <p>If the variable is a bitfield, it additionally has the following field:</p>
-<h4>&ldquo;width&rdquo; (integer)</h4>
-<p>The bitfield width.</p>
-<h3>template-specific fields</h3>
+<ul>
+<li>&ldquo;width&rdquo;: The bitfield width (an integer)</li>
+</ul>
+<h2 id="member_template">Template-specific fields</h2>
 <p>For members that are a class template, struct template, union template, function template or alias template,
 the following field is additionally present:</p>
-<h4>&ldquo;template_parameters&rdquo; (list)</h4>
-<p>A list of dictionaries, one for each template parameter. It contains the following
-fields:
-- <code>"name"</code> (string): name of template parameter.
-- <code>"type"</code>: Type of template parameter: <code>"type"</code> or a dictionary encoding
-  the type in case of a non-type template parameter, see below under &ldquo;The type dictionary&rdquo;.
-- <code>"default"</code>: A type dictionary for type parameters, a string for non-type parameters,
-  or <code>null</code> (translates to <code>None</code> in Python) if no default is given.</p>
-<p>For example, for <code>template&lt;typename A&gt;</code>, <code>"type"</code> will be equal to <code>"type"</code>, whereas
-for <code>template&lt;int A&gt;</code>, <code>"type"</code> will be <code>"int"</code>.</p>
-<h3>The type dictionary</h3>
-<p>Types are encoded as a dictionary with the following fields:
-- <code>"typename"</code> (string): name of the type.
-- <code>"id"</code> (string): ID of the type, if declared in the project being documented.
-- <code>"qualifiers"</code> (string): qualifiers.</p>
-<p>The type could be rendered in Markdown as follows: <code>[typename](#id) qualifiers</code>.</p>
-<p>If the type represents a function prototype, <code>"typename"</code> is a full representation,
-but the dictionary will additionally contain the following fields:
-- <code>"retval"</code>: Type dictionary for the function&rsquo;s return value
-- <code>"arguments"</code>: List of type dictionaries for the function arguments</p>
-        <div class="m-note m-dim m-thin m-text-center"><a href="json_output.html" class="m-doc">&laquo; JSON output of <strong>dox++parse</strong></a> | <a href="documentation.html" class="m-doc">Documentation</a></div>
+<ul>
+<li><a href="members.html#member_template_parameters">&ldquo;template_parameters&rdquo;</a></li>
+</ul>
+<h3 id="member_template_parameters">&ldquo;template_parameters&rdquo;</h3>
+<p>A list of dictionaries, one for each template parameter. Each of these dictionaries
+contains the following fields:</p>
+<ul>
+<li><code>"name"</code>: name of template parameter</li>
+<li><code>"type"</code>: type of template parameter: the string <code>"type"</code>, or a dictionary encoding
+  the type in case of a non-type template parameter, see <a href="members.html#member_type_dictionary">The type dictionary</a></li>
+<li><code>"default"</code>: a type dictionary for type parameters, a string for non-type parameters,
+  or <code>null</code> (translates to <code>None</code> in Python) if no default is given</li>
+</ul>
+<p>For example, for <code>template&lt;typename A&gt;</code>, &ldquo;type&rdquo; will be equal to <code>"type"</code>, whereas
+for <code>template&lt;int A&gt;</code>, &ldquo;type&rdquo; will be a dictionary <code>{"typename": "int", "id": "", "qualifiers": ""}</code>.</p>
+<h2 id="member_type_dictionary">The type dictionary</h2>
+<p>Types are encoded as a dictionary with the following fields:</p>
+<ul>
+<li>&ldquo;typename&rdquo;: name of the type</li>
+<li>&ldquo;id&rdquo;: ID of the type, if declared in the project being documented</li>
+<li>&ldquo;qualifiers&rdquo;: qualifiers (as a string)</li>
+</ul>
+<p>The type could be rendered in Markdown as follows: <code>[&lt;typename&gt;](#&lt;id&gt;) &lt;qualifiers&gt;</code>.</p>
+<p>If the type represents a function prototype, &ldquo;typename&rdquo; is a full representation,
+but the dictionary will additionally contain the following fields:</p>
+<ul>
+<li>&ldquo;retval&rdquo;: type dictionary for the function&rsquo;s return value</li>
+<li>&ldquo;arguments&rdquo;: list of type dictionaries for the function arguments</li>
+</ul>
+        <div class="m-note m-dim m-thin m-text-center"><a href="json_output.html" class="m-doc">JSON output of <strong>dox++parse</strong></a></div>
       </div>
     </div>
   </div>

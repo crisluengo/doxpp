@@ -1788,6 +1788,7 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                 member['type'] = process_type(item.underlying_typedef_type, item)
                 process_children = is_template
             elif member_type == 'union':
+                # TODO: How about anonymous unions?
                 if not item.is_definition():
                     # This is a forward declaration, let's skip it
                     continue

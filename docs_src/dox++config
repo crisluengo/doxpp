@@ -21,11 +21,11 @@ url = https://crisluengo.github.io/doxpp
 
 [html]
 output directory = ../docs
-theme color = #22272e
+theme color = #cb4b16
 favicon = 
 stylesheets = css/m-light-documentation.compiled.css
-navigation bar 1 = [('','#documentation',[('','#documenting_code',[]),('','#configuration',[]),('','#running_the_tools',[]),('','#json_output',[])])]
-navigation bar 2 = [('example site','example/index.html',[])]
+navigation bar 1 = [('','#documentation',[('','#documenting_code',[]),('','#commands',[]),('','#markdown',[]),('','#configuration',[]),('','#running_the_tools',[])])]
+navigation bar 2 = [('example site','example/index.html',[]),('GitHub','https://github.com/crisluengo/doxpp',[])]
 
 [search]
 enable = yes

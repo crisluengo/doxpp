@@ -314,7 +314,7 @@ is rendered as
 
 \section markdown_boxes Boxes
 
-Boxes can be generated using the "admonition" syntax from rST (implemented here through the
+Boxes can be generated using the "admonition" syntax from reST (implemented here through the
 [admonition](https://python-markdown.github.io/extensions/admonition/) extension).
 ```text
 !!! note "Box title"

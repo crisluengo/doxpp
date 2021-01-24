@@ -34,7 +34,7 @@ The biggest changes to these templates are:
 - Renamed details-func.html -> details-function.html and entry-func.html -> entry-function.html
 - Renamed details-typedef.html -> details-alias.html and entry-typedef.html -> entry-alias.html
 - Renamed details-var.html -> details-variable.html and entry-var.html -> entry-variable.html
-- ... and of course some changes to the templates themselves.
+- Lots of changes, big and small, to the templates themselves.
 
 ---
 

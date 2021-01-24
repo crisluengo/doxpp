@@ -65,6 +65,13 @@ line breaks, indent subsequent lines to indicate continuation. Lines starting wi
 or a hash (`#`) are ignored. Keys are grouped into sections, indicated with `[name]`. These
 sections are relevant, a key with the same name in a different section is not the same option.
 
+!!! note
+    All paths are relative to the current directory at the time of running the tools, not relative
+    to the configuration file's directory or to the \ref config_input_rootdirectory option
+    (of course absolute paths can be used as well).
+
+    Directory names or file names with spaces in them must be enclosed in double quotes.
+
 \section config_section_clang Section clang
 
 Options to configure Clang.
@@ -106,9 +113,7 @@ will be shown in the documentation relative to this directory.
 
 \subsection config_input_headerfiles header files
 List of header file names to parse for documentation. Separate names
-with a space, enclose names with spaces in quotes. Names can contain wildcards. Paths
-are relative to the current directory at the time of running the tools, not relative
-to the configuration file's directory or to the **root directory** option.
+with a space, enclose names with spaces in quotes. Names can contain wildcards.
 
 \subsection config_input_markdownfiles markdown files
 List of Markdown files with additional documentation, provided in the
@@ -126,9 +131,7 @@ This does not affect the Markdown parsing, which always assumes 4 spaces indenta
 Options to configure the intermediate JSON file.
 
 \subsection config_json_filename filename
-Name of the intermediate JSON file. Defaults to `dox++out.json`. The path
-given is relative to the current directory at the time of running **dox++parse** or
-**dox++html**, not relative to the directory containing the configuration file.
+Name of the intermediate JSON file. Defaults to `dox++out.json`.
 
 \subsection config_json_usetypewriterfont use typewriter font
 'yes' or 'no' (defaults to 'no'),
@@ -191,14 +194,14 @@ those are not reported by **dox++parse** if they're not explicitly documented).
 If 'no', undocumented members that have documented child members will still be shown.
 
 \subsection config_html_modifyincludestatement modify include statement
-A Python function to modify include statements. The default is
+A Python function to modify include statements. The input to the function is the ID of the include file,
+the output is the ID for the include file to report instead. The default is
 a no-op function:
 ```ini
 modify include statement = def modify_include_statement(id): return id
 ```
-The input to the function is the ID of the include file, the output is the ID for the
-include file to report instead.
-The DIPlib project uses the following function:
+
+For example, the DIPlib project uses the following function:
 ```ini
 modify include statement = def modify_include_statement(id): return 'file--diplib-h' if id.startswith('file--diplib--library--') else id
 ```
@@ -214,43 +217,80 @@ shown to declare a lot of library functionality, which might be misleading.
 
 \subsection config_html_themecolor theme color
 '#hhhhhh'. The 6-digit hexadecimal representation of a color, sets the
-`<meta name="theme-color">` tag in the header of each HTML file. Defaults to '#22272e'.
+`<meta name="theme-color">` tag in the header of each HTML file. Defaults to '#cb4b16'.
 
 \subsection config_html_favicon favicon
 Name of icon file. Sets the `<link rel="icon">` tag in the header of each HTML file.
+If empty (the default), uses the default `html_templates/favicon-light.png` (in the `doxpp` directory).
 
 \subsection config_html_stylesheets stylesheets
+Style sheets to use instead of the default ones (separate multiple files with spaces).
+except if it is one of the two default CSS files:
 
+- `css/m-light-documentation.compiled.css`
+- `css/m-dark-documentation.compiled.css`.
+
+If empty (the default), `css/m-light-documentation.compiled.css` is used.
 
 \subsection config_html_templates templates
+Path to templates to use instead of the default ones. The default templates are used
+as fallback. Thus, you can copy and modify only one or a few of the templates, and give
+the directory containing these modified copies here. The missing templates will be
+taken from the default location.
 
 \subsection config_html_documentationlinkclass documentation link class
-Defaults to 'm-doc'.
+CSS class to add to links to documented members. Defaults to 'm-doc', and should match
+the class used in the templates.
 
 \subsection config_html_extrafiles extra files
+Additional files to copy to output directory, separate multiple names with spaces.
+The files given in the \ref config_html_favicon and \ref config_html_stylesheets options
+are always copied. List here files referenced in your customized templates and stylesheets.
 
 \subsection config_html_htmlheader html header
+HTML code to add to the `<head>` section of each HTML page.
 
 \subsection config_html_pageheader page header
+HTML code to add to the top of each page.
 
 \subsection config_html_fineprint fine print
-Defaults to: `[default]`.
+Text to use at the bottom of each page. If empty, no footer will be produced.
+Defaults to `[default]`, which inserts the default footer.
 
 \subsection config_html_navigationbar1 navigation bar 1
+Items to add to the first navigation bar. This is interpreted as a Python expression.
+The expression must evaluate to a list of tuples `(<name>, <URL>, <submenu>)`,
+with `<name>` the name shown, `<URL>` the URL that the item links to, and `<submenu>` a
+list of tuples `(<name>, <URL>, [])` defining the submenu. Only one level of submenus
+is supported.
+
+If `<URL>` starts with `#`, it is interpreted as the ID of the documented element to
+link to. Besides the explicitly documented elements, IDs `pages`, `modules`, `namespaces`,
+`classes` and `files` can be used. These reference the corresponding index pages.
+The page created with `\mainpage` has ID `index`.
+
+If `<name>` is empty, and `<URL>` is `#<ID>`, then the element's name or title will
+be shown in the menu.
+
+This can be an empty list to not display the first navigtation bar.
+
 Defaults to: `[('', '#pages', []),('', '#modules', []),('', '#namespaces', [])]`.
 
 \subsection config_html_navigationbar2 navigation bar 2
+Same as \ref config_html_navigationbar1, for the second navigation bar.
 Defaults to: `[('', '#classes', []),('', '#files', [])]`.
 
 \subsection config_html_fileindexexpandlevels file index expand levels
-Defaults to '1'.
+How many levels of the file tree to expand. 0 means only the top-level dirs/files are shown.
+Defaults to 1.
 
 \subsection config_html_classindexexpandlevels class index expand levels
-Defaults to '1'.
+How many levels of the class tree to expand. 0 means only the top-level symbols are shown.
+Defaults to 1.
 
 \subsection config_classindexexpandinner class index expand inner
 'yes' or 'no' (default).
-
+Whether to expand inner types (i.e. a class inside a class) in the symbol tree.
 
 \section config_section_search Section search
 
@@ -262,7 +302,7 @@ Options to configure the search functionality on the generated website.
 \subsection config_search_downloadbinary download binary
 'yes' or 'no' (default). If 'yes', the client automatically downloads a tightly
 packed binary containing search data and performs search directly on it. However, in some
-browsers (Chormium, Safari) this does not work when reading from a local file system
+browsers (Chromium, Safari) this does not work when reading from a local file system
 (i.e. when you're testing your site before deployment). For this case, set the option to 'no'.
 This creates a base85-encoded representation of the search binary, which can be loaded asynchronously
 as a plain JavaScript file. The search data will be 25% larger. Set to 'yes' for deployment.

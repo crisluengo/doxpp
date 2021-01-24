@@ -1,5 +1,5 @@
-The css theme (everything in this directory) is taken unmodified
-from [m.css](https://mcss.mosra.cz/).
+The css theme (everything in this directory) is taken from
+[m.css](https://mcss.mosra.cz/) with small changes.
 
 ---
 

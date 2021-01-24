@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Documentation &raquo; Markdown markup | dox++ | Documentation preparation system for C++</title>
+  <title>Documentation &raquo; How to document your code &raquo; Markdown markup | dox++ | Documentation preparation system for C++</title>
   <link rel="stylesheet" href="m-light-documentation.compiled.css" />
   <link rel="icon" href="favicon-light.png" type="image/png" />
   <link rel="search" type="application/opensearchdescription+xml" href="opensearch.xml" title="Search dox++ documentation" />
   <link rel="prev" href="grouping.html" />
-  <link rel="next" href="running_the_tools.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#22272e" />
+  <meta name="theme-color" content="#cb4b16" />
 </head>
 <body>
 <header><nav id="navigation">
@@ -31,14 +30,16 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
+                <li><a href="commands.html">Documentation commands</a></li>
+                <li><a href="markdown.html" id="m-navbar-current">Markdown markup</a></li>
                 <li><a href="configuration.html">Configuring the <strong>dox++</strong> tools</a></li>
                 <li><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
-                <li><a href="json_output.html">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
             </li>
           </ol>
           <ol class="m-col-t-6 m-col-m-none" start="2">
             <li><a href="example/index.html">example site</a></li>
+            <li><a href="https://github.com/crisluengo/doxpp">GitHub</a></li>
             <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
               <use href="#m-doc-search-icon-path" />
             </svg></a></li>
@@ -54,6 +55,7 @@
       <div class="m-col-l-10 m-push-l-1">
         <h1>
           <span class="m-breadcrumb"><a href="documentation.html">Documentation</a> &raquo;</span>
+          <span class="m-breadcrumb"><a href="documenting_code.html">How to document your code</a> &raquo;</span>
           Markdown markup
         </h1>
         <div class="m-block m-default">
@@ -471,7 +473,7 @@ Content Cell  | Content Cell  | Content Cell
 </table>
 </aside>
 <h2 id="markdown_boxes">Boxes</h2>
-<p>Boxes can be generated using the &ldquo;admonition&rdquo; syntax from rST (implemented here through the
+<p>Boxes can be generated using the &ldquo;admonition&rdquo; syntax from reST (implemented here through the
 <a href="https://python-markdown.github.io/extensions/admonition/">admonition</a> extension).</p>
 <div class="m-code"><pre><span></span>!!! note &quot;Box title&quot;
     Paragraph 1
@@ -759,7 +761,7 @@ cells of a table, not the table itself, this is the only way to add special styl
 to a whole table. It is also the only way to add special styling to lists.</p>
 <p>Examine the CSS style sheets as well as the generated HTML to learn what classes exist.
 You can modify the default CSS style sheets as well, see <a href="configuration.html">Configuring the <strong>dox++</strong> tools</a>.</p>
-        <div class="m-note m-dim m-thin m-text-center"><a href="grouping.html" class="m-doc">&laquo; Grouping</a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="running_the_tools.html" class="m-doc">Running <strong>dox++parse</strong> and <strong>dox++html</strong> &raquo;</a></div>
+        <div class="m-note m-dim m-thin m-text-center"><a href="grouping.html" class="m-doc">&laquo; Grouping</a> | <a href="documenting_code.html" class="m-doc">How to document your code</a></div>
       </div>
     </div>
   </div>

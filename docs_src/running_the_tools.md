@@ -26,3 +26,5 @@ dox++html [<config_file>]
 ```
 will create the website.
 
+!!! m-default m-block "Subpages"
+    - \subpage configuration

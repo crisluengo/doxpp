@@ -7,7 +7,7 @@
   <link rel="icon" href="favicon-light.png" type="image/png" />
   <link rel="search" type="application/opensearchdescription+xml" href="opensearch.xml" title="Search dox++ documentation" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#22272e" />
+  <meta name="theme-color" content="#cb4b16" />
 </head>
 <body>
 <header><nav id="navigation">
@@ -29,14 +29,16 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
+                <li><a href="commands.html">Documentation commands</a></li>
+                <li><a href="markdown.html">Markdown markup</a></li>
                 <li><a href="configuration.html">Configuring the <strong>dox++</strong> tools</a></li>
                 <li><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
-                <li><a href="json_output.html">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
             </li>
           </ol>
           <ol class="m-col-t-6 m-col-m-none" start="2">
             <li><a href="example/index.html">example site</a></li>
+            <li><a href="https://github.com/crisluengo/doxpp">GitHub</a></li>
             <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
               <use href="#m-doc-search-icon-path" />
             </svg></a></li>
@@ -66,7 +68,7 @@
 </ul>
 </aside>
 <aside class="m-note m-info">
-<p><a href="https://github.com/crisluengo/doxpp">Fork it on GitHub</a></p>
+<p class="m-text-center"><a href="https://github.com/crisluengo/doxpp">Fork it on GitHub</a></p>
 </aside>
 <h2>Examples</h2>
 <ul>
@@ -99,11 +101,15 @@ all the information needed to produce documentation. It contains documentation f
 namespaces, classes, functions, variables, etc., even those without explicit documentation
 blocks. It contains documentation for each header file and for each group, and it contains
 additional pages. It links references to members across the project.
-Typesetting, creating indices, etc. is left to the generator, which keeps the program simple.</p>
+Typesetting, creating indices, etc. is left to the generator, which keeps the program simple.
+This is equivalent to running Doxygen with XML output, with the intention of using a 3rd
+party tool to turn that XML into user-browsable content. Do however note the
+<a href="doxygen_differences.html">Differences with Doxygen</a>.</p>
 <p><strong>dox++html</strong> produces a series of HTML files documenting the project, using the
 JSON created by <strong>dox++parse</strong>. The generated HTML is based on <a href="https://mcss.mosra.cz/">m.css</a>,
 and its fantastic Doxygen C++ theme, by Vladimír Vondruš. It is all static HTML5 with
-customizable CSS, and wonderful client-side search functionality that uses JavaScript.</p>
+customizable CSS, and wonderful client-side search functionality that uses JavaScript.
+The output has some differences with m.css, see <a href="mcss_differences.html">Differences with m.css</a>.</p>
 <p>Other generators are considered.</p>
 <p>See the <a href="documentation.html">Documentation</a> to learn how to use these tools.</p>
 <h2>What is missing</h2>
@@ -126,6 +132,9 @@ that I am aware of:</p>
 <li>
 <p>References to a member that is injected into a different namespace it was declared in are not
    resolved (e.g. through a <code>using</code> statement, or members of an anonymous or inline namespace).</p>
+</li>
+<li>
+<p>Anonymous unions are not yet recognized.</p>
 </li>
 <li>
 <p>Clang doesn&rsquo;t easily report on pre-processor macros. Instead of making things complicated,

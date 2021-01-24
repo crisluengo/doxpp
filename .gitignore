@@ -2,4 +2,4 @@ __pycache__
 *.pyc
 .idea
 example/transport.json
-docsrc/dox++out.json
+docs_src/dox++out.json

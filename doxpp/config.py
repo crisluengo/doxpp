@@ -19,21 +19,21 @@ import configparser
 
 default_config_values = {
     'clang': {
-        'compiler flags': '',         # could be '-std=c++11', for example
-        'include directories': '',    # make these space-separated
+        'compiler flags': '',
+        'include directories': '',
     },
     'log': {
         'level': 'warning',           # 'error', 'warning', 'info' or 'debug'
     },
     'input': {
-        'root directory': '.',        # the include path recorded for header files will be relative to this
-        'header files': '*.h *.hpp',  # do give a path here, relative to working directory, for example: '*.h lib/*.h'
-        'markdown files': '*.md',     # additional files to read
-        'tab size': '4'               # size of a TAB character
+        'root directory': '.',
+        'header files': '*.h *.hpp',
+        'markdown files': '*.md',
+        'tab size': '4'
     },
     'json': {
         'filename': 'dox++out.json',
-        'use typewriter font': 'no',  # 'yes' or 'no', the Markdown output uses backticks (code formatting) around type names
+        'use typewriter font': 'no',
         'formatting': 'compact'       # 'compact' or 'readable'
     },
     'project': {
@@ -43,21 +43,21 @@ default_config_values = {
         'logo': ''
     },
     'html': {
-        'output directory' : 'html',  # relative path to where the HTML output is generated
+        'output directory' : 'html',
         'document private virtual members': 'yes',
         'document private non-virtual members': 'yes',
         'document protected members': 'yes',
         'document undocumented members': 'no',
         'modify include statement': 'def modify_include_statement(id): return id',
-        'theme color': '#22272e',
-        'favicon': '',                # favicon to use instead of the default one
-        'stylesheets': '',            # style sheets to use instead of the default ones (separate multiple files with spaces)
-        'templates': '',              # relative path to templates to use instead of the default ones
-        'documentation link class': 'm-doc',  # CSS name of class used in templates for styling links to documented members
-        'extra files': '',            # additional files to copy to output directory (separate multiple files with spaces)
-        'html header': '',            # HTML code to add to the <head> section of each HTML page
-        'page header': '',            # HTML code to add to the top of each page
-        'fine print': '[default]',    # text to use at the bottom of each page, leave empty for no footer
+        'theme color': '#cb4b16',
+        'favicon': '',
+        'stylesheets': '',
+        'templates': '',
+        'documentation link class': 'm-doc',
+        'extra files': '',
+        'html header': '',
+        'page header': '',
+        'fine print': '[default]',
         'navigation bar 1': "[('', '#pages', []),('', '#modules', []),('', '#namespaces', [])]",
         'navigation bar 2': "[('', '#classes', []),('', '#files', [])]",
         'file index expand levels': '1',
@@ -66,11 +66,11 @@ default_config_values = {
     },
     'search': {
         'enable': 'yes',
-        'download binary': 'no',  # Set to False for browsing HTML from the local file system. Set to True for deployment to server (fewer bytes).
+        'download binary': 'no',
         'base URL': '',
         'external URL': '',
-        'add snake case suffixes': 'yes',  # Turn off if this creates too many symbols in the search table
-        'add camel case suffixes': 'yes'   # Turn off if this creates too many symbols in the search table
+        'add snake case suffixes': 'yes',
+        'add camel case suffixes': 'yes'
     }
 }
 

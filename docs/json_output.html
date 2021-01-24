@@ -6,10 +6,9 @@
   <link rel="stylesheet" href="m-light-documentation.compiled.css" />
   <link rel="icon" href="favicon-light.png" type="image/png" />
   <link rel="search" type="application/opensearchdescription+xml" href="opensearch.xml" title="Search dox++ documentation" />
-  <link rel="prev" href="configuration.html" />
-  <link rel="next" href="members.html" />
+  <link rel="prev" href="running_the_tools.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#22272e" />
+  <meta name="theme-color" content="#cb4b16" />
 </head>
 <body>
 <header><nav id="navigation">
@@ -31,14 +30,16 @@
               <a href="documentation.html">Documentation</a>
               <ol>
                 <li><a href="documenting_code.html">How to document your code</a></li>
+                <li><a href="commands.html">Documentation commands</a></li>
+                <li><a href="markdown.html">Markdown markup</a></li>
                 <li><a href="configuration.html">Configuring the <strong>dox++</strong> tools</a></li>
                 <li><a href="running_the_tools.html">Running <strong>dox++parse</strong> and <strong>dox++html</strong></a></li>
-                <li><a href="json_output.html" id="m-navbar-current">JSON output of <strong>dox++parse</strong></a></li>
               </ol>
             </li>
           </ol>
           <ol class="m-col-t-6 m-col-m-none" start="2">
             <li><a href="example/index.html">example site</a></li>
+            <li><a href="https://github.com/crisluengo/doxpp">GitHub</a></li>
             <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
               <use href="#m-doc-search-icon-path" />
             </svg></a></li>
@@ -56,99 +57,104 @@
           <span class="m-breadcrumb"><a href="documentation.html">Documentation</a> &raquo;</span>
           JSON output of <strong>dox++parse</strong>
         </h1>
-<p><strong>TODO:</strong> This page still needs to be formatted correctly.</p>
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li><a href="#json_output_members">&ldquo;members&rdquo;</a></li>
+            <li>
+              <a href="#json_output_headers">&ldquo;headers&rdquo;</a>
+              <ul>
+                <li><a href="#json_output_includes">&ldquo;includes&rdquo;</a></li>
+              </ul>
+            </li>
+            <li><a href="#json_output_groups">&ldquo;groups&rdquo;</a></li>
+            <li><a href="#json_output_pages">&ldquo;pages&rdquo;</a></li>
+            <li>
+              <a href="#json_output_common_fields">Fields common to all elements</a>
+              <ul>
+                <li><a href="#json_output_brief_doc">&ldquo;brief&rdquo; and &ldquo;doc&rdquo;</a></li>
+                <li><a href="#json_output_anchors">&ldquo;anchors&rdquo;</a></li>
+                <li><a href="#json_output_sections">&ldquo;sections&rdquo;</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
 <p>The <strong>dox++parse</strong> program outputs a single JSON file, which should be easy to convert into any representation
-the user desires. The JSON file has the following format:</p>
-<div class="m-code"><pre><span></span><span class="p">{</span>
-   <span class="nt">&quot;members&quot;</span><span class="p">:</span> <span class="p">[],</span>
-   <span class="nt">&quot;headers&quot;</span><span class="p">:</span> <span class="p">[],</span>
-   <span class="nt">&quot;groups&quot;</span><span class="p">:</span> <span class="p">[],</span>
-   <span class="nt">&quot;pages&quot;</span><span class="p">:</span> <span class="p">[]</span>
-<span class="p">}</span>
-</pre></div>
-
-<h3>&ldquo;members&rdquo;</h3>
-<p>This is a list of everything that is defined at the global scope. Members are listed in order
-in which they were found in the header file. Each <code>members[i]</code> is a dictionary as follows:</p>
-<div class="m-code"><pre><span></span><span class="p">{</span>
-   <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>             <span class="err">#</span> <span class="kc">t</span><span class="err">his</span> <span class="err">is</span> <span class="err">a</span> <span class="err">u</span><span class="kc">n</span><span class="err">ique</span> <span class="err">ide</span><span class="kc">nt</span><span class="err">i</span><span class="kc">f</span><span class="err">ier</span> <span class="err">used</span> <span class="kc">f</span><span class="err">or</span> <span class="err">re</span><span class="kc">feren</span><span class="err">ci</span><span class="kc">n</span><span class="err">g</span>
-   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>           <span class="err">#</span> <span class="kc">na</span><span class="err">me</span> <span class="err">o</span><span class="kc">f</span> <span class="kc">t</span><span class="err">he</span> <span class="err">member</span>
-   <span class="nt">&quot;brief&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>          <span class="err">#</span> <span class="err">brie</span><span class="kc">f</span> <span class="err">descrip</span><span class="kc">t</span><span class="err">io</span><span class="kc">n</span><span class="p">,</span> <span class="err">i</span><span class="kc">n</span> <span class="err">Markdow</span><span class="kc">n</span>
-   <span class="nt">&quot;doc&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>            <span class="err">#</span> <span class="kc">full</span> <span class="err">docume</span><span class="kc">ntat</span><span class="err">io</span><span class="kc">n</span><span class="p">,</span> <span class="err">i</span><span class="kc">n</span> <span class="err">Markdow</span><span class="kc">n</span>
-   <span class="nt">&quot;sections&quot;</span><span class="p">:</span> <span class="p">[],</span>       <span class="err">#</span> <span class="err">(ID</span><span class="p">,</span> <span class="kc">t</span><span class="err">i</span><span class="kc">tle</span><span class="p">,</span> <span class="err">level)</span> <span class="kc">f</span><span class="err">or</span> <span class="err">sec</span><span class="kc">t</span><span class="err">io</span><span class="kc">ns</span> <span class="err">i</span><span class="kc">n</span> <span class="nt">&quot;doc&quot;</span>
-   <span class="nt">&quot;anchors&quot;</span><span class="p">:</span> <span class="p">[],</span>        <span class="err">#</span> <span class="err">IDs</span> <span class="err">o</span><span class="kc">f</span> <span class="err">a</span><span class="kc">n</span><span class="err">chors</span> <span class="err">i</span><span class="kc">n</span> <span class="nt">&quot;doc&quot;</span>
-   <span class="nt">&quot;member_type&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>    <span class="err">#</span> <span class="err">class/</span><span class="kc">fun</span><span class="err">c</span><span class="kc">t</span><span class="err">io</span><span class="kc">n</span><span class="err">/e</span><span class="kc">nu</span><span class="err">m/variable/de</span><span class="kc">f</span><span class="err">i</span><span class="kc">ne</span><span class="err">/</span><span class="kc">na</span><span class="err">mespace/e</span><span class="kc">t</span><span class="err">c.</span>
-   <span class="nt">&quot;parent&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>         <span class="err">#</span> <span class="err">ID</span> <span class="err">o</span><span class="kc">f</span> <span class="err">pare</span><span class="kc">nt</span> <span class="err">member</span>
-   <span class="nt">&quot;header&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>         <span class="err">#</span> <span class="err">ID</span> <span class="err">o</span><span class="kc">f</span> <span class="kc">t</span><span class="err">he</span> <span class="err">header</span> <span class="kc">f</span><span class="err">ile</span> <span class="err">i</span><span class="kc">t</span> <span class="err">is</span> <span class="err">i</span><span class="kc">n</span> <span class="err">(or</span> <span class="kc">t</span><span class="err">he</span> <span class="kc">f</span><span class="err">irs</span><span class="kc">t</span> <span class="err">o</span><span class="kc">ne</span> <span class="err">i</span><span class="kc">t</span> <span class="err">is</span> <span class="err">e</span><span class="kc">n</span><span class="err">cou</span><span class="kc">ntere</span><span class="err">d</span> <span class="err">i</span><span class="kc">n</span><span class="err">)</span>
-   <span class="nt">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>          <span class="err">#</span> <span class="err">ID</span> <span class="err">o</span><span class="kc">f</span> <span class="kc">t</span><span class="err">he</span> <span class="err">group</span> <span class="err">i</span><span class="kc">t</span> <span class="err">is</span> <span class="err">i</span><span class="kc">n</span> <span class="err">(or</span> <span class="err">emp</span><span class="kc">t</span><span class="err">y</span> <span class="err">s</span><span class="kc">tr</span><span class="err">i</span><span class="kc">n</span><span class="err">g)</span>
-   <span class="nt">&quot;deprecated&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>  <span class="err">#</span> <span class="kc">false</span> <span class="err">or</span> <span class="kc">true</span>
-   <span class="nt">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">[],</span>     <span class="err">#</span> <span class="err">(i</span><span class="kc">f</span> <span class="err">a</span> <span class="kc">fun</span><span class="err">c</span><span class="kc">t</span><span class="err">io</span><span class="kc">n</span><span class="err">)</span>
-   <span class="nt">&quot;return_type&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>    <span class="err">#</span> <span class="err">(i</span><span class="kc">f</span> <span class="err">a</span> <span class="kc">fun</span><span class="err">c</span><span class="kc">t</span><span class="err">io</span><span class="kc">n</span><span class="err">)</span>
-   <span class="nt">&quot;members&quot;</span><span class="p">:</span> <span class="p">[],</span>        <span class="err">#</span> <span class="err">(i</span><span class="kc">f</span> <span class="err">a</span> <span class="err">class</span> <span class="err">or</span> <span class="kc">na</span><span class="err">mespace)</span> <span class="err">recursively</span> <span class="err">lis</span><span class="kc">t</span> <span class="err">members</span>
-   <span class="nt">&quot;related&quot;</span><span class="p">:</span> <span class="p">[],</span>        <span class="err">#</span> <span class="err">(i</span><span class="kc">f</span> <span class="err">a</span> <span class="err">class)</span> <span class="err">lis</span><span class="kc">t</span> <span class="err">o</span><span class="kc">f</span> <span class="err">IDs</span> <span class="err">o</span><span class="kc">f</span> <span class="kc">fun</span><span class="err">c</span><span class="kc">t</span><span class="err">io</span><span class="kc">ns</span> <span class="err">rela</span><span class="kc">te</span><span class="err">d</span> <span class="kc">t</span><span class="err">o</span> <span class="kc">t</span><span class="err">his</span> <span class="err">class</span> <span class="err">(`\rela</span><span class="kc">tes</span><span class="err">`</span> <span class="err">comma</span><span class="kc">n</span><span class="err">d)</span>
-   <span class="err">...</span>                   <span class="err">#</span> <span class="err">o</span><span class="kc">t</span><span class="err">her</span> <span class="err">eleme</span><span class="kc">nts</span> <span class="err">wi</span><span class="kc">t</span><span class="err">h</span> <span class="err">addi</span><span class="kc">t</span><span class="err">io</span><span class="kc">nal</span> <span class="err">i</span><span class="kc">nf</span><span class="err">orma</span><span class="kc">t</span><span class="err">io</span><span class="kc">n</span> <span class="err">as</span> <span class="kc">nee</span><span class="err">ded</span> <span class="err">(</span><span class="s2">&quot;virtual&quot;</span><span class="p">,</span> <span class="s2">&quot;mutable&quot;</span><span class="p">,</span> <span class="err">e</span><span class="kc">t</span><span class="err">c.)</span>
-<span class="p">}</span>
-</pre></div>
-
-<p>Member IDs are not unrecognizable hash codes as Doxygen does it, but simply created from the fully
-qualified name and parameters, guaranteeing uniqueness. For example:
- - <code>int ns::foo()</code>                     ⇒ <code>"ns-foo"</code>
- - <code>int ns::foo(int, double)</code>          ⇒ <code>"ns-foo-int--double-"</code>
- - <code>int ns::foo(int&amp;, double const&amp;)</code>  ⇒ <code>"ns-foo-int-L-double-CL"</code>
- - <code>class ns::bar</code>                     ⇒ <code>"ns-bar"</code>
- - <code>ns::bar::bar(float*)</code>              ⇒ <code>"ns-bar-bar-float-P"</code></p>
-<p>See <a href="members.md"><code>members.md</code></a> for more information
-on the dictionary fields for each of the types of members.</p>
-<h3>&ldquo;headers&rdquo;</h3>
-<p>This is a list of files. Each <code>headers[i]</code> is a dictionary as follows:</p>
-<div class="m-code"><pre><span></span><span class="p">{</span>
-   <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>             <span class="err">#</span> <span class="err">u</span><span class="kc">n</span><span class="err">ique</span> <span class="err">ide</span><span class="kc">nt</span><span class="err">i</span><span class="kc">f</span><span class="err">ier</span>
-   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>           <span class="err">#</span> <span class="kc">f</span><span class="err">ile</span> <span class="kc">na</span><span class="err">me</span><span class="p">,</span> <span class="err">wi</span><span class="kc">t</span><span class="err">h</span> <span class="err">pa</span><span class="kc">t</span><span class="err">h</span> <span class="kc">fr</span><span class="err">om</span> <span class="err">projec</span><span class="kc">t</span> <span class="err">roo</span><span class="kc">t</span>
-   <span class="nt">&quot;brief&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>          <span class="err">#</span> <span class="err">brie</span><span class="kc">f</span> <span class="err">descrip</span><span class="kc">t</span><span class="err">io</span><span class="kc">n</span><span class="p">,</span> <span class="err">i</span><span class="kc">n</span> <span class="err">Markdow</span><span class="kc">n</span>
-   <span class="nt">&quot;doc&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>            <span class="err">#</span> <span class="kc">full</span> <span class="err">docume</span><span class="kc">ntat</span><span class="err">io</span><span class="kc">n</span><span class="p">,</span> <span class="err">i</span><span class="kc">n</span> <span class="err">Markdow</span><span class="kc">n</span>
-   <span class="nt">&quot;sections&quot;</span><span class="p">:</span> <span class="p">[],</span>       <span class="err">#</span> <span class="err">(ID</span><span class="p">,</span> <span class="kc">t</span><span class="err">i</span><span class="kc">tle</span><span class="p">,</span> <span class="err">level)</span> <span class="kc">f</span><span class="err">or</span> <span class="err">sec</span><span class="kc">t</span><span class="err">io</span><span class="kc">ns</span> <span class="err">i</span><span class="kc">n</span> <span class="nt">&quot;doc&quot;</span>
-   <span class="nt">&quot;anchors&quot;</span><span class="p">:</span> <span class="p">[],</span>        <span class="err">#</span> <span class="err">IDs</span> <span class="err">o</span><span class="kc">f</span> <span class="err">a</span><span class="kc">n</span><span class="err">chors</span> <span class="err">i</span><span class="kc">n</span> <span class="nt">&quot;doc&quot;</span>
-   <span class="nt">&quot;includes&quot;</span><span class="p">:</span> <span class="p">[]</span>        <span class="err">#</span> <span class="err">lis</span><span class="kc">t</span> <span class="err">o</span><span class="kc">f</span> <span class="kc">f</span><span class="err">iles</span> <span class="err">i</span><span class="kc">n</span><span class="err">cluded</span> <span class="err">by</span> <span class="kc">t</span><span class="err">he</span> <span class="err">header</span>
-<span class="p">}</span>
-</pre></div>
-
-<p>We don&rsquo;t list what is defined in a file, this information can easily be gathered by iterating through
-all members and finding the ones that list a file&rsquo;s ID.</p>
+the user desires. The JSON file has the following fields:</p>
+<ul>
+<li><a href="json_output.html#json_output_members">&ldquo;members&rdquo;</a>: members are the namespaces, classes, functions, variables, etc.</li>
+<li><a href="json_output.html#json_output_headers">&ldquo;headers&rdquo;</a>: the header files</li>
+<li><a href="json_output.html#json_output_groups">&ldquo;groups&rdquo;</a>: the groups (or modules)</li>
+<li><a href="json_output.html#json_output_pages">&ldquo;pages&rdquo;</a>: the pages</li>
+</ul>
+<p>Each of these is a list of elements, each element is a dictionary with fields that depend on the type.</p>
+<h2 id="json_output_members">&ldquo;members&rdquo;</h2>
+<p>This is a list of everything that is defined at the global scope, with each namespace and each
+class/struct/union containing lists of its members. Thus, a hierarchical structure is formed
+that mimics the declarations in the code.</p>
+<p>Members are listed in order in which they were found in the header file.
+Each member is a dictionary as described in <a href="members.html">Detailed description of fields for C++ members</a>.</p>
+<h2 id="json_output_headers">&ldquo;headers&rdquo;</h2>
+<p>This is a list of header files. Each headers is a dictionary with the following fields:</p>
+<ul>
+<li>&ldquo;id&rdquo;: unique identifier</li>
+<li>&ldquo;name&rdquo;: file name, with path from project root</li>
+<li>&ldquo;brief&rdquo;: brief description (see <a href="json_output.html#json_output_brief_doc">&ldquo;brief&rdquo; and &ldquo;doc&rdquo;</a>)</li>
+<li>&ldquo;doc&rdquo;: full documentation (see <a href="json_output.html#json_output_brief_doc">&ldquo;brief&rdquo; and &ldquo;doc&rdquo;</a>)</li>
+<li>&ldquo;sections&rdquo;: (ID, title, level) for sections in &ldquo;doc&rdquo; (see <a href="json_output.html#json_output_sections">&ldquo;sections&rdquo;</a>)</li>
+<li>&ldquo;anchors&rdquo;: IDs of anchors in &ldquo;doc&rdquo; (see <a href="json_output.html#json_output_anchors">&ldquo;anchors&rdquo;</a>)</li>
+<li>&ldquo;includes&rdquo;: list of files included by the header</li>
+</ul>
+<p>We don&rsquo;t list the members that are defined in a file, this information can easily be gathered
+by iterating through all members and finding the ones that list a file&rsquo;s ID.</p>
 <p>Any directory structure to be shown in the documentation can be reconstructed from the file names,
 it is not explicitly stored here.</p>
-<h3>&ldquo;groups&rdquo;</h3>
-<p>A list of defined groups. Each <code>groups[i]</code> is a dictionary as follows:</p>
-<div class="m-code"><pre><span></span><span class="p">{</span>
-   <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>             <span class="err">#</span> <span class="err">u</span><span class="kc">n</span><span class="err">ique</span> <span class="err">ide</span><span class="kc">nt</span><span class="err">i</span><span class="kc">f</span><span class="err">ier</span>
-   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>           <span class="err">#</span> <span class="err">group</span> <span class="kc">na</span><span class="err">me</span>
-   <span class="nt">&quot;brief&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>          <span class="err">#</span> <span class="err">brie</span><span class="kc">f</span> <span class="err">descrip</span><span class="kc">t</span><span class="err">io</span><span class="kc">n</span><span class="p">,</span> <span class="err">i</span><span class="kc">n</span> <span class="err">Markdow</span><span class="kc">n</span>
-   <span class="nt">&quot;doc&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>            <span class="err">#</span> <span class="kc">full</span> <span class="err">docume</span><span class="kc">ntat</span><span class="err">io</span><span class="kc">n</span><span class="p">,</span> <span class="err">i</span><span class="kc">n</span> <span class="err">Markdow</span><span class="kc">n</span>
-   <span class="nt">&quot;sections&quot;</span><span class="p">:</span> <span class="p">[],</span>       <span class="err">#</span> <span class="err">(ID</span><span class="p">,</span> <span class="kc">t</span><span class="err">i</span><span class="kc">tle</span><span class="p">,</span> <span class="err">level)</span> <span class="kc">f</span><span class="err">or</span> <span class="err">sec</span><span class="kc">t</span><span class="err">io</span><span class="kc">ns</span> <span class="err">i</span><span class="kc">n</span> <span class="nt">&quot;doc&quot;</span>
-   <span class="nt">&quot;anchors&quot;</span><span class="p">:</span> <span class="p">[],</span>        <span class="err">#</span> <span class="err">IDs</span> <span class="err">o</span><span class="kc">f</span> <span class="err">a</span><span class="kc">n</span><span class="err">chors</span> <span class="err">i</span><span class="kc">n</span> <span class="nt">&quot;doc&quot;</span>
-   <span class="nt">&quot;parent&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>         <span class="err">#</span> <span class="err">ID</span> <span class="err">o</span><span class="kc">f</span> <span class="kc">t</span><span class="err">he</span> <span class="err">pare</span><span class="kc">nt</span> <span class="err">group</span><span class="p">,</span> <span class="err">i</span><span class="kc">f</span> <span class="err">a</span><span class="kc">n</span><span class="err">y</span>
-   <span class="nt">&quot;subgroups&quot;</span><span class="p">:</span> <span class="p">[]</span>       <span class="err">#</span> <span class="err">lis</span><span class="kc">t</span> <span class="err">o</span><span class="kc">f</span> <span class="err">IDs</span> <span class="err">o</span><span class="kc">f</span> <span class="err">child</span> <span class="err">groups</span>
-<span class="p">}</span>
-</pre></div>
-
-<p>Groups can be nested.</p>
-<h3>&ldquo;pages&rdquo;</h3>
-<p>A list of pages. Each <code>pages[i]</code> is a dictionary as follows:</p>
-<div class="m-code"><pre><span></span><span class="p">{</span>
-   <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>             <span class="err">#</span> <span class="err">u</span><span class="kc">n</span><span class="err">ique</span> <span class="err">ide</span><span class="kc">nt</span><span class="err">i</span><span class="kc">f</span><span class="err">ier</span>
-   <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>          <span class="err">#</span> <span class="err">page</span> <span class="kc">t</span><span class="err">i</span><span class="kc">tle</span>
-   <span class="nt">&quot;doc&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>            <span class="err">#</span> <span class="kc">full</span> <span class="err">docume</span><span class="kc">ntat</span><span class="err">io</span><span class="kc">n</span><span class="p">,</span> <span class="err">i</span><span class="kc">n</span> <span class="err">Markdow</span><span class="kc">n</span>
-   <span class="nt">&quot;sections&quot;</span><span class="p">:</span> <span class="p">[],</span>       <span class="err">#</span> <span class="err">(ID</span><span class="p">,</span> <span class="kc">t</span><span class="err">i</span><span class="kc">tle</span><span class="p">,</span> <span class="err">level)</span> <span class="kc">f</span><span class="err">or</span> <span class="err">sec</span><span class="kc">t</span><span class="err">io</span><span class="kc">ns</span> <span class="err">i</span><span class="kc">n</span> <span class="nt">&quot;doc&quot;</span>
-   <span class="nt">&quot;anchors&quot;</span><span class="p">:</span> <span class="p">[],</span>        <span class="err">#</span> <span class="err">IDs</span> <span class="err">o</span><span class="kc">f</span> <span class="err">a</span><span class="kc">n</span><span class="err">chors</span> <span class="err">i</span><span class="kc">n</span> <span class="nt">&quot;doc&quot;</span>
-   <span class="nt">&quot;parent&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>         <span class="err">#</span> <span class="err">ID</span> <span class="err">o</span><span class="kc">f</span> <span class="kc">t</span><span class="err">he</span> <span class="err">pare</span><span class="kc">nt</span> <span class="err">page</span><span class="p">,</span> <span class="err">i</span><span class="kc">f</span> <span class="err">a</span><span class="kc">n</span><span class="err">y</span>
-   <span class="nt">&quot;subpages&quot;</span><span class="p">:</span> <span class="p">[]</span>        <span class="err">#</span> <span class="err">lis</span><span class="kc">t</span> <span class="err">o</span><span class="kc">f</span> <span class="err">IDs</span> <span class="err">o</span><span class="kc">f</span> <span class="err">child</span> <span class="err">pages</span>
-<span class="p">}</span>
-</pre></div>
-
-<p>One page has the ID &lsquo;index&rsquo;, this is the main page, and the root of the hierarchy.</p>
-<h3>The &ldquo;brief&rdquo; and &ldquo;doc&rdquo; fields</h3>
+<h3 id="json_output_includes">&ldquo;includes&rdquo;</h3>
+<p>This is a list of strings, one for each header included by the header file. If the included
+header file is part of the documentation, the string will be the header file name enclosed
+in double quotes, the file name being a Markdown-formatted link to the file. Otherwise,
+the string will be the header file name enclosed in angled brackets.</p>
+<h2 id="json_output_groups">&ldquo;groups&rdquo;</h2>
+<p>This is a list of defined groups. Each groups is a dictionary with the following fields:</p>
+<ul>
+<li>&ldquo;id&rdquo;: unique identifier</li>
+<li>&ldquo;name&rdquo;: group name</li>
+<li>&ldquo;brief&rdquo;: brief description (see <a href="json_output.html#json_output_brief_doc">&ldquo;brief&rdquo; and &ldquo;doc&rdquo;</a>)</li>
+<li>&ldquo;doc&rdquo;: full documentation (see <a href="json_output.html#json_output_brief_doc">&ldquo;brief&rdquo; and &ldquo;doc&rdquo;</a>)</li>
+<li>&ldquo;sections&rdquo;: (ID, title, level) for sections in &ldquo;doc&rdquo; (see <a href="json_output.html#json_output_sections">&ldquo;sections&rdquo;</a>)</li>
+<li>&ldquo;anchors&rdquo;: IDs of anchors in &ldquo;doc&rdquo; (see <a href="json_output.html#json_output_anchors">&ldquo;anchors&rdquo;</a>)</li>
+<li>&ldquo;parent&rdquo;: ID of the parent group, if any</li>
+<li>&ldquo;subgroups&rdquo;: list of IDs of any child groups</li>
+</ul>
+<p>Note that the &ldquo;subgroups&rdquo; field contains the IDs of child groups, not dictionaries defining
+the groups. The group list is a flat list, the hierarchy can be reconstructed by following
+the IDs of parents and children. No loops will ever be created (i.e. a group cannot be
+both an ancestor and a child of another group). Groups do not need to be in the hierarchy
+either.</p>
+<h2 id="json_output_pages">&ldquo;pages&rdquo;</h2>
+<p>A list of pages. Each page is a dictionary with the following fields:</p>
+<ul>
+<li>&ldquo;id&rdquo;: unique identifier</li>
+<li>&ldquo;title&rdquo;: page title</li>
+<li>&ldquo;doc&rdquo;: full documentation (see <a href="json_output.html#json_output_brief_doc">&ldquo;brief&rdquo; and &ldquo;doc&rdquo;</a>)</li>
+<li>&ldquo;sections&rdquo;: (ID, title, level) for sections in &ldquo;doc&rdquo; (see <a href="json_output.html#json_output_sections">&ldquo;sections&rdquo;</a>)</li>
+<li>&ldquo;anchors&rdquo;: IDs of anchors in &ldquo;doc&rdquo; (see <a href="json_output.html#json_output_anchors">&ldquo;anchors&rdquo;</a>)</li>
+<li>&ldquo;parent&rdquo;: ID of the parent page, if any</li>
+<li>&ldquo;subpages&rdquo;: list of IDs of any child pages</li>
+</ul>
+<p>Like with groups, pages are stored as a flat list, with the hierarchy described by
+the &ldquo;parent&rdquo; and &ldquo;subpages&rdquo; fields. No loops will ever be created.</p>
+<p>One page has the ID &lsquo;index&rsquo;, this is the main page. The index page doesn&rsquo;t need
+to be the parent of the other pages though, but it can be. It cannot be a subpage,
+its &ldquo;parent&rdquo; field will always be empty.</p>
+<h2 id="json_output_common_fields">Fields common to all elements</h2>
+<h3 id="json_output_brief_doc">&ldquo;brief&rdquo; and &ldquo;doc&rdquo;</h3>
+<p>The first line of the documentation will be split off as into the &ldquo;brief&rdquo; field, with
+the remaining text in the &ldquo;doc&rdquo; field. However, if the first line starts with <code>\brief</code>
+then the whole first paragraph is split off into the &ldquo;brief&rdquo; field, see <a href="commands.html#command_brief">Command <code>\brief</code> and <code>\short</code></a>.</p>
 <p>Any Markdown in the documentation will not be parsed, this is something for the generator to do.
-However, we will look for <code>\‍ref</code>, <code>\ingroup</code> and similar commands, as described in the
-<a href="commands.md"><code>commands.md</code></a> page.</p>
+However, we will look for <code>\‍ref</code>, <code>\ingroup</code> and similar commands, as described in
+<a href="commands.html#commands_inside">Inside documentation blocks</a>.</p>
 <p>Commands that create a link are replaced by the Markdown syntax for a link, linking to
 <code>#&lt;id&gt;</code>. For example, <code>\‍ref foo::bar</code> will be replaced by <code>[foo::bar](#foo-bar)</code>, and
 <code>\‍ref foo::bar "the bar value"</code> will be replaced by <code>[the bar value](#foo-bar)</code>. Note that
@@ -156,22 +162,27 @@ this is Markdown syntax to link to an anchor within the same page. The generator
 to identify these and change them to links to another page if necessary (only the generator
 will know what page the documentation for a given member is put in).</p>
 <p>Other recognized commands will be similarly replaced with Markdown or removed, as appropriate.
-Any command not listed in in the <a href="commands.md"><code>commands.md</code></a>
-page will be left as-is.</p>
-<h3>The &ldquo;anchors&rdquo; field</h3>
+Any command not listed in <a href="commands.html#commands_inside">Inside documentation blocks</a> will be left as-is.</p>
+<h3 id="json_output_anchors">&ldquo;anchors&rdquo;</h3>
 <p>Documentation can contain anchors that can be referenced in the same way that members or pages
-can be referenced. These are created with the command <code>\anchor</code>. This command is replaced with
+can be referenced. These are created with <a href="commands.html#command_anchor">Command <code>\anchor</code></a>. This command is replaced with
 appropriate Markdown syntax to create an anchor, and the anchor ID (the string that can be used
 with <code>\‍ref</code> to link to the anchor) is listed in the &ldquo;anchors&rdquo; field. Where these anchors are
 referenced, a Markdown link is generated as described in the section above. The generator will
 need to modify this link to point to the right page. The &ldquo;anchor&rdquo; field gives the required
 information to the generator for this.</p>
-<h3>The &ldquo;sections&rdquo; field</h3>
+<h3 id="json_output_sections">&ldquo;sections&rdquo;</h3>
 <p>In a similar fashion to anchors, documentation can also contain headers that can be referenced.
-These are created with the commands <code>\section</code>, <code>\subsection</code> and <code>\subsubsection</code>. These commands
-are replaced with the appropriate Markdown syntax, and the section ID, title and level (1 for section,
-2 for subsection, etc.) is stored as tuples in the &ldquo;sections&rdquo; field.</p>
-        <div class="m-note m-dim m-thin m-text-center"><a href="configuration.html" class="m-doc">&laquo; Configuring the <strong>dox++</strong> tools</a> | <a href="documentation.html" class="m-doc">Documentation</a> | <a href="members.html" class="m-doc">Detailed description of keys for C++ members &raquo;</a></div>
+These are created with the <a href="commands.html#command_section">Command <code>\section</code></a>, <a href="commands.html#command_subsection">Command <code>\subsection</code></a> and <a href="commands.html#command_subsubsection">Command <code>\subsubsection</code></a>.
+These commands are replaced with the appropriate Markdown syntax, and the section ID, title and
+level (1 for section, 2 for subsection, etc.) is stored as tuples in the &ldquo;sections&rdquo; field.</p>
+<aside class="m-block m-default">
+<h4>Subpages</h4>
+<ul>
+<li><a href="members.html">Detailed description of fields for C++ members</a></li>
+</ul>
+</aside>
+        <div class="m-note m-dim m-thin m-text-center"><a href="running_the_tools.html" class="m-doc">&laquo; Running <strong>dox++parse</strong> and <strong>dox++html</strong></a> | <a href="documentation.html" class="m-doc">Documentation</a></div>
       </div>
     </div>
   </div>

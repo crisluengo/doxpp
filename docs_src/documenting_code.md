@@ -72,3 +72,8 @@ class bang{};
  * and this is documentation for bang
  * */
 ```
+
+!!! m-default m-block "Subpages"
+    - \subpage commands
+    - \subpage grouping
+    - \subpage markdown
