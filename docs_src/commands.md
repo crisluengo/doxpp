@@ -404,7 +404,7 @@ One can also directly write `# My Title {#my-title}`, but then the `\‍ref` com
 Starts a paragraph with a "See also" header linking the given entities (members, headers, groups, pages).
 See `\‍ref` for how `<name>` is interpreted and disambiguated.
 
-Note that this inserts a `\par See also` command that the backend must interpret to create the heading,
+Note that this inserts an admonition (`!!! see`) that the backend must interpret to create the heading,
 and optionally box the whole paragraph.
 
 This command is expected to be on its own on a line. Cannot occur inside the brief description.

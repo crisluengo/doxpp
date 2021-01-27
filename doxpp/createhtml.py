@@ -61,6 +61,7 @@ from .markdown.add_classes import AddClassesExtension
 from .markdown.record_images import RecordLinkedImagesExtension
 from .markdown.mdx_subscript import SubscriptExtension
 from .markdown.mdx_superscript import SuperscriptExtension
+from .markdown import mdx_math_svg
 
 
 doxpp_path = os.path.dirname(os.path.realpath(__file__))
@@ -688,6 +689,8 @@ def parse_markdown(status: Status):
         'smarty',           # https://python-markdown.github.io/extensions/smarty/
         # Installed with package `markdown-headdown`
         'mdx_headdown',     # https://github.com/SaschaCowley/Markdown-Headdown
+        # Temporarily a local file, to be made into a package
+        mdx_math_svg.MathSvgExtension(inline_class='m-math', display_class='m-math', fontsize=1),
         # Our own concoctions
         AdmonitionExtension(),              # Modification of the standard 'admonition' extension
         FixLinksExtension(status.id_map),   # Fixes links from '#id' to 'page_id.html#id'
@@ -707,10 +710,11 @@ def parse_markdown(status: Status):
             'offset': 1
         }
     }
-    # TODO: Create a LaTeX math extension based on some stuff in m.css as well as the following:
-    #       https://github.com/justinvh/Markdown-LaTeX
-    #       https://github.com/ShadowKyogre/python-asciimathml
     md = markdown.Markdown(extensions=extensions, extension_configs=extension_configs, output_format="html5")
+
+    # TODO: the cache file name should be configurable
+    math_cache_file_name = 'math_cache'
+    mdx_math_svg.load_cache(math_cache_file_name)
 
     for header in status.headers.values():
         if header['brief']:
@@ -738,6 +742,8 @@ def parse_markdown(status: Status):
         if page['title']:
             page['title'] = remove_p_tag(md.reset().convert(page['title']))
         process_sections(page, md)
+
+    mdx_math_svg.save_cache(math_cache_file_name)
 
 
 def render_type(type, status: Status, doc_link_class):

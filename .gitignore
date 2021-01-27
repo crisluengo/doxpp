@@ -3,3 +3,4 @@ __pycache__
 .idea
 example/transport.json
 docs_src/dox++out.json
+math_cache

@@ -17,9 +17,12 @@ the Markdown-formatted text into HTML with a small set of extensions:
   [md_in_html](https://python-markdown.github.io/extensions/md_in_html/),
   [sane_lists](https://python-markdown.github.io/extensions/sane_lists/), and
   [smarty](https://python-markdown.github.io/extensions/smarty/) to improve standard formatting.
+- Cris Luengo's
+  [mdx_math_svg]() to render equations.
 - Andrew Pinkham's
   [markdown_subscript_extension](https://github.com/jambonrose/markdown_subscript_extension), and
-  [markdown_superscript_extension](https://github.com/jambonrose/markdown_superscript_extension).
+  [markdown_superscript_extension](https://github.com/jambonrose/markdown_superscript_extension)
+  to add sub- and superscripts.
 - Sascha Cowley's
   [mdx_headdown](https://github.com/SaschaCowley/Markdown-Headdown) for internal purposes.
 - Some **dox++**-specific extensions to allow it to correct internal links and retrieve
@@ -382,7 +385,72 @@ is rendered as a "block" like this one:
 
 \section markdown_equations Equations
 
-**TODO** This is not yet implemented
+Equations are rendered as embedded SVG. They are written as LaTeX (with amsmath and amssymb
+packages loaded). For inline math mode, enclose the LaTeX in:
+
+- dollar signs (`$ ... $`), or
+- LaTeX inline math delimiters `\( ... \)`.
+
+For display math mode, enclose the LaTeX in:
+
+- double dollar signs (`$$ ... $$`),
+- LaTeX display math delimiters `\[ ... \]`, or
+- any LaTeX environment that starts math mode (`\begin{<env>} ... \end{<env>}`, with
+an appropriate `<env>`).
+
+The single dollar sign is "smart", in that it requires there be no spaces on the inside of the signs,
+between the signs and the LaTeX content. This makes it possible to write things like
+"I have $3.00 and you have $5.00" without worrying about triggering math mode. For example,
+
+```text
+Let's assume that $x$ is positive, then $f(x) = -x$ is negative. But $ x $ is not
+rendered in math mode!
+```
+is rendered as:
+
+!!! par
+    Let's assume that $x$ is positive, then $f(x) = -x$ is negative. But $ x $ is not
+    rendered in math mode!
+
+One can always escape the dollar sign if needed: `\$x$` is rendered as \$x$.
+
+Display equations must have an empty line above and below, and must not contain
+empty lines.
+```text
+Given $x$, we can determine
+
+$$ y = e^{-x^2 / \sigma^2} $$
+
+with the constraint that
+
+\begin{align*}
+	0 &< x \\
+	a &\geq x^2
+\end{align*}
+```
+is rendered as:
+
+!!! par
+    Given $x$, we can determine
+
+    $$ y = e^{-x^2 / \sigma^2} $$
+
+    with the constraint that
+
+    \begin{align*}
+        0 &< x \\
+	    a &\geq x^2
+    \end{align*}
+
+By assigning appropriate attributes (as described in \ref markdown_attributes), it is
+possible to e.g. change the size of the equations and colorize them:
+```text
+Given $x$, we can determine $y = e^{-x^2 / \sigma^2}${ .m-text .m-small .m-danger }.
+```
+is rendered as:
+
+!!! par
+    Given $x$, we can determine $y = e^{-x^2 / \sigma^2}${ .m-text .m-small .m-danger }.
 
 \section markdown_images Images
 
@@ -425,30 +493,30 @@ To add the CSS attributes to a block element, put them in a line by themselves a
 end of the block element:
 ```text
 This is a paragraph.
-{ .m-text .m-tiny }
+{ .m-text .m-small }
 ```
 will be rendered as
 
 !!! par
     This is a paragraph.
-    { .m-text .m-tiny }
+    { .m-text .m-small }
 
 To add the attributes to inline elements, add them right after the element, with no
 space in between:
 ```text
-This is a **paragraph**{ .m-text .m-tiny }.
+This is a **paragraph**{ .m-text .m-small }.
 ```
 will be rendered as
 
 !!! par
-    This is a **paragraph**{ .m-text .m-tiny }.
+    This is a **paragraph**{ .m-text .m-small }.
 
 Note that it is not possible to assign attributes to a single word, unless it is wrapped
 in an element as above.
 
 For code blocks, use the fences syntax and apply the attributes to the opening fences:
 ````text
-``` { .cpp .m-text .m-tiny }
+``` { .cpp .m-text .m-small }
 // This is code
 foo(bar);
 ```
@@ -456,7 +524,7 @@ foo(bar);
 The first class name is interpreted as the language, the remaining ones are CSS classes.
 
 <aside markdown="1" class="m-note m-frame">
-``` { .cpp .m-text .m-tiny }
+``` { .cpp .m-text .m-small }
 // This is code
 foo(bar);
 ```
@@ -506,7 +574,7 @@ will be rendered as
 
 This can be useful to add a CSS class to a portion of the text, for example:
 ```text
-<div markdown="1" class="m-text m-tiny">
+<div markdown="1" class="m-text m-small">
 
 First Header  | Second Header
 ------------- | -------------
@@ -515,10 +583,10 @@ Content Cell  | Content Cell
 
 </div>
 ```
-will create a table with a very small font:
+will create a table with a small font:
 
 !!!par
-    <div markdown="1" class="m-text m-tiny">
+    <div markdown="1" class="m-text m-small">
 
     First Header  | Second Header
     ------------- | -------------
