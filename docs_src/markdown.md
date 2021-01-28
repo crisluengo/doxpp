@@ -70,6 +70,7 @@ be interpreted as Markdown formatting:
 - \-   minus sign (hyphen)
 - \.   dot
 - \!   exclamation mark
+- \$   dollar sign
 
 It is possible to create headers using Markdown formatting, but this will prevent
 **dox++** from linking to them from other documentation blocks and from generating indexes.

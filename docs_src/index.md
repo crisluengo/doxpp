@@ -6,7 +6,7 @@
     - API documented through Markdown-formatted comment blocks right next to the declarations.
     - Uses Clang to parse the header files, so all the latest C++ features are recognized. 
     - Generates a static and mobile-friendly HTML5 website that loads fast. 
-    - Math rendered as embedded SVG, not as images or MathJax (**TODO**).
+    - Math rendered as embedded SVG, not as images or MathJax.
     - Using Pygments for better code highlighting.
     - Snappy client-side search functionality, fully controllable through the keyboard.
 
@@ -93,9 +93,7 @@ that I am aware of:
 6. Function arguments can not yet be individually documented. `\param`, `\return` and `\exception`
    are not yet supported.
 
-7. Soon we'll have the ability to typeset equations from LaTeX strings.
-
-8. We cannot yet include source code from another file, or create pages for example
+7. We cannot yet include source code from another file, or create pages for example
    programs.
 
 

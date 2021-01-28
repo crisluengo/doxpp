@@ -61,6 +61,7 @@ Based on:
 from markdown import Extension
 from markdown.inlinepatterns import InlineProcessor
 from markdown.blockprocessors import BlockProcessor
+from markdown.extensions import attr_list
 from markdown import util as md_util
 import xml.etree.ElementTree as ET
 
@@ -408,6 +409,8 @@ class BlockMathSvgProcessor(BlockProcessor):
 
         self.display_class = config.get('display_class', '')
         self.md = md
+        self.checked_for_deps = False
+        self.use_attr_list = False  # will be set in run(), we'll know all extensions have been initialized by then
 
         self.match = None
         self.pattern = re.compile(pattern)
@@ -423,21 +426,44 @@ class BlockMathSvgProcessor(BlockProcessor):
     def run(self, parent, blocks):
         """Find and handle block content."""
 
+        # Check for dependent extensions
+        if not self.checked_for_deps:
+            for ext in self.md.registeredExtensions:
+                if isinstance(ext, attr_list.AttrListExtension):
+                    self.use_attr_list = True
+                    break
+
+            self.checked_for_deps = True
+
         blocks.pop(0)
 
         escaped = False
-        latex = self.match.group('math')
+        latex, attrib = self.match.group('math'), self.match.group('attrib')
         if not latex:
-            latex = self.match.group('math3')
+            latex, attrib = self.match.group('math3'), self.match.group('attrib3')
         if not latex:
-            latex = self.match.group('math2')
+            latex, attrib = self.match.group('math2'), self.match.group('attrib2')
             escaped = True  # math2 includes the '\begin{env}' and '\end{env}'
         if not escaped:
             latex = r'\[' + latex + r'\]'
         svg = latex2svg(latex)
+        attrib_dict = {'class': self.display_class}
+        if attrib and self.use_attr_list:
+            print("\nFound attrib:", attrib)
+            for k, v in attr_list.get_attrs(attrib):
+                if k == '.':
+                    attrib_dict['class'] += ' ' + v
+                elif k == 'class':  # we need to preserve our "display class"!
+                    attrib_dict['class'] = self.display_class + ' ' + v
+                else:
+                    attrib_dict[k] = v
+            print(attrib_dict)
+            attrib = ''
 
-        el = ET.SubElement(parent, 'div', {'class': self.display_class})
+        el = ET.SubElement(parent, 'div', attrib_dict)
         el.text = self.md.htmlStash.store(svg)
+        if attrib:
+            el.tail = attrib
 
         return True
 
@@ -446,9 +472,9 @@ RE_SMART_DOLLAR_INLINE = r'(?:(?<!\\)((?:\\{2})+)(?=\$)|(?<!\\)(\$)(?!\s)((?:\\.
 RE_DOLLAR_INLINE = r'(?:(?<!\\)((?:\\{2})+)(?=\$)|(?<!\\)(\$)((?:\\.|[^\\$])+?)(?:\$))'
 RE_BRACKET_INLINE = r'(?:(?<!\\)((?:\\{2})+?)(?=\\\()|(?<!\\)(\\\()((?:\\[^)]|[^\\])+?)(?:\\\)))'
 
-RE_DOLLAR_BLOCK = r'(?P<dollar>[$]{2})(?P<math>((?:\\.|[^\\])+?))(?P=dollar)'
-RE_TEX_BLOCK = r'(?P<math2>\\begin\{(?P<env>[a-z]+\*?)\}(?:\\.|[^\\])+?\\end\{(?P=env)\})'
-RE_BRACKET_BLOCK = r'\\\[(?P<math3>(?:\\[^\]]|[^\\])+?)\\\]'
+RE_DOLLAR_BLOCK = r'(?P<dollar>[$]{2})(?P<math>((?:\\.|[^\\])+?))(?P=dollar)(?:\{(?P<attrib>.*)\})?'
+RE_TEX_BLOCK = r'(?P<math2>\\begin\{(?P<env>[a-z]+\*?)\}(?:\\.|[^\\])+?\\end\{(?P=env)\})(?:\{(?P<attrib2>.*)\})?'
+RE_BRACKET_BLOCK = r'\\\[(?P<math3>(?:\\[^\]]|[^\\])+?)\\\](?:\{(?P<attrib3>.*)\})?'
 
 
 class MathSvgExtension(Extension):
