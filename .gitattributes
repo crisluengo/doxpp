@@ -1,0 +1,3 @@
+docs linguist-generated
+docs_src linguist-documentation
+doxpp/css/*.compiled.css linguist-generated
