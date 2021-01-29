@@ -557,12 +557,6 @@ def assign_page(status: Status):
             if status.groups[id]['page_id']:
                 group['modules'].append(status.groups[id])
         group['modules'].sort(key=lambda x: x['name'].casefold())
-    # Set module value of all members in each module
-    for group in status.groups.values():
-        module = (group['name'], group['id'] + '.html')
-        for members in [group['namespaces'], group['classes']]:
-            for member in members:
-                member['module'] = module
     # All pages have a page, obviously
     for page in status.pages.values():
         page['member_type'] = 'page'
@@ -1171,6 +1165,13 @@ def createhtml(input_file, output_dir, options, template_params):
 
     # Parse all Markdown
     parse_markdown(status)
+
+    # Add group info to classes and namespaces
+    for group in status.groups.values():
+        module = (group['name'], group['id'] + '.html')
+        for members in [group['namespaces'], group['classes']]:
+            for member in members:
+                member['module'] = module
 
     # Convert type name strings into HTML links if appropriate
     parse_types(status, options['doc_link_class'])
