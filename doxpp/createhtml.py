@@ -727,6 +727,7 @@ def parse_markdown(status: Status):
             group['brief'] = remove_p_tag(md.reset().convert(group['brief']))
         if group['doc']:
             group['doc'] = md.reset().convert(group['doc'])
+        group['name'] = remove_p_tag(md.reset().convert(group['name']))
         process_sections(group, md)
     for member in status.members.values():
         if member['id'] not in status.id_map:
@@ -802,7 +803,7 @@ def add_breadcrumb(compound, name, compounds):
         parent = compounds[parent]['parent']
     compound['breadcrumb'] = []
     for elem in reversed(path_reverse):
-        compound['breadcrumb'].append([compounds[elem][name], elem + '.html'])
+        compound['breadcrumb'].append([compounds[elem][name], elem + '.html', strip_html_tags(compounds[elem][name])])
 
 
 def fixup_namespace_compound_members(compound, status: Status):
@@ -1219,15 +1220,13 @@ def createhtml(input_file, output_dir, options, template_params):
         #    continue
         type = compound['member_type']
         if type == 'file':
-            compound['breadcrumb'] = [(p, '') for p in compound['name'].split('/')]  # TODO: Make sure this works on Windows
+            compound['breadcrumb'] = [(p, '', p) for p in compound['name'].split('/')]  # TODO: Make sure this works on Windows
             fixup_namespace_compound_members(compound, status)
         elif type == 'module':
             add_breadcrumb(compound, 'name', status.groups)
             fixup_namespace_compound_members(compound, status)
         elif type == 'page':
             add_breadcrumb(compound, 'title', status.pages)
-            for elem in compound['breadcrumb']:
-                elem.append(strip_html_tags(elem[0]))
         else:
             add_breadcrumb(compound, 'name', status.members)
             if type == 'namespace':

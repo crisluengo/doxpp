@@ -84,7 +84,7 @@ All pages can define:
 All reference pages define:
 - `compound`
 File/module/namespace reference pages, `compound` contains:
-- `compound.breadcrumb` array of (name, target)
+- `compound.breadcrumb` array of (name, target, clean_name)
 - `compound.inline` (for namespace only)
 - `compound.since` # TODO
 - `compound.include` (not for file)
@@ -107,7 +107,7 @@ File/module/namespace reference pages, `compound` contains:
 - `compound.has_variable_details`
 - `compound.has_macro_details`
 Class/struct/union reference pages, `compound` contains:
-- `compound.breadcrumb` array of (name, target)
+- `compound.breadcrumb` array of (name, target, clean_name)
 - `compound.member_type`
 - `compound.templated`
 - `compound.template_parameters` (if `compound.templated`)

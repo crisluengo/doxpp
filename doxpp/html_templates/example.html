@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{% set j = joiner(' &raquo; ') %}{% for name, _ in compound.breadcrumb %}{{ j() }}{{ name }}{% endfor %} source | {{ super() }}{% endblock %}
+{% block title %}{% set j = joiner(' &raquo; ') %}{% for _, _, name in compound.breadcrumb %}{{ j() }}{{ name }}{% endfor %} source | {{ super() }}{% endblock %}
 
 {% block header_links %}
 {% if compound.footer_navigation and compound.footer_navigation[0] %}
@@ -13,7 +13,7 @@
 
 {% block main %}
         <h1>
-          {% for name, target in compound.breadcrumb[:-1] %}
+          {% for name, target, _ in compound.breadcrumb[:-1] %}
           <span class="m-breadcrumb"><a href="{{ target }}">{{ name }}</a> &raquo;</span>
           {% endfor %}
           {{ compound.breadcrumb[-1][0] }} <span class="m-thin">source</span>

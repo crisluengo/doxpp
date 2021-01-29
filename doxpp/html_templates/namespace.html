@@ -1,18 +1,18 @@
 {% extends 'base-reference.html' %}
 
-{% block title %}{% set j = joiner('::') %}{% for name, _ in compound.breadcrumb %}{{ j() }}{{ name }}{% endfor %} namespace | {{ super() }}{% endblock %}
+{% block title %}{% set j = joiner('::') %}{% for _, _, name in compound.breadcrumb %}{{ j() }}{{ name }}{% endfor %} namespace | {{ super() }}{% endblock %}
 
 {% block header %}
         <h1>
           {% if compound.include or compound.module %}
           <div class="m-doc-include m-right-m m-text-right">
-            {% if compound.module %}<a href="{{ compound.module[1] }}">{{ compound.module[0] }}</a> <span class="m-thin">module</span>{% endif %}
+            {% if compound.module %}<span class="m-thin"><a href="{{ compound.module[1] }}" class="m-doc">{{ compound.module[0] }}</a> module</span>{% endif %}
             {% if compound.include and compound.module %}<br/>{% endif %}
             {% if compound.include %}<span class="m-code m-inverted"><span class="cp">#include</span> <a class="cpf" href="{{ compound.include[1] }}">{{ compound.include[0] }}</a></span>{% endif %}
           </div>
           {% endif %}
 
-          {%+ for name, target in compound.breadcrumb[:-1] %}<span class="m-breadcrumb"><a href="{{ target }}">{{ name }}</a>::<wbr/></span>{% endfor %}{{ compound.breadcrumb[-1][0] }} <span class="m-thin">namespace</span>{% if compound.inline %} <span class="m-label m-flat m-info">inline</span>{% endif %}{% if compound.since %} {{ compound.since }}{% endif %}
+          {%+ for name, target, _ in compound.breadcrumb[:-1] %}<span class="m-breadcrumb"><a href="{{ target }}">{{ name }}</a>::<wbr/></span>{% endfor %}{{ compound.breadcrumb[-1][0] }} <span class="m-thin">namespace</span>{% if compound.inline %} <span class="m-label m-flat m-info">inline</span>{% endif %}{% if compound.since %} {{ compound.since }}{% endif %}
           {# need an explicit space here otherwise the newline gets removed #}
         </h1>
 {% endblock %}

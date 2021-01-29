@@ -17,12 +17,12 @@ the Markdown-formatted text into HTML with a small set of extensions:
   [md_in_html](https://python-markdown.github.io/extensions/md_in_html/),
   [sane_lists](https://python-markdown.github.io/extensions/sane_lists/), and
   [smarty](https://python-markdown.github.io/extensions/smarty/) to improve standard formatting.
-- Cris Luengo's
-  [mdx_math_svg]() to render equations.
 - Andrew Pinkham's
   [markdown_subscript_extension](https://github.com/jambonrose/markdown_subscript_extension), and
   [markdown_superscript_extension](https://github.com/jambonrose/markdown_superscript_extension)
   to add sub- and superscripts.
+- Cris Luengo's
+  [mdx_math_svg]() to render equations.
 - Sascha Cowley's
   [mdx_headdown](https://github.com/SaschaCowley/Markdown-Headdown) for internal purposes.
 - Some **dox++**-specific extensions to allow it to correct internal links and retrieve
@@ -121,7 +121,7 @@ Both will be rendered in the same way:
 We use the [codehilite](https://python-markdown.github.io/extensions/code_hilite/) extension
 to apply syntax highlighting to the code. This uses Pygments to identify the language and
 apply highlighting. We recommend that you don't leave the language identification to chance
-(we see above that identification failed for this short snipped),
+(we see above that identification failed for this short snippet),
 and specify the language explicitly:
 ```text
     :::cpp

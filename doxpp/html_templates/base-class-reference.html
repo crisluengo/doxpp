@@ -14,13 +14,13 @@
 {% macro details_variable(variable, show_full_name=False) %}{% include 'details-variable.html' %}{% endmacro %}
 {% macro details_macro(macro) %}{% include 'details-macro.html' %}{% endmacro %}
 
-{% block title %}{% set j = joiner('::') %}{% for name, _ in compound.breadcrumb %}{{ j() }}{{ name }}{% endfor %} {{ compound.member_type }} | {{ super() }}{% endblock %}
+{% block title %}{% set j = joiner('::') %}{% for _, _, name in compound.breadcrumb %}{{ j() }}{{ name }}{% endfor %} {{ compound.member_type }} | {{ super() }}{% endblock %}
 
 {% block main %}
         <h1>
           {% if compound.include or compound.module %}
           <div class="m-doc-include m-right-m m-text-right">
-              {% if compound.module %}<a href="{{ compound.module[1] }}">{{ compound.module[0] }}</a> <span class="m-thin">module</span>{% endif %}
+            {% if compound.module %}<span class="m-thin"><a href="{{ compound.module[1] }}" class="m-doc">{{ compound.module[0] }}</a> module</span>{% endif %}
             {% if compound.include and compound.module %}<br/>{% endif %}
             {% if compound.include %}<span class="m-code m-inverted"><span class="cp">#include</span> <a class="cpf" href="{{ compound.include[1] }}">{{ compound.include[0] }}</a></span>{% endif %}
           </div>
@@ -30,7 +30,7 @@
           {% set j = joiner(',\n    ') %}
           <div class="m-doc-template"><span class="m-doc-wrap-bumper">template&lt;</span><span class="m-doc-wrap">{% for t in compound.template_parameters %}{{ j() }}{{ t.type }}{% if t.name %} {{ t.name }}{% endif %}{% if t.default %} = {{ t.default }}{% endif%}{% endfor %}&gt;</span></div>
           {% endif %}
-          {%+ for name, target in compound.breadcrumb[:-1] %}<span class="m-breadcrumb"><a href="{{ target }}">{{ name }}</a>::<wbr/></span>{% endfor %}{{ compound.breadcrumb[-1][0] }} <span class="m-thin">{{ compound.member_type }}</span>{% if compound.final %} <span class="m-label m-flat m-warning">final</span>{% endif %}{% if compound.since %} {{ compound.since }}{% endif %}
+          {%+ for name, target, _ in compound.breadcrumb[:-1] %}<span class="m-breadcrumb"><a href="{{ target }}">{{ name }}</a>::<wbr/></span>{% endfor %}{{ compound.breadcrumb[-1][0] }} <span class="m-thin">{{ compound.member_type }}</span>{% if compound.final %} <span class="m-label m-flat m-warning">final</span>{% endif %}{% if compound.since %} {{ compound.since }}{% endif %}
         </h1>
         {% if compound.brief %}
         <p>{{ compound.brief }}</p>
