@@ -531,8 +531,6 @@ def assign_page(status: Status):
     }
     add_compound_member_lists(base)
     process_namespace(base, status)
-    # Fix base and derived class lists, and related member lists
-    process_base_derived_related_lists(status)
     # Assign a header file to groups and namespaces
     for member in status.members.values():
         if member['id'] and member['header']:
@@ -1172,6 +1170,9 @@ def createhtml(input_file, output_dir, options, template_params):
         for members in [group['namespaces'], group['classes']]:
             for member in members:
                 member['module'] = module
+
+    # Fix base and derived class lists, and related member lists
+    process_base_derived_related_lists(status)
 
     # Convert type name strings into HTML links if appropriate
     parse_types(status, options['doc_link_class'])
