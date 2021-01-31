@@ -447,7 +447,8 @@ but this will be demoted by the backend to be a lower level than the containing 
 See <code>\‍ref</code> for how <code>&lt;name&gt;</code> is interpreted and disambiguated.</p>
 <p>Note that this inserts an admonition (<code>!!! see</code>) that the backend must interpret to create the heading,
 and optionally box the whole paragraph.</p>
-<p>This command is expected to be on its own on a line. Cannot occur inside the brief description.</p>
+<p>This command is expected to be on its own on a line, and must be followed by an empty line. The
+<code>&lt;name&gt;</code> elements can spread over multiple lines. Cannot occur inside the brief description.</p>
 <h3 id="command_subpage">Command <code>\‍subpage</code></h3>
 <div class="m-code"><pre><span></span><span class="err">\‍subpage &lt;name&gt; [&quot;&lt;text&gt;&quot;]</span>
 </pre></div>

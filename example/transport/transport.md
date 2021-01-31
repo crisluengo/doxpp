@@ -42,7 +42,9 @@ We can reference the first one of the two using this ambiguous reference:
 \ref transport::RacingBike::PedalHarder. Note that we can reference
 multiple things one one line: \ref transport::foo, \ref macro--FOOBAR.
 
-\see transport::Bicycle, transport::MountainBike, transport::RacingBike, transport::RacingBike::PedalHarder(double), transport::RacingBike::PedalHarder(), transport::foo, macro--FOOBAR
+\see transport::Bicycle, transport::MountainBike, transport::RacingBike,
+transport::RacingBike::PedalHarder(double), transport::RacingBike::PedalHarder(),
+transport::foo, macro--FOOBAR
 
 We can reference back to \ref index "the main page" right here, but also to random
 anchors in it, for example \ref anchor-in-main "this one" or \ref main-test-refs-sa.

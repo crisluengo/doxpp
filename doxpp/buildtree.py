@@ -561,6 +561,7 @@ def collect_template_params(member, template_params, members):
 
 def post_process_types(members):
     # Add 'id' member to 'type' dicts
+    log.info("Linking types to members")
     for member in members.values():
         template_params = set()
         collect_template_params(member, template_params, members)
@@ -596,6 +597,7 @@ def cleanup_qualifiers(member):
 
 def post_process_inheritance(members):
     # Add links to derived classes in the base classes
+    log.info("Adding links to derived classes in the base classes")
     for member in members.values():
         if 'bases' in member:
             for base in member['bases']:
@@ -608,11 +610,12 @@ def post_process_inheritance(members):
 
 ref_cmd_match = re.compile(r'[\\@]ref +((?:\w|::|%|-)+(?: *\(.*?\))?)(?: +"(.*?)")?')
 ref_cmd_quotes_match = re.compile(r'[\\@]ref +"((?:[^"]|"")+)"(?: +"(.*?)")?')
-see_cmd_match = re.compile(r'^ *[\\@](?:see|sa) +(.+?) *$', re.MULTILINE)  # TODO: multiline `\see`?
+see_cmd_match = re.compile(r'^ *[\\@](?:see|sa) +(.+?) *(?:\Z|\n\n)', re.MULTILINE|re.DOTALL)
 see_arg_match = re.compile(r'([^,(]+(?:\(.*?\))?)')  # Split \see command arguments
 
 def post_process_links(elements, status: Status):
     # Process documentation for `\ref` and `\see` commands
+    log.info("Processing the \\ref and \\see commands")
     for elem in elements.values():
 
         def find_if_member(name, text):
@@ -704,6 +707,7 @@ relates_cmd_match = re.compile(r'^ *[\\@]relate[sd] +(.+?) *$', re.MULTILINE)
 
 def post_process_relates(members):
     # Process documentation for `\relates` commands (and `\related` synonym)
+    log.info("Processing the \\relates command")
     for member in members.values():
 
         def relates_cmd_replace(match):
@@ -733,6 +737,7 @@ subpage_cmd_match = re.compile(r'[\\@]subpage +((?:\w|-)+(?: *\(.*?\))?)(?: +"(.
 
 def post_process_subpages(pages):
     # Process documentation for `\subpage` commands
+    log.info("Processing the \\subpage command")
     for page in pages.values():
 
         def subpage_cmd_replace(match):

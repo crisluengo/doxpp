@@ -1157,14 +1157,17 @@ def createhtml(input_file, output_dir, options, template_params):
 
     # Find out which pages to create, what is listed in each, and in which page
     # the detailed documentation for each member has to go
+    log.info("Assigning members to pages")
     assign_page(status)
     #print('\n\nhtml_pages', status.html_pages)
     #print('\n\nid_map', status.id_map)
 
     # Parse all Markdown
+    log.info("Parsing Markdown")
     parse_markdown(status)
 
     # Add group info to classes and namespaces
+    log.info("Postprocessing information")
     for group in status.groups.values():
         module = (group['name'], group['id'] + '.html')
         for members in [group['namespaces'], group['classes']]:
@@ -1178,6 +1181,7 @@ def createhtml(input_file, output_dir, options, template_params):
     parse_types(status, options['doc_link_class'])
 
     # Create tree structure for index pages
+    log.info("Compiling indices")
     index = create_indices(status)
 
     # Navbar links
@@ -1220,6 +1224,7 @@ def createhtml(input_file, output_dir, options, template_params):
         #if not compound:
         #    log.error("Generating 'compound' data structure for unknown id = %s", id)
         #    continue
+        log.info("Generating page %s", file)
         type = compound['member_type']
         if type == 'file':
             compound['breadcrumb'] = [(p, '', p) for p in compound['name'].split('/')]  # TODO: Make sure this works on Windows
@@ -1249,6 +1254,7 @@ def createhtml(input_file, output_dir, options, template_params):
 
     # Generate indexes for pages, groups (==modules), namespaces, classes/structs/unions (==classes), and headers (==files)
     for file in ['pages.html', 'modules.html', 'namespaces.html', 'classes.html', 'files.html']:
+        log.info("Generating page %s", file)
         template = env.get_template(file)
         log.debug("Rendering file %s using template %s", file, template)
         rendered = template.render(index=index,
@@ -1260,6 +1266,7 @@ def createhtml(input_file, output_dir, options, template_params):
 
     # Generate search data
     if not template_params['SEARCH_DISABLED']:
+        log.info("Compiling search data")
         data = build_search_data(status,
                                  add_snake_case_suffixes=options['add_snake_case_suffixes'],
                                  add_camel_case_suffixes=options['add_camel_case_suffixes'])

@@ -407,7 +407,8 @@ See `\‍ref` for how `<name>` is interpreted and disambiguated.
 Note that this inserts an admonition (`!!! see`) that the backend must interpret to create the heading,
 and optionally box the whole paragraph.
 
-This command is expected to be on its own on a line. Cannot occur inside the brief description.
+This command is expected to be on its own on a line, and must be followed by an empty line. The
+`<name>` elements can spread over multiple lines. Cannot occur inside the brief description.
 
 \subsection command_subpage Command `\‍subpage`
 
