@@ -16,25 +16,25 @@
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import logging
+import sys
 
-logger = logging.getLogger()
+if sys.stderr.isatty():
+    logging.addLevelName( logging.WARNING, "\033[33m%s\033[0m" % logging.getLevelName(logging.WARNING))
+    logging.addLevelName( logging.ERROR, "\033[31m%s\033[0m" % logging.getLevelName(logging.ERROR))
+    formatter = logging.Formatter('\033[1m[%(levelname)s]\033[0m: %(message)s')
+else:
+    formatter = logging.Formatter('[%(levelname)s]: %(message)s')
 
 handler = logging.StreamHandler()
-formatter = logging.Formatter('\033[1m[%(levelname)s]\033[0m: %(message)s')
-
 handler.setFormatter(formatter)
+logger = logging.getLogger()
 logger.addHandler(handler)
 
-WARNING = logging.WARNING
-ERROR = logging.ERROR
-DEBUG = logging.DEBUG
-INFO = logging.INFO
-
 levels = {
-    'warning': WARNING,
-    'error': ERROR,
-    'info': INFO,
-    'debug': DEBUG
+    'warning': logging.WARNING,
+    'error': logging.ERROR,
+    'info': logging.INFO,
+    'debug': logging.DEBUG
 }
 
 def setLevel(level):
@@ -53,4 +53,4 @@ def info(msg, *args, **kwargs):
 def debug(msg, *args, **kwargs):
     logger.debug(msg, *args, **kwargs)
 
-setLevel(ERROR)
+setLevel(logging.ERROR)

@@ -754,6 +754,8 @@ def render_type(type, status: Status, doc_link_class):
 
 def parse_types(status: Status, doc_link_class):
     for member in status.members.values():
+        if 'page_id' not in member or not member['page_id']:
+            continue  # Don't bother with non-documented members
         if 'type' in member and isinstance(member['type'], dict):
             member['type']['type'] = render_type(member['type'], status, doc_link_class)
         if 'return_type' in member and member['return_type']:

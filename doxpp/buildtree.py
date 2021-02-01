@@ -623,11 +623,10 @@ def post_process_links(elements, status: Status):
             if parent not in status.members:
                 parent = ''
             id = find_member(name, parent, status.members)
-            if id:
-                if not text:
-                    text = name
-                    if code_formatting:
-                        text = '`{}`'.format(text)
+            if id and not text:
+                text = name
+                if code_formatting:
+                    text = '`{}`'.format(text)
             return id, text
 
         def find_and_format_name(name, text):
@@ -713,8 +712,11 @@ def post_process_relates(members):
         def relates_cmd_replace(match):
             id = find_member(match[1], member['id'], members)
             if id and members[id]['member_type'] in ['class', 'struct', 'union']:
-                members[id]['related'].append(member['id'])
-                member['relates'] = id
+                if 'related' in members[id]:
+                    members[id]['related'].append(member['id'])
+                    member['relates'] = id
+                else:
+                    log.error("Reference %s is not declared in the documented headers.\n   in documentation for %s", match[1], member['id'])
             else:
                 log.error("Reference %s could not be matched to class or struct.\n   in documentation for %s", match[1], member['id'])
             return ''
@@ -1680,6 +1682,7 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                 except StopIteration:
                     log.error("Couldn't find conversion operator type for %s\n   in file %s",
                               name, status.current_header_name)
+                    log.debug("token spelling: %s", ", ".join([x.spelling for x in item.get_tokens()]))
                     pass
 
             # Find the group this member belongs to
