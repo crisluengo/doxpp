@@ -61,7 +61,7 @@ from .markdown.add_classes import AddClassesExtension
 from .markdown.record_images import RecordLinkedImagesExtension
 from .markdown.mdx_subscript import SubscriptExtension
 from .markdown.mdx_superscript import SuperscriptExtension
-from .markdown import mdx_math_svg
+import mdx_math_svg
 
 
 doxpp_path = os.path.dirname(os.path.realpath(__file__))

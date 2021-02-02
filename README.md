@@ -5,12 +5,14 @@ See [the project website](https://crisluengo.github.io/doxpp/) for details.
 
 # Requirements
 
-dox++ requires Python 3, and has been tested (so far) with Python 3.9. Required packages from PyPI:
-`clang`, `jinja2`, `markdown`, `markdown-headdown`, `Pygments`.
+**dox++** requires Python 3, and has been tested (so far) with Python 3.9. Required packages from PyPI:
+`clang`, `jinja2`, `markdown`, `markdown-headdown`, `mdx_math_svg`, `Pygments`.
 
-dox++ requires Clang to be installed on the system. I don't know which is the minimal
+**dox++** requires Clang to be installed on the system. I don't know which is the minimal
 version, but there's no reason to use a very old one.
 
+The `mdx_math_svg` Markdown extension requires a working installation of LaTeX, but only if
+you use equations in your documentation. [TeX Live](https://tug.org/texlive/) is a good choice.
 
 # License
 

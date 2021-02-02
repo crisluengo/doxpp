@@ -148,8 +148,11 @@ Changes from Doxygen are as follows:
    members. Thus, it is not necessary to document a file just to be able to document the functions
    that are declared in it.
 
-10. `\param`, `\tparam`, `\returns` and the like are not yet supported. Currently function arguments
-   must be documented in the documentation text.
+10. With Doxygen there's sometimes a need for conditional compilation to avoid getting its parser
+    confused. Because **dox++parse** uses Clang, there's no danger of confusion.
+
+11. `\param`, `\tparam`, `\returns` and the like are not yet supported. Currently function arguments
+    must be documented in the documentation text.
 
 
 \page mcss_differences Differences with m.css
