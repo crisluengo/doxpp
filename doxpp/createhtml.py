@@ -231,18 +231,19 @@ def is_class_like(member):
     return member['member_type'] in ['class', 'struct', 'union']
 
 def class_has_documented_members(compound):
-    return compound['typeless_functions'] or compound['groups'] or compound['groups_names'] or \
-           compound['classes'] or compound['enums'] or compound['aliases'] or compound['functions'] or \
-           compound['variables'] or compound['related']
+    return (compound['typeless_functions'] or compound['groups'] or compound['groups_names'] or
+            compound['classes'] or compound['enums'] or compound['aliases'] or compound['functions'] or
+            compound['operators'] or compound['variables'] or compound['related'])
 
 def class_is_simple(compound):  # This is true if it has no documented members other than variables
     return not (compound['typeless_functions'] or compound['groups'] or compound['groups_names'] or
                 compound['classes'] or compound['enums'] or compound['aliases'] or compound['functions'] or
-                compound['related'] or compound['bases'] or compound['derived'])
+                compound['operators'] or compound['related'] or compound['bases'] or compound['derived'])
 
 def compound_has_documented_members(compound):  # not for classes
-    return compound['modules'] or compound['namespaces'] or compound['classes'] or compound['enums'] or \
-           compound['aliases'] or compound['functions'] or compound['variables'] or compound['macros']
+    return (compound['modules'] or compound['namespaces'] or compound['classes'] or compound['enums'] or
+            compound['aliases'] or compound['functions'] or compound['operators'] or compound['variables'] or
+            compound['macros'])
 
 def add_compound_member_booleans(compound):
     compound['has_class_details'] = False
@@ -260,6 +261,7 @@ def add_class_member_lists(compound):
     compound['enums'] = []
     compound['aliases'] = []
     compound['functions'] = []
+    compound['operators'] = []
     compound['variables'] = []
     add_compound_member_booleans(compound)
 
@@ -270,6 +272,7 @@ def add_compound_member_lists(compound):  # not for classes
     compound['enums'] = []
     compound['aliases'] = []
     compound['functions'] = []
+    compound['operators'] = []
     compound['variables'] = []
     compound['macros'] = []
     add_compound_member_booleans(compound)
@@ -311,6 +314,8 @@ def process_class_member(compound, member, status: Status):
         elif member_type == 'function':
             if member['method_type'] == 'method':
                 compound['functions'].append(member)
+            elif member['method_type'] == 'operator':
+                compound['operators'].append(member)
             else:
                 compound['typeless_functions'].append(member)  # this can actually also be an assignment operator
         elif member_type == 'variable':
@@ -388,11 +393,18 @@ def process_namespace_member(compound, member, status: Status):
             if group_compound:
                 group_compound['aliases'].append(member)
         elif member_type == 'function':
-            compound['functions'].append(member)
-            if header_compound:
-                header_compound['functions'].append(member)
-            if group_compound:
-                group_compound['functions'].append(member)
+            if member['operator']:
+                compound['operators'].append(member)
+                if header_compound:
+                    header_compound['operators'].append(member)
+                if group_compound:
+                    group_compound['operators'].append(member)
+            else:
+                compound['functions'].append(member)
+                if header_compound:
+                    header_compound['functions'].append(member)
+                if group_compound:
+                    group_compound['functions'].append(member)
         elif member_type == 'variable':
             compound['variables'].append(member)
             if header_compound:
@@ -448,8 +460,8 @@ def find_header_file(compound):
     # TODO: Modules without members, that only have submodules, should be assigned a header file.
     # We first count how many members have the same header file
     headers = {}
-    for members in (compound['classes'], compound['enums'], compound['aliases'],
-                    compound['functions'], compound['variables'], compound['macros']):
+    for members in (compound['classes'], compound['enums'], compound['aliases'], compound['functions'],
+                    compound['operators'], compound['variables'], compound['macros']):
         for member in members:
             if member['header'] in headers:
                 headers[member['header']] += 1
@@ -694,6 +706,7 @@ def parse_markdown(status: Status):
         SubscriptExtension(),       # https://github.com/jambonrose/markdown_subscript_extension
         SuperscriptExtension()      # https://github.com/jambonrose/markdown_superscript_extension
     ]
+    # TODO: Add an extension that inserts zero-width word breaks <wbr> after ::.
     extension_configs = {
         'codehilite': {
             'css_class': 'm-code',
@@ -860,7 +873,7 @@ def fixup_class_compound_members(compound, status: Status):
 
     compound['include'] = ('"' + status.headers[compound['header']]['name'] + '"', compound['header'] + '.html')
     for members in (compound['typeless_functions'], compound['classes'], compound['enums'], compound['aliases'],
-                    compound['functions'], compound['variables']):
+                    compound['functions'], compound['operators'], compound['variables']):
         for member in members:
             member['has_details'] = has_details(member)
     for group in compound['groups']:

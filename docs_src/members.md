@@ -141,6 +141,7 @@ If the member is an enumvalue (a child of an enum), it additionally has the foll
 If the member is a function, it additionally has the following fields:
 
 - "templated": `true` if this is a function template
+- "operator": `true` if the function is an operator
 - "constexpr": `true` if this is a `constexpr` function
 - "noexcept": `true` if the function is marked `noexcept`
 - "return_type": the function's return type, see \ref member_type_dictionary
@@ -168,9 +169,11 @@ If the function is a class or struct member, it additionally has the following f
 - "const": `true` or `false` depending on if the function is declared const or not
 - "access": set to a string `"public"`, `"protected"` or `"private"`
 - "method_type": set to a string `"method"`, `"conversionfunction"`, `"assignmentoperator"`,
-  `"constructor"` or `"destructor"`
+  `"operator"`, `"constructor"` or `"destructor"`
 - "explicit": `true` or `false` depending on if the function is marked `explicit`
   (exists only if "method_type" is either `"conversionfunction"` or `"constructor"`)
+
+"method_type" is `"operator"` or `"assignmentoperator"` if "operator" is `true`.
 
 \section member_macro Macro-specific fields
 

@@ -50,7 +50,7 @@
           </tbody>
         </table>
         {% endif %}
-        {% if compound.sections or compound.base_classes or compound.derived_classes or compound.typeless_functions or compound.groups or compound.classes or compound.enums or compound.aliases or compound.functions or compound.variables or compound.related %}
+        {% if compound.sections or compound.base_classes or compound.derived_classes or compound.typeless_functions or compound.groups or compound.classes or compound.enums or compound.aliases or compound.functions or compound.operators or compound.variables or compound.related %}
         <div class="m-block m-default">
           <h3>Contents</h3>
           <ul>
@@ -92,6 +92,9 @@
                 {% endif %}
                 {% if compound.functions %}
                 <li><a href="#function-members">Functions</a></li>
+                {% endif %}
+                {% if compound.operators %}
+                <li><a href="#operator-members">Operators</a></li>
                 {% endif %}
                 {% if compound.variables %}
                 <li><a href="#variable-members">Variables</a></li>
@@ -143,15 +146,15 @@
             <dl class="m-doc">
                 {% for member in group.members %}
                 {% if member.member_type in ['class', 'struct', 'union'] %}
-                {{ entry_class(member) }}
+{{ entry_class(member) }}
                 {% elif member.member_type == 'enum' %}
-                {{ entry_enum(member) }}
+{{ entry_enum(member) }}
                 {% elif member.member_type == 'alias' %}
-                {{ entry_alias(member) }}
+{{ entry_alias(member) }}
                 {% elif member.member_type == 'function' %}
-                {{ entry_function(member) }}
+{{ entry_function(member) }}
                 {% elif member.member_type == 'variable' %}
-                {{ entry_variable(member) }}
+{{ entry_variable(member) }}
                 {% endif %}
                 {% endfor %}
             </dl>
@@ -161,8 +164,8 @@
         <section id="nested-classes">
           <h2>Classes</h2>
           <dl class="m-doc">
-            {% for type in compound.classes %}
-{{ entry_class(type) }}
+            {% for class in compound.classes %}
+{{ entry_class(class) }}
             {% endfor %}
           </dl>
         </section>
@@ -171,8 +174,8 @@
         <section id="alias-members">
             <h2>Aliases</h2>
             <dl class="m-doc">
-                {% for function in compound.aliases %}
-                {{ entry_alias(function) }}
+                {% for alias in compound.aliases %}
+{{ entry_alias(alias) }}
                 {% endfor %}
             </dl>
         </section>
@@ -181,8 +184,8 @@
         <section id="enum-members">
           <h2>Enums</h2>
           <dl class="m-doc">
-            {% for type in compound.enums %}
-{{ entry_enum(type) }}
+            {% for enum in compound.enums %}
+{{ entry_enum(enum) }}
             {% endfor %}
           </dl>
         </section>
@@ -191,8 +194,18 @@
         <section id="function-members">
           <h2>Functions</h2>
           <dl class="m-doc">
-            {% for variable in compound.functions %}
-{{ entry_function(variable) }}
+            {% for function in compound.functions %}
+{{ entry_function(function) }}
+            {% endfor %}
+          </dl>
+        </section>
+        {% endif %}
+        {% if compound.operators %}
+        <section id="operator-members">
+          <h2>Operators</h2>
+          <dl class="m-doc">
+            {% for function in compound.operators %}
+{{ entry_function(function) }}
             {% endfor %}
           </dl>
         </section>
@@ -201,8 +214,8 @@
         <section id="variable-members">
            <h2>Variables</h2>
            <dl class="m-doc">
-              {% for function in compound.variables %}
-{{ entry_variable(function) }}
+              {% for variable in compound.variables %}
+{{ entry_variable(variable) }}
               {% endfor %}
            </dl>
         </section>

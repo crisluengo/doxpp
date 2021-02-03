@@ -370,6 +370,17 @@ def ends_with_token_char(str):
 def starts_with_token_char(str):
     return str and is_token_char(str[0])
 
+def is_operator(name):
+    # Returns True if `name` is "operator foo", "operator=", etc.
+    # Returns False if "operator_foo", which is a normal function name.
+    if not name.startswith('operator'):
+        return False
+    d = len('operator')
+    if len(name) <= d:
+        return True  # There's something fishy here! But `find_member()` depends on this returning True
+    c = name[d]
+    return not (c.isalnum() or c == '_')
+
 
 # --- find_member ---
 
@@ -454,7 +465,7 @@ def find_member(name, start_id, members):
         #       This would be much more nicely be solved if we had a better way to encode types, making
         #       template parameters explicit elements in some sort of list of dict elements:
         #       [{'foo',template_params},{'type',id}]
-    if name.startswith('operator'):
+    if is_operator(name):
         part = name[len('operator'):].strip()
         # We can have:
         # - <op>     + - * / % ^ & | ~ ! = < > += -= *= /= %= ^= &= |= << >> >>= <<= == != <= >= <=> && || ++ -- , ->* -> () []
@@ -1731,8 +1742,12 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                     # is_move_constructor
                 if member_type in ['conversionfunction', 'constructor']:
                     member['explicit'] = is_explicit(item)
-                if member['name'] == 'operator=':
-                    member_type = 'assignmentoperator'
+                member['operator'] = is_operator(member['name'])
+                if member['operator']:
+                    if member['name'] == 'operator=':
+                        member_type = 'assignmentoperator'
+                    else:
+                        member_type = 'operator'
                 if member_type in ['assignmentoperator', 'constructor', 'destructor']:
                     v = get_defaulted_or_deleted(item)
                     member['defaulted'] = v == 'default'
@@ -1772,6 +1787,7 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                 member['templated'] = is_template
                 if is_template:
                     member['template_parameters'] = []
+                member['operator'] = is_operator(member['name'])
                 process_function_declaration(item, member)
             elif member_type == 'namespace':
                 member['inline'] = is_inline(item)

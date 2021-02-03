@@ -222,6 +222,7 @@ to the class and their documentation could be shown together with that of the cl
 <p>If the member is a function, it additionally has the following fields:</p>
 <ul>
 <li>&ldquo;templated&rdquo;: <code>true</code> if this is a function template</li>
+<li>&ldquo;operator&rdquo;: <code>true</code> if the function is an operator</li>
 <li>&ldquo;constexpr&rdquo;: <code>true</code> if this is a <code>constexpr</code> function</li>
 <li>&ldquo;noexcept&rdquo;: <code>true</code> if the function is marked <code>noexcept</code></li>
 <li>&ldquo;return_type&rdquo;: the function&rsquo;s return type, see <a href="members.html#member_type_dictionary">The type dictionary</a></li>
@@ -246,10 +247,11 @@ to the class and their documentation could be shown together with that of the cl
 <li>&ldquo;const&rdquo;: <code>true</code> or <code>false</code> depending on if the function is declared const or not</li>
 <li>&ldquo;access&rdquo;: set to a string <code>"public"</code>, <code>"protected"</code> or <code>"private"</code></li>
 <li>&ldquo;method_type&rdquo;: set to a string <code>"method"</code>, <code>"conversionfunction"</code>, <code>"assignmentoperator"</code>,
-  <code>"constructor"</code> or <code>"destructor"</code></li>
+  <code>"operator"</code>, <code>"constructor"</code> or <code>"destructor"</code></li>
 <li>&ldquo;explicit&rdquo;: <code>true</code> or <code>false</code> depending on if the function is marked <code>explicit</code>
   (exists only if &ldquo;method_type&rdquo; is either <code>"conversionfunction"</code> or <code>"constructor"</code>)</li>
 </ul>
+<p>&ldquo;method_type&rdquo; is <code>"operator"</code> or <code>"assignmentoperator"</code> if &ldquo;operator&rdquo; is <code>true</code>.</p>
 <h2 id="member_macro">Macro-specific fields</h2>
 <p>If the member is a macro, it additionally has the following field:</p>
 <ul>

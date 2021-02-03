@@ -41,7 +41,7 @@
             <li><a href="#{{ id }}">{{ name }}</a></li>
             {% endif %}
             {% endfor %}
-            {% if compound.modules or compound.namespaces or compound.classes or compound.enums or compound.aliases or compound.functions or compound.variables or compound.macros %}
+            {% if compound.modules or compound.namespaces or compound.classes or compound.enums or compound.aliases or compound.functions or compound.operators or compound.variables or compound.macros %}
             <li>
               Reference
               <ul>
@@ -62,6 +62,9 @@
                 {% endif %}
                 {% if compound.functions %}
                 <li><a href="#function-members">Functions</a></li>
+                {% endif %}
+                {% if compound.operators %}
+                <li><a href="#operator-members">Operators</a></li>
                 {% endif %}
                 {% if compound.variables %}
                 <li><a href="#variable-members">Variables</a></li>
@@ -113,7 +116,7 @@
             <h2>Aliases</h2>
             <dl class="m-doc">
                 {% for alias in compound.aliases %}
-                {{ entry_alias(alias) }}
+{{ entry_alias(alias) }}
                 {% endfor %}
             </dl>
         </section>
@@ -133,6 +136,16 @@
           <h2>Functions</h2>
           <dl class="m-doc">
             {% for function in compound.functions %}
+{{ entry_function(function) }}
+            {% endfor %}
+          </dl>
+        </section>
+        {% endif %}
+        {% if compound.operators %}
+        <section id="operator-members">
+          <h2>Operators</h2>
+          <dl class="m-doc">
+            {% for function in compound.operators %}
 {{ entry_function(function) }}
             {% endfor %}
           </dl>
