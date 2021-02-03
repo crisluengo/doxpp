@@ -1,0 +1,207 @@
+{
+  "members": [
+    {
+      "id": "N",
+      "name": "N",
+      "brief": "",
+      "doc": "",
+      "sections": [],
+      "anchors": [],
+      "member_type": "namespace",
+      "parent": "",
+      "relates": "",
+      "header": "file--default_parameters-h",
+      "group": "",
+      "deprecated": false,
+      "inline": false,
+      "members": [
+        {
+          "id": "N-A",
+          "name": "A",
+          "brief": "",
+          "doc": "",
+          "sections": [],
+          "anchors": [],
+          "member_type": "struct",
+          "parent": "N",
+          "relates": "",
+          "header": "file--default_parameters-h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "abstract": false,
+          "final": false,
+          "bases": [],
+          "derived": [],
+          "members": [
+            {
+              "id": "N-A-a",
+              "name": "a",
+              "brief": "",
+              "doc": "",
+              "sections": [],
+              "anchors": [],
+              "member_type": "variable",
+              "parent": "N-A",
+              "relates": "",
+              "header": "file--default_parameters-h",
+              "group": "",
+              "deprecated": false,
+              "type": {
+                "typename": "int",
+                "qualifiers": "",
+                "id": ""
+              },
+              "static": false,
+              "mutable": false,
+              "access": "public",
+              "constexpr": false
+            },
+            {
+              "id": "N-A-b",
+              "name": "b",
+              "brief": "",
+              "doc": "",
+              "sections": [],
+              "anchors": [],
+              "member_type": "variable",
+              "parent": "N-A",
+              "relates": "",
+              "header": "file--default_parameters-h",
+              "group": "",
+              "deprecated": false,
+              "type": {
+                "typename": "int",
+                "qualifiers": "",
+                "id": ""
+              },
+              "static": false,
+              "mutable": false,
+              "access": "public",
+              "constexpr": false
+            },
+            {
+              "id": "N-A-c",
+              "name": "c",
+              "brief": "",
+              "doc": "",
+              "sections": [],
+              "anchors": [],
+              "member_type": "variable",
+              "parent": "N-A",
+              "relates": "",
+              "header": "file--default_parameters-h",
+              "group": "",
+              "deprecated": false,
+              "type": {
+                "typename": "double",
+                "qualifiers": "",
+                "id": ""
+              },
+              "static": false,
+              "mutable": false,
+              "access": "public",
+              "constexpr": false
+            },
+            {
+              "id": "N-A-d",
+              "name": "d",
+              "brief": "",
+              "doc": "",
+              "sections": [],
+              "anchors": [],
+              "member_type": "variable",
+              "parent": "N-A",
+              "relates": "",
+              "header": "file--default_parameters-h",
+              "group": "",
+              "deprecated": false,
+              "type": {
+                "typename": "char",
+                "qualifiers": "",
+                "id": ""
+              },
+              "static": false,
+              "mutable": false,
+              "access": "public",
+              "constexpr": false
+            }
+          ],
+          "related": []
+        },
+        {
+          "id": "N-foo",
+          "name": "foo",
+          "brief": "",
+          "doc": "",
+          "sections": [],
+          "anchors": [],
+          "member_type": "variable",
+          "parent": "N",
+          "relates": "",
+          "header": "file--default_parameters-h",
+          "group": "",
+          "deprecated": false,
+          "type": {
+            "typename": "double",
+            "qualifiers": "const",
+            "id": ""
+          },
+          "static": false,
+          "constexpr": true
+        },
+        {
+          "id": "N-func-N-A-CL-double-",
+          "name": "func",
+          "brief": "",
+          "doc": "",
+          "sections": [],
+          "anchors": [],
+          "member_type": "function",
+          "parent": "N",
+          "relates": "",
+          "header": "file--default_parameters-h",
+          "group": "",
+          "deprecated": false,
+          "templated": false,
+          "constexpr": false,
+          "noexcept": false,
+          "return_type": {
+            "typename": "void",
+            "qualifiers": "",
+            "id": ""
+          },
+          "arguments": [
+            {
+              "typename": "N::A",
+              "qualifiers": "const&",
+              "name": "x",
+              "default": "{0,4,3.14,'x'}",
+              "id": "N-A"
+            },
+            {
+              "typename": "double",
+              "qualifiers": "",
+              "name": "y",
+              "default": "N::foo",
+              "id": ""
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "headers": [
+    {
+      "id": "file--default_parameters-h",
+      "name": "default_parameters.h",
+      "brief": "",
+      "doc": "",
+      "sections": [],
+      "anchors": [],
+      "includes": []
+    }
+  ],
+  "groups": [],
+  "pages": []
+}

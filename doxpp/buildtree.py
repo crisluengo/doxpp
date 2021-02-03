@@ -1247,10 +1247,11 @@ def process_type(type, cursor=None):
     process_type_recursive(type, cursor, output)
     return output
 
-def find_default_value(tokens):
+def find_default_value(item):
+    tokens = [x.spelling for x in item.get_tokens()]
     for ii in range(len(tokens) - 1):
         if tokens[ii] == '=':
-            return tokens[ii + 1]
+            return ''.join(tokens[ii + 1:])
     return None
 
 def is_constexpr(item):
@@ -1346,7 +1347,7 @@ def process_template_nontype_parameter(item):
         #       process the tokens manually.
     else:
         type = process_type(item.type, item)
-    default = find_default_value([x.spelling for x in item.get_tokens()])
+    default = find_default_value(item)
     return {
         'name': name,
         'type': type,
@@ -1361,19 +1362,9 @@ def process_function_declaration(item, member):
     template_parameters = []
     for child in item.get_children():
         if child.kind == cindex.CursorKind.PARM_DECL:
-            name = child.spelling
-            param = None
-            default = None
-            for elem in child.get_children():
-                if elem.kind == cindex.CursorKind.TYPE_REF:
-                    param = process_type(child.type, cursor=elem)
-                    default = find_default_value([x.spelling for x in child.get_tokens()])
-                    break
-            if param is None:
-                param = process_type(child.type)
-                default = find_default_value([x.spelling for x in child.get_tokens()])
-            param['name'] = name
-            param['default'] = default
+            param = process_type(child.type)
+            param['name'] = child.spelling
+            param['default'] = find_default_value(child)
             arguments.append(param)
         elif child.kind == cindex.CursorKind.CXX_FINAL_ATTR:
             member['final'] = True
