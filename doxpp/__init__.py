@@ -16,5 +16,3 @@
 
 from . import log
 from . import config
-from . import buildtree
-from . import createhtml

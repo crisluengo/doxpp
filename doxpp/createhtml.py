@@ -670,6 +670,7 @@ def process_sections(compound, md):
         compound['sections'].append(process_sections_recursive(sections, 1, md))
 
 def parse_markdown(status: Status):
+    math_svg_extension = mdx_math_svg.MathSvgExtension(inline_class='m-math', display_class='m-math', fontsize=1)
     extensions = [
         # Extensions packaged with `markdown`:
         'attr_list',        # https://python-markdown.github.io/extensions/attr_list/
@@ -681,8 +682,8 @@ def parse_markdown(status: Status):
         'smarty',           # https://python-markdown.github.io/extensions/smarty/
         # Installed with package `markdown-headdown`
         'mdx_headdown',     # https://github.com/SaschaCowley/Markdown-Headdown
-        # Temporarily a local file, to be made into a package
-        mdx_math_svg.MathSvgExtension(inline_class='m-math', display_class='m-math', fontsize=1),
+        # Installed with package `mdx_math_svg`
+        math_svg_extension,         # https://github.com/crisluengo/mdx_math_svg
         # Our own concoctions
         AdmonitionExtension(),              # Modification of the standard 'admonition' extension
         FixLinksExtension(status.id_map),   # Fixes links from '#id' to 'page_id.html#id'
@@ -706,7 +707,7 @@ def parse_markdown(status: Status):
 
     # TODO: the cache file name should be configurable
     math_cache_file_name = 'math_cache'
-    mdx_math_svg.load_cache(math_cache_file_name)
+    math_svg_extension.latex2svg.load_cache(math_cache_file_name)
 
     for header in status.headers.values():
         if header['brief']:
@@ -736,7 +737,7 @@ def parse_markdown(status: Status):
             page['title'] = remove_p_tag(md.reset().convert(page['title']))
         process_sections(page, md)
 
-    mdx_math_svg.save_cache(math_cache_file_name)
+    math_svg_extension.latex2svg.save_cache(math_cache_file_name)
 
 
 def render_type(type, status: Status, doc_link_class):

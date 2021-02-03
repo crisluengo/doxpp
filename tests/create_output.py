@@ -7,8 +7,8 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 import doxpp
+import doxpp.buildtree
 
-doxpp.log.setLevel('info')
 
 options = {
     'code_formatting': 'no',
@@ -16,6 +16,7 @@ options = {
 }
 
 for file in glob.glob(os.path.join(currentdir, 'input', '*')):
+    print('Processing', file)
     name, ext = os.path.splitext(os.path.basename(file))
     json_file = os.path.join(currentdir, 'output', name + '.json')
     if ext == '.md':

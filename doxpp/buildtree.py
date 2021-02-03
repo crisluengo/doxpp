@@ -1768,6 +1768,7 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                 member['members'] = []
                 process_children = True
             elif member_type == 'field':
+                # TODO: initializer
                 member['type'] = process_type(item.type, item)
                 member['static'] = item.storage_class == cindex.StorageClass.STATIC
                 member['mutable'] = item.is_mutable_field()
@@ -1809,6 +1810,7 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                 member['related'] = []
                 process_children = True
             elif member_type == 'variable':
+                # TODO: initializer
                 member['type'] = process_type(item.type, item)
                 member['static'] = item.storage_class == cindex.StorageClass.STATIC
                 member['constexpr'] = is_constexpr(item)

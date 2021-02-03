@@ -20,6 +20,7 @@ import argparse
 import os
 import shlex
 import doxpp
+import doxpp.createhtml
 import importlib.util
 
 
