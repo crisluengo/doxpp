@@ -6,8 +6,8 @@ This is the default configuration file created by `dox++parse -g`:
 # Default dox++ configuration file
 
 [clang]
-compiler flags = 
-include directories = 
+compiler flags =
+include directories =
 
 [log]
 level = warning
@@ -26,8 +26,8 @@ formatting = compact
 [project]
 name = Project Name
 brief = Short project description
-url = 
-logo = 
+url =
+logo =
 
 [html]
 output directory = html
@@ -37,13 +37,13 @@ document protected members = yes
 document undocumented members = no
 modify include statement = def modify_include_statement(id): return id
 theme color = #22272e
-favicon = 
-stylesheets = 
-templates = 
+favicon =
+stylesheets =
+templates =
 documentation link class = m-doc
-extra files = 
-html header = 
-page header = 
+extra files =
+html header =
+page header =
 fine print = [default]
 navigation bar 1 = [('', '#pages', []),('', '#modules', []),('', '#namespaces', [])]
 navigation bar 2 = [('', '#classes', []),('', '#files', [])]
@@ -54,8 +54,8 @@ class index expand inner = no
 [search]
 enable = yes
 download binary = no
-base url = 
-external url = 
+base url =
+external url =
 add snake case suffixes = yes
 add camel case suffixes = yes
 ```
@@ -79,7 +79,7 @@ Options to configure Clang.
 \subsection config_clang_compilerflags compiler flags
 Flags to pass to Clang when parsing the project header files. Specify
 the C++ standard used (e.g. `-std=c++17`), preprocessor macro definitions (e.g. `-DFOO`),
-and options such as `-xc++` (ensures sources are interpreted as C++, not C). 
+and options such as `-xc++` (ensures sources are interpreted as C++, not C).
 
 \subsection config_clang_includedirectories include directories
 Directories to add to the include search path. Separate them with
@@ -123,7 +123,7 @@ same way as the header files.
 Integer value for how many spaces each tab character advances. If the source code
 uses tabs, they will be converted to spaces according to this value. It is important to match
 this value correctly so that Markdown indenting is interpreted as intended.
-This does not affect the Markdown parsing, which always assumes 4 spaces indentation. 
+This does not affect the Markdown parsing, which always assumes 4 spaces indentation.
 
 
 \section config_section_json Section json
