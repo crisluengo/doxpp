@@ -961,6 +961,8 @@ div.m-math svg {
   margin-left: auto;
   margin-right: auto;
   display: block;
+}
+.m-math svg {
   overflow: visible;
 }
 div.m-button a svg.m-math { fill: var(--button-background-color); }
