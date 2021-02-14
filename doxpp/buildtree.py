@@ -461,7 +461,7 @@ def find_member(name, start_id, members):
         templated = True
         # TODO: We don't need to match template, but we do want our match to be a templated type with
         #       the right number of arguments. We might also want to link
-        # TODO: In cases such as `foo<T>::type`, we're linking to `foo`, not to it's `type` member.
+        # TODO: In cases such as `foo<T>::type`, we're linking to `foo`, not to its `type` member.
         #       This would be much more nicely be solved if we had a better way to encode types, making
         #       template parameters explicit elements in some sort of list of dict elements:
         #       [{'foo',template_params},{'type',id}]

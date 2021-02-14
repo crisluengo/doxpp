@@ -119,7 +119,6 @@ def create_member_dict(members):
     output[''] = {
         'id': '',
         'members': members
-        # TODO: add dictionary keys expected by code.
     }
     create_member_dict_recursive(members, output)
     return output
