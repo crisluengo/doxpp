@@ -133,7 +133,7 @@ of them.</p>
 with one of these commands, otherwise it will be associated to the next declaration
 (or previous if it starts with <code>&lt;</code>).</p>
 <h3 id="command_addtogroup">Command <code>\addtogroup</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍addtogroup &lt;name&gt;</span>
+<div class="m-code"><pre><span></span>\‍addtogroup &lt;name&gt;
 </pre></div>
 
 <p>Sets <code>&lt;name&gt;</code> as the active group. If the group is not defined, a new group will be created
@@ -144,8 +144,8 @@ case it must not have a <code>&lt;name&gt;</code> parameter.</p>
 <p>See <a href="grouping.html">Grouping</a> for more information on grouping.</p>
 <p>The remainder of the comment block is ignored.</p>
 <h3 id="command_alias">Command <code>\alias</code> and <code>\typedef</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍alias &lt;name&gt;</span>
-<span class="err">\‍typedef &lt;name&gt;</span>
+<div class="m-code"><pre><span></span>\‍alias &lt;name&gt;
+\‍typedef &lt;name&gt;
 </pre></div>
 
 <p>Documents an alias declared in the headers with <code>using</code> or <code>typedef</code>. The declaration must actually
@@ -155,8 +155,8 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 <code>&lt;name&gt;</code> is not the fully qualified name of the matched alias.</p>
 <p><code>\typedef</code> is an alias for compatibility with Doxygen.</p>
 <h3 id="command_class">Command <code>\class</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍class &lt;name&gt;</span>
-<span class="err">\‍class &lt;id&gt;</span>
+<div class="m-code"><pre><span></span>\‍class &lt;name&gt;
+\‍class &lt;id&gt;
 </pre></div>
 
 <p>Documents a class declared in the headers with <code>class</code>. The declaration must actually
@@ -166,19 +166,19 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 <code>&lt;name&gt;</code> is not the fully qualified name of the matched class.</p>
 <p>Alternatively, provide the ID for the class.</p>
 <h3 id="command_dir">Command <code>\dir</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍dir [&lt;path fragment&gt;]</span>
+<div class="m-code"><pre><span></span>\‍dir [&lt;path fragment&gt;]
 </pre></div>
 
 <p><strong>dox++</strong> doesn&rsquo;t document directories. This Doxygen command is recognized and a warning
 message is produced.</p>
 <h3 id="command_endgroup">Command <code>\endgroup</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍endgroup</span>
+<div class="m-code"><pre><span></span>\‍endgroup
 </pre></div>
 
 <p>Closes the nearest previous <code>\addtogroup</code>.
 See <a href="grouping.html">Grouping</a> for more information.</p>
 <h3 id="command_endname">Command <code>\endname</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍endname</span>
+<div class="m-code"><pre><span></span>\‍endname
 </pre></div>
 
 <p>Closes the nearest previous <code>\name</code>.
@@ -195,7 +195,7 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 <code>&lt;name&gt;</code> is not the fully qualified name of the matched enumerator.</p>
 <p>Alternatively, provide the ID for the enumerator.</p>
 <h3 id="command_file">Command <code>\file</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍file [&lt;name&gt;]</span>
+<div class="m-code"><pre><span></span>\‍file [&lt;name&gt;]
 </pre></div>
 
 <p>Adds documentation for the current file, or a different file if the file name is given.
@@ -206,10 +206,10 @@ The rest of the comment block is considered documentation.</p>
 </pre></div>
 
 <h3 id="command_function">Command <code>\function</code> and <code>\fn</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍function &lt;name&gt;</span>
-<span class="err">\‍function &lt;id&gt;</span>
-<span class="err">\‍fn &lt;name&gt;</span>
-<span class="err">\‍fn &lt;id&gt;</span>
+<div class="m-code"><pre><span></span>\‍function &lt;name&gt;
+\‍function &lt;id&gt;
+\‍fn &lt;name&gt;
+\‍fn &lt;id&gt;
 </pre></div>
 
 <p>Documents a function or class method declared in the headers. The declaration must actually
@@ -224,8 +224,8 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 <p>Alternatively, provide the ID for the function.</p>
 <p><code>\fn</code> is an alias for compatibility with Doxygen.</p>
 <h3 id="command_group">Command <code>\group</code> and <code>\defgroup</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍group &lt;name&gt; [&lt;title&gt;]</span>
-<span class="err">\‍defgroup &lt;name&gt; [&lt;title&gt;]</span>
+<div class="m-code"><pre><span></span>\‍group &lt;name&gt; [&lt;title&gt;]
+\‍defgroup &lt;name&gt; [&lt;title&gt;]
 </pre></div>
 
 <p>Documents a group.</p>
@@ -243,8 +243,8 @@ will become active.</p>
 somewhat differently.</p>
 <p>See <a href="grouping.html">Grouping</a> for more information on grouping.</p>
 <h3 id="command_macro">Command <code>\macro</code> and <code>\def</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍macro &lt;name&gt;</span>
-<span class="err">\‍def &lt;name&gt;</span>
+<div class="m-code"><pre><span></span>\‍macro &lt;name&gt;
+\‍def &lt;name&gt;
 </pre></div>
 
 <p>The only way of documenting preprocessor macros, as Clang doesn&rsquo;t report on the work of
@@ -264,13 +264,13 @@ put this command in the same file where the macro is actually defined.</p>
 <p><strong>TODO:</strong> Maybe eventually <code>\headerfile</code> can be used to indicate which header the macro is defined in.</p>
 <p><code>\def</code> is an alias for compatibility with Doxygen.</p>
 <h3 id="command_mainpage">Command <code>\mainpage</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍mainpage [&lt;title&gt;]</span>
+<div class="m-code"><pre><span></span>\‍mainpage [&lt;title&gt;]
 </pre></div>
 
 <p>Creates a page with the ID <code>index</code>, and <code>&lt;title&gt;</code> as the page&rsquo;s title. This is the start page
 for the documentation. Text in this block is the page&rsquo;s text. See <code>\page</code> for more information.</p>
 <h3 id="command_name">Command <code>\name</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍name &lt;header&gt;</span>
+<div class="m-code"><pre><span></span>\‍name &lt;header&gt;
 </pre></div>
 
 <p>Creates a group for class or struct members.  The <code>&lt;header&gt;</code> text
@@ -286,8 +286,8 @@ of the file until <code>\endname</code> is encountered, even within other classe
 The backend can choose to group class or struct members by access (private/protected/public), or
 by <code>\name</code> grouping, or both.</p>
 <h3 id="command_namespace">Command <code>\namespace</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍namespace &lt;name&gt;</span>
-<span class="err">\‍namespace &lt;id&gt;</span>
+<div class="m-code"><pre><span></span>\‍namespace &lt;name&gt;
+\‍namespace &lt;id&gt;
 </pre></div>
 
 <p>Documents a namespace declared in the headers. The declaration must actually exist. <code>&lt;name&gt;</code> is the
@@ -297,7 +297,7 @@ match). In case of ambiguity, the first match is chosen. A warning is produced i
 the fully qualified name of the matched namespace.</p>
 <p>Alternatively, provide the ID for the namespace.</p>
 <h3 id="command_page">Command <code>\page</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍page &lt;name&gt; &lt;title&gt;</span>
+<div class="m-code"><pre><span></span>\‍page &lt;name&gt; &lt;title&gt;
 </pre></div>
 
 <p>Creates a page with <code>&lt;name&gt;</code> as ID and <code>&lt;title&gt;</code> as the title. Text in this block is the page&rsquo;s text.
@@ -306,8 +306,8 @@ The page can be referenced by its ID.</p>
 this page. Use <code>\‍ref</code> commands to reference other pages but not impose any hierarchy.</p>
 <p>By default, all pages are at the same level, not subordinate to any other page.</p>
 <h3 id="command_struct">Command <code>\struct</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍struct &lt;name&gt;</span>
-<span class="err">\‍struct &lt;id&gt;</span>
+<div class="m-code"><pre><span></span>\‍struct &lt;name&gt;
+\‍struct &lt;id&gt;
 </pre></div>
 
 <p>Documents a struct declared in the headers. The declaration must actually exist.
@@ -317,8 +317,8 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 <code>&lt;name&gt;</code> is not the fully qualified name of the matched struct.</p>
 <p>Alternatively, provide the ID for the struct.</p>
 <h3 id="command_union">Command <code>\union</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍union &lt;name&gt;</span>
-<span class="err">\‍union &lt;id&gt;</span>
+<div class="m-code"><pre><span></span>\‍union &lt;name&gt;
+\‍union &lt;id&gt;
 </pre></div>
 
 <p>Documents a union or constant declared in the headers. The declaration must actually exist.
@@ -343,7 +343,7 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 <p><code>\var</code> is an alias for compatibility with Doxygen.</p>
 <h2 id="commands_inside">Inside documentation blocks</h2>
 <h3 id="command_anchor">Command <code>\anchor</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍anchor &lt;name&gt;</span>
+<div class="m-code"><pre><span></span>\‍anchor &lt;name&gt;
 </pre></div>
 
 <p>Anywhere in a documentation block, adds an anchor that can be referenced elsewhere with <code>\‍ref</code>.</p>
@@ -351,8 +351,8 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 in either case it references the preceding paragraph. The paragraph is assigned the <code>#&lt;name&gt;</code>
 attribute.</p>
 <h3 id="command_brief">Command <code>\brief</code> and <code>\short</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\brief &lt;paragraph&gt;</span>
-<span class="err">\short &lt;paragraph&gt;</span>
+<div class="m-code"><pre><span></span>\brief &lt;paragraph&gt;
+\short &lt;paragraph&gt;
 </pre></div>
 
 <p>Used at the beginning of the first line of a comment block, turns the first paragraph into the &ldquo;brief&rdquo; string.</p>
@@ -366,7 +366,7 @@ attribute.</p>
 
 <p><code>\short</code> is an alias.</p>
 <h3 id="command_ingroup">Command <code>\ingroup</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\ingroup &lt;name&gt;</span>
+<div class="m-code"><pre><span></span>\ingroup &lt;name&gt;
 </pre></div>
 
 <p>If this appears in the comment block for a namespace member, the member will become part of the
@@ -375,15 +375,15 @@ group listed. It can also appear in the comment block of a group, to nest groups
 <p>See <a href="grouping.html">Grouping</a> for more information on grouping.</p>
 <p>This command is expected to be on its own on a line.</p>
 <h3 id="command_n">Command <code>\‍n</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍n</span>
+<div class="m-code"><pre><span></span>\‍n
 </pre></div>
 
 <p>Inserts a line break. The Markdown for a line break is two spaces at the end of a line.
 Because many code editors automatically remove such spaces, use this command instead.
 It will be replaced by two spaces, and a newline will be added if it&rsquo;s not there already.</p>
 <h3 id="command_ref">Command <code>\‍ref</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍ref &lt;name&gt; [&quot;&lt;text&gt;&quot;]</span>
-<span class="err">\‍ref &quot;&lt;name&gt;&quot; [&quot;&lt;text&gt;&quot;]</span>
+<div class="m-code"><pre><span></span>\‍ref &lt;name&gt; [&quot;&lt;text&gt;&quot;]
+\‍ref &quot;&lt;name&gt;&quot; [&quot;&lt;text&gt;&quot;]
 </pre></div>
 
 <p>Creates a link to the entity (member, header, group or page) called <code>&lt;name&gt;</code>. Optionally,
@@ -418,8 +418,8 @@ after the link.</p>
 for <code>&lt;text&gt;</code> is mandatory. Two sequential quotes are considered part of an operator name,
 such as in <code>\‍ref "operator""_w"</code>.</p>
 <h3 id="command_relates">Command <code>\relates</code> and <code>\related</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍relates &lt;name&gt;</span>
-<span class="err">\‍related &lt;name&gt;</span>
+<div class="m-code"><pre><span></span>\‍relates &lt;name&gt;
+\‍related &lt;name&gt;
 </pre></div>
 
 <p>Added to the documentation block of a function or variable, and with <code>&lt;name&gt;</code> referencing
@@ -429,7 +429,7 @@ in namespace members (including global scope).</p>
 <p>This command is expected to be on its own on a line. Each member can only have one <code>\relates</code>
 command.</p>
 <h3 id="command_section">Command <code>\section</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\section &lt;name&gt; &lt;title&gt;</span>
+<div class="m-code"><pre><span></span>\section &lt;name&gt; &lt;title&gt;
 </pre></div>
 
 <p>Starts a new section within a documentation block or a page. <code>&lt;name&gt;</code> is the ID that can
@@ -439,8 +439,8 @@ but this will be demoted by the backend to be a lower level than the containing 
 <p>One can also directly write <code># My Title {#my-title}</code>, but then the <code>\‍ref</code> command will not recognize
 <code>my-title</code> as something that can be referenced.</p>
 <h3 id="command_see">Command <code>\see</code> and <code>\sa</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍see &lt;name&gt; [, &lt;name&gt; [, ...]</span>
-<span class="err">\‍sa &lt;name&gt; [, &lt;name&gt; [, ...]</span>
+<div class="m-code"><pre><span></span>\‍see &lt;name&gt; [, &lt;name&gt; [, ...]
+\‍sa &lt;name&gt; [, &lt;name&gt; [, ...]
 </pre></div>
 
 <p>Starts a paragraph with a &ldquo;See also&rdquo; header linking the given entities (members, headers, groups, pages).
@@ -450,7 +450,7 @@ and optionally box the whole paragraph.</p>
 <p>This command is expected to be on its own on a line, and must be followed by an empty line. The
 <code>&lt;name&gt;</code> elements can spread over multiple lines. Cannot occur inside the brief description.</p>
 <h3 id="command_subpage">Command <code>\‍subpage</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\‍subpage &lt;name&gt; [&quot;&lt;text&gt;&quot;]</span>
+<div class="m-code"><pre><span></span>\‍subpage &lt;name&gt; [&quot;&lt;text&gt;&quot;]
 </pre></div>
 
 <p>This is similar to <code>\‍ref</code>, but for pages. It can only occur inside a page (see <code>\page</code>).
@@ -463,12 +463,12 @@ a tree structure.</p>
 <p><code>\‍subpage &lt;name&gt; "&lt;text&gt;"</code> uses <code>&lt;text&gt;</code> as the anchor text for the link.</p>
 <p>To create links without creating hierarchical relations, use <code>\‍ref</code>.</p>
 <h3 id="command_subsection">Command <code>\subsection</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\subsection &lt;name&gt; &lt;title&gt;</span>
+<div class="m-code"><pre><span></span>\subsection &lt;name&gt; &lt;title&gt;
 </pre></div>
 
 <p>Like <code>\section</code>, but for a level 2 heading (<code>##</code> in Markdown).</p>
 <h3 id="command_subsubsection">Command <code>\subsubsection</code></h3>
-<div class="m-code"><pre><span></span><span class="err">\subsubsection &lt;name&gt; &lt;title&gt;</span>
+<div class="m-code"><pre><span></span>\subsubsection &lt;name&gt; &lt;title&gt;
 </pre></div>
 
 <p>Like <code>\section</code>, but for a level 3 heading (<code>###</code> in Markdown).</p>

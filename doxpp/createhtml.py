@@ -681,7 +681,7 @@ def process_sections(compound, md):
     while sections:
         compound['sections'].append(process_sections_recursive(sections, 1, md))
 
-def parse_markdown(status: Status):
+def parse_markdown(status: Status, math_cache_file):
     math_svg_extension = mdx_math_svg.MathSvgExtension(inline_class='m-math', display_class='m-math', fontsize=1)
     extensions = [
         # Extensions packaged with `markdown`:
@@ -718,9 +718,7 @@ def parse_markdown(status: Status):
     }
     md = markdown.Markdown(extensions=extensions, extension_configs=extension_configs, output_format="html5")
 
-    # TODO: the cache file name should be configurable
-    math_cache_file_name = 'math_cache'
-    math_svg_extension.latex2svg.load_cache(math_cache_file_name)
+    math_svg_extension.latex2svg.load_cache(math_cache_file)
 
     for header in status.headers.values():
         if header['brief']:
@@ -750,7 +748,7 @@ def parse_markdown(status: Status):
             page['title'] = remove_p_tag(md.reset().convert(page['title']))
         process_sections(page, md)
 
-    math_svg_extension.latex2svg.save_cache(math_cache_file_name)
+    math_svg_extension.latex2svg.save_cache(math_cache_file)
 
 
 def render_type(type, status: Status, doc_link_class):
@@ -1156,6 +1154,7 @@ def createhtml(input_file, output_dir, options, template_params):
     - 'doc_link_class': CSS class to add to links to members (must match templates)
     - 'add_snake_case_suffixes': split up names according to snake case for searching
     - 'add_camel_case_suffixes': split up names according to camel case for searching
+    - 'math_cache_file': file name for the cache for the mdx_math_svg markdown extension.
     """
 
     # Load data
@@ -1180,7 +1179,7 @@ def createhtml(input_file, output_dir, options, template_params):
 
     # Parse all Markdown
     log.info("Parsing Markdown")
-    parse_markdown(status)
+    parse_markdown(status, options['math_cache_file'])
 
     # Add group info to classes and namespaces
     log.info("Postprocessing information")

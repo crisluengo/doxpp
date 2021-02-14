@@ -64,6 +64,9 @@ default_config_values = {
         'class index expand levels': '1',
         'class index expand inner': 'no',
     },
+    'math': {
+        'cache file': 'math_cache'
+    },
     'search': {
         'enable': 'yes',
         'download binary': 'no',
@@ -77,13 +80,8 @@ default_config_values = {
 
 def generate(filename: str):
     config = configparser.ConfigParser()
-    config['clang'] = default_config_values['clang']
-    config['log'] = default_config_values['log']
-    config['input'] = default_config_values['input']
-    config['json'] = default_config_values['json']
-    config['project'] = default_config_values['project']
-    config['html'] = default_config_values['html']
-    config['search'] = default_config_values['search']
+    for key in default_config_values.keys():
+        config[key] = default_config_values[key]
     with open(filename, 'w') as configfile:
         configfile.write('# Default dox++ configuration file\n\n')
         config.write(configfile)
@@ -92,20 +90,9 @@ def generate(filename: str):
 def read(filename: str):
     config = configparser.ConfigParser(interpolation=None)
     config.read(filename)
-    if not 'clang' in config:
-        config['clang'] = {}
-    if not 'log' in config:
-        config['log'] = {}
-    if not 'input' in config:
-        config['input'] = {}
-    if not 'json' in config:
-        config['json'] = {}
-    if not 'project' in config:
-        config['project'] = {}
-    if not 'html' in config:
-        config['html'] = {}
-    if not 'search' in config:
-        config['search'] = {}
+    for key in default_config_values.keys():
+        if not key in config:
+            config[key] = {}
     return config
 
 

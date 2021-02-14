@@ -32,3 +32,6 @@ enable = yes
 download binary = no
 base url = https://crisluengo.github.io/doxpp
 external url = https://google.com/search?q=site:crisluengo.github.io+{query}
+
+[math]
+cache file = math_cache

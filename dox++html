@@ -49,7 +49,8 @@ options = {
                     shlex.split(doxpp.config.get(config, 'input', 'markdown files'), posix=False),
     'doc_link_class': doxpp.config.get(config, 'html', 'documentation link class'),
     'add_snake_case_suffixes': doxpp.config.get_boolean(config, 'search', 'add snake case suffixes'),
-    'add_camel_case_suffixes': doxpp.config.get_boolean(config, 'search', 'add camel case suffixes')
+    'add_camel_case_suffixes': doxpp.config.get_boolean(config, 'search', 'add camel case suffixes'),
+    'math_cache_file': doxpp.config.get(config, 'math', 'cache file')
 }
 
 template_params = {
