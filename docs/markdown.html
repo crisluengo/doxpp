@@ -769,6 +769,20 @@ with the constraint that
 </g>
 </svg></div>
 </aside>
+<aside class="m-note m-info">
+<h4>Attention</h4>
+<p>GCC warns about a single-line comment ending in a backslash (<code>\</code>), because this backslash turns the next
+line in a comment as well. Putting an aligned equation as above, or a matrix or any other LaTeX formatting
+with a newline (<code>\\</code>) at the end of a line, in a <code>///</code> style comment block will trigger this warning.</p>
+<p>Avoid the warning by using a <code>/** ... */</code> style comment block, or by putting the backslashes
+at the beggining of the next line instead:</p>
+<div class="m-code"><pre><span></span><span class="c1">/// \begin{align*}</span>
+<span class="c1">///      0 &amp;&lt; x</span>
+<span class="c1">///   \\ a &amp;\geq x^2</span>
+<span class="c1">/// \end{align*}</span>
+</pre></div>
+
+</aside>
 <p>By assigning appropriate attributes (as described in <a href="markdown.html#markdown_attributes">Attributes</a>), it is
 possible to e.g. change the size of the equations and colorize them:</p>
 <div class="m-code"><pre><span></span>Given $x$, we can determine $y = e^{-x^2 / \sigma^2}${ .m-text .m-small .m-danger }.

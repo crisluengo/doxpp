@@ -443,6 +443,20 @@ is rendered as:
 	    a &\geq x^2
     \end{align*}
 
+!!! attention
+    GCC warns about a single-line comment ending in a backslash (`\`), because this backslash turns the next
+    line in a comment as well. Putting an aligned equation as above, or a matrix or any other LaTeX formatting
+    with a newline (`\\`) at the end of a line, in a `///` style comment block will trigger this warning.
+
+    Avoid the warning by using a `/** ... */` style comment block, or by putting the backslashes
+    at the beggining of the next line instead:
+
+        :::cpp
+        /// \begin{align*}
+        ///      0 &< x
+        ///   \\ a &\geq x^2
+        /// \end{align*}
+
 By assigning appropriate attributes (as described in \ref markdown_attributes), it is
 possible to e.g. change the size of the equations and colorize them:
 ```text
@@ -586,7 +600,7 @@ Content Cell  | Content Cell
 ```
 will create a table with a small font:
 
-!!!par
+!!! par
     <div markdown="1" class="m-text m-small">
 
     First Header  | Second Header
