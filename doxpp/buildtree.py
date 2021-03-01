@@ -1936,7 +1936,9 @@ def buildtree(root_dir, header_files, markdown_files, compiler_flags, include_di
     include_dirs = [os.path.realpath(x) for x in shlex.split(include_dirs, posix=False)]
 
     # Get system include directories and figure out compiler flags
-    include_dirs = [root_dir] + libclang.get_system_includes(compiler_flags) + include_dirs
+    system_include_dirs, sysroot = libclang.get_system_includes(compiler_flags)
+    compiler_flags += ['-isysroot' + sysroot]
+    include_dirs = [root_dir] + system_include_dirs + include_dirs
     compiler_flags += ['-I{0}'.format(x) for x in include_dirs]
     compiler_flags.insert(0, '-xc++')
     log.debug("Compiler flags: %s", ' '.join(compiler_flags))

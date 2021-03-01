@@ -18,6 +18,7 @@
 import os
 import platform
 import subprocess
+import re
 
 from . import log
 from clang import cindex
@@ -56,8 +57,21 @@ def get_system_includes(f):
             if p.endswith(suffix):
                 p = p[:-len(suffix)]
             paths.append(os.path.realpath(p))
-            
-    return paths
+
+    # On macOS we have some weird issues with <cmath> not being properly loaded. Adding the appropriate
+    # `-isysroot` option fixes this.
+    # TODO: We could parse the output of the `clang++` call above to find its `-isysroot` argument,
+    #       on my system it looks like this: "-isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+    #       (embedded in a long list of command line arguments).
+    sysroot = ''
+    sysroot_re = re.compile(r'.*/MacOSX.*\.sdk/')
+    for p in paths:
+        m = sysroot_re.match(p)
+        if m:
+            sysroot = m[0]
+            break
+
+    return paths, sysroot
 
 def load_libclang():
     from ctypes.util import find_library
