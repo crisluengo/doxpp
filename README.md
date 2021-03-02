@@ -5,7 +5,8 @@ See [the project website](https://crisluengo.github.io/doxpp/) for details.
 
 # Requirements
 
-**dox++** requires Python 3, and has been tested (so far) with Python 3.9. Required packages from PyPI:
+**dox++** requires Python 3, and has been tested (so far) with Python 3.6 on Linux and 3.9 on macOS.
+Required packages from PyPI:
 `clang`, `jinja2`, `markdown`, `markdown-headdown`, `mdx_math_svg`, `Pygments`.
 
 **dox++** requires Clang to be installed on the system. I don't know which is the minimal
