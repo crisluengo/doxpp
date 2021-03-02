@@ -1987,12 +1987,12 @@ def buildtree(root_dir, header_files, markdown_files, compiler_flags, include_di
             tu = index.parse(f, compiler_flags, options=cindex.TranslationUnit.PARSE_SKIP_FUNCTION_BODIES +
                                                         cindex.TranslationUnit.PARSE_INCOMPLETE)
         except cindex.TranslationUnitLoadError as e:
-            log.error("Could not parse file %s", f)
             log.error(str(e))
-            exit(1)
+            log.error("Could not parse file %s, skipping", f)
+            continue
         if not tu:
-            log.error("Could not parse file %s", f)
-            exit(1)
+            log.error("Could not parse file %s, skipping", f)
+            continue
         if len(tu.diagnostics) != 0:
             fatal = False
             for d in tu.diagnostics:
@@ -2004,8 +2004,8 @@ def buildtree(root_dir, header_files, markdown_files, compiler_flags, include_di
                 else:
                     log.warning(d.format())
             if fatal:
-                log.error("Could not generate documentation due to parser errors")
-                exit(1)
+                log.error("Could not include documentation for file %s due to parser errors", f)
+                continue
 
         # Extract list of headers included by this file
         extract_includes(tu, status, header_files, include_dirs)
