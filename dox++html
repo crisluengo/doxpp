@@ -56,7 +56,9 @@ options = {
 template_params = {
     'PROJECT_NAME': doxpp.config.get(config, 'project', 'name'),
     'PROJECT_BRIEF': doxpp.config.get(config, 'project', 'brief'),
+    'PROJECT_VERSION': doxpp.config.get(config, 'project', 'version'),
     'MAIN_PROJECT_URL': doxpp.config.get(config, 'project', 'url'),
+    'PROJECT_DOWNLOAD_URL': doxpp.config.get(config, 'project', 'download'),
     'PROJECT_LOGO': doxpp.config.get(config, 'project', 'logo'),
     'THEME_COLOR': doxpp.config.get(config, 'html', 'theme color'),
     'FAVICON': doxpp.config.get(config, 'html', 'favicon'),

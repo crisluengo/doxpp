@@ -26,7 +26,9 @@ formatting = compact
 [project]
 name = Project Name
 brief = Short project description
+version =
 url =
+download =
 logo =
 
 [html]
@@ -157,8 +159,15 @@ Project name, shown in the header of each HTML page.
 \subsection config_project_brief brief
 Project short description, shown in the header of each HTML page.
 
+\subsection config_project_version version
+Project version number, shown in the header of each HTML page.
+
 \subsection config_project_url url
 Project homepage URL, the project's name will be a link to the homepage.
+
+\subsection config_project_download download
+Project download URL, the project's version number will be a link to the download page.
+It is assumed that this link points to the download for the given version.
 
 \subsection config_project_logo logo
 Project logo, shown in the header of each HTML page.

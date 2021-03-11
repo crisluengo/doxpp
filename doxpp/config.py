@@ -39,7 +39,9 @@ default_config_values = {
     'project': {
         'name': 'Project Name',
         'brief': 'Short project description',
+        'version': '',
         'url': '',
+        'download': '',
         'logo': ''
     },
     'html': {

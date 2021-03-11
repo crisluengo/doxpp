@@ -64,7 +64,9 @@ Reference pages:
 All pages can define:
 - `PROJECT_NAME`
 - `PROJECT_BRIEF`
+- `PROJECT_VERSION`
 - `MAIN_PROJECT_URL`
+- `PROJECT_DOWNLOAD_URL`
 - `PROJECT_LOGO`
 - `STYLESHEETS`
 - `FAVICON`

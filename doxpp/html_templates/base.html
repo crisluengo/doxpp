@@ -27,7 +27,7 @@
   <div class="m-container">
     <div class="m-row">
       <span id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">
-        <a href="{% if MAIN_PROJECT_URL %}{{ MAIN_PROJECT_URL }}{% else %}index.html{% endif %}">{% if PROJECT_LOGO %}<img src="{{ PROJECT_LOGO|basename_or_url|e }}" alt="" />{% endif %}{{ PROJECT_NAME }}</a>{% if PROJECT_BRIEF %}<span class="m-breadcrumb">┃</span><a href="index.html" class="m-thin">{{ PROJECT_BRIEF }}</a>{% endif %}
+        <a href="{% if MAIN_PROJECT_URL %}{{ MAIN_PROJECT_URL }}{% else %}index.html{% endif %}">{% if PROJECT_LOGO %}<img src="{{ PROJECT_LOGO|basename_or_url|e }}" alt="" />{% endif %}{{ PROJECT_NAME }}</a>{% if PROJECT_BRIEF %}<span class="m-breadcrumb">┃</span><a href="index.html" class="m-thin">{{ PROJECT_BRIEF }}</a>{% endif %}{% if PROJECT_VERSION %}<span class="m-breadcrumb">┃</span><a href="{% if PROJECT_DOWNLOAD_URL %}{{ PROJECT_DOWNLOAD_URL }}{% else %}index.html{% endif %}" class="m-thin">{{ PROJECT_VERSION }}</a>{% endif %}
       </span>
       {% if LINKS_NAVBAR1 or LINKS_NAVBAR2 or not SEARCH_DISABLED %}
       <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
