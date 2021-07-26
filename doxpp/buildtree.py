@@ -635,7 +635,7 @@ def post_process_links(elements, status: Status):
                 parent = ''
             id = find_member(name, parent, status.members)
             if id and not text:
-                text = name
+                text = walktree.get_fully_qualified_name(id, status.members)
                 if code_formatting:
                     text = '`{}`'.format(text)
             return id, text

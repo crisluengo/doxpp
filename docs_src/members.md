@@ -3,7 +3,7 @@
 Each member is a dictionary with the following fields:
 
 - \ref members_common_id: unique identifier
-- \ref members_common_name: member name, with path from project root
+- \ref members_common_name: member name
 - "brief": brief description (see \ref json_output_brief_doc)
 - "doc": full documentation (see \ref json_output_brief_doc)
 - \ref json_output_sections: (ID, title, level) for sections in "doc"
