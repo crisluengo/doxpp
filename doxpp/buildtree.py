@@ -551,15 +551,19 @@ def find_file(name, headers):
 
 # --- Post-process documentation to add links ---
 
-def get_type_id_or_empty_string(type, start_id, template_params, members):
+def set_type_id_or_empty_string_recursive(type, start_id, template_params, members):
     if type['typename'] in template_params:
-        return ''
+        type['id'] = ''
+        return
     if 'function_prototype' in type and type['function_prototype']:
-        type['retval']['id'] = get_type_id_or_empty_string(type['retval'], start_id, template_params, members)
+        set_type_id_or_empty_string_recursive(type['retval'], start_id, template_params, members)
         for arg in type['arguments']:
-            arg['id'] = get_type_id_or_empty_string(arg, start_id, template_params, members)
-        return ''
-    return find_member(type['typename'], start_id, members)
+            set_type_id_or_empty_string_recursive(arg, start_id, template_params, members)
+        type['id'] = ''
+        return
+    type['id'] = find_member(type['typename'], start_id, members)
+    if type['id']:
+        type['typename'] = walktree.get_fully_qualified_name(type['id'], members)  # CLang apparently sometimes doesn't give a fully qualified name?!
 
 def collect_template_params(member, template_params, members):
     # Recurse through `member` and its ancestors, noting any template parameter names they have
@@ -577,18 +581,18 @@ def post_process_types(members):
         template_params = set()
         collect_template_params(member, template_params, members)
         if 'type' in member and isinstance(member['type'], dict):
-            member['type']['id'] = get_type_id_or_empty_string(member['type'], member['id'], template_params, members)
+            set_type_id_or_empty_string_recursive(member['type'], member['id'], template_params, members)
         if 'return_type' in member and member['return_type']:
-            member['return_type']['id'] = get_type_id_or_empty_string(member['return_type'], member['id'], template_params, members)
+            set_type_id_or_empty_string_recursive(member['return_type'], member['id'], template_params, members)
         if 'arguments' in member:
             for arg in member['arguments']:
-                arg['id'] = get_type_id_or_empty_string(arg, member['id'], template_params, members)
+                set_type_id_or_empty_string_recursive(arg, member['id'], template_params, members)
         if 'template_parameters' in member:
             for arg in member['template_parameters']:
                 if isinstance(arg['default'], dict):
-                    arg['default']['id'] = get_type_id_or_empty_string(arg['default'], member['id'], template_params, members)
+                    set_type_id_or_empty_string_recursive(arg['default'], member['id'], template_params, members)
                 elif isinstance(arg['type'], dict):
-                    arg['type']['id'] = get_type_id_or_empty_string(arg['type'], member['id'], template_params, members)
+                    set_type_id_or_empty_string_recursive(arg['type'], member['id'], template_params, members)
 
 def cleanup_qualifiers(member):
     # Replace 'qualifiers' member in 'type' dicts with a string
