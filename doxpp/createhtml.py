@@ -840,7 +840,7 @@ def fixup_namespace_compound_members(compound, status: Status):
         else:
             compound['include'] = ()
     for members in (compound['classes'], compound['enums'], compound['aliases'], compound['functions'],
-                    compound['variables'], compound['macros']):
+                    compound['operators'], compound['variables'], compound['macros']):
         for member in members:
             if is_class_like(member) and not member['simple']:
                 member['has_details'] = False

@@ -321,6 +321,11 @@
 {{ details_function(function) }}
           {% endif %}
           {% endfor %}
+          {% for function in compound.operators %}
+          {% if function.has_details %}
+{{ details_function(function) }}
+          {% endif %}
+          {% endfor %}
           {% for member in compound.related %}
           {% if member.member_type == 'function' and member.has_details %}
 {{ details_function(member, show_full_name=True) }}

@@ -209,6 +209,11 @@
 {{ details_function(function) }}
           {% endif %}
           {% endfor %}
+          {% for function in compound.operators %}
+          {% if function.has_details %}
+{{ details_function(function) }}
+          {% endif %}
+          {% endfor %}
         </section>
         {% endif %}
         {% if compound.has_variable_details %}
