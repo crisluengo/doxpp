@@ -54,6 +54,7 @@
           "override": false,
           "const": false,
           "access": "public",
+          "operator": false,
           "method_type": "method",
           "constexpr": false,
           "noexcept": false,

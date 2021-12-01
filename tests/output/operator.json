@@ -4,7 +4,7 @@
       "id": "N",
       "name": "N",
       "brief": "Namespace N",
-      "doc": "Contains [`operator==`](#N-operator%3D%3D-N-A-CL-N-A-CL), and [`operator\"\"_w`](#N-operator%22%22_w-long double-), as well as struct [`A`](#N-A).\n\nWe should be able to reference [`operator==`](#N-operator%3D%3D-N-A-CL-N-A-CL) or [`operator==(const A &, const A &)`](#N-operator%3D%3D-N-A-CL-N-A-CL)",
+      "doc": "Contains [`N::operator==`](#N-operator%3D%3D-N-A-CL-N-A-CL), and [`N::operator\"\"_w`](#N-operator%22%22_w-long double-), as well as struct [`N::A`](#N-A).\n\nWe should be able to reference [`N::operator==`](#N-operator%3D%3D-N-A-CL-N-A-CL) or [`N::operator==`](#N-operator%3D%3D-N-A-CL-N-A-CL)",
       "sections": [],
       "anchors": [],
       "member_type": "namespace",
@@ -19,7 +19,7 @@
           "id": "N-A",
           "name": "A",
           "brief": "Struct N::A",
-          "doc": "Contains [`operator<`](#N-A-operator%3C-N-A-CL), and [`operator int*`](#N-A-operator%20int%2A-C).",
+          "doc": "Contains [`N::A::operator<`](#N-A-operator%3C-N-A-CL), and [`N::A::operator int*`](#N-A-operator%20int%2A-C).",
           "sections": [],
           "anchors": [],
           "member_type": "struct",
@@ -55,7 +55,8 @@
               "override": false,
               "const": false,
               "access": "public",
-              "method_type": "method",
+              "operator": true,
+              "method_type": "operator",
               "constexpr": false,
               "noexcept": false,
               "return_type": {
@@ -95,10 +96,15 @@
               "const": true,
               "access": "public",
               "explicit": false,
-              "method_type": "conversionfunction",
+              "operator": true,
+              "method_type": "operator",
               "constexpr": false,
               "noexcept": false,
-              "return_type": {},
+              "return_type": {
+                "typename": "int",
+                "qualifiers": "*",
+                "id": ""
+              },
               "arguments": []
             }
           ],
@@ -118,6 +124,7 @@
           "group": "",
           "deprecated": false,
           "templated": false,
+          "operator": true,
           "constexpr": false,
           "noexcept": false,
           "return_type": {
@@ -145,7 +152,7 @@
         {
           "id": "N-operator%22%22_w-long double-",
           "name": "operator\"\"_w",
-          "brief": "operator \"\" _w() allows us to write `34.5_w` to create an object of type [`A`](#N-A).",
+          "brief": "operator \"\" _w() allows us to write `34.5_w` to create an object of type [`N::A`](#N-A).",
           "doc": "",
           "sections": [],
           "anchors": [],
@@ -156,6 +163,7 @@
           "group": "",
           "deprecated": false,
           "templated": false,
+          "operator": true,
           "constexpr": false,
           "noexcept": false,
           "return_type": {
@@ -189,6 +197,7 @@
       "group": "",
       "deprecated": false,
       "templated": false,
+      "operator": true,
       "constexpr": false,
       "noexcept": false,
       "return_type": {
@@ -220,6 +229,7 @@
       "group": "",
       "deprecated": false,
       "templated": false,
+      "operator": true,
       "constexpr": false,
       "noexcept": false,
       "return_type": {
@@ -251,6 +261,7 @@
       "group": "",
       "deprecated": false,
       "templated": false,
+      "operator": true,
       "constexpr": false,
       "noexcept": true,
       "return_type": {
@@ -282,6 +293,7 @@
       "group": "",
       "deprecated": false,
       "templated": false,
+      "operator": true,
       "constexpr": false,
       "noexcept": true,
       "return_type": {

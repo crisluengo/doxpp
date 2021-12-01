@@ -42,6 +42,7 @@
               "group": "",
               "deprecated": false,
               "templated": false,
+              "operator": false,
               "constexpr": false,
               "noexcept": false,
               "return_type": {
