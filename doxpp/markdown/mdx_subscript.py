@@ -9,18 +9,18 @@ Will output:
     <p>The molecular composition of water is H<sub>2</sub>O.</p>
 
 :website: https://github.com/jambonrose/markdown_subscript_extension
-:copyright: Copyright 2014-2018 Andrew Pinkham
+:copyright: Copyright 2014-2018 Andrew Pinkham, Copyright 2022 Cris Luengo
 :license: Simplified BSD, see LICENSE for details.
 """
 
 from markdown.extensions import Extension
-from markdown.inlinepatterns import SimpleTagPattern
+from markdown.inlinepatterns import SimpleTagInlineProcessor
 
 # match ~, at least one character that is not ~, and ~ again
-SUBSCRIPT_RE = r"(\~)([^\~]+)\2"
+SUBSCRIPT_RE = r"()\~(.*?)\~"
 
 
-def makeExtension(*args, **kwargs):  # noqa: N802
+def makeExtension(*args, **kwargs):
     """Inform Markdown of the existence of the extension."""
     return SubscriptExtension(*args, **kwargs)
 
@@ -28,8 +28,6 @@ def makeExtension(*args, **kwargs):  # noqa: N802
 class SubscriptExtension(Extension):
     """Extension: text between ~ characters will be subscripted."""
 
-    def extendMarkdown(self, md, md_globals):  # noqa: N802
+    def extendMarkdown(self, md):
         """Insert 'subscript' pattern before 'not_strong' pattern."""
-        md.inlinePatterns.add(
-            "subscript", SimpleTagPattern(SUBSCRIPT_RE, "sub"), "<not_strong"
-        )
+        md.inlinePatterns.register(SimpleTagInlineProcessor(SUBSCRIPT_RE, "sub"), "subscript", 75)

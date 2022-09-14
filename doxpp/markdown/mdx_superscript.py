@@ -9,18 +9,18 @@ Will output:
     2<sup>10</sup> is 1024.
 
 :website: https://github.com/jambonrose/markdown_superscript_extension
-:copyright: Copyright 2014-2018 Andrew Pinkham
+:copyright: Copyright 2014-2018 Andrew Pinkham, Copyright 2022 Cris Luengo
 :license: Simplified BSD, see LICENSE for details.
 """
 
 from markdown.extensions import Extension
-from markdown.inlinepatterns import SimpleTagPattern
+from markdown.inlinepatterns import SimpleTagInlineProcessor
 
 # match ^, at least one character that is not ^, and ^ again
-SUPERSCRIPT_RE = r"(\^)([^\^]+)\2"
+SUPERSCRIPT_RE = r"()\^(.*?)\^"
 
 
-def makeExtension(*args, **kwargs):  # noqa: N802
+def makeExtension(*args, **kwargs):
     """Inform Markdown of the existence of the extension."""
     return SuperscriptExtension(*args, **kwargs)
 
@@ -28,10 +28,6 @@ def makeExtension(*args, **kwargs):  # noqa: N802
 class SuperscriptExtension(Extension):
     """Extension: text between ^ characters will be superscripted."""
 
-    def extendMarkdown(self, md, md_globals):  # noqa: N802
+    def extendMarkdown(self, md):
         """Insert 'superscript' pattern before 'not_strong' pattern."""
-        md.inlinePatterns.add(
-            "superscript",
-            SimpleTagPattern(SUPERSCRIPT_RE, "sup"),
-            "<not_strong",
-        )
+        md.inlinePatterns.register(SimpleTagInlineProcessor(SUPERSCRIPT_RE, "sup"), "superscript", 74)
