@@ -242,7 +242,7 @@ def clean_single_line_comment_block(comment):
 def clean_multiline_comment(comment, prelen=None):
     comment = comment.expandtabs(tab_size)
     start = 3
-    if start < len(comment)  and comment[start] == '<':
+    if start < len(comment) and comment[start] == '<':
         # This is if the comment is in the style "/**< ... */"
         start = 4
     lines = comment[start:-2].strip(' ').splitlines()
@@ -255,7 +255,7 @@ def clean_multiline_comment(comment, prelen=None):
             else:
                 # TODO: should we warn here about shenanigans?
                 pass
-    if len(lines) == 1:
+    if len(lines) <= 1:
         return lines
     # At this point, all but the first line might have some uniform indentation, depending on the style
     # of the comment:
@@ -621,6 +621,9 @@ def post_process_inheritance(members):
                 if id:
                     base['id'] = id
                     base_member = members[id]
+                    if 'derived' not in base_member:
+                        log.error("Base class for %s is not a class, I've inferred the wrong thing here!", member['name'])
+                        continue
                     base_member['derived'].append(member['id'])
 
 ref_cmd_match = re.compile(r'[\\@]ref +((?:\w|::|%|-)+(?: *\(.*?\))?)(?: +"(.*?)")?')
