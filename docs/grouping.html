@@ -100,11 +100,11 @@ specified by the <code>\ingroup</code> command.</p>
 <span class="c1">/// \addtogroup</span>
 
 <span class="c1">/// A function in group `name`</span>
-<span class="kt">void</span> <span class="nf">function1</span><span class="p">();</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">function1</span><span class="p">();</span>
 
 <span class="c1">/// A function in a different group `foo`</span>
 <span class="c1">/// \ingroup foo</span>
-<span class="kt">void</span> <span class="nf">function2</span><span class="p">();</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">function2</span><span class="p">();</span>
 
 <span class="c1">/// \endgroup</span>
 </pre></div>
@@ -128,18 +128,18 @@ these groups.</p>
 block) comes after the <code>\name</code> command that creates this block, and before another <code>\name</code>
 or <code>\endname</code> command.</p>
 <p>For example:</p>
-<div class="m-code"><pre><span></span><span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
-   <span class="c1">/// \name Group A</span>
-   <span class="kt">int</span> <span class="n">foo</span><span class="p">;</span>
-   <span class="kt">int</span> <span class="n">bar</span><span class="p">;</span>
-   <span class="c1">/// \name Group B</span>
-   <span class="kt">int</span> <span class="n">baz</span><span class="p">;</span>
+<div class="m-code"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">A</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">/// \name Group A</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="n">foo</span><span class="p">;</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="n">bar</span><span class="p">;</span>
+<span class="w">   </span><span class="c1">/// \name Group B</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="n">baz</span><span class="p">;</span>
 <span class="k">public</span><span class="o">:</span>
-   <span class="n">A</span><span class="p">();</span>
-   <span class="c1">/// \name Group C</span>
-   <span class="n">A</span><span class="p">(</span><span class="kt">int</span> <span class="n">foo</span><span class="p">);</span>
-   <span class="kt">int</span> <span class="nf">getFoo</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
-   <span class="c1">/// \endname</span>
+<span class="w">   </span><span class="n">A</span><span class="p">();</span>
+<span class="w">   </span><span class="c1">/// \name Group C</span>
+<span class="w">   </span><span class="n">A</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">foo</span><span class="p">);</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="nf">getFoo</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<span class="w">   </span><span class="c1">/// \endname</span>
 <span class="p">};</span>
 </pre></div>
 
@@ -149,12 +149,12 @@ or <code>\endname</code> command.</p>
 this causes their influence to extend beyond a class declaration. If you don&rsquo;t put
 an <code>\endname</code> at the end of a class, then in the next class&rsquo; declaration, the previous
 <code>\name</code> command will still be in effect. Thus:</p>
-<div class="m-code"><pre><span></span><span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
-   <span class="c1">/// \name Group A</span>
-   <span class="kt">int</span> <span class="n">foo</span><span class="p">;</span>
+<div class="m-code"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">A</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="c1">/// \name Group A</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="n">foo</span><span class="p">;</span>
 <span class="p">};</span>
-<span class="k">class</span> <span class="nc">B</span> <span class="p">{</span>
-   <span class="kt">int</span> <span class="n">bar</span><span class="p">;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">B</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="n">bar</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
 
@@ -168,14 +168,14 @@ recognized by <strong>dox++</strong>. Left is Doxygen, right is corresponding <s
 <div class="m-code"><pre><span></span><span class="c1">/// \defgroup name title            /// \group name title</span>
 <span class="c1">/// \{                              /// \addtogroup</span>
 
-<span class="kt">void</span> <span class="nf">function1</span><span class="p">();</span>                   <span class="kt">void</span> <span class="nf">function1</span><span class="p">();</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">function1</span><span class="p">();</span><span class="w">                   </span><span class="kt">void</span><span class="w"> </span><span class="nf">function1</span><span class="p">();</span>
 
 <span class="c1">/// \}                              /// \endgroup</span>
 
 <span class="c1">/// \addtogroup name                /// \addtogroup name</span>
 <span class="c1">/// \{</span>
 
-<span class="kt">void</span> <span class="nf">function2</span><span class="p">();</span>                   <span class="kt">void</span> <span class="nf">function2</span><span class="p">();</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">function2</span><span class="p">();</span><span class="w">                   </span><span class="kt">void</span><span class="w"> </span><span class="nf">function2</span><span class="p">();</span>
 
 <span class="c1">/// \}                              /// \endgroup</span>
 </pre></div>

@@ -184,8 +184,8 @@ See <a href="grouping.html">Grouping</a> for more information.</p>
 <p>Closes the nearest previous <code>\name</code>.
 See <a href="commands.html#command_name">Command <code>\name</code></a>.</p>
 <h3 id="command_enum">Command <code>\enum</code></h3>
-<div class="m-code"><pre><span></span>\<span class="err">‍</span><span class="k">enum</span> <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span>
-\<span class="err">‍</span><span class="k">enum</span> <span class="o">&lt;</span><span class="n">id</span><span class="o">&gt;</span>
+<div class="m-code"><pre><span></span>\‍enum &lt;name&gt;
+\‍enum &lt;id&gt;
 </pre></div>
 
 <p>Documents an enumerator declared in the headers with <code>enum</code> or <code>enum class</code>. The declaration must actually
@@ -328,10 +328,10 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 <code>&lt;name&gt;</code> is not the fully qualified name of the matched union.</p>
 <p>Alternatively, provide the ID for the union.</p>
 <h3 id="command_variable">Command <code>\variable</code> and <code>\var</code></h3>
-<div class="m-code"><pre><span></span>\<span class="err">‍</span><span class="n">variable</span> <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span>
-\<span class="err">‍</span><span class="n">variable</span> <span class="o">&lt;</span><span class="n">id</span><span class="o">&gt;</span>
-\<span class="err">‍</span><span class="k">var</span> <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span>
-\<span class="err">‍</span><span class="k">var</span> <span class="o">&lt;</span><span class="n">id</span><span class="o">&gt;</span>
+<div class="m-code"><pre><span></span>\‍variable &lt;name&gt;
+\‍variable &lt;id&gt;
+\‍var &lt;name&gt;
+\‍var &lt;id&gt;
 </pre></div>
 
 <p>Documents a variable or constant declared in the headers. The declaration must actually exist.
@@ -361,7 +361,7 @@ attribute.</p>
 <span class="c1">///</span>
 <span class="c1">/// This is the detailed description right here.</span>
 <span class="c1">/// Note the empty line that separates paragraphs.</span>
-<span class="kt">int</span> <span class="n">foo</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">foo</span><span class="p">;</span>
 </pre></div>
 
 <p><code>\short</code> is an alias.</p>

@@ -942,7 +942,7 @@ camel_case_point = '[^A-Z][A-Z].'
 snake_case_point_re = re.compile(snake_case_point)
 camel_case_point_re = re.compile(camel_case_point)
 camel_or_snake_case_point_re = re.compile('({})|({})'.format(snake_case_point, camel_case_point))
-word_point_re = re.compile('\W\w')
+word_point_re = re.compile('\\W\\w')
 
 def add_entry_to_search_data(result, joiner: str, trie: Trie, map: ResultMap,
                              add_snake_case_suffixes, add_camel_case_suffixes):
@@ -1008,6 +1008,7 @@ def add_entry_to_search_data(result, joiner: str, trie: Trie, map: ResultMap,
 def fixup_title_for_search(title):
     title = title.replace('‍', '')
     title = strip_html_tags(title)
+    title = html.unescape(title)
     if not title[-1].isalnum():
         title += '\u2800'  # This fixes an issue that arises because of the rtl text in the search box
     return title

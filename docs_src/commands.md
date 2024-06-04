@@ -19,7 +19,9 @@ with one of these commands, otherwise it will be associated to the next declarat
 
 \subsection command_addtogroup Command `\addtogroup`
 
-    \‍addtogroup <name>
+```text
+\‍addtogroup <name>
+```
 
 Sets `<name>` as the active group. If the group is not defined, a new group will be created
 with no name and no documentation. Use `\group` to name and document the group.
@@ -34,8 +36,10 @@ The remainder of the comment block is ignored.
 
 \subsection command_alias Command `\alias` and `\typedef`
 
-    \‍alias <name>
-    \‍typedef <name>
+```text
+\‍alias <name>
+\‍typedef <name>
+```
 
 Documents an alias declared in the headers with `using` or `typedef`. The declaration must actually
 exist. `<name>` is the fully qualified name of the alias, or, if not fully qualified, the alias
@@ -47,8 +51,10 @@ to make the match). In case of ambiguity, the first match is chosen. A warning i
 
 \subsection command_class Command `\class`
 
-    \‍class <name>
-    \‍class <id>
+```text
+\‍class <name>
+\‍class <id>
+```
 
 Documents a class declared in the headers with `class`. The declaration must actually
 exist. `<name>` is the fully qualified name of the class, or, if not fully qualified, the class
@@ -60,29 +66,37 @@ Alternatively, provide the ID for the class.
 
 \subsection command_dir Command `\dir`
 
-    \‍dir [<path fragment>]
+```text
+\‍dir [<path fragment>]
+```
 
 **dox++** doesn't document directories. This Doxygen command is recognized and a warning
 message is produced.
 
 \subsection command_endgroup Command `\endgroup`
 
-    \‍endgroup
+```text
+\‍endgroup
+```
 
 Closes the nearest previous `\addtogroup`.
 See \ref grouping for more information.
 
 \subsection command_endname Command `\endname`
 
-    \‍endname
+```text
+\‍endname
+```
 
 Closes the nearest previous `\name`.
 See \ref command_name.
 
 \subsection command_enum Command `\enum`
 
-    \‍enum <name>
-    \‍enum <id>
+```text
+\‍enum <name>
+\‍enum <id>
+```
 
 Documents an enumerator declared in the headers with `enum` or `enum class`. The declaration must actually
 exist. `<name>` is the fully qualified name of the enumerator, or, if not fully qualified, the enumerator
@@ -94,7 +108,9 @@ Alternatively, provide the ID for the enumerator.
 
 \subsection command_file Command `\file`
 
-    \‍file [<name>]
+```text
+\‍file [<name>]
+```
 
 Adds documentation for the current file, or a different file if the file name is given.
 The rest of the comment block is considered documentation.
@@ -106,10 +122,12 @@ The rest of the comment block is considered documentation.
 
 \subsection command_function Command `\function` and `\fn`
 
-    \‍function <name>
-    \‍function <id>
-    \‍fn <name>
-    \‍fn <id>
+```text
+\‍function <name>
+\‍function <id>
+\‍fn <name>
+\‍fn <id>
+```
 
 Documents a function or class method declared in the headers. The declaration must actually
 exist. `<name>` is the fully qualified name of the function, or, if not fully qualified, the function
@@ -128,8 +146,10 @@ Alternatively, provide the ID for the function.
 
 \subsection command_group Command `\group` and `\defgroup`
 
-    \‍group <name> [<title>]
-    \‍defgroup <name> [<title>]
+```text
+\‍group <name> [<title>]
+\‍defgroup <name> [<title>]
+```
 
 Documents a group.
 
@@ -155,8 +175,10 @@ See \ref grouping for more information on grouping.
 
 \subsection command_macro Command `\macro` and `\def`
 
-    \‍macro <name>
-    \‍def <name>
+```text
+\‍macro <name>
+\‍def <name>
+```
 
 The only way of documenting preprocessor macros, as Clang doesn't report on the work of
 the preprocessor (well, it's possible, but it makes things a lot more complex).
@@ -181,14 +203,18 @@ put this command in the same file where the macro is actually defined.
 
 \subsection command_mainpage Command `\mainpage`
 
-    \‍mainpage [<title>]
+```text
+\‍mainpage [<title>]
+```
 
 Creates a page with the ID `index`, and `<title>` as the page's title. This is the start page
 for the documentation. Text in this block is the page's text. See `\page` for more information.
 
 \subsection command_name Command `\name`
 
-    \‍name <header>
+```text
+\‍name <header>
+```
 
 Creates a group for class or struct members.  The `<header>` text
 is used to label the group in the documentation. Each `\name` command closes the previous
@@ -209,8 +235,10 @@ by `\name` grouping, or both.
 
 \subsection command_namespace Command `\namespace`
 
-    \‍namespace <name>
-    \‍namespace <id>
+```text
+\‍namespace <name>
+\‍namespace <id>
+```
 
 Documents a namespace declared in the headers. The declaration must actually exist. `<name>` is the
 fully qualified name of the namespace, or, if not fully qualified, the namespace with the "best"
@@ -222,7 +250,9 @@ Alternatively, provide the ID for the namespace.
 
 \subsection command_page Command `\page`
 
-    \‍page <name> <title>
+```text
+\‍page <name> <title>
+```
 
 Creates a page with `<name>` as ID and `<title>` as the title. Text in this block is the page's text.
 The page can be referenced by its ID.
@@ -234,8 +264,10 @@ By default, all pages are at the same level, not subordinate to any other page.
 
 \subsection command_struct Command `\struct`
 
-    \‍struct <name>
-    \‍struct <id>
+```text
+\‍struct <name>
+\‍struct <id>
+```
 
 Documents a struct declared in the headers. The declaration must actually exist.
 `<name>` is the fully qualified name of the struct, or, if not fully qualified, the struct
@@ -247,8 +279,10 @@ Alternatively, provide the ID for the struct.
 
 \subsection command_union Command `\union`
 
-    \‍union <name>
-    \‍union <id>
+```text
+\‍union <name>
+\‍union <id>
+```
 
 Documents a union or constant declared in the headers. The declaration must actually exist.
 `<name>` is the fully qualified name of the union, or, if not fully qualified, the union
@@ -260,10 +294,12 @@ Alternatively, provide the ID for the union.
 
 \subsection command_variable Command `\variable` and `\var`
 
-    \‍variable <name>
-    \‍variable <id>
-    \‍var <name>
-    \‍var <id>
+```text
+\‍variable <name>
+\‍variable <id>
+\‍var <name>
+\‍var <id>
+```
 
 Documents a variable or constant declared in the headers. The declaration must actually exist.
 `<name>` is the fully qualified name of the variable, or, if not fully qualified, the variable
@@ -280,7 +316,9 @@ Alternatively, provide the ID for the variable.
 
 \subsection command_anchor Command `\anchor`
 
-    \‍anchor <name>
+```text
+\‍anchor <name>
+```
 
 Anywhere in a documentation block, adds an anchor that can be referenced elsewhere with `\‍ref`.
 
@@ -290,8 +328,10 @@ attribute.
 
 \subsection command_brief Command `\brief` and `\short`
 
-    \brief <paragraph>
-    \short <paragraph>
+```text
+\brief <paragraph>
+\short <paragraph>
+```
 
 Used at the beginning of the first line of a comment block, turns the first paragraph into the "brief" string.
 ```cpp
@@ -307,7 +347,9 @@ int foo;
 
 \subsection command_ingroup Command `\ingroup`
 
-    \ingroup <name>
+```text
+\ingroup <name>
+```
 
 If this appears in the comment block for a namespace member, the member will become part of the
 group listed. It can also appear in the comment block of a group, to nest groups.
@@ -320,7 +362,9 @@ This command is expected to be on its own on a line.
 
 \subsection command_n Command `\‍n`
 
-    \‍n
+```text
+\‍n
+```
 
 Inserts a line break. The Markdown for a line break is two spaces at the end of a line.
 Because many code editors automatically remove such spaces, use this command instead.
@@ -328,8 +372,10 @@ It will be replaced by two spaces, and a newline will be added if it's not there
 
 \subsection command_ref Command `\‍ref`
 
-    \‍ref <name> ["<text>"]
-    \‍ref "<name>" ["<text>"]
+```text
+\‍ref <name> ["<text>"]
+\‍ref "<name>" ["<text>"]
+```
 
 Creates a link to the entity (member, header, group or page) called `<name>`. Optionally,
 the link text can be set to `<text>`. If left out, the link text will be the tile of the page
@@ -371,8 +417,10 @@ such as in `\‍ref "operator""_w"`.
 
 \subsection command_relates Command `\relates` and `\related`
 
-    \‍relates <name>
-    \‍related <name>
+```text
+\‍relates <name>
+\‍related <name>
+```
 
 Added to the documentation block of a function or variable, and with `<name>` referencing
 a class, adds the function or variable to a "Related" section in the class' documentation.
@@ -385,7 +433,9 @@ command.
 
 \subsection command_section Command `\section`
 
-    \section <name> <title>
+```text
+\section <name> <title>
+```
 
 Starts a new section within a documentation block or a page. `<name>` is the ID that can
 be used with `\‍ref` to reference the section.
@@ -398,8 +448,10 @@ One can also directly write `# My Title {#my-title}`, but then the `\‍ref` com
 
 \subsection command_see Command `\see` and `\sa`
 
-    \‍see <name> [, <name> [, ...]
-    \‍sa <name> [, <name> [, ...]
+```text
+\‍see <name> [, <name> [, ...]
+\‍sa <name> [, <name> [, ...]
+```
 
 Starts a paragraph with a "See also" header linking the given entities (members, headers, groups, pages).
 See `\‍ref` for how `<name>` is interpreted and disambiguated.
@@ -412,7 +464,9 @@ This command is expected to be on its own on a line, and must be followed by an 
 
 \subsection command_subpage Command `\‍subpage`
 
-    \‍subpage <name> ["<text>"]
+```text
+\‍subpage <name> ["<text>"]
+```
 
 This is similar to `\‍ref`, but for pages. It can only occur inside a page (see `\page`).
 `\‍subpage <name>` creates a link to page `<name>` and additionally builds a hierarchy
@@ -429,13 +483,17 @@ To create links without creating hierarchical relations, use `\‍ref`.
 
 \subsection command_subsection Command `\subsection`
 
-    \subsection <name> <title>
+```text
+\subsection <name> <title>
+```
 
 Like `\section`, but for a level 2 heading (`##` in Markdown).
 
 \subsection command_subsubsection Command `\subsubsection`
 
-    \subsubsection <name> <title>
+```text
+\subsubsection <name> <title>
+```
 
 Like `\section`, but for a level 3 heading (`###` in Markdown).
 

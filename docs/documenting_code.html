@@ -59,19 +59,19 @@
         </h1>
 <p>Put a decorated comment before the declaration of each member:</p>
 <div class="m-code"><pre><span></span><span class="c1">/// documentation for foo</span>
-<span class="kt">int</span> <span class="n">foo</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">foo</span><span class="p">;</span>
 
 <span class="c1">//! documentation for bar</span>
 <span class="c1">//! and more detailed stuff here</span>
-<span class="kt">void</span> <span class="nf">bar</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">bar</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
 
 <span class="cm">/** documentation for baz</span>
 <span class="cm"> * and more detailed stuff here</span>
 <span class="cm"> */</span>
-<span class="kt">int</span> <span class="nf">baz</span><span class="p">(</span><span class="kt">double</span><span class="p">);</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">baz</span><span class="p">(</span><span class="kt">double</span><span class="p">);</span>
 
 <span class="cm">/*! and this is documentation for bang */</span>
-<span class="k">class</span> <span class="nc">bang</span><span class="p">{};</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">bang</span><span class="p">{};</span>
 </pre></div>
 
 <p>The first line of comment is the &ldquo;brief&rdquo; string, the rest is the &ldquo;doc&rdquo; string.</p>
@@ -90,7 +90,7 @@ the fist comment line in a block:</p>
 <span class="c1">///</span>
 <span class="c1">/// This is the detailed description right here.</span>
 <span class="c1">/// Note the empty line that separates paragraphs.</span>
-<span class="kt">int</span> <span class="n">foo</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">foo</span><span class="p">;</span>
 </pre></div>
 
 <p>As an alternative, you can put documentation blocks separate from the declarations,
@@ -98,14 +98,14 @@ either in the same header file, a different header file, or a Markdown file. The
 documentation blocks must start with a command such as <code>\class</code> or <code>\function</code> to
 identify which member is being documented by that block. This member must actually
 be declared in a documented header file.</p>
-<div class="m-code"><pre><span></span><span class="kt">int</span> <span class="n">foo</span><span class="p">;</span>
+<div class="m-code"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">foo</span><span class="p">;</span>
 
-<span class="kt">void</span> <span class="nf">bar</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">bar</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
 
-<span class="kt">int</span> <span class="nf">baz</span><span class="p">(</span><span class="kt">double</span><span class="p">);</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">baz</span><span class="p">(</span><span class="kt">double</span><span class="p">);</span>
 
 <span class="cm">/*! and this is documentation for bang */</span>
-<span class="k">class</span> <span class="nc">bang</span><span class="p">{};</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">bang</span><span class="p">{};</span>
 
 <span class="c1">/// \variable foo</span>
 <span class="c1">/// documentation for foo</span>

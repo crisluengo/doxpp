@@ -226,8 +226,8 @@ foo(bar);
 
 <p>Both will be rendered in the same way:</p>
 <aside class="m-note m-frame">
-<div class="m-code"><pre><span></span>// This is code
-foo(bar);
+<div class="m-code"><pre><span></span><span class="c1">// This is code</span>
+<span class="n">foo</span><span class="p">(</span><span class="n">bar</span><span class="p">);</span>
 </pre></div>
 
 </aside>
@@ -346,8 +346,8 @@ indent the additional blocks by 4 spaces:</p>
 </li>
 <li>
 <p>list item 3</p>
-<div class="m-code"><pre><span></span>    <span class="c1">// A C++ code block in list item 3</span>
-    <span class="n">foo</span><span class="p">(</span><span class="n">bar</span><span class="p">);</span>
+<div class="m-code"><pre><span></span><span class="w">    </span><span class="c1">// A C++ code block in list item 3</span>
+<span class="w">    </span><span class="n">foo</span><span class="p">(</span><span class="n">bar</span><span class="p">);</span>
 </pre></div>
 
 </li>
@@ -425,21 +425,21 @@ Other text   | Other text     | Other text
 <table class="m-table">
 <thead>
 <tr>
-<th align="left">Left aligned</th>
-<th align="center">Center aligned</th>
-<th align="right">Rigt aligned</th>
+<th style="text-align: left;">Left aligned</th>
+<th style="text-align: center;">Center aligned</th>
+<th style="text-align: right;">Rigt aligned</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">Text</td>
-<td align="center">Text</td>
-<td align="right">Text</td>
+<td style="text-align: left;">Text</td>
+<td style="text-align: center;">Text</td>
+<td style="text-align: right;">Text</td>
 </tr>
 <tr>
-<td align="left">Other text</td>
-<td align="center">Other text</td>
-<td align="right">Other text</td>
+<td style="text-align: left;">Other text</td>
+<td style="text-align: center;">Other text</td>
+<td style="text-align: right;">Other text</td>
 </tr>
 </tbody>
 </table>
