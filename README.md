@@ -5,7 +5,7 @@ See [the project website](https://crisluengo.github.io/doxpp/) for details.
 
 # Requirements
 
-**dox++** requires Python 3, and has been tested (so far) with Python 3.6 on Linux and 3.9 on macOS.
+**dox++** requires Python 3, and has been tested (so far) with Python 3.6 on Linux, and 3.9 and 3.12 on macOS.
 Required packages from PyPI:
 `clang`, `jinja2`, `markdown`, `markdown-headdown`, `mdx_math_svg`, `Pygments`.
 
@@ -31,8 +31,8 @@ CSS and HTML templates are modified from m.css; search functionality is unmodifi
 Copyright 2017-2020 Vladimír Vondruš  
 m.css uses the MIT license.
 
-This project includes verbatim copies of `mdx_subscript.py` and `mdx_superscript.py`
-from the PyPI packages `MarkdownSubscript` and `MarkdownSuperscript`,
-since those packages down-grade the `markdown` package when installing.  
+This project includes copies of `mdx_subscript.py` and `mdx_superscript.py`
+from the PyPI packages `MarkdownSubscript` and `MarkdownSuperscript`, updated for
+the latest version of Python-Markdown.  
 Copyright 2014-2018 Andrew Pinkham  
 using the Simplified BSD license.

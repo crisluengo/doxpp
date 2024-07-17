@@ -551,19 +551,19 @@ def find_file(name, headers):
 
 # --- Post-process documentation to add links ---
 
-def set_type_id_or_empty_string_recursive(type, start_id, template_params, members):
-    if type['typename'] in template_params:
-        type['id'] = ''
+def set_type_id_or_empty_string_recursive(typeval, start_id, template_params, members):
+    if typeval['typename'] in template_params:
+        typeval['id'] = ''
         return
-    if 'function_prototype' in type and type['function_prototype']:
-        set_type_id_or_empty_string_recursive(type['retval'], start_id, template_params, members)
-        for arg in type['arguments']:
+    if 'function_prototype' in typeval and typeval['function_prototype']:
+        set_type_id_or_empty_string_recursive(typeval['retval'], start_id, template_params, members)
+        for arg in typeval['arguments']:
             set_type_id_or_empty_string_recursive(arg, start_id, template_params, members)
-        type['id'] = ''
+        typeval['id'] = ''
         return
-    type['id'] = find_member(type['typename'], start_id, members)
-    if type['id']:
-        type['typename'] = walktree.get_fully_qualified_name(type['id'], members)  # CLang apparently sometimes doesn't give a fully qualified name?!
+    typeval['id'] = find_member(typeval['typename'], start_id, members)
+    if typeval['id']:
+        typeval['typename'] = walktree.get_fully_qualified_name(typeval['id'], members)  # Clang apparently sometimes doesn't give a fully qualified name?!
 
 def collect_template_params(member, template_params, members):
     # Recurse through `member` and its ancestors, noting any template parameter names they have
@@ -1204,35 +1204,35 @@ def extract_markdown(filename, status: Status):
 # --- Parsing header files --- extracting declarations ---
 
 def full_typename(decl):
-    type = decl.displayname
+    typeval = decl.displayname
     parent = decl.semantic_parent
     if not parent or parent.kind == cindex.CursorKind.TRANSLATION_UNIT:
-        return type
+        return typeval
     parent_type = full_typename(parent)
-    if not type:
+    if not typeval:
         return parent_type
     if parent_type:
-        return parent_type + '::' + type
-    return type
+        return parent_type + '::' + typeval
+    return typeval
 
 fixup_angled_brackets_match = re.compile(r"> >")
 
-def process_type_recursive(type, cursor, output):
-    kind = type.kind
+def process_type_recursive(typeval, cursor, output):
+    kind = typeval.kind
     done = False
     # Reference/pointer qualifiers
     if kind in type_kind_to_type_map:
-        process_type_recursive(type.get_pointee(), cursor, output)
+        process_type_recursive(typeval.get_pointee(), cursor, output)
         if not('function_prototype' in output and output['function_prototype']):
             output['qualifiers'].append(type_kind_to_type_map[kind])
         done = True
     # Is it an array?
     if kind in type_kind_array_types:
-        process_type_recursive(type.get_array_element_type(), None, output)
+        process_type_recursive(typeval.get_array_element_type(), None, output)
         output['qualifiers'].append('[]')
         done = True
     # Const qualifier
-    if type.is_const_qualified():
+    if typeval.is_const_qualified():
         output['qualifiers'].append('const')
     if done:
         return
@@ -1242,13 +1242,13 @@ def process_type_recursive(type, cursor, output):
     elif kind == cindex.TypeKind.FUNCTIONPROTO:
         # Parse function prototype
         output['function_prototype'] = True
-        output['retval'] = process_type(type.get_result(), None)
-        output['arguments'] = [process_type(arg) for arg in type.argument_types()]
-        # output['typename'] = type.spelling
+        output['retval'] = process_type(typeval.get_result(), None)
+        output['arguments'] = [process_type(arg) for arg in typeval.argument_types()]
+        # output['typename'] = typeval.spelling
         output['typename'] = output['retval']['typename'] + '(*)(' + \
                              ', '.join([arg['typename'] for arg in output['arguments']]) + ')'
-    elif hasattr(type, 'spelling'):
-        typename = type.spelling
+    elif hasattr(typeval, 'spelling'):
+        typename = typeval.spelling
         if typename.startswith('const '):
             typename = typename[len('const '):]
         typename = fixup_angled_brackets_match.sub('>>', typename)
@@ -1260,9 +1260,9 @@ def process_type_recursive(type, cursor, output):
     # TODO: For template types, we might want to split up the type and the template arguments (recursively!)
     #       so that we can later link the type to its docs.
 
-def process_type(type, cursor=None):
+def process_type(typeval, cursor=None):
     output = {'typename': '', 'qualifiers': []}
-    process_type_recursive(type, cursor, output)
+    process_type_recursive(typeval, cursor, output)
     return output
 
 def find_default_value(item):
@@ -1360,15 +1360,15 @@ def process_template_nontype_parameter(item):
         # This happens for SFINAE template parameters
         # TODO: This would happen for any parameter that is not named. What to do?
         name = '<SFINAE>'
-        type = {'typename': '', 'qualifiers': []}
+        typeval = {'typename': '', 'qualifiers': []}
         # TODO: To get a proper representation of this template parameter we'd need to
         #       process the tokens manually.
     else:
-        type = process_type(item.type, item)
+        typeval = process_type(item.type, item)
     default = find_default_value(item)
     return {
         'name': name,
-        'type': type,
+        'type': typeval,
         'default': default
     }
 
@@ -1578,10 +1578,10 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                 if not semantic_parent:
                     log.error("Base class specifier has no semantic parent!?")
                     continue
-                type = process_type(item.type, item)['typename']
+                typeval = process_type(item.type, item)['typename']
                 access = access_specifier_map[item.access_specifier]
                 status.members[semantic_parent]['bases'].append({
-                    'typename': type,
+                    'typename': typeval,
                     'access': access
                 })
                 continue
@@ -1606,9 +1606,9 @@ def extract_declarations(citer, parent, status: Status, level = 0):
             # Process actual using element of templated using directive differently
             # We've already created the alias member, we are just missing the type
             if member_type == 'using' and parent and status.members[parent]['member_type'] == 'alias':
-                type = process_type(item.underlying_typedef_type, item)
-                type['qualifiers'] = ''.join(type['qualifiers'])
-                status.members[parent]['type'] = type
+                typeval = process_type(item.underlying_typedef_type, item)
+                typeval['qualifiers'] = ''.join(typeval['qualifiers'])
+                status.members[parent]['type'] = typeval
                 continue
 
             # Disambiguate templated types:
@@ -1680,14 +1680,14 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                     while t.spelling != 'operator':
                         t = next(i)
                     t = next(i)
-                    type = ''
+                    typeval = ''
                     while t.spelling != '(':
                         p = t.spelling
-                        if ends_with_token_char(type) and starts_with_token_char(p):
+                        if ends_with_token_char(typeval) and starts_with_token_char(p):
                             p = ' ' + p
-                        type += p
+                        typeval += p
                         t = next(i)
-                    member['name'] = 'operator ' + type
+                    member['name'] = 'operator ' + typeval
                 except StopIteration:
                     log.error("Couldn't find conversion operator type for %s\n   in file %s",
                               name, status.current_header_name)
@@ -1776,12 +1776,11 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                 member['scoped'] = item.is_scoped_enum()
                 if not parent_is_namespace:
                     member['access'] = access_specifier_map[item.access_specifier]
-                type = process_type(item.enum_type)['typename']
-                member['type'] = type
+                typeval = process_type(item.enum_type)['typename']
+                member['type'] = typeval
                 member['members'] = []
                 process_children = True
             elif member_type == 'field':
-                # TODO: initializer
                 member['type'] = process_type(item.type, item)
                 member['static'] = item.storage_class == cindex.StorageClass.STATIC
                 member['mutable'] = item.is_mutable_field()
@@ -1789,6 +1788,9 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                 member['constexpr'] = is_constexpr(item)
                 if item.is_bitfield():
                     member['width'] = item.get_bitfield_width()
+                value = find_default_value(item)
+                if value:
+                    member['value'] = value
                 member_type = 'variable'
             elif member_type == 'function':
                 member['templated'] = is_template
@@ -1824,10 +1826,12 @@ def extract_declarations(citer, parent, status: Status, level = 0):
                 member['related'] = []
                 process_children = True
             elif member_type == 'variable':
-                # TODO: initializer
                 member['type'] = process_type(item.type, item)
                 member['static'] = item.storage_class == cindex.StorageClass.STATIC
                 member['constexpr'] = is_constexpr(item)
+                value = find_default_value(item)
+                if value:
+                    member['value'] = value
             member['member_type'] = member_type
 
             # Deal with IDs -- we do this at the end of the above so we can use all that data to generate our ID.

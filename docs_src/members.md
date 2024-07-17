@@ -208,11 +208,13 @@ alias, enum, function, variable, class, struct or union.
 
 \section member_variable Variable-specific fields
 
-If the member is a variable, it additionally has the following field:
+If the member is a variable, it additionally has the following fields:
 
 - "type": the variable's type, see \ref member_type_dictionary
 - "static": `true` or `false` depending on if the variable is declared `static` or not
 - "constexpr": `true` if this is a `constexpr` value
+- "value": the value assigned to the variable when first declared (as a string); this field is not present if
+  no value is assigned
 
 
 \section member_variable_field Variable-specific fields, if class, struct or union member
