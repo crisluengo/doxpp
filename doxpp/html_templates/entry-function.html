@@ -16,4 +16,4 @@
                 {% if function.noexcept %} <span class="m-label m-flat m-success">noexcept</span>{% endif %}
                 {% if function.since %} {{ function.since }}{% endif %}</span>
             </dt>
-            <dd>{{ function.brief }}</dd>
+            <dd>{{ function.brief }}{% if function.has_details %} <a href="{% if function.page_id != compound.page_id %}{{ function.page_id }}.html{% endif %}#{{ function.id }}">more...</a>{% endif %}</dd>

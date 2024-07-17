@@ -4,4 +4,4 @@
                 {%- if macro.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}
                 {% if macro.since %} {{ macro.since }}{% endif %}</span>
             </dt>
-            <dd>{{ macro.brief }}</dd>
+            <dd>{{ macro.brief }}{% if macro.has_details %} <a href="{% if macro.page_id != compound.page_id %}{{ macro.page_id }}.html{% endif %}#{{ macro.id }}">more...</a>{% endif %}</dd>

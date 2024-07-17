@@ -34,7 +34,7 @@
             <li>
               <a href="#{{ id }}">{{ name }}</a>
               <ul>
-{{ loop(children)|rtrim|indent(4, true) }}
+                {{ loop(children)|rtrim|indent(4, true) }}
               </ul>
             </li>
             {% else %}
@@ -79,14 +79,14 @@
         </div>
         {% endif %}
         {% if compound.doc %}
-{{ compound.doc }}
+          {{ compound.doc }}
         {% endif %}
         {% if compound.modules %}
         <section id="modules">
           <h2>Modules</h2>
           <dl class="m-doc">
             {% for module in compound.modules %}
-{{ entry_module(module) }}
+              {{ entry_module(module) }}
             {% endfor %}
           </dl>
         </section>
@@ -96,7 +96,7 @@
           <h2>Namespaces</h2>
           <dl class="m-doc">
             {% for namespace in compound.namespaces %}
-{{ entry_namespace(namespace) }}
+              {{ entry_namespace(namespace) }}
             {% endfor %}
           </dl>
         </section>
@@ -106,7 +106,7 @@
           <h2>Classes</h2>
           <dl class="m-doc">
             {% for class in compound.classes %}
-{{ entry_class(class) }}
+              {{ entry_class(class) }}
             {% endfor %}
           </dl>
         </section>
@@ -116,7 +116,7 @@
             <h2>Aliases</h2>
             <dl class="m-doc">
                 {% for alias in compound.aliases %}
-{{ entry_alias(alias) }}
+                  {{ entry_alias(alias) }}
                 {% endfor %}
             </dl>
         </section>
@@ -126,7 +126,7 @@
           <h2>Enums</h2>
           <dl class="m-doc">
             {% for enum in compound.enums %}
-{{ entry_enum(enum) }}
+              {{ entry_enum(enum) }}
             {% endfor %}
           </dl>
         </section>
@@ -136,7 +136,7 @@
           <h2>Functions</h2>
           <dl class="m-doc">
             {% for function in compound.functions %}
-{{ entry_function(function) }}
+              {{ entry_function(function) }}
             {% endfor %}
           </dl>
         </section>
@@ -146,7 +146,7 @@
           <h2>Operators</h2>
           <dl class="m-doc">
             {% for function in compound.operators %}
-{{ entry_function(function) }}
+              {{ entry_function(function) }}
             {% endfor %}
           </dl>
         </section>
@@ -156,7 +156,7 @@
           <h2>Variables</h2>
           <dl class="m-doc">
             {% for variable in compound.variables %}
-{{ entry_variable(variable) }}
+              {{ entry_variable(variable) }}
             {% endfor %}
           </dl>
         </section>
@@ -166,7 +166,7 @@
           <h2>Macros</h2>
           <dl class="m-doc">
             {% for macro in compound.macros %}
-{{ entry_macro(macro) }}
+              {{ entry_macro(macro) }}
             {% endfor %}
           </dl>
         </section>
@@ -175,9 +175,9 @@
         <section>
             <h2>Class documentation</h2>
             {% for class in compound.classes %}
-            {% if class.has_details %}
-            {{ details_class(class) }}
-            {% endif %}
+              {% if class.has_details %}
+                {{ details_class(class) }}
+              {% endif %}
             {% endfor %}
         </section>
         {% endif %}
@@ -185,9 +185,9 @@
         <section>
             <h2>Alias documentation</h2>
             {% for alias in compound.aliases %}
-            {% if alias.has_details %}
-            {{ details_alias(alias) }}
-            {% endif %}
+              {% if alias.has_details %}
+                {{ details_alias(alias) }}
+              {% endif %}
             {% endfor %}
         </section>
         {% endif %}
@@ -195,9 +195,9 @@
         <section>
           <h2>Enum documentation</h2>
           {% for enum in compound.enums %}
-          {% if enum.has_details %}
-{{ details_enum(enum) }}
-          {% endif %}
+            {% if enum.has_details %}
+              {{ details_enum(enum) }}
+            {% endif %}
           {% endfor %}
         </section>
         {% endif %}
@@ -205,14 +205,14 @@
         <section>
           <h2>Function documentation</h2>
           {% for function in compound.functions %}
-          {% if function.has_details %}
-{{ details_function(function) }}
-          {% endif %}
+            {% if function.has_details %}
+              {{ details_function(function) }}
+            {% endif %}
           {% endfor %}
           {% for function in compound.operators %}
-          {% if function.has_details %}
-{{ details_function(function) }}
-          {% endif %}
+            {% if function.has_details %}
+              {{ details_function(function) }}
+            {% endif %}
           {% endfor %}
         </section>
         {% endif %}
@@ -220,9 +220,9 @@
         <section>
           <h2>Variable documentation</h2>
           {% for variable in compound.variables %}
-          {% if variable.has_details %}
-{{ details_variable(variable) }}
-          {% endif %}
+            {% if variable.has_details %}
+              {{ details_variable(variable) }}
+            {% endif %}
           {% endfor %}
         </section>
         {% endif %}
@@ -230,9 +230,9 @@
         <section>
           <h2>Macro documentation</h2>
           {% for macro in compound.macros %}
-          {% if macro.has_details %}
-{{ details_macro(macro) }}
-          {% endif %}
+            {% if macro.has_details %}
+              {{ details_macro(macro) }}
+            {% endif %}
           {% endfor %}
         </section>
         {% endif %}

@@ -59,7 +59,7 @@
             <li>
               <a href="#{{ id }}">{{ name }}</a>
               <ul>
-{{ loop(children)|rtrim|indent(4, true) }}
+                {{ loop(children)|rtrim|indent(4, true) }}
               </ul>
             </li>
             {% else %}
@@ -108,14 +108,14 @@
         </div>
         {% endif %}
         {% if compound.doc %}
-{{ compound.doc }}
+          {{ compound.doc }}
         {% endif %}
         {% if compound.base_classes %}
         <section id="base-classes">
           <h2>Base classes</h2>
           <dl class="m-doc">
             {% for class in compound.base_classes %}
-{{ entry_class(class, show_full_name=True) }}
+              {{ entry_class(class, show_full_name=True) }}
             {% endfor %}
           </dl>
         </section>
@@ -125,7 +125,7 @@
           <h2>Derived classes</h2>
           <dl class="m-doc">
             {% for class in compound.derived_classes %}
-{{ entry_class(class, show_full_name=True) }}
+              {{ entry_class(class, show_full_name=True) }}
             {% endfor %}
           </dl>
         </section>
@@ -135,7 +135,7 @@
             <h2>Constructors, destructors, assignment and conversion operators</h2>
             <dl class="m-doc">
                 {% for function in compound.typeless_functions %}
-{{ entry_function(function) }}
+                  {{ entry_function(function) }}
                 {% endfor %}
             </dl>
         </section>
@@ -145,17 +145,17 @@
             <h2>{{ group.name }}</h2>
             <dl class="m-doc">
                 {% for member in group.members %}
-                {% if member.member_type in ['class', 'struct', 'union'] %}
-{{ entry_class(member) }}
-                {% elif member.member_type == 'enum' %}
-{{ entry_enum(member) }}
-                {% elif member.member_type == 'alias' %}
-{{ entry_alias(member) }}
-                {% elif member.member_type == 'function' %}
-{{ entry_function(member) }}
-                {% elif member.member_type == 'variable' %}
-{{ entry_variable(member) }}
-                {% endif %}
+                  {% if member.member_type in ['class', 'struct', 'union'] %}
+                    {{ entry_class(member) }}
+                  {% elif member.member_type == 'enum' %}
+                    {{ entry_enum(member) }}
+                  {% elif member.member_type == 'alias' %}
+                    {{ entry_alias(member) }}
+                  {% elif member.member_type == 'function' %}
+                    {{ entry_function(member) }}
+                  {% elif member.member_type == 'variable' %}
+                    {{ entry_variable(member) }}
+                  {% endif %}
                 {% endfor %}
             </dl>
         </section>
@@ -165,7 +165,7 @@
           <h2>Classes</h2>
           <dl class="m-doc">
             {% for class in compound.classes %}
-{{ entry_class(class) }}
+              {{ entry_class(class) }}
             {% endfor %}
           </dl>
         </section>
@@ -175,7 +175,7 @@
             <h2>Aliases</h2>
             <dl class="m-doc">
                 {% for alias in compound.aliases %}
-{{ entry_alias(alias) }}
+                  {{ entry_alias(alias) }}
                 {% endfor %}
             </dl>
         </section>
@@ -185,7 +185,7 @@
           <h2>Enums</h2>
           <dl class="m-doc">
             {% for enum in compound.enums %}
-{{ entry_enum(enum) }}
+              {{ entry_enum(enum) }}
             {% endfor %}
           </dl>
         </section>
@@ -195,7 +195,7 @@
           <h2>Functions</h2>
           <dl class="m-doc">
             {% for function in compound.functions %}
-{{ entry_function(function) }}
+              {{ entry_function(function) }}
             {% endfor %}
           </dl>
         </section>
@@ -205,7 +205,7 @@
           <h2>Operators</h2>
           <dl class="m-doc">
             {% for function in compound.operators %}
-{{ entry_function(function) }}
+              {{ entry_function(function) }}
             {% endfor %}
           </dl>
         </section>
@@ -215,7 +215,7 @@
            <h2>Variables</h2>
            <dl class="m-doc">
               {% for variable in compound.variables %}
-{{ entry_variable(variable) }}
+                {{ entry_variable(variable) }}
               {% endfor %}
            </dl>
         </section>
@@ -225,17 +225,17 @@
           <h2>Related</h2>
           <dl class="m-doc">
             {% for member in compound.related %}
-            {% if member.member_type == 'alias' %}
-{{ entry_alias(member, show_full_name=True) }}
-            {% elif member.member_type == 'enum' %}
-{{ entry_enum(member, show_full_name=True) }}
-            {% elif member.member_type == 'function' %}
-{{ entry_function(member, show_full_name=True) }}
-            {% elif member.member_type == 'variable' %}
-{{ entry_variable(member, show_full_name=True) }}
-            {% elif member.member_type == 'macro' %}
-{{ entry_macro(member, show_full_name=True) }}
-            {% endif %}
+              {% if member.member_type == 'alias' %}
+                {{ entry_alias(member, show_full_name=True) }}
+              {% elif member.member_type == 'enum' %}
+                {{ entry_enum(member, show_full_name=True) }}
+              {% elif member.member_type == 'function' %}
+                {{ entry_function(member, show_full_name=True) }}
+              {% elif member.member_type == 'variable' %}
+                {{ entry_variable(member, show_full_name=True) }}
+              {% elif member.member_type == 'macro' %}
+                {{ entry_macro(member, show_full_name=True) }}
+              {% endif %}
             {% endfor %}
           </dl>
         </section>
@@ -244,16 +244,16 @@
         <section>
           <h2>Class documentation</h2>
           {% for group in compound.groups %}
-          {% for member in group.members %}
-          {% if member.member_type in ['class', 'struct', 'union'] and member.has_details %}
-{{ details_class(member) }}
-          {% endif %}
-          {% endfor %}
+            {% for member in group.members %}
+              {% if member.member_type in ['class', 'struct', 'union'] and member.has_details %}
+                {{ details_class(member) }}
+              {% endif %}
+            {% endfor %}
           {% endfor %}
           {% for member in compound.classes %}
-          {% if member.has_details %}
-{{ details_class(member) }}
-          {% endif %}
+            {% if member.has_details %}
+              {{ details_class(member) }}
+            {% endif %}
           {% endfor %}
         </section>
         {% endif %}
@@ -261,21 +261,21 @@
         <section>
           <h2>Alias documentation</h2>
           {% for group in compound.groups %}
-          {% for member in group.members %}
-          {% if member.member_type == 'alias' and member.has_details %}
-{{ details_alias(member) }}
-          {% endif %}
-          {% endfor %}
+            {% for member in group.members %}
+              {% if member.member_type == 'alias' and member.has_details %}
+                {{ details_alias(member) }}
+              {% endif %}
+            {% endfor %}
           {% endfor %}
           {% for member in compound.aliases %}
-          {% if member.has_details %}
-{{ details_alias(member) }}
-          {% endif %}
+            {% if member.has_details %}
+              {{ details_alias(member) }}
+            {% endif %}
           {% endfor %}
           {% for member in compound.related %}
-          {% if member.member_type == 'alias' and member.has_details %}
-{{ details_alias(member, show_full_name=True) }}
-          {% endif %}
+            {% if member.member_type == 'alias' and member.has_details %}
+              {{ details_alias(member, show_full_name=True) }}
+            {% endif %}
           {% endfor %}
         </section>
         {% endif %}
@@ -283,21 +283,21 @@
         <section>
             <h2>Enum documentation</h2>
             {% for group in compound.groups %}
-            {% for member in group.members %}
-            {% if member.member_type == 'enum' and member.has_details %}
-{{ details_enum(member) }}
-            {% endif %}
-            {% endfor %}
+              {% for member in group.members %}
+                {% if member.member_type == 'enum' and member.has_details %}
+                  {{ details_enum(member) }}
+                {% endif %}
+              {% endfor %}
             {% endfor %}
             {% for member in compound.enums %}
-            {% if member.has_details %}
-{{ details_enum(member) }}
-            {% endif %}
+              {% if member.has_details %}
+                {{ details_enum(member) }}
+              {% endif %}
             {% endfor %}
             {% for member in compound.related %}
-            {% if member.member_type == 'enum' and member.has_details %}
-{{ details_enum(member, show_full_name=True) }}
-            {% endif %}
+              {% if member.member_type == 'enum' and member.has_details %}
+                {{ details_enum(member, show_full_name=True) }}
+              {% endif %}
             {% endfor %}
         </section>
         {% endif %}
@@ -305,31 +305,31 @@
         <section>
           <h2>Function documentation</h2>
           {% for function in compound.typeless_functions %}
-          {% if function.has_details %}
-{{ details_function(function) }}
-          {% endif %}
+            {% if function.has_details %}
+              {{ details_function(function) }}
+            {% endif %}
           {% endfor %}
           {% for group in compound.groups %}
-          {% for member in group.members %}
-          {% if member.member_type == 'function' and member.has_details %}
-{{ details_function(member) }}
-          {% endif %}
-          {% endfor %}
+            {% for member in group.members %}
+              {% if member.member_type == 'function' and member.has_details %}
+                {{ details_function(member) }}
+              {% endif %}
+            {% endfor %}
           {% endfor %}
           {% for function in compound.functions %}
-          {% if function.has_details %}
-{{ details_function(function) }}
-          {% endif %}
+            {% if function.has_details %}
+              {{ details_function(function) }}
+            {% endif %}
           {% endfor %}
           {% for function in compound.operators %}
-          {% if function.has_details %}
-{{ details_function(function) }}
-          {% endif %}
+            {% if function.has_details %}
+              {{ details_function(function) }}
+            {% endif %}
           {% endfor %}
           {% for member in compound.related %}
-          {% if member.member_type == 'function' and member.has_details %}
-{{ details_function(member, show_full_name=True) }}
-          {% endif %}
+            {% if member.member_type == 'function' and member.has_details %}
+              {{ details_function(member, show_full_name=True) }}
+            {% endif %}
           {% endfor %}
         </section>
         {% endif %}
@@ -337,21 +337,21 @@
         <section>
           <h2>Variable documentation</h2>
           {% for group in compound.groups %}
-          {% for member in group.members %}
-          {% if member.member_type == 'variable' and member.has_details %}
-{{ details_variable(member) }}
-          {% endif %}
-          {% endfor %}
+            {% for member in group.members %}
+              {% if member.member_type == 'variable' and member.has_details %}
+                {{ details_variable(member) }}
+              {% endif %}
+            {% endfor %}
           {% endfor %}
           {% for variable in compound.variables %}
-          {% if variable.has_details %}
-{{ details_variable(variable) }}
-          {% endif %}
+            {% if variable.has_details %}
+              {{ details_variable(variable) }}
+            {% endif %}
           {% endfor %}
           {% for member in compound.related %}
-          {% if member.member_type == 'variable' and member.has_details %}
-{{ details_variable(member, show_full_name=True) }}
-          {% endif %}
+            {% if member.member_type == 'variable' and member.has_details %}
+              {{ details_variable(member, show_full_name=True) }}
+            {% endif %}
           {% endfor %}
         </section>
         {% endif %}
@@ -359,9 +359,9 @@
         <section>
           <h2>Macro documentation</h2>
           {% for member in compound.related %}
-          {% if member.member_type == 'macro' and member.has_details %}
-{{ details_macro(member) }}
-          {% endif %}
+            {% if member.member_type == 'macro' and member.has_details %}
+              {{ details_macro(member) }}
+            {% endif %}
           {% endfor %}
         </section>
         {% endif %}

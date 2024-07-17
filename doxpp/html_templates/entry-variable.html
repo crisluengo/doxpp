@@ -12,4 +12,4 @@
               {# This empty line needs to be there otherwise it's eaten #}
 
             </dt>
-            <dd>{{ variable.brief }}</dd>
+            <dd>{{ variable.brief }}{% if variable.has_details %} <a href="{% if variable.page_id != compound.page_id %}{{ variable.page_id }}.html{% endif %}#{{ variable.id }}">more...</a>{% endif %}</dd>

@@ -11,4 +11,4 @@
 
               {# the empty line is above to fix spacing #}
             </dt>
-            <dd>{{ class.brief }}</dd>
+            <dd>{{ class.brief }}{% if class.has_details %} <a href="{% if class.page_id != compound.page_id %}{{ class.page_id }}.html{% endif %}#{{ class.id }}">more...</a>{% endif %}</dd>

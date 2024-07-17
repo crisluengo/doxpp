@@ -14,4 +14,4 @@
               {# This empty line needs to be there otherwise it's eaten #}
 
             </dt>
-            <dd>{{ alias.brief }}</dd>
+            <dd>{{ alias.brief }}{% if alias.has_details %} <a href="{% if alias.page_id != compound.page_id %}{{ alias.page_id }}.html{% endif %}#{{ alias.id }}">more...</a>{% endif %}</dd>
