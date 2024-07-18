@@ -2,7 +2,7 @@
             <h3>
               {% if compound.templated or alias.templated %}
               {% if alias.include %}
-              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ alias.include[1] }}">{{ alias.include[0] }}</a></div>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right">#include <a href="{{ alias.include[1] }}">{{ alias.include[0] }}</a></div>
               {% endif %}
               <div class="m-doc-template">
                 {% if compound.templated %}
@@ -26,7 +26,7 @@
               {# the empty line has to be here to prevent the lines from merging #}
 
               {% if alias.include and not compound.templated and not alias.templated %}
-              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ alias.include[1] }}">{{ alias.include[0] }}</a></div>
+              <div class="m-doc-include m-code m-inverted m-text-right">#include <a href="{{ alias.include[1] }}">{{ alias.include[0] }}</a></div>
               {% endif %}
             </h3>
             {% if alias.brief %}

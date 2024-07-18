@@ -16,7 +16,7 @@
                  templated class, but in that case we have global include
                  information, so no need to handle case where
                  `enum.include and not compound.templated` #}
-              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ enum.include[1] }}">{{ enum.include[0] }}</a></div>
+              <div class="m-doc-include m-code m-inverted m-text-right">#include <a href="{{ enum.include[1] }}">{{ enum.include[0] }}</a></div>
               {% endif %}
             </h3>
             {% if enum.brief %}{# brief can be omitted for anonymous enums #}

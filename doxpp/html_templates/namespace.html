@@ -5,10 +5,10 @@
 {% block header %}
         <h1>
           {% if compound.include or compound.module %}
-          <div class="m-doc-include m-right-m m-text-right">
-            {% if compound.module %}<span class="m-thin"><a href="{{ compound.module[1] }}" class="m-doc">{{ compound.module[0] }}</a> module</span>{% endif %}
+          <div class="m-doc-include m-thin m-right-m m-text-right">
+            {% if compound.module %}<a href="{{ compound.module[1] }}" class="m-doc">{{ compound.module[0] }}</a> module{% endif %}
             {% if compound.include and compound.module %}<br/>{% endif %}
-            {% if compound.include %}<span class="m-code m-inverted"><span class="cp">#include</span> <a class="cpf" href="{{ compound.include[1] }}">{{ compound.include[0] }}</a></span>{% endif %}
+            {% if compound.include %}<span class="m-code m-thin">#include <a href="{{ compound.include[1] }}">{{ compound.include[0] }}</a></span>{% endif %}
           </div>
           {% endif %}
 

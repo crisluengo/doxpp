@@ -44,8 +44,8 @@
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
         <h1>
-          <div class="m-doc-include m-right-m m-text-right">
-<span class="m-thin"><a href="all-terrain.html" class="m-doc">All-terrain bicycles</a> module</span><br/><span class="m-code m-inverted"><span class="cp">#include</span> <a class="cpf" href="file--transport--mountainbike-h.html">"transport/mountainbike.h"</a></span>          </div>
+          <div class="m-doc-include m-thin m-right-m m-text-right">
+<a href="all-terrain.html" class="m-doc">All-terrain bicycles</a> module<br/><span class="m-code m-thin">#include <a href="file--transport--mountainbike-h.html">"transport/mountainbike.h"</a></span>          </div>
 
           <span class="m-breadcrumb"><a href="transport.html">transport</a>::<wbr/></span>MountainBike <span class="m-thin">class</span>        </h1>
         <p>Mountain bike implementation of a <a href="transport-Bicycle.html"><code>transport::Bicycle</code></a>.</p>
@@ -62,7 +62,7 @@
             </li>
           </ul>
         </div>
-<p><code>MountainBike</code> is an implementation of a <a href="transport-Bicycle.html"><code>transport::Bicycle</code></a>
+          <p><code>MountainBike</code> is an implementation of a <a href="transport-Bicycle.html"><code>transport::Bicycle</code></a>
 providing a bike for cycling on rough terrain. Mountain bikes
 are pretty cool because they have stuff like <strong>Suspension</strong> (and
 you can even adjust it using <a href="transport-MountainBike.html#transport-MountainBike-SetSuspension-double-C"><code>transport::MountainBike::SetSuspension</code></a>). If you&rsquo;re looking
@@ -71,7 +71,7 @@ for a bike for use on the road, you might be better off using a
         <section id="base-classes">
           <h2>Base classes</h2>
           <dl class="m-doc">
-            <dt>
+                          <dt>
               class <a href="transport-Bicycle.html" class="m-doc">transport::<wbr />Bicycle</a> <span class="m-label m-flat m-warning">abstract</span>
             </dt>
             <dd>Standard bicycle class. This is a rather long brief line, it
@@ -81,29 +81,30 @@ occupies the whole paragraph&hellip;</dd>
         <section id="function-members">
           <h2>Functions</h2>
           <dl class="m-doc">
-            <dt>
+                          <dt>
               <span class="m-doc-wrap-bumper">auto <a href="#transport-MountainBike-SetSuspension-double-C" class="m-doc">SetSuspension</a>(</span><span class="m-doc-wrap">double const stiffness = 0) -&gt; bool</span>
             </dt>
-            <dd>Set suspension stiffness.</dd>
-            <dt>
+            <dd>Set suspension stiffness. <a href="#transport-MountainBike-SetSuspension-double-C">more...</a></dd>
+                          <dt>
               <div class="m-doc-template">template&lt;typename BreakType&gt;</div>
               <span class="m-doc-wrap-bumper">auto <a href="#transport-MountainBike-ChangeBreak-T-BreakType-C" class="m-doc">ChangeBreak</a>(</span><span class="m-doc-wrap">BreakType const breakType) -&gt; bool</span>
             </dt>
-            <dd>Change the break type.</dd>
+            <dd>Change the break type. <a href="#transport-MountainBike-ChangeBreak-T-BreakType-C">more...</a></dd>
           </dl>
         </section>
         <section id="related">
           <h2>Related</h2>
           <dl class="m-doc">
-            <dt id="transport-vars-CONST">
-            static int const <a href="#transport-vars-CONST" class="m-doc-self">transport::<wbr />vars::<wbr />CONST</a> <span class="m-label m-flat m-primary">constexpr</span>
+                            <dt id="transport-vars-CONST">
+            static int const <a href="#transport-vars-CONST" class="m-doc-self">transport::<wbr />vars::<wbr />CONST</a>
+ = 5 <span class="m-label m-flat m-primary">constexpr</span>
             </dt>
             <dd>A constexpr declaration</dd>
           </dl>
         </section>
         <section>
           <h2>Function documentation</h2>
-          <section class="m-doc-details" id="transport-MountainBike-SetSuspension-double-C"><div>
+                        <section class="m-doc-details" id="transport-MountainBike-SetSuspension-double-C"><div>
             <h3>
               <span class="m-doc-wrap-bumper">bool
                 </span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#transport-MountainBike-SetSuspension-double-C" class="m-doc-self">SetSuspension</a>(</span><span class="m-doc-wrap">double const stiffness = 0)</span></span>
@@ -116,7 +117,7 @@ could not be adjusted.</p>
 <p>@return true if the suspension was adjusted successfully,
         false otherwise.</p>
           </div></section>
-          <section class="m-doc-details" id="transport-MountainBike-ChangeBreak-T-BreakType-C"><div>
+                        <section class="m-doc-details" id="transport-MountainBike-ChangeBreak-T-BreakType-C"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;typename BreakType&gt;

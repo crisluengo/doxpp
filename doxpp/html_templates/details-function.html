@@ -2,7 +2,7 @@
             <h3>
               {% if compound.templated or function.templated %}
               {% if function.include %}
-              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ function.include[1] }}">{{ function.include[0] }}</a></div>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right">#include <a href="{{ function.include[1] }}">{{ function.include[0] }}</a></div>
               {% endif %}
               <div class="m-doc-template">
                 {% if compound.templated %}
@@ -28,7 +28,7 @@
               {% if function.noexcept %} <span class="m-label m-flat m-success">noexcept</span>{% endif %}
               {% if function.since %} {{ function.since }}{% endif %}</span></span>
               {% if function.include and not compound.templated and not function.templated %}
-              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ function.include[1] }}">{{ function.include[0] }}</a></div>
+              <div class="m-doc-include m-code m-inverted m-text-right">#include <a href="{{ function.include[1] }}">{{ function.include[0] }}</a></div>
               {% endif %}
             </h3>
             {% if function.brief %}

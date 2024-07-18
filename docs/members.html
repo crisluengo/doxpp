@@ -275,11 +275,13 @@ to the class and their documentation could be shown together with that of the cl
 <p>The &ldquo;members&rdquo; list contains dictionaries of members. These members can be of type
 alias, enum, function, variable, class, struct or union.</p>
 <h2 id="member_variable">Variable-specific fields</h2>
-<p>If the member is a variable, it additionally has the following field:</p>
+<p>If the member is a variable, it additionally has the following fields:</p>
 <ul>
 <li>&ldquo;type&rdquo;: the variable&rsquo;s type, see <a href="members.html#member_type_dictionary">The type dictionary</a></li>
 <li>&ldquo;static&rdquo;: <code>true</code> or <code>false</code> depending on if the variable is declared <code>static</code> or not</li>
 <li>&ldquo;constexpr&rdquo;: <code>true</code> if this is a <code>constexpr</code> value</li>
+<li>&ldquo;value&rdquo;: the value assigned to the variable when first declared (as a string); this field is not present if
+  no value is assigned</li>
 </ul>
 <h2 id="member_variable_field">Variable-specific fields, if class, struct or union member</h2>
 <p>If the variable is a class or struct or union member, it additionally has the following fields:</p>

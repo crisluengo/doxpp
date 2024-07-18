@@ -44,8 +44,8 @@
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
         <h1>
-          <div class="m-doc-include m-right-m m-text-right">
-<span class="m-thin"><a href="bikes.html" class="m-doc">Bicycle types</a> module</span><br/><span class="m-code m-inverted"><span class="cp">#include</span> <a class="cpf" href="file--transport--racingbike-h.html">"transport/racingbike.h"</a></span>          </div>
+          <div class="m-doc-include m-thin m-right-m m-text-right">
+<a href="bikes.html" class="m-doc">Bicycle types</a> module<br/><span class="m-code m-thin">#include <a href="file--transport--racingbike-h.html">"transport/racingbike.h"</a></span>          </div>
 
           <span class="m-breadcrumb"><a href="transport.html">transport</a>::<wbr/></span>RacingBike <span class="m-thin">class</span> <span class="m-label m-flat m-warning">final</span>        </h1>
         <p>Racing bike class.</p>
@@ -62,13 +62,13 @@
             </li>
           </ul>
         </div>
-<p><code>RacingBike</code> is a special kind of bike which can go much faster
+          <p><code>RacingBike</code> is a special kind of bike which can go much faster
 on the road, with much less effort (even uphill!). It doesn&rsquo;t make
 sense to call <a href="transport-RacingBike.html#transport-RacingBike-RingBell"><code>transport::RacingBike::RingBell</code></a> on a racing bike for they don&rsquo;t have bells.</p>
         <section id="base-classes">
           <h2>Base classes</h2>
           <dl class="m-doc">
-            <dt>
+                          <dt>
               class <a href="transport-Bicycle.html" class="m-doc">transport::<wbr />Bicycle</a> <span class="m-label m-flat m-warning">abstract</span>
             </dt>
             <dd>Standard bicycle class. This is a rather long brief line, it
@@ -78,15 +78,15 @@ occupies the whole paragraph&hellip;</dd>
         <section id="group--Behavior">
             <h2>Behavior</h2>
             <dl class="m-doc">
-            <dt id="transport-RacingBike-PedalHarder-double-">
+                                <dt id="transport-RacingBike-PedalHarder-double-">
               <span class="m-doc-wrap-bumper">void <a href="#transport-RacingBike-PedalHarder-double-" class="m-doc-self">PedalHarder</a>(</span><span class="m-doc-wrap">double speed)</span>
             </dt>
             <dd>An overloaded function, doesn&rsquo;t override <a href="transport-Bicycle.html#transport-Bicycle-PedalHarder"><code>transport::Bicycle::PedalHarder</code></a>.</dd>
-            <dt id="transport-RacingBike-PedalHarder">
+                                <dt id="transport-RacingBike-PedalHarder">
               <span class="m-doc-wrap-bumper">void <a href="#transport-RacingBike-PedalHarder" class="m-doc-self">PedalHarder</a>(</span><span class="m-doc-wrap">) <span class="m-label m-flat m-warning">override</span></span>
             </dt>
             <dd>@inherit</dd>
-            <dt id="transport-RacingBike-RingBell">
+                                <dt id="transport-RacingBike-RingBell">
               <span class="m-doc-wrap-bumper">void <a href="#transport-RacingBike-RingBell" class="m-doc-self">RingBell</a>(</span><span class="m-doc-wrap">) <span class="m-label m-flat m-warning">override</span></span>
             </dt>
             <dd><code>RingBell</code> is not implemented.</dd>
@@ -95,20 +95,21 @@ occupies the whole paragraph&hellip;</dd>
         <section id="group--Properties">
             <h2>Properties</h2>
             <dl class="m-doc">
-            <dt>
+                                <dt>
               <span class="m-doc-wrap-bumper">enum class <a href="#transport-RacingBike-GearSystem" class="m-doc">GearSystem</a>: int{ </span><span class="m-doc-wrap"><a href="#transport-RacingBike-GearSystem-expensive" class="m-doc">expensive</a>,
               <a href="#transport-RacingBike-GearSystem-cheap" class="m-doc">cheap</a> }</span>
             </dt>
-            <dd>What kind of gears can a <code>RacingBike</code> have?</dd>
-            <dt id="transport-RacingBike-gearSystem">
+            <dd>What kind of gears can a <code>RacingBike</code> have? <a href="#transport-RacingBike-GearSystem">more...</a></dd>
+                                <dt id="transport-RacingBike-gearSystem">
             <a href="transport-RacingBike.html#transport-RacingBike-GearSystem" class="m-doc">transport::RacingBike::GearSystem</a> <a href="#transport-RacingBike-gearSystem" class="m-doc-self">gearSystem</a>
+ = GearSystem::expensive
             </dt>
             <dd>What kind of gears does this racing bike have?</dd>
             </dl>
         </section>
         <section>
             <h2>Enum documentation</h2>
-          <section class="m-doc-details" id="transport-RacingBike-GearSystem"><div>
+                            <section class="m-doc-details" id="transport-RacingBike-GearSystem"><div>
             <h3>
               enum class <a href="#transport-RacingBike-GearSystem" class="m-doc-self">GearSystem</a>: int
             </h3>

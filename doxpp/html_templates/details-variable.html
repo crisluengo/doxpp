@@ -2,7 +2,7 @@
             <h3>
               {% if compound.templated or variable.templated  %}
               {% if variable.include %}
-              <div class="m-doc-include m-code m-inverted m-right-m m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ variable.include[1] }}">{{ variable.include[0] }}</a></div>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right">#include <a href="{{ variable.include[1] }}">{{ variable.include[0] }}</a></div>
               {% endif %}
               <div class="m-doc-template">
                 {% if compound.templated %}
@@ -24,7 +24,7 @@
               {# the empty line needs to be here to prevent the lines from merging #}
 
               {% if variable.include and not compound.templated and not variable.templated %}
-              <div class="m-doc-include m-code m-inverted m-text-right"><span class="cp">#include</span> <a class="cpf" href="{{ variable.include[1] }}">{{ variable.include[0] }}</a></div>
+              <div class="m-doc-include m-code m-inverted m-text-right">#include <a href="{{ variable.include[1] }}">{{ variable.include[0] }}</a></div>
               {% endif %}
             </h3>
             {% if variable.brief %}
