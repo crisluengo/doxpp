@@ -1,0 +1,83 @@
+#! /usr/bin/env python3
+
+# This tool, not yet documented elsewhere, generates a Python file that defines a list
+# of tuples, each linking each fully qualified name that is documented (replacing '::' with '.')
+# to the (relative) URL where dox++html puts that documentation. This allows Python code to
+# know where the documentation for any given function resides.
+
+# dox++
+# Copyright 2024, Cris Luengo
+#
+# This file is part of dox++.  dox++ is free software: you can
+# redistribute it and/or modify it under the terms of the GNU General Public
+# License as published by the Free Software Foundation, version 2.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 51
+# Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+import argparse
+import os
+import urllib.parse
+import doxpp
+import doxpp.createhtml
+import doxpp.walktree
+
+
+parser = argparse.ArgumentParser(description='dox++, C++ documentation, back-end generator.')
+parser.add_argument('config_file', nargs='?', default='dox++config', help='name of the configuration file')
+args = parser.parse_args()
+
+# Processing options
+config = doxpp.config.read(args.config_file)
+
+options = {
+    'show_private_virtual': doxpp.config.get_boolean(config, 'html', 'document private virtual members'),
+    'show_private_nonvirtual': doxpp.config.get_boolean(config, 'html', 'document private non-virtual members'),
+    'show_protected': doxpp.config.get_boolean(config, 'html', 'document protected members'),
+    'show_undocumented': doxpp.config.get_boolean(config, 'html', 'document undocumented members'),
+    'modify_include_statement': lambda x: x,
+}
+
+outfile = doxpp.config.get(config, 'urls', 'filename')
+os.makedirs(os.path.dirname(outfile), exist_ok=True)
+
+infile = doxpp.config.get(config, 'json', 'filename')
+
+
+def create_urls(input_file, output_file, options):
+    # Load data
+    status = doxpp.createhtml.Status(doxpp.walktree.load_data_from_json_file(input_file), options)
+
+    # Generate fully qualified names
+    doxpp.createhtml.generate_fully_qualified_names(status.data['members'], status)
+
+    # Find out which pages to create, what is listed in each, and in which page
+    # the detailed documentation for each member has to go
+    doxpp.createhtml.assign_page(status)
+
+    # Create a Python file with a list of tuples. Each tuple is a fully-qualified name and a URL.
+    # Note that it's possible to have multiple identical fully-qualified names (overloaded functions).
+    # Thus, the user's code must process this list taking that into account.
+    with open(output_file, 'w') as outfile:
+        outfile.write("# This is an automatically generated file, do not edit.\n\n")
+        outfile.write("doc_url_pairs = [\n")
+        for member in status.members.values():
+            if not 'page_id' in member or not member['page_id']:  # Not documented, skip
+                continue
+            prefix = doxpp.walktree.get_prefix(member['id'], status.members)
+            name = '.'.join(prefix + [member['name']])
+            url = urllib.parse.quote(member['page_id']) + '.html'
+            if member['page_id'] != member['id']:
+                url += '#' + urllib.parse.quote(member['id'])
+            outfile.write(f"    ('{name}', '{url}'),\n")
+        outfile.write("]\n")
+
+
+# Generate HTML
+create_urls(infile, outfile, options)

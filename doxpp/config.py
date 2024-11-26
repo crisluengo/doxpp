@@ -76,7 +76,15 @@ default_config_values = {
         'external URL': '',
         'add snake case suffixes': 'yes',
         'add camel case suffixes': 'yes'
-    }
+    },
+    'brief': {
+        # For dox++brief
+        'filename': 'brief.h',
+    },
+    'urls': {
+        # For dox++urls
+        'filename': 'urls.py',
+    },
 }
 
 

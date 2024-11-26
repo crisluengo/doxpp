@@ -1,0 +1,107 @@
+#! /usr/bin/env python3
+
+# This tool, not yet documented elsewhere, generates a C++ header file that defines a static
+# string for each brief description in the documentation. A variable is declared for each
+# of these strings, whose name is derived from the ID assigned by dox++parse. One possible
+# usage is with pybind11, which generates Python bindings for C++ functions.
+
+# dox++
+# Copyright 2024, Cris Luengo
+#
+# This file is part of dox++.  dox++ is free software: you can
+# redistribute it and/or modify it under the terms of the GNU General Public
+# License as published by the Free Software Foundation, version 2.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 51
+# Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+import argparse
+import os
+import re
+import textwrap
+import doxpp
+import doxpp.createhtml
+import doxpp.walktree
+
+
+parser = argparse.ArgumentParser(description='dox++, C++ documentation, back-end generator.')
+parser.add_argument('config_file', nargs='?', default='dox++config', help='name of the configuration file')
+args = parser.parse_args()
+
+# Processing options
+config = doxpp.config.read(args.config_file)
+
+options = {
+    'show_private_virtual': doxpp.config.get_boolean(config, 'html', 'document private virtual members'),
+    'show_private_nonvirtual': doxpp.config.get_boolean(config, 'html', 'document private non-virtual members'),
+    'show_protected': doxpp.config.get_boolean(config, 'html', 'document protected members'),
+    'show_undocumented': doxpp.config.get_boolean(config, 'html', 'document undocumented members'),
+    'modify_include_statement': lambda x: x,
+}
+
+outfile = doxpp.config.get(config, 'brief', 'filename')
+os.makedirs(os.path.dirname(outfile), exist_ok=True)
+
+infile = doxpp.config.get(config, 'json', 'filename')
+
+
+def generate_header_file(input_file, output_file, options):
+    # Load data
+    status = doxpp.createhtml.Status(doxpp.walktree.load_data_from_json_file(input_file), options)
+
+    # Generate fully qualified names
+    doxpp.createhtml.generate_fully_qualified_names(status.data['members'], status)
+
+    # Find out which pages to create, what is listed in each, and in which page
+    # the detailed documentation for each member has to go
+    doxpp.createhtml.assign_page(status)
+
+    match_link = re.compile(r"\[(.+?)\]\(.+?\)")
+    wrapper = textwrap.TextWrapper(width=78, break_long_words=False)
+    with open(output_file, 'w', newline='') as outfile:
+        outfile.write("// This is an automatically generated file, do not edit.\n\n")
+        outfile.write("namespace doc_strings {\n")
+        for member in status.members.values():
+            if not 'page_id' in member or not member['page_id']:  # Not documented, skip
+                continue
+            varname = member['id']
+            varname = varname.replace('operator-', 'operatorminus') # special case so we don't get operator·
+            varname = varname.replace('-', '·')  # this is U+00B7, valid in C++ identifiers
+            varname = varname.replace(' ', '_')
+            varname = varname.replace('...', '_')
+            varname = varname.replace(',', '_')
+            varname = varname.replace('%20', '_')
+            varname = varname.replace('%3D', 'eq')
+            varname = varname.replace('%21', 'not')
+            varname = varname.replace('<', 'gt')
+            varname = varname.replace('%3E', 'gt')
+            varname = varname.replace('>', 'lt')
+            varname = varname.replace('%3C', 'lt')
+            varname = varname.replace('%28%29', 'paren')
+            varname = varname.replace('%5B%5D', 'sqbra')
+            varname = varname.replace('%2A', 'times')
+            varname = varname.replace('%2B', 'plus')
+            varname = varname.replace('%2F', 'div')
+            varname = varname.replace('%25', 'mod')
+            varname = varname.replace('%26', 'and')
+            varname = varname.replace('%7C', 'or')
+            varname = varname.replace('%5E', 'xor')
+            varname = varname.replace('~', 'neg')
+            varname = varname.replace('%3A', 'colon')
+            brief = member['brief']
+            brief = brief.replace('\\', '')
+            brief = brief.replace('"', r'\"')
+            brief = match_link.sub(r'\1', brief)
+            brief = r'\n'.join(wrapper.wrap(brief))
+            outfile.write(f'constexpr char const* {varname} = "{brief}";\n')
+        outfile.write("} // namespace doc_strings\n")
+
+
+# Generate HTML
+generate_header_file(infile, outfile, options)
