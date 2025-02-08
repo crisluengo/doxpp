@@ -38,8 +38,8 @@
                   {% endif %}
                   {%+ if variable.static %}static {% elif variable.mutable %}mutable {% endif %}{{ variable.type.type }} <a href="#{{ variable.id }}" class="m-doc-self" id="{{ variable.id }}">{{ variable.name }}</a>
                   {%- if variable.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}
-                  {% if variable.access == 'protected' %} <span class="m-label m-flat m-warning">protected</span>{% elif variable.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}
-                  {% if variable.constexpr %} <span class="m-label m-flat m-primary">constexpr</span>{% endif %}
+                  {% if variable.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif variable.access == 'private' %} <span class="m-label m-danger">private</span>{% endif %}
+                  {% if variable.constexpr %} <span class="m-label m-primary">constexpr</span>{% endif %}
                   {% if variable.since %} {{ variable.since }}{% endif %}
                   </td>
                   <td>

@@ -5,7 +5,7 @@
               {% endif %}
               {% set j = joiner(',\n              ') %}
               <span class="m-doc-wrap-bumper">{% if function.static %}static {% endif %}{% if function.return_type.type == 'void' %}void {% elif function.return_type %}auto {% endif -%}
-                <a href="{% if function.page_id != compound.page_id %}{{ function.page_id }}.html{% endif %}#{{ function.id }}" class="m-doc{% if not function.has_details and function.page_id == compound.page_id %}-self{% endif %}">{{ function.fully_qualified_name if show_full_name else function.name }}</a>(</span><span class="m-doc-wrap">{% for param in function.arguments %}{{ j() }}{{ param.type }} {{ param.name }}{% if param.default %} = {{ param.default }}{% endif %}{% endfor %}){% if function.const %} const{% endif %}{% if function.return_type and function.return_type.type != 'void' %} -&gt; {{ function.return_type.type }}{% endif %}
+                <a href="{% if function.page_id != compound.page_id %}{{ function.page_id }}.html{% endif %}#{{ function.id }}" class="m-doc{% if not function.doc %}-self{% endif %}">{{ function.fully_qualified_name if show_full_name else function.name }}</a>(</span><span class="m-doc-wrap">{% for param in function.arguments %}{{ j() }}{{ param.type }} {{ param.name }}{% if param.default %} = {{ param.default }}{% endif %}{% endfor %}){% if function.const %} const{% endif %}{% if function.return_type and function.return_type.type != 'void' %} -&gt; {{ function.return_type.type }}{% endif %}
                 {% if function.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}
                 {% if function.access == 'protected' %} <span class="m-label m-flat m-warning">protected</span>{% elif function.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}
                 {% if function.defaulted %} <span class="m-label m-flat m-info">defaulted</span>{% endif %}
@@ -16,4 +16,4 @@
                 {% if function.noexcept %} <span class="m-label m-flat m-success">noexcept</span>{% endif %}
                 {% if function.since %} {{ function.since }}{% endif %}</span>
             </dt>
-            <dd>{{ function.brief }}{% if function.has_details %} <a href="{% if function.page_id != compound.page_id %}{{ function.page_id }}.html{% endif %}#{{ function.id }}">more...</a>{% endif %}</dd>
+            <dd>{{ function.brief }}{% if function.doc %} <a href="{% if function.page_id != compound.page_id %}{{ function.page_id }}.html{% endif %}#{{ function.id }}">more...</a>{% endif %}</dd>

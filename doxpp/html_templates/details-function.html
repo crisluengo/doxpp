@@ -25,7 +25,7 @@
               {% if function.explicit %} <span class="m-label m-info">explicit</span>{% endif %}
               {% if function.final %} <span class="m-label m-warning">final</span>{% elif function.override %} <span class="m-label m-warning">override</span>{% elif function.pure_virtual %} <span class="m-label m-warning">pure virtual</span>{% elif function.virtual %} <span class="m-label m-warning">virtual</span>{% endif %}
               {% if function.constexpr %} <span class="m-label m-primary">constexpr</span>{% endif %}
-              {% if function.noexcept %} <span class="m-label m-flat m-success">noexcept</span>{% endif %}
+              {% if function.noexcept %} <span class="m-label m-success">noexcept</span>{% endif %}
               {% if function.since %} {{ function.since }}{% endif %}</span></span>
               {% if function.include and not compound.templated and not function.templated %}
               <div class="m-doc-include m-code m-inverted m-text-right">#include <a href="{{ function.include[1] }}">{{ function.include[0] }}</a></div>

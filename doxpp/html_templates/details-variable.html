@@ -18,7 +18,7 @@
               {% endif %}
               {%+ if variable.static %}static {% elif variable.mutable %}mutable {% endif %}{{ variable.type.type }} <a href="#{{ variable.id }}" class="m-doc-self">{{ variable.fully_qualified_name if show_full_name else variable.name }}</a>
               {% if variable.value %} = {{ variable.value }}{% endif %}
-              {%- if variable.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif variable.access == 'private' %} <span class="m-label m-flat m-danger">private</span>{% endif %}
+              {%- if variable.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif variable.access == 'private' %} <span class="m-label m-danger">private</span>{% endif %}
               {% if variable.constexpr %} <span class="m-label m-primary">constexpr</span>{% endif %}
               {% if variable.since %} {{ variable.since }}{% endif %}
               {# the empty line needs to be here to prevent the lines from merging #}

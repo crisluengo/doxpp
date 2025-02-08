@@ -1,4 +1,4 @@
             <dt>file <a href="{{ file.page_id }}.html" class="m-doc">{{ file.name }}</a>
               {%- if file.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}
               {% if file.since %} {{ file.since }}{% endif %}</dt>
-            <dd>{{ file.brief }}{% if file.has_details %} <a href="{% if file.page_id != compound.page_id %}{{ file.page_id }}.html{% endif %}#{{ file.id }}">more...</a>{% endif %}</dd>
+            <dd>{{ file.brief }} <a href="{{ file.page_id }}.html#{{ file.id }}">more...</a></dd>

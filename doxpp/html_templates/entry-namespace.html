@@ -1,4 +1,4 @@
             <dt>namespace <a href="{{ namespace.page_id }}.html" class="m-doc">{{ namespace.fully_qualified_name if show_full_name else namespace.name }}</a>{% if namespace.inline %} <span class="m-label m-flat m-info">inline</span>{% endif %}
               {%- if namespace.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}
               {% if namespace.since %} {{ namespace.since }}{% endif %}</dt>
-            <dd>{{ namespace.brief }}{% if namespace.has_details %} <a href="{% if namespace.page_id != compound.page_id %}{{ namespace.page_id }}.html{% endif %}#{{ namespace.id }}">more...</a>{% endif %}</dd>
+            <dd>{{ namespace.brief }} <a href="{{ namespace.page_id }}.html#{{ namespace.id }}">more...</a></dd>

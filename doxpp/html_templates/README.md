@@ -262,7 +262,7 @@ For Entries:
 - `macro.page_id`
 - `macro.id`
 - `macro.name` & `macro.fully_qualified_name`
-- `macro.params`
+- `macro.macro_params`
 - `macro.deprecated`
 - `macro.since` # TODO
 - `macro.brief`
