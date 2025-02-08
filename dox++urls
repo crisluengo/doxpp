@@ -54,9 +54,6 @@ def create_urls(input_file, output_file, options):
     # Load data
     status = doxpp.createhtml.Status(doxpp.walktree.load_data_from_json_file(input_file), options)
 
-    # Generate fully qualified names
-    doxpp.createhtml.generate_fully_qualified_names(status.data['members'], status)
-
     # Find out which pages to create, what is listed in each, and in which page
     # the detailed documentation for each member has to go
     doxpp.createhtml.assign_page(status)

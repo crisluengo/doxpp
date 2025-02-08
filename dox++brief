@@ -55,20 +55,14 @@ def generate_header_file(input_file, output_file, options):
     # Load data
     status = doxpp.createhtml.Status(doxpp.walktree.load_data_from_json_file(input_file), options)
 
-    # Generate fully qualified names
-    doxpp.createhtml.generate_fully_qualified_names(status.data['members'], status)
-
-    # Find out which pages to create, what is listed in each, and in which page
-    # the detailed documentation for each member has to go
-    doxpp.createhtml.assign_page(status)
-
+    # Output all brief doc strings
     match_link = re.compile(r"\[(.+?)\]\(.+?\)")
     wrapper = textwrap.TextWrapper(width=78, break_long_words=False)
     with open(output_file, 'w', newline='') as outfile:
         outfile.write("// This is an automatically generated file, do not edit.\n\n")
         outfile.write("namespace doc_strings {\n")
         for member in status.members.values():
-            if not 'page_id' in member or not member['page_id']:  # Not documented, skip
+            if not 'brief' in member or not member['brief']:
                 continue
             varname = member['id']
             varname = varname.replace('operator-', 'operatorminus') # special case so we don't get operator·
