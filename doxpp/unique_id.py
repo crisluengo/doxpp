@@ -35,7 +35,8 @@ qualifier_map = {
 def type_from_string(string):
     # Assuming string is fully qualified type name, no qualifiers
     # (awkward distinction between "qualified" and "qualifiers"...)
-    return re.sub('::', '-', string)
+    # return re.sub('::', '-', string)
+    return urllib.parse.quote(re.sub('::', '-', string), safe='%')
     # TODO: There's something more to do here, for templated types
 
 def type(dict):
