@@ -1,9 +1,9 @@
           <section class="m-doc-details" id="{{ variable.id }}"><div>
             <h3>
-              {% if compound.templated or variable.templated  %}
               {% if variable.include %}
               <div class="m-doc-include m-code m-inverted m-right-m m-text-right">#include <a href="{{ variable.include[1] }}">{{ variable.include[0] }}</a></div>
               {% endif %}
+              {% if compound.templated or variable.templated  %}
               <div class="m-doc-template">
                 {% if compound.templated %}
                 {% set j = joiner(', ') %}
@@ -16,16 +16,12 @@
                 {% endif %}
               </div>
               {% endif %}
-              {%+ if variable.static %}static {% elif variable.mutable %}mutable {% endif %}{{ variable.type.type }} <a href="#{{ variable.id }}" class="m-doc-self">{{ variable.fully_qualified_name if show_full_name else variable.name }}</a>
+              <span class="m-doc-return">{% if variable.static %}static {% elif variable.mutable %}mutable {% endif %}{{ variable.type.type }} </span><span class="m-doc-name"><a href="#{{ variable.id }}" class="m-doc-self">{{ variable.fully_qualified_name if show_full_name else variable.name }}</a></span>
               {% if variable.value %} = {{ variable.value }}{% endif %}
               {%- if variable.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif variable.access == 'private' %} <span class="m-label m-danger">private</span>{% endif %}
               {% if variable.constexpr %} <span class="m-label m-primary">constexpr</span>{% endif %}
+              {% if variable.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}
               {% if variable.since %} {{ variable.since }}{% endif %}
-              {# the empty line needs to be here to prevent the lines from merging #}
-
-              {% if variable.include and not compound.templated and not variable.templated %}
-              <div class="m-doc-include m-code m-inverted m-text-right">#include <a href="{{ variable.include[1] }}">{{ variable.include[0] }}</a></div>
-              {% endif %}
             </h3>
             {% if variable.brief %}
             <p>{{ variable.brief }}</p>

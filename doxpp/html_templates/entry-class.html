@@ -1,4 +1,4 @@
-            <dt{% if not class.has_details and class.page_id == compound.page_id %} id="{{ class.id }}"{% endif %}>
+            <dt>
               {% if class.templated %}
               {% set j = joiner(', ') %}
               <div class="m-doc-template">template&lt;{% for t in class.template_parameters %}{{ j() }}{{ t.type }}{% if t.name %} {{ t.name }}{% endif %}{% if t.default %} = {{ t.default }}{% endif %}{% endfor %}&gt;</div>

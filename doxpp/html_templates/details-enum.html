@@ -1,23 +1,18 @@
           <section class="m-doc-details" id="{{ enum.id }}"><div>
             <h3>
+              {% if enum.include %}
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right">#include <a href="{{ enum.include[1] }}">{{ enum.include[0] }}</a></div>
+              {% endif %}
               {% if compound.templated %}
               <div class="m-doc-template">
                 {% set j = joiner(', ') %}
                 template&lt;{% for t in compound.template_parameters %}{{ j() }}{{ t.type }} {% if t.name %}{{ t.name }}{% else %}_{{ loop.index }}{% endif %}{% endfor %}&gt;
               </div>
               {% endif %}
-              enum {% if enum.scoped %}class {% endif %}<a href="#{{ enum.id }}" class="m-doc-self">{{ enum.fully_qualified_name if show_full_name else enum.name }}</a>{% if enum.type %}: {{ enum.type }}{% endif %}
+              <span class="m-doc-return">enum{% if enum.scoped %} class{% endif %} </span><span class="m-doc-name"><a href="#{{ enum.id }}" class="m-doc-self">{{ enum.fully_qualified_name if show_full_name else enum.name }}</a></span>{% if enum.type %}: {{ enum.type }}{% endif %}
               {%- if enum.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif enum.access == 'private' %} <span class="m-label m-danger">private</span>{% endif %}
+              {% if enum.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}
               {% if enum.since %} {{ enum.since }}{% endif %}
-              {# not sure why there needs to be this space #}
-
-              {% if enum.include %}
-              {# Template info can be only present if the enum is inside a
-                 templated class, but in that case we have global include
-                 information, so no need to handle case where
-                 `enum.include and not compound.templated` #}
-              <div class="m-doc-include m-code m-inverted m-text-right">#include <a href="{{ enum.include[1] }}">{{ enum.include[0] }}</a></div>
-              {% endif %}
             </h3>
             {% if enum.brief %}{# brief can be omitted for anonymous enums #}
             <p>{{ enum.brief }}</p>
@@ -31,7 +26,9 @@
               <tbody>
                 {% for value in enum.members %}
                 <tr>
-                  <td><a href="#{{ value.id }}" class="m-doc-self" id="{{ value.id }}">{{ value.name }}</a> = {{ value.value }}{% if value.since %} {{ value.since }}{% endif %}</td>
+                  <td><a href="#{{ value.id }}" class="m-doc-self" id="{{ value.id }}">{{ value.name }}</a> = {{ value.value }}
+                    {% if value.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}
+                    {% if value.since %} {{ value.since }}{% endif %}</td>
                   <td>
                   {% if value.doc %}
                   <p>{{ value.brief }}</p>

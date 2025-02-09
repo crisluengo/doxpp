@@ -2705,6 +2705,17 @@ span.m-doc-wrap {
   white-space: pre-line;
   max-width: 100%;
 }
+span.m-doc-return {
+  display: block;
+}
+span.m-doc-name {
+  display: inline;
+  font-size: 125%;
+}
+span.m-doc-arg {
+  margin-left: 4rem;
+  display: block;
+}
 dl.m-doc dd {
   margin-bottom: 0.5rem;
 }

@@ -124,7 +124,7 @@
         <section id="derived-classes">
           <h2>Derived classes</h2>
           <dl class="m-doc">
-            {% for class in compound.derived_classes %}
+            {% for class in compound.derived_classes|sort(attribute="fully_qualified_name") %}
               {{ entry_class(class, show_full_name=True) }}
             {% endfor %}
           </dl>
@@ -134,7 +134,7 @@
         <section id="typeless-methods">
             <h2>Constructors, destructors, assignment and conversion operators</h2>
             <dl class="m-doc">
-                {% for function in compound.typeless_functions %}
+                {% for function in compound.typeless_functions|sort(attribute="name") %}
                   {{ entry_function(function) }}
                 {% endfor %}
             </dl>
@@ -144,7 +144,7 @@
         <section id="{{ group.id }}">
             <h2>{{ group.name }}</h2>
             <dl class="m-doc">
-                {% for member in group.members %}
+                {% for member in group.members|sort(attribute="name") %}
                   {% if member.member_type in ['class', 'struct', 'union'] %}
                     {{ entry_class(member) }}
                   {% elif member.member_type == 'enum' %}
@@ -164,7 +164,7 @@
         <section id="nested-classes">
           <h2>Classes</h2>
           <dl class="m-doc">
-            {% for class in compound.classes %}
+            {% for class in compound.classes|sort(attribute="name") %}
               {{ entry_class(class) }}
             {% endfor %}
           </dl>
@@ -174,7 +174,7 @@
         <section id="alias-members">
             <h2>Aliases</h2>
             <dl class="m-doc">
-                {% for alias in compound.aliases %}
+                {% for alias in compound.aliases|sort(attribute="name") %}
                   {{ entry_alias(alias) }}
                 {% endfor %}
             </dl>
@@ -184,7 +184,7 @@
         <section id="enum-members">
           <h2>Enums</h2>
           <dl class="m-doc">
-            {% for enum in compound.enums %}
+            {% for enum in compound.enums|sort(attribute="name") %}
               {{ entry_enum(enum) }}
             {% endfor %}
           </dl>
@@ -194,7 +194,7 @@
         <section id="function-members">
           <h2>Functions</h2>
           <dl class="m-doc">
-            {% for function in compound.functions %}
+            {% for function in compound.functions|sort(attribute="name") %}
               {{ entry_function(function) }}
             {% endfor %}
           </dl>
@@ -204,7 +204,7 @@
         <section id="operator-members">
           <h2>Operators</h2>
           <dl class="m-doc">
-            {% for function in compound.operators %}
+            {% for function in compound.operators|sort(attribute="name") %}
               {{ entry_function(function) }}
             {% endfor %}
           </dl>
@@ -214,7 +214,7 @@
         <section id="variable-members">
            <h2>Variables</h2>
            <dl class="m-doc">
-              {% for variable in compound.variables %}
+              {% for variable in compound.variables|sort(attribute="name") %}
                 {{ entry_variable(variable) }}
               {% endfor %}
            </dl>
@@ -224,7 +224,7 @@
         <section id="related">
           <h2>Related</h2>
           <dl class="m-doc">
-            {% for member in compound.related %}
+            {% for member in compound.related|sort(attribute="fully_qualified_name") %}
               {% if member.member_type == 'alias' %}
                 {{ entry_alias(member, show_full_name=True) }}
               {% elif member.member_type == 'enum' %}

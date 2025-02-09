@@ -71,6 +71,17 @@ span.m-doc-wrap {
   white-space: pre-line;
   max-width: 100%; /* otherwise horizontal scrollbars, wtf */
 }
+span.m-doc-return {
+  display: block;
+}
+span.m-doc-name {
+  display: inline;
+  font-size: 125%;
+}
+span.m-doc-arg {
+  margin-left: 4rem;
+  display: block;
+}
 
 /* Highlight the doc entries the same way as sections */
 dl.m-doc dd {

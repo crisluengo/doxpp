@@ -1,11 +1,14 @@
           <section class="m-doc-details" id="{{ macro.id }}"><div>
             <h3>
-              {% set j = joiner(', ') %}
-              <span class="m-doc-wrap-bumper">#define <a href="#{{ macro.id }}" class="m-doc-self">{{ macro.name }}</a>{% if macro.macro_params %}(</span><span class="m-doc-wrap">{% for param in macro.macro_params %}{{ j() }}{{ param }}{% endfor %}){% endif %}
-                {%- if macro.since %} {{ macro.since }}{% endif %}</span>
               {% if macro.include %}
-              <div class="m-doc-include m-code m-inverted m-text-right">#include <a href="{{ macro.include[1] }}">{{ macro.include[0] }}</a></div>
+              <div class="m-doc-include m-code m-inverted m-right-m m-text-right">#include <a href="{{ macro.include[1] }}">{{ macro.include[0] }}</a></div>
               {% endif %}
+              {% set j = joiner(', ') %}
+                <span class="m-doc-return">#define </span>
+                <span class="m-doc-name"><a href="#{{ macro.id }}" class="m-doc-self">{{ macro.name }}</a></span>
+                {% if macro.macro_params %}({% for param in macro.macro_params %}<span class="m-doc-arg">{{ param }}{% if not loop.last %}, {% endif %}</span>{% endfor %}){% endif %}
+                {%- if macro.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}
+                {% if macro.since %} {{ macro.since }}{% endif %}</span>
             </h3>
             {% if macro.brief %}
             <p>{{ macro.brief }}</p>
@@ -19,7 +22,7 @@
               <tbody>
                 {% for name, doc in macro.params %}
                 <tr>
-                  <td{{ name }}</td>
+                  <td>{{ name }}</td>
                   <td>{{ doc }}</td>
                 </tr>
                 {% endfor %}

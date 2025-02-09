@@ -85,7 +85,7 @@
         <section id="modules">
           <h2>Modules</h2>
           <dl class="m-doc">
-            {% for module in compound.modules %}
+            {% for module in compound.modules|sort(attribute="name") %}
               {{ entry_module(module) }}
             {% endfor %}
           </dl>
@@ -95,7 +95,7 @@
         <section id="namespaces">
           <h2>Namespaces</h2>
           <dl class="m-doc">
-            {% for namespace in compound.namespaces %}
+            {% for namespace in compound.namespaces|sort(attribute="fully_qualified_name") %}
               {{ entry_namespace(namespace) }}
             {% endfor %}
           </dl>
@@ -105,7 +105,7 @@
         <section id="nested-classes">
           <h2>Classes</h2>
           <dl class="m-doc">
-            {% for class in compound.classes %}
+            {% for class in compound.classes|sort(attribute="fully_qualified_name") %}
               {{ entry_class(class) }}
             {% endfor %}
           </dl>
@@ -115,7 +115,7 @@
         <section id="alias-members">
             <h2>Aliases</h2>
             <dl class="m-doc">
-                {% for alias in compound.aliases %}
+                {% for alias in compound.aliases|sort(attribute="fully_qualified_name") %}
                   {{ entry_alias(alias) }}
                 {% endfor %}
             </dl>
@@ -125,7 +125,7 @@
         <section id="enum-members">
           <h2>Enums</h2>
           <dl class="m-doc">
-            {% for enum in compound.enums %}
+            {% for enum in compound.enums|sort(attribute="fully_qualified_name") %}
               {{ entry_enum(enum) }}
             {% endfor %}
           </dl>
@@ -135,7 +135,7 @@
         <section id="function-members">
           <h2>Functions</h2>
           <dl class="m-doc">
-            {% for function in compound.functions %}
+            {% for function in compound.functions|sort(attribute="fully_qualified_name") %}
               {{ entry_function(function) }}
             {% endfor %}
           </dl>
@@ -145,7 +145,7 @@
         <section id="operator-members">
           <h2>Operators</h2>
           <dl class="m-doc">
-            {% for function in compound.operators %}
+            {% for function in compound.operators|sort(attribute="fully_qualified_name") %}
               {{ entry_function(function) }}
             {% endfor %}
           </dl>
@@ -155,7 +155,7 @@
         <section id="variable-members">
           <h2>Variables</h2>
           <dl class="m-doc">
-            {% for variable in compound.variables %}
+            {% for variable in compound.variables|sort(attribute="fully_qualified_name") %}
               {{ entry_variable(variable) }}
             {% endfor %}
           </dl>
@@ -165,7 +165,7 @@
         <section id="macro-members">
           <h2>Macros</h2>
           <dl class="m-doc">
-            {% for macro in compound.macros %}
+            {% for macro in compound.macros|sort(attribute="name") %}
               {{ entry_macro(macro) }}
             {% endfor %}
           </dl>

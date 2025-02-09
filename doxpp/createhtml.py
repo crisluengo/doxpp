@@ -290,8 +290,7 @@ def process_class_member(compound, member, status: Status):
         if member['simple']:
             document_member_on_page(member, compound['id'], status)
             document_member_variables_on_page(member, compound['id'], status)
-            if member['doc'] or member['variables']:
-                compound['has_class_details'] = True
+            compound['has_class_details'] = True
         if 'page_id' in member:
             compound['classes'].append(member)
     elif show_member(member, status):
@@ -323,8 +322,7 @@ def process_class_member(compound, member, status: Status):
         else:
             log.error("Member of type %s cannot be listed on %s page", member_type, compound['member_type'])
             return
-        if member['doc'] or (member_type == 'enum' and member['has_value_details']):
-            compound['has_' + member_type + '_details'] = True
+        compound['has_' + member_type + '_details'] = True
 
 def process_namespace_member(compound, member, status: Status):
     # compound must be a namespace
@@ -420,8 +418,7 @@ def process_namespace_member(compound, member, status: Status):
         else:
             log.error("Member of type %s cannot be listed on %s page", member_type, compound['member_type'])
             return
-        if member['doc'] or (member_type == 'enum' and member['has_value_details']):
-            (compound if page_id == compound['id'] else status.get_compound(page_id))['has_' + member_type + '_details'] = True
+        (compound if page_id == compound['id'] else status.get_compound(page_id))['has_' + member_type + '_details'] = True
 
 def process_class(compound, status: Status):
     # compound must be a class/struct/union
@@ -819,17 +816,6 @@ def fixup_namespace_compound_members(compound, status: Status):
     # - has_details: if a section with member details needs to be shown for this member
     # - include: either () to not show include file information, or ("name", link) to show it
     # - TODO: fixup referenced types in each member to be relative to compound if compound is a namespace
-    def has_details(member):
-        if member['page_id'] != compound['page_id']:
-            return False
-        if member['doc']:
-            return True
-        if is_class_like(member) and member['variables']:  # we only get here if it's 'simple'.
-            return True
-        if member['member_type'] == 'enum' and member['has_value_details']:
-            return True
-        return False
-
     if compound['member_type'] == 'file':
         # None of the members will show an include file
         compound_header = compound['id']
@@ -845,29 +831,17 @@ def fixup_namespace_compound_members(compound, status: Status):
             if is_class_like(member) and not member['simple']:
                 member['has_details'] = False
                 continue
-            member['has_details'] = has_details(member)
+            member['has_details'] = member['page_id'] == compound['page_id']
             if member['header'] == compound_header:
                 member['include'] = ()
             else:
                 member['include'] = ('"' + status.headers[member['header']]['name'] + '"', member['header'] + '.html')
-                member['has_details'] = True
-                if member['page_id'] == compound['id']:
-                    compound['has_' + member['member_type'] + '_details'] = True
 
 def fixup_class_compound_members(compound, status: Status):
     # This function works like `fixup_namespace_compound_members`, but is for when the compound is a class/struct/union.
     # - TODO: fixup referenced types in each member to be relative to compound
     def has_details(member):
-        if is_class_like(member):
-            if not member['simple']:
-                return False
-            if member['variables']:
-                return True
-        if member['doc']:
-            return True
-        if member['member_type'] == 'enum' and member['has_value_details']:
-            return True
-        return False
+        return not(is_class_like(member) and not member['simple'])
 
     compound['include'] = ('"' + status.headers[compound['header']]['name'] + '"', compound['header'] + '.html')
     for members in (compound['typeless_functions'], compound['classes'], compound['enums'], compound['aliases'],
@@ -883,8 +857,6 @@ def fixup_class_compound_members(compound, status: Status):
             member['include'] = ()
         else:
             member['include'] = ('"' + status.headers[member['header']]['name'] + '"', member['header'] + '.html')
-            member['has_details'] = True
-            compound['has_' + member['member_type'] + '_details'] = True
 
 
 class EntryType(enum.Enum):

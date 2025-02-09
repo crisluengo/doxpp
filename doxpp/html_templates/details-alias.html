@@ -1,9 +1,9 @@
           <section class="m-doc-details" id="{{ alias.id }}"><div>
             <h3>
-              {% if compound.templated or alias.templated %}
               {% if alias.include %}
               <div class="m-doc-include m-code m-inverted m-right-m m-text-right">#include <a href="{{ alias.include[1] }}">{{ alias.include[0] }}</a></div>
               {% endif %}
+              {% if compound.templated or alias.templated %}
               <div class="m-doc-template">
                 {% if compound.templated %}
                 {% set j = joiner(', ') %}
@@ -16,18 +16,10 @@
                 {% endif %}
               </div>
               {% endif %}
-              {% if alias.oldfashioned %}
-              typedef {{ alias.type.type }} <a href="#{{ alias.id }}" class="m-doc-self">{{ alias.fully_qualified_name if show_full_name else alias.name }}</a>
-              {% else %}
-              using <a href="#{{ alias.id }}" class="m-doc-self">{{ alias.fully_qualified_name if show_full_name else alias.name }}</a> = {{ alias.type.type }}
-              {% endif %}
+              <span class="m-doc-return">{% if alias.oldfashioned %}typedef {{ alias.type.type }}{% else %}using{% endif %} </span><span class="m-doc-name"><a href="#{{ alias.id }}" class="m-doc-self">{{ alias.fully_qualified_name if show_full_name else alias.name }}</a></span>{% if not alias.oldfashioned %} = {{ alias.type.type }}{% endif %}
               {%- if alias.access == 'protected' %} <span class="m-label m-warning">protected</span>{% elif alias.access == 'private' %} <span class="m-label m-danger">private</span>{% endif %}
+              {% if alias.deprecated %} <span class="m-label m-danger">deprecated</span>{% endif %}
               {% if alias.since %} {{ alias.since }}{% endif %}
-              {# the empty line has to be here to prevent the lines from merging #}
-
-              {% if alias.include and not compound.templated and not alias.templated %}
-              <div class="m-doc-include m-code m-inverted m-text-right">#include <a href="{{ alias.include[1] }}">{{ alias.include[0] }}</a></div>
-              {% endif %}
             </h3>
             {% if alias.brief %}
             <p>{{ alias.brief }}</p>
