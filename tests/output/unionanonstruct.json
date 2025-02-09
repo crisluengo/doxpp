@@ -16,8 +16,8 @@
       "templated": false,
       "members": [
         {
-          "id": "A-",
-          "name": "",
+          "id": "A-%28anonymous%20struct%20at%20%2FUsers%2Fcris%2Fsrc%2Fdox%2B%2B%2Ftests%2Finput%2Funionanonstruct.h%3A8%3A2%29",
+          "name": "(anonymous struct at /Users/cris/src/dox++/tests/input/unionanonstruct.h:8:2)",
           "brief": "",
           "doc": "",
           "sections": [],
@@ -36,14 +36,14 @@
           "derived": [],
           "members": [
             {
-              "id": "A--a",
+              "id": "A-%28anonymous%20struct%20at%20%2FUsers%2Fcris%2Fsrc%2Fdox%2B%2B%2Ftests%2Finput%2Funionanonstruct.h%3A8%3A2%29-a",
               "name": "a",
               "brief": "The a field.",
               "doc": "",
               "sections": [],
               "anchors": [],
               "member_type": "variable",
-              "parent": "A-",
+              "parent": "A-%28anonymous%20struct%20at%20%2FUsers%2Fcris%2Fsrc%2Fdox%2B%2B%2Ftests%2Finput%2Funionanonstruct.h%3A8%3A2%29",
               "relates": "",
               "header": "file--unionanonstruct-h",
               "group": "",
@@ -59,14 +59,14 @@
               "constexpr": false
             },
             {
-              "id": "A--b",
+              "id": "A-%28anonymous%20struct%20at%20%2FUsers%2Fcris%2Fsrc%2Fdox%2B%2B%2Ftests%2Finput%2Funionanonstruct.h%3A8%3A2%29-b",
               "name": "b",
               "brief": "The b field.",
               "doc": "",
               "sections": [],
               "anchors": [],
               "member_type": "variable",
-              "parent": "A-",
+              "parent": "A-%28anonymous%20struct%20at%20%2FUsers%2Fcris%2Fsrc%2Fdox%2B%2B%2Ftests%2Finput%2Funionanonstruct.h%3A8%3A2%29",
               "relates": "",
               "header": "file--unionanonstruct-h",
               "group": "",
@@ -82,14 +82,14 @@
               "constexpr": false
             },
             {
-              "id": "A--x",
+              "id": "A-%28anonymous%20struct%20at%20%2FUsers%2Fcris%2Fsrc%2Fdox%2B%2B%2Ftests%2Finput%2Funionanonstruct.h%3A8%3A2%29-x",
               "name": "x",
               "brief": "The x field.",
               "doc": "",
               "sections": [],
               "anchors": [],
               "member_type": "variable",
-              "parent": "A-",
+              "parent": "A-%28anonymous%20struct%20at%20%2FUsers%2Fcris%2Fsrc%2Fdox%2B%2B%2Ftests%2Finput%2Funionanonstruct.h%3A8%3A2%29",
               "relates": "",
               "header": "file--unionanonstruct-h",
               "group": "",
@@ -105,14 +105,14 @@
               "constexpr": false
             },
             {
-              "id": "A--y",
+              "id": "A-%28anonymous%20struct%20at%20%2FUsers%2Fcris%2Fsrc%2Fdox%2B%2B%2Ftests%2Finput%2Funionanonstruct.h%3A8%3A2%29-y",
               "name": "y",
               "brief": "The y field.",
               "doc": "",
               "sections": [],
               "anchors": [],
               "member_type": "variable",
-              "parent": "A-",
+              "parent": "A-%28anonymous%20struct%20at%20%2FUsers%2Fcris%2Fsrc%2Fdox%2B%2B%2Ftests%2Finput%2Funionanonstruct.h%3A8%3A2%29",
               "relates": "",
               "header": "file--unionanonstruct-h",
               "group": "",

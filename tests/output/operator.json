@@ -4,7 +4,7 @@
       "id": "N",
       "name": "N",
       "brief": "Namespace N",
-      "doc": "Contains [`N::operator==`](#N-operator%3D%3D-N-A-CL-N-A-CL), and [`N::operator\"\"_w`](#N-operator%22%22_w-long double-), as well as struct [`N::A`](#N-A).\n\nWe should be able to reference [`N::operator==`](#N-operator%3D%3D-N-A-CL-N-A-CL) or [`N::operator==`](#N-operator%3D%3D-N-A-CL-N-A-CL)",
+      "doc": "Contains [`N::operator==`](#N-operator%3D%3D-A-CL-A-CL), and [`N::operator\"\"_w`](#N-operator%22%22_w-long%20double-), as well as struct [`N::A`](#N-A).\n\nWe should be able to reference [`N::operator==`](#N-operator%3D%3D-A-CL-A-CL) or [`N::operator==`](#N-operator%3D%3D-A-CL-A-CL)",
       "sections": [],
       "anchors": [],
       "member_type": "namespace",
@@ -19,7 +19,7 @@
           "id": "N-A",
           "name": "A",
           "brief": "Struct N::A",
-          "doc": "Contains [`N::A::operator<`](#N-A-operator%3C-N-A-CL), and [`N::A::operator int*`](#N-A-operator%20int%2A-C).",
+          "doc": "Contains [`N::A::operator<`](#N-A-operator%3C-A-CL), and [`N::A::operator int*`](#N-A-operator%20int%2A-C).",
           "sections": [],
           "anchors": [],
           "member_type": "struct",
@@ -35,7 +35,7 @@
           "derived": [],
           "members": [
             {
-              "id": "N-A-operator%3C-N-A-CL",
+              "id": "N-A-operator%3C-A-CL",
               "name": "operator<",
               "brief": "",
               "doc": "",
@@ -111,7 +111,7 @@
           "related": []
         },
         {
-          "id": "N-operator%3D%3D-N-A-CL-N-A-CL",
+          "id": "N-operator%3D%3D-A-CL-A-CL",
           "name": "operator==",
           "brief": "operator==",
           "doc": "",
@@ -150,7 +150,7 @@
           ]
         },
         {
-          "id": "N-operator%22%22_w-long double-",
+          "id": "N-operator%22%22_w-long%20double-",
           "name": "operator\"\"_w",
           "brief": "operator \"\" _w() allows us to write `34.5_w` to create an object of type [`N::A`](#N-A).",
           "doc": "",

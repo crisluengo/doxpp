@@ -1,7 +1,7 @@
 {
   "members": [
     {
-      "id": "sort_ints-int(*)(int, int)-",
+      "id": "sort_ints-int%28%2A%29%28int%2C%20int%29-",
       "name": "sort_ints",
       "brief": "",
       "doc": "",

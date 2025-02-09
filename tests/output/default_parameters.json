@@ -148,10 +148,11 @@
             "id": ""
           },
           "static": false,
-          "constexpr": true
+          "constexpr": true,
+          "value": "0.1"
         },
         {
-          "id": "N-func-N-A-CL-double-",
+          "id": "N-func-A-CL-double-",
           "name": "func",
           "brief": "",
           "doc": "",
