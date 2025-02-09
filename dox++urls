@@ -69,9 +69,9 @@ def create_urls(input_file, output_file, options):
                 continue
             prefix = doxpp.walktree.get_prefix(member['id'], status.members)
             name = '.'.join(prefix + [member['name']])
-            url = urllib.parse.quote(member['page_id']) + '.html'
+            url = member['page_id'] + '.html'
             if member['page_id'] != member['id']:
-                url += '#' + urllib.parse.quote(member['id'])
+                url += '#' + member['id']
             outfile.write(f"    ('{name}', '{url}'),\n")
         outfile.write("]\n")
 
