@@ -26,7 +26,7 @@
         <p>{{ compound.brief }}</p>
         {% endif %}
         {% if compound.sections or compound.modules or compound.namespaces or compound.classes or compound.enums or compound.aliases or compound.functions or compound.variables or compound.macros %}
-        <div class="m-block m-default">
+        <div class="m-index m-block m-default">
           <h3>Contents</h3>
           <ul>
             {% for id, name, children in compound.sections recursive %}
