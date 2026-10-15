@@ -136,8 +136,8 @@ def postprocess(files, process_imports, out_file):
 
     with open(out_file, mode='w', encoding='utf8') as out:
         # Put a helper comment and a license blob on top
-        out.write("""/* Generated using `./postprocess.py {}`. Do not edit. */
-
+        out.write(f"/* Generated using `./postprocess.py {' '.join(sys.argv[1:])}`. Do not edit. */")
+        out.write("""
 /*
     This file is part of m.css.
 
@@ -161,7 +161,7 @@ def postprocess(files, process_imports, out_file):
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
     DEALINGS IN THE SOFTWARE.
 */
-""".format(' '.join(sys.argv[1:])))
+""")
 
         # Parse the top-level file
         with open(files[0], encoding='utf8') as f: parse(f)

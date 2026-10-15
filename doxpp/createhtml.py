@@ -921,7 +921,7 @@ snake_case_point ='_[^_]'
 camel_case_point = '[^A-Z][A-Z].'
 snake_case_point_re = re.compile(snake_case_point)
 camel_case_point_re = re.compile(camel_case_point)
-camel_or_snake_case_point_re = re.compile('({})|({})'.format(snake_case_point, camel_case_point))
+camel_or_snake_case_point_re = re.compile(f'({snake_case_point})|({camel_case_point})')
 word_point_re = re.compile('\\W\\w')
 
 def add_entry_to_search_data(result, joiner: str, trie: Trie, map: ResultMap,

@@ -342,10 +342,10 @@ def find_anchor_cmds(doc, status: Status):
         title = match[3]
         if name in status.anchors:
             log.error("Anchor %s already exists, ignored.", name)
-            return '{} {}'.format('#' * level, title)
+            return f'{"#" * level} {title}'
         status.anchors[name] = title
         sections.append([name, title, level])
-        return '{} {} {{#{}}}'.format('#' * level, title, name)
+        return f'{"#" * level} {title} {{#{name}}}'
 
     def anchor_cmd_replace(match):
         name = match[1]
@@ -354,7 +354,7 @@ def find_anchor_cmds(doc, status: Status):
             return ''
         status.anchors[name] = ''
         anchors.append(name)
-        return '\n{{: #{} }}\n\n'.format(name)
+        return f'\n{{: #{name} }}\n\n'
 
     doc = newline_cmd_match.sub('  \n', doc)
     doc = section_cmd_match.sub(section_cmd_replace, doc)
@@ -644,7 +644,7 @@ def post_process_links(elements, status: Status):
             if id and not text:
                 text = walktree.get_fully_qualified_name(id, status.members)
                 if code_formatting:
-                    text = '`{}`'.format(text)
+                    text = f'`{text}`'
             return id, text
 
         def find_and_format_name(name, text):
@@ -656,7 +656,7 @@ def post_process_links(elements, status: Status):
                     if not text:
                         text = status.members[id]['name']
                     if code_formatting:
-                        text = '`{}`'.format(text)
+                        text = f'`{text}`'
                 elif name in status.groups:
                     id = name
                     if not text:
@@ -675,8 +675,8 @@ def post_process_links(elements, status: Status):
                         text = status.anchors[id]
                 else:
                     log.error("Reference to '%s' could not be matched.\n   in documentation for %s", name, elem['id'])
-                    return text
-            return '[{}](#{})'.format(text, id)
+                    return text if text else name
+            return f'[{text}](#{id})'
 
         def find_and_format_quotes_name(name, text):
             # For matches of header name, member name, or any ID, when given in quotes
@@ -684,7 +684,7 @@ def post_process_links(elements, status: Status):
             if id:
                 if not text:
                     text = status.headers[id]['name']
-                return '[{}](#{})'.format(text, id)
+                return f'[{text}](#{id})'
             return find_and_format_name(name, text)
 
         def ref_cmd_replace(match):
@@ -781,7 +781,7 @@ def post_process_subpages(pages):
                 parent = pages[parent]['parent']
             page['subpages'].append(id)
             pages[id]['parent'] = page['id']
-            return '[{}](#{})'.format(text, id)
+            return f'[{text}](#{id})'
 
         page['doc'] = subpage_cmd_match.sub(subpage_cmd_replace, page['doc'])
         pass
@@ -1894,9 +1894,9 @@ def extract_includes(tu, status: Status, header_files, include_dirs):
             include_name, is_under_project = is_under_directory(include, include_dirs[0])
             if is_under_project:
                 if include in header_files:
-                    this_file_includes.append('"[{}](#{})"'.format(include_name, unique_id.header(include_name)))
+                    this_file_includes.append(f'"[{include_name}](#{unique_id.header(include_name)})"')
                 else:
-                    this_file_includes.append('"{}"'.format(include_name))
+                    this_file_includes.append(f'"{include_name}"')
             else:
                 full_include = include
                 for dir in include_dirs[1:]:
@@ -1906,7 +1906,7 @@ def extract_includes(tu, status: Status, header_files, include_dirs):
                 if os.path.isabs(include):
                     log.warning("Included file %s not in any of the directories on the path\n   in file %s",
                                 include, status.current_header_name)
-                this_file_includes.append('<{}>'.format(include))
+                this_file_includes.append(f'<{include}>')
 
 
 # --- Main function for this file ---
@@ -1951,7 +1951,7 @@ def buildtree(root_dir, header_files, markdown_files, compiler_flags, include_di
     if sysroot:
         compiler_flags += ['-isysroot' + sysroot]
     include_dirs = [root_dir] + system_include_dirs + include_dirs
-    compiler_flags += ['-I{0}'.format(x) for x in include_dirs]
+    compiler_flags += [f'-I{x}' for x in include_dirs]
     compiler_flags.insert(0, '-xc++')
     log.debug("Compiler flags: %s", ' '.join(compiler_flags))
 

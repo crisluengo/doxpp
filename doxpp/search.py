@@ -516,12 +516,12 @@ def pretty_print_trie(serialized: bytes, *, show_merged=False, show_lookahead_ba
 
     out = _pretty_print_trie(serialized, hashtable, stats, Trie.root_offset_struct.unpack_from(serialized, 0)[0], '', show_merged=show_merged, show_lookahead_barriers=show_lookahead_barriers, color_map=color_map)
     if out: out = color_map['white'] + out
-    stats = """
-node count:             {}
-max node results:       {}
-max node children:      {}
-max node result index:  {}
-max node child offset:  {}""".lstrip().format(stats.node_count, stats.max_node_results, stats.max_node_children, stats.max_node_result_index, stats.max_node_child_offset)
+    stats = f"""
+node count:             {stats.node_count}
+max node results:       {stats.max_node_results}
+max node children:      {stats.max_node_children}
+max node result index:  {stats.max_node_result_index}
+max node child offset:  {stats.max_node_child_offset}""".lstrip()
     return out, stats
 
 def pretty_print_map(serialized: bytes, *, entryTypeClass, colors=False):
@@ -579,4 +579,4 @@ def pretty_print(serialized: bytes, *, entryTypeClass, show_merged=False, show_l
     pretty_trie, stats = pretty_print_trie(serialized[search_data_header_struct.size:map_offset], show_merged=show_merged, show_lookahead_barriers=show_lookahead_barriers, colors=colors)
     pretty_map = pretty_print_map(serialized[map_offset:type_map_offset], entryTypeClass=entryTypeClass, colors=colors)
     pretty_type_map = pretty_print_type_map(serialized[type_map_offset:], entryTypeClass=entryTypeClass)
-    return '{} symbols\n'.format(symbol_count) + pretty_trie + '\n' + pretty_map + '\n' + pretty_type_map, stats
+    return f'{symbol_count} symbols\n' + pretty_trie + '\n' + pretty_map + '\n' + pretty_type_map, stats
