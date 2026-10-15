@@ -660,6 +660,14 @@ def remove_p_tag(title):
         log.warning("Title contains a HTML paragraph tag: %s", title)
     return title
 
+def markdown_to_html(text, md):
+    try:
+        out = md.reset().convert(text)
+    except:
+        print("Error converting Markdown: ", text)
+        out = text
+    return out
+
 def process_sections_recursive(sections, level, md):
     if sections[0][2] < level:
         return []
@@ -667,7 +675,7 @@ def process_sections_recursive(sections, level, md):
     subsections = []
     while sections and sections[0][2] > section[2]:
         subsections.append(process_sections_recursive(sections, level + 1, md))
-    return (section[0], remove_p_tag(md.reset().convert(section[1])), subsections)
+    return (section[0], remove_p_tag(markdown_to_html(section[1], md)), subsections)
 
 def process_sections(compound, md):
     # compound['sections'] is a flat list of tuples [(name, title, level), ...]
@@ -719,30 +727,30 @@ def parse_markdown(status: Status, math_cache_file):
 
     for header in status.headers.values():
         if header['brief']:
-            header['brief'] = remove_p_tag(md.reset().convert(header['brief']))
+            header['brief'] = remove_p_tag(markdown_to_html(header['brief'], md))
         if header['doc']:
-            header['doc'] = md.reset().convert(header['doc'])
+            header['doc'] = markdown_to_html(header['doc'], md)
         process_sections(header, md)
     for group in status.groups.values():
         if group['brief']:
-            group['brief'] = remove_p_tag(md.reset().convert(group['brief']))
+            group['brief'] = remove_p_tag(markdown_to_html(group['brief'], md))
         if group['doc']:
-            group['doc'] = md.reset().convert(group['doc'])
-        group['name'] = remove_p_tag(md.reset().convert(group['name']))
+            group['doc'] = markdown_to_html(group['doc'], md)
+        group['name'] = remove_p_tag(markdown_to_html(group['name'], md))
         process_sections(group, md)
     for member in status.members.values():
         if member['id'] not in status.id_map:
             continue
         if member['brief']:
-            member['brief'] = remove_p_tag(md.reset().convert(member['brief']))
+            member['brief'] = remove_p_tag(markdown_to_html(member['brief'], md))
         if member['doc']:
-            member['doc'] = md.reset().convert(member['doc'])
+            member['doc'] = markdown_to_html(member['doc'], md)
         process_sections(member, md)
     for page in status.pages.values():
         if page['doc']:
-            page['doc'] = md.reset().convert(page['doc'])
+            page['doc'] = markdown_to_html(page['doc'], md)
         if page['title']:
-            page['title'] = remove_p_tag(md.reset().convert(page['title']))
+            page['title'] = remove_p_tag(markdown_to_html(page['title'], md))
         process_sections(page, md)
 
     math_svg_extension.latex2svg.save_cache(math_cache_file)
